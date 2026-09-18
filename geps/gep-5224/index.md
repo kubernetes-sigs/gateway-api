@@ -5,7 +5,7 @@ title: "GEP-5224: Pre-Routing Filters"
 * Issue: [#5224](https://github.com/kubernetes-sigs/gateway-api/issues/5224)
   * Split out of [GEP-5091: PayloadProcessor Resource](https://github.com/kubernetes-sigs/gateway-api/pull/5092)
   * Resolves the pre-routing portion of [#5194: Filter ordering](https://github.com/kubernetes-sigs/gateway-api/issues/5194)
-* Status: Provisional
+* Status: Experimental
 
 ## TLDR
 
@@ -18,14 +18,25 @@ Every filter Gateway API defines today, from `RequestHeaderModifier` to
 is no portable mechanism for a filter to act on a request before route
 selection.
 
-This provisional revision is scoped to the *what*, *who*, and *why*. It
-establishes that pre-routing processing is a distinct and necessary phase, and
+This provisional revision was scoped to the *what*, *who*, and *why*. It
+established that pre-routing processing is a distinct and necessary phase, and
 that the distinction between pre-routing and post-routing is a first-class
-architectural property rather than an implementation detail. The concrete API
-shape (a Gateway/listener-level attachment vs. a new construct vs. something
-else), the set of filters allowed in the pre-routing phase, and the ordering
-and re-matching semantics are deliberately left open here and enumerated as
-*options under consideration*. They will be resolved at the Experimental stage.
+architectural property rather than an implementation detail.
+
+This Experimental revision defines the concrete API shape (see
+[API](#api)). Pre-routing filters are attached to a Gateway `Listener` via a
+new field, `httpPreRoutingFilters []HTTPPreRoutingFilter`, whose element type
+reuses six of the eight `HTTPRouteFilter` payload variants (the two
+response-side variants, `ResponseHeaderModifier` and `CORS`, are excluded
+because they have no meaningful semantics before a route or backend has been
+selected). Ordering within the list is a strict guarantee (MUST), route
+matching runs single-pass after all pre-routing filters complete, and
+Listener selection cannot be affected by pre-routing filter mutations —
+enforced structurally by TLS for HTTPS listeners and contractually by this
+GEP for cleartext HTTP listeners. The v1 experimental surface covers
+HTTP-family listener protocols and `HTTPRoute`; extension to `GRPCRoute` and
+to L4 route kinds is captured as a deliberate design consideration, not
+deferred by accident.
 
 This GEP is one of three that the payload-processing proposal
 ([GEP-5091](https://github.com/kubernetes-sigs/gateway-api/pull/5091) was split into during Gateway API community discussion:
@@ -58,7 +69,7 @@ rule has matched the request:
 
 > "Filters define the filters that are applied to requests that match this
 > rule."
-> — `HTTPRouteRule.Filters`, [apis/v1/httproute_types.go](../../apis/v1/httproute_types.go)
+> — [`HTTPRouteRule.Filters` reference](../../reference/api-types/httproute.md#filters-optional)
 
 This is true of all eight filter types: `RequestHeaderModifier`,
 `ResponseHeaderModifier`, `RequestRedirect`, `URLRewrite`, `RequestMirror`,
@@ -116,7 +127,7 @@ Filter ordering in Gateway API is currently a `SHOULD`, not a `MUST`:
 > "Wherever possible, implementations SHOULD implement filters in the order
 > they are specified. Implementations MAY choose to implement this ordering
 > strictly [...]"
-> — `HTTPRouteRule.Filters`, [apis/v1/httproute_types.go](../../apis/v1/httproute_types.go)
+> — [`HTTPRouteRule.Filters` reference](../../reference/api-types/httproute.md#filters-optional)
 
 [Issue #5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194) revisits whether that ordering should become a
 guarantee. As noted there, when filters were "largely commutative header and
@@ -147,37 +158,49 @@ existing post-routing filters.
 * Cover the classes of use cases that require a pre-route decision, including
   but not limited to body-based routing, identity-derived routing, and
   matching-input normalization.
-* Establish that ordering among pre-routing filters is significant and should
-  be a guarantee from the introduction of the phase, providing a concrete
-  answer to the pre-routing portion of [#5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194).
-* Enumerate the API-shape and semantic decisions that must be resolved at the
-  Experimental stage, without committing to any of them here.
+* Define a concrete Experimental API — attachment point, element type,
+  ordering guarantee, and route-matching interaction — for HTTP-family
+  listeners and `HTTPRoute`. Specifically, add
+  `Listener.httpPreRoutingFilters []HTTPPreRoutingFilter` with strict list
+  ordering. See [API](#api).
+* Establish that ordering among pre-routing filters is significant and is a
+  guarantee (MUST, not SHOULD) from the introduction of the phase, providing
+  a concrete answer to the pre-routing portion of
+  [#5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194).
 
 ## Non-Goals
 
-* **Selecting a concrete API shape.** Whether pre-routing filters attach at the
-  `Gateway` level, the listener level, via a new construct on `HTTPRoute`, via
-  policy attachment, or some combination, is deferred. See
-  [Options Under Consideration](#options-under-consideration).
-* **Defining which specific filters are pre-routing-capable.** Whether existing
-  filter types can run in the pre-routing phase, and which new ones are
-  introduced, is out of scope for a provisional GEP.
-* **Body-level processing semantics.** How the body is addressed, buffered, or
-  mutated is the subject of the body-based routing / [GEP-5091](https://github.com/kubernetes-sigs/gateway-api/pull/5091) work.
-  This GEP is about the *phase*, not the *body*.
+* **Defining an L4 pre-routing surface.** SNI/TLS-based selection
+  ([GEP-2643](../gep-2643/index.md)) and TCP/UDP-layer pre-routing filters
+  are lower-layer forms of pre-routing and are not in scope here. The API
+  is deliberately structured so a parallel L4 field (see
+  [Extensibility to Other Route Kinds](#extensibility-to-other-route-kinds))
+  can be added by a follow-up GEP without renaming or moving
+  `httpPreRoutingFilters`.
+* **Defining pre-routing for `GRPCRoute`.** GRPCRoute is HTTP/2 in practice,
+  and the same `httpPreRoutingFilters` field is expected to serve it, but
+  formally extending the phase (and conformance) to GRPCRoute is a follow-up.
+* **Introducing new filter payload types.** The v1 experimental surface
+  reuses six of the eight existing `HTTPRouteFilter` payloads inside a new
+  outer `HTTPPreRoutingFilter` wrapper; the two response-side variants
+  (`ResponseHeaderModifier`, `CORS`) are excluded. Adding pre-routing-only
+  filter variants (for example, a body-projection filter once GEP-5091 lands)
+  is deferred.
+* **Body-level processing semantics.** How the body is addressed, buffered,
+  or mutated is the subject of the body-based routing / [GEP-5091](https://github.com/kubernetes-sigs/gateway-api/pull/5091) work.
+  This GEP defines the *phase*; the body-processing content of that phase is
+  defined elsewhere.
 * **External processing wire protocols.** Invoking an external service is the
-  subject of the external-callouts split. Pre-routing filters may eventually
-  host such callouts, but the protocol is out of scope here.
+  subject of the external-callouts split. Pre-routing filters may host such
+  callouts (via `ExternalAuth` or `ExtensionRef`), but the protocol is out of
+  scope here.
 * **Re-litigating post-routing filter ordering.** [#5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194) asks a
-  broader question about the existing GA filter list. This GEP only commits to
-  strict ordering *within the new pre-routing phase*; the post-routing question
-  is left to that issue.
+  broader question about the existing GA filter list. This GEP commits to
+  strict ordering *only within the new `HTTPPreRoutingFilters` list*; the
+  post-routing question is left to that issue.
 * **Replacing existing filters or route matching.** Pre-routing filters
   complement `HTTPRoute` matching and existing filters; they do not replace
   header/path/method matching or post-routing transformation.
-* **TCP/UDP/TLS-layer processing.** SNI/TLS-based selection
-  ([GEP-2643](https://github.com/kubernetes-sigs/gateway-api/pull/2643)) is a different,
-  lower-layer form of pre-routing and is not in scope here.
 
 ## User Stories
 
@@ -389,47 +412,626 @@ Gateway API's filter model currently exposes only the post-routing hook. A
 pre-routing filter API would map onto capabilities these data planes already
 have, rather than asking them to build something new.
 
-## Options Under Consideration
+## API
 
-These design dimensions are enumerated so that agreement on motivation and the
-phase model is not blocked on any one of them. All are deferred to the
-Experimental stage.
+This section defines the concrete API shape proposed at the Experimental
+stage. It resolves the attachment point, the filter type, ordering, and
+interaction with route matching. Alternatives that were considered but not
+adopted are recorded in [Alternatives Considered](#alternatives-considered).
 
-* **Attachment point and API shape.** Because pre-routing filters cannot be
-  scoped to a matched route, they need an attachment point that exists before
-  routing, for example a `Gateway`, a listener / `ListenerSet`
-  ([GEP-1713](https://gateway-api.sigs.k8s.io/geps/gep-1713/)), or a new
-  construct. Whether this is expressed via policy attachment
-  ([GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/)), a dedicated
-  field, or a new resource is open.
-* **Which filters are allowed pre-routing.** Whether the pre-routing phase
-  reuses existing filter types, defines a new set, or both, is unresolved.
-* **Re-matching semantics.** Whether routing is evaluated exactly once after
-  all pre-routing filters run (the provisional position, mirroring
-  [GEP-5091][gep-5091]), or whether any re-entry is allowed, must be defined.
-  Avoiding feedback loops argues for single-pass matching.
-* **Ordering guarantee mechanics.** This GEP takes the position that
-  pre-routing ordering is significant and should be guaranteed from the start;
-  exactly how that is specified and conformance-tested is a design detail for
-  the Experimental stage.
-* **Interaction with post-routing filters and `ExternalAuth`.** The ordering
-  and layering between the pre-routing phase and the existing post-routing
-  filter list, especially authorization, must be specified rather than left
-  implementation-defined.
+### At a Glance
+
+* HTTP Pre-routing filters attach to a Gateway `Listener` via a new
+  `HttpPreRoutingFilters` field.
+* The list is a new type, `HTTPPreRoutingFilter`, whose element variants
+  reuse six of the eight `HTTPRouteFilter` payloads (the two response-side
+  variants, `ResponseHeaderModifier` and `CORS`, are excluded — see
+  [Excluded Filter Variants](#excluded-filter-variants)).
+* Filters MUST execute in the exact order they appear in the list. Ordering is
+  a *guarantee*, not a `SHOULD`, from the moment the field is introduced.
+* HTTPRoute matching runs exactly once after all pre-routing filters have run.
+* Pre-routing filters cannot re-select the Listener. For HTTPS listeners this
+  is enforced structurally by the TLS handshake (SNI binds the listener to a
+  specific certificate before HTTP bytes are exchanged); for cleartext HTTP
+  listeners it is enforced contractually — Listener selection uses the
+  request's initial `Host` header and filter mutations do not feed back into
+  that selection. See [Listener Match Invariance](#listener-match-invariance).
+* The v1 experimental surface only applies to HTTP-family listener protocols
+  (`HTTP`, `HTTPS`) and to `HTTPRoute`. The type is designed so that support
+  for `GRPCRoute` and for L4 route kinds can be added later without renaming
+  or restructuring the field.
+
+### Attachment: `Listener.httpPreRoutingFilters`
+
+Pre-routing filters attach to an individual `Listener` in the Gateway spec.
+The Listener is the smallest existing Gateway API surface that already
+carries a specific protocol and hostname context, both of which are
+determined without reference to filter state — HTTPS by the TLS handshake
+before HTTP bytes are exchanged, cleartext HTTP by matching the request's
+initial `Host` header against `Listener.hostname` (see
+[Listener Match Invariance](#listener-match-invariance)). This makes the
+Listener a natural attachment point.
+
+```go
+type Listener struct {
+    // ...existing fields (Name, Hostname, Port, Protocol, TLS, AllowedRoutes)...
+
+    // HTTPPreRoutingFilters is an ordered list of HTTP-layer filters that run
+    // on every request accepted on this Listener, before HTTPRoute matching
+    // is performed. The list order is load-bearing: implementations MUST
+    // execute the filters in the exact order they appear here and MUST NOT
+    // reorder them. Each filter's Name MUST be unique within the list.
+    //
+    // HTTPPreRoutingFilters may mutate inputs that HTTPRoute matching
+    // consumes (path, request headers including :authority/Host, method,
+    // computed metadata). Implementations MUST evaluate HTTPRoute matching
+    // exactly once after the last HTTPPreRoutingFilter has run.
+    //
+    // HTTPPreRoutingFilters MUST NOT be interpreted as changing which
+    // Listener handles the request. Listener selection is decided from
+    // inputs the client committed to before any pre-routing filter runs:
+    // TLS SNI (for HTTPS) or the request's initial Host header (for HTTP).
+    // Filter mutations of Host, :authority, or any other header MUST NOT
+    // be re-fed into Listener selection.
+    //
+    // HTTPPreRoutingFilters MUST be empty when Protocol is not `HTTP` or
+    // `HTTPS`. Implementations MUST reject a Listener with
+    // Accepted=False / Reason=UnsupportedValue if this constraint is
+    // violated.
+    //
+    // Support: Extended
+    //
+    // +optional
+    // +listType=atomic
+    // +kubebuilder:validation:MaxItems=16
+    HTTPPreRoutingFilters []HTTPPreRoutingFilter `json:"httpPreRoutingFilters,omitempty"`
+}
+```
+
+The v1 experimental surface only accepts `httpPreRoutingFilters` on listeners
+whose `Protocol` is `HTTP` or `HTTPS`, because every element type has HTTP
+semantics (header mutation, URL rewrite, HTTP-shaped external auth).
+The HTTP prefix on the field name signals both the payload shape and this
+protocol restriction. Follow-up GEPs may introduce parallel fields for other
+protocols (`tlsPreRoutingFilters`, `tcpPreRoutingFilters`, `udpPreRoutingFilters`)
+with protocol-appropriate element types; the naming convention keeps each
+phase attached to a phase-appropriate payload rather than forcing a single
+polymorphic list to shape-shift.
+
+### The `HTTPPreRoutingFilter` Type
+
+`HTTPPreRoutingFilter` is a **new type**, distinct from `HTTPRouteFilter`. Its
+element variants intentionally mirror a **subset** of the eight
+`HTTPRouteFilter` variants — the six that have well-defined semantics on the
+request side, before route selection has happened. The two response-side
+variants (`ResponseHeaderModifier`, `CORS`) are deliberately omitted; see
+[Excluded Filter Variants](#excluded-filter-variants) for the rationale. The
+outer type is separate so that the strict-ordering guarantee lives on the
+pre-routing container and does not perturb the `SHOULD`-ordering semantics of
+[`HTTPRouteRule.Filters`](../../reference/api-types/httproute.md#filters-optional).
+
+```go
+// HTTPPreRoutingFilter is one element of a Listener.HTTPPreRoutingFilters list.
+// Unlike HTTPRouteFilter, which runs after a route is selected and whose
+// ordering is a SHOULD, HTTPPreRoutingFilter runs before route selection and
+// its ordering within the containing list is a MUST.
+type HTTPPreRoutingFilter struct {
+    // Name is a required, list-unique identifier for this filter. It is used
+    // as a stable key in Gateway status conditions and in implementation
+    // diagnostics (for example, to report which filter rejected a request).
+    //
+    // +required
+    // +kubebuilder:validation:MinLength=1
+    // +kubebuilder:validation:MaxLength=253
+    Name SectionName `json:"name"`
+
+    // Type identifies which variant of the discriminated union below is
+    // populated. Uses the same union-discriminator pattern as HTTPRouteFilter.
+    //
+    // +unionDiscriminator
+    // +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExternalAuth;ExtensionRef
+    // +required
+    Type HTTPPreRoutingFilterType `json:"type"`
+
+    // The following fields reuse the corresponding HTTPRouteFilter payload
+    // types verbatim. Exactly one MUST be set, and it MUST correspond to
+    // Type. CEL validation enforces this, matching the existing
+    // HTTPRouteFilter pattern.
+    //
+    // Note that ResponseHeaderModifier and CORS from HTTPRouteFilter are
+    // intentionally not present here — see the GEP text for details.
+
+    RequestHeaderModifier *HTTPHeaderFilter          `json:"requestHeaderModifier,omitempty"`
+    RequestMirror         *HTTPRequestMirrorFilter   `json:"requestMirror,omitempty"`
+    RequestRedirect       *HTTPRequestRedirectFilter `json:"requestRedirect,omitempty"`
+    URLRewrite            *HTTPURLRewriteFilter      `json:"urlRewrite,omitempty"`
+    ExternalAuth          *HTTPExternalAuthFilter    `json:"externalAuth,omitempty"`
+    ExtensionRef          *LocalObjectReference      `json:"extensionRef,omitempty"`
+}
+
+// HTTPPreRoutingFilterType is a distinct enum from HTTPRouteFilterType so
+// that the two lists can diverge: pre-routing already omits the two
+// response-side variants (ResponseHeaderModifier, CORS), and future
+// revisions may add pre-routing-only variants (for example, a first-class
+// body-projection filter once GEP-5091 lands) without disturbing
+// HTTPRouteFilter.
+type HTTPPreRoutingFilterType string
+
+const (
+    HTTPPreRoutingFilterRequestHeaderModifier HTTPPreRoutingFilterType = "RequestHeaderModifier"
+    HTTPPreRoutingFilterRequestMirror         HTTPPreRoutingFilterType = "RequestMirror"
+    HTTPPreRoutingFilterRequestRedirect       HTTPPreRoutingFilterType = "RequestRedirect"
+    HTTPPreRoutingFilterURLRewrite            HTTPPreRoutingFilterType = "URLRewrite"
+    HTTPPreRoutingFilterExternalAuth          HTTPPreRoutingFilterType = "ExternalAuth"
+    HTTPPreRoutingFilterExtensionRef          HTTPPreRoutingFilterType = "ExtensionRef"
+)
+```
+
+The paired-CEL validation rule (already established by `HTTPRouteFilter`)
+carries over: the field named by `Type` MUST be set, and every other variant
+field MUST be nil.
+
+Example YAML:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: example
+spec:
+  gatewayClassName: example-class
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 443
+    hostname: api.example.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: api-tls
+    httpPreRoutingFilters:
+    - name: verify-jwt
+      type: ExternalAuth
+      externalAuth:
+        backendRef:
+          name: jwt-verifier
+          port: 8443
+        protocol: HTTP
+    - name: project-tenant-header
+      type: ExtensionRef
+      extensionRef:
+        group: example.com
+        kind: JWTClaimToHeader
+        name: tenant-claim
+    - name: canonicalize-path
+      type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+```
+
+The three filters above execute *in that exact order* on every request that
+terminates on the `https` listener, and only then does HTTPRoute matching run
+against the mutated request.
+
+### Filter Ordering (strict)
+
+The `httpPreRoutingFilters` list is authoritative:
+
+1. **Execution order MUST equal list order.** Implementations MUST NOT
+   reorder, deduplicate, or coalesce entries.
+2. **No skipping.** Implementations MUST NOT skip an entry because a later
+   entry is inapplicable, unsupported, or short-circuits. If a filter is
+   unsupported by the implementation, the listener MUST be rejected via
+   status (`Accepted=False`, `Reason=UnsupportedValue`) rather than the
+   filter silently omitted.
+3. **Atomic list semantics.** The list is declared `+listType=atomic`, so
+   server-side apply replaces the entire list rather than merging elements.
+   This eliminates a whole class of ordering ambiguity that would otherwise
+   arise from two appliers touching the same list.
+4. **Unique `Name` per element.** `Name` MUST be unique within a single
+   listener's `httpPreRoutingFilters` list. Names are consumed by status
+   reporting so that a listener condition can name the failing filter (for
+   example, `Reason=UnsupportedValue`, `Message="filter 'verify-jwt' type
+   ExternalAuth is not supported by this implementation"`).
+5. **Short-circuit behavior.** A filter that produces a response (for
+   example, `RequestRedirect` or `ExternalAuth` returning deny) MUST prevent
+   subsequent pre-routing filters from running for that request and MUST
+   prevent HTTPRoute matching from running. The response returned to the
+   client is the one produced by the short-circuiting filter.
+
+The intent of this MUST is stated explicitly in godoc on the field, and is
+verified by conformance tests (see [Conformance](#conformance)). This is a
+deliberate contrast to
+[`HTTPRouteRule.Filters`](../../reference/api-types/httproute.md#filters-optional),
+which today only guarantees ordering as a `SHOULD`. Establishing the strict
+guarantee on the *new* container avoids the compatibility problem that a
+retroactive `SHOULD`->`MUST` change on `HTTPRouteRule.Filters` would create,
+which is the resolution [#5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194)
+converged on.
+
+### Route Matching Interaction
+
+Route matching is **single-pass**:
+
+1. Every entry in `httpPreRoutingFilters` executes, in order, on the incoming
+   request.
+2. After the last pre-routing filter completes (or one short-circuits), the
+   implementation performs HTTPRoute matching against the (potentially
+   mutated) request.
+3. Implementations MUST NOT re-run any `httpPreRoutingFilters` entries after
+   HTTPRoute matching begins.
+4. Implementations MAY invalidate an internal route cache after a
+   pre-routing filter mutates a matching input (for example, Envoy's
+   `clearRouteCache`), but this is an implementation detail; from the API's
+   perspective there is exactly one HTTPRoute match evaluation per request.
+
+Single-pass matching is chosen because it (a) eliminates loop-detection
+semantics that different data planes model differently (NGINX rewrite loops vs. Envoy route-cache
+invalidation vs. HAProxy frontend/backend split), and (b) preserves the
+mental model that pre-routing is a discrete phase, not an interleaved
+feedback loop with routing.
+
+### Listener Match Invariance
+
+Listener selection observes only inputs the client committed to *before* any
+pre-routing filter runs, and is not re-evaluated as pre-routing filters
+mutate the request. How that invariance is enforced depends on the listener
+protocol:
+
+* **Port** is fixed by the TCP handshake, for both HTTP and HTTPS listeners.
+* **Protocol** is fixed by the TCP/TLS negotiation (HTTP/1.1, HTTP/2, TLS
+  with SNI), for both.
+* **Hostname (HTTPS listeners)** The client sends its Server
+  Name Indication (SNI) in the TLS ClientHello, as the very first bytes on
+  the connection, before any HTTP request bytes are exchanged. The gateway
+  must pick the listener at that moment because the certificate presented in
+  ServerHello must match the SNI. The TLS session keys are then derived from
+  material tied to that specific certificate, so every HTTP byte on the
+  connection is bound to the selected listener by cryptography. A pre-routing
+  filter can rewrite `Host` / `:authority`, but it cannot renegotiate the
+  certificate; the connection remains on the SNI-selected listener for its
+  entire lifetime. When a later request's `Host` header disagrees with the
+  SNI-selected listener, Gateway API's Listener spec instructs implementations
+  to return `421 Misdirected Request` (or `404` if no other listener would
+  have matched either) rather than re-dispatch to a different listener — see
+  [`Listener.Hostname` spec](../../reference/api-types/gateway.md).
+* **Hostname (cleartext HTTP listeners)** Cleartext HTTP has
+  no pre-HTTP hostname signal (no SNI equivalent), and the spec allows
+  successive HTTP requests on the same TCP connection to carry different
+  `Host` headers — either via HTTP/1.1 keep-alive to distinct virtual hosts
+  or via HTTP/2 multiplexing. Gateway API's spec therefore matches the
+  listener **per request**, against the request's `Host` header. To keep
+  pre-routing coherent with that per-request matching, this GEP specifies:
+  1. Listener selection MUST use the request's `Host` header **as received
+     on the wire**, before any pre-routing filter has run.
+  2. Pre-routing filters MUST run within the filter chain of the
+     initially-selected listener only. Mutations of `Host` (or any other
+     header) by a pre-routing filter MUST NOT be re-fed into listener
+     selection.
+  3. If pre-routing filter mutations leave HTTPRoute matching within the
+     selected listener with no matching rule, the request MUST be answered
+     per the existing "no matching rule" rules (typically `404`). It MUST
+     NOT be re-dispatched to a different listener's pre-routing chain, even
+     if the mutated `Host` would have selected that other listener.
+
+The net effect in both cases is identical: **pre-routing filters can affect
+HTTPRoute selection, but not Listener selection.** For HTTPS the invariance
+is enforced by the wire protocol (renegotiating the certificate is the only
+protocol-legal way to re-select the listener, and pre-routing filters cannot
+do that). For cleartext HTTP the invariance is enforced by this API contract
+(listener selection observes only the initial `Host`, and filter mutations
+do not feed back). Both prevent cross-listener leakage and both rule out
+re-selection loops.
+
+Concretely, walking the six pre-routing filter variants:
+
+| Filter | Can mutate route-matching inputs? | Can re-select the listener? |
+|---|---|---|
+| `RequestHeaderModifier` | Yes (e.g. `Host`) | No — HTTPS: cert binding; HTTP: initial-`Host` rule above. |
+| `URLRewrite` | Yes (hostname, path) | No — same reasoning as above. |
+| `RequestRedirect` | N/A (terminates) | No — filter chain short-circuits. |
+| `RequestMirror` | No (does not mutate primary) | No. |
+| `ExternalAuth` | Yes (injected request headers) | No — same reasoning as `RequestHeaderModifier`. |
+| `ExtensionRef` | Depends on extension | No — extension MUST NOT re-invoke listener selection. |
+
+This invariance is what makes the Listener a safe attachment point for the
+six pre-routing filter payloads and disposes of the corresponding open
+question from earlier revisions of this GEP.
+
+### Interaction with Post-Routing Filters (including `ExternalAuth`)
+
+Every request that reaches HTTPRoute matching has, by construction, already
+passed the pre-routing phase. Post-routing filters
+(`HTTPRouteRule.Filters`, including
+[`ExternalAuth`](../gep-1494/index.md)) continue to run exactly as they do
+today, on the matched rule, with unchanged semantics.
+
+Key layering rules:
+
+1. Pre-routing filters on a Listener run for **every** request on that
+   listener, regardless of which HTTPRoute (if any) is later matched.
+2. If HTTPRoute matching fails to select a rule, post-routing filters do not
+   run, but pre-routing filters already have.
+3. The same filter type may appear both pre-routing (on a Listener) and
+   post-routing (on an HTTPRoute). Both instances execute; they are
+   independent configurations.
+4. For identity-driven routing, `ExternalAuth` is expected to be used
+   pre-routing so that identity is established before HTTPRoute selection.
+   The identical filter payload can still be used post-routing on individual
+   `HTTPRouteRule`s to enforce route-scoped authorization. The two positions
+   do not conflict: they are two independent executions of the same filter
+   type at two different phases.
+
+### Which Filter Types Are Legal Pre-Routing
+
+Six of the eight `HTTPRouteFilter` variants are permitted in a
+`httpPreRoutingFilters` list. The two response-side variants
+(`ResponseHeaderModifier`, `CORS`) are excluded — see
+[Excluded Filter Variants](#excluded-filter-variants).
+
+| Filter | Pre-routing use case | Notes |
+|---|---|---|
+| `RequestHeaderModifier` | **Common.** Project a computed value into a header that HTTPRoute matches on. | Load-bearing for identity-derived and body-based routing. |
+| `URLRewrite` | **Common.** Canonicalize path/host so matching is predictable. | Directly mutates HTTPRoute matching inputs. |
+| `ExternalAuth` | **Common.** Establish verified identity before route selection. | Answers the "auth before routing" motivation. |
+| `ExtensionRef` | **Common.** Escape hatch for body-based routing, JWT-claim projection, WASM plugins. | Same conformance status as post-routing `ExtensionRef`. |
+| `RequestMirror` | Legal, less common. | Fires the mirror unconditionally, independent of route selection. |
+| `RequestRedirect` | Legal. | Short-circuits with a redirect before route matching runs. |
+
+### Excluded Filter Variants
+
+Two `HTTPRouteFilter` variants are deliberately **not** present in
+`HTTPPreRoutingFilter`:
+
+* **`ResponseHeaderModifier`.** This filter mutates headers on the response
+  path. During the pre-routing phase, no backend has been selected, no request
+  has been forwarded, and no response bytes exist. There are only two ways to
+  interpret a `ResponseHeaderModifier` entry in a pre-routing list, and both
+  are undesirable: either the filter is registered to run on the eventual
+  response (in which case it doesn't actually *execute* in the pre-routing
+  phase, and the strict-ordering guarantee has no meaning for it), or it is
+  a no-op (in which case listing it is misleading). The same mutation is
+  already available on `HTTPRouteRule.Filters` in the correct phase; there
+  is no capability gap.
+* **`CORS`.** CORS is fundamentally a response-side concern: its output is
+  `Access-Control-Allow-*` response headers, and the CORS preflight handshake
+  is a request/response exchange rather than a mutation on the incoming
+  request. Its natural home is post-routing, where the response headers can
+  be tailored to the matched route, which is exactly what
+  `HTTPRouteRule.Filters` already offers.
+
+Future revisions of this GEP MAY add pre-routing-only variants (for example,
+a first-class body-projection filter once GEP-5091 lands) without disturbing
+either the post-routing surface or the exclusions above, because
+`HTTPPreRoutingFilterType` is a distinct enum from `HTTPRouteFilterType`.
+
+### Extensibility to Other Route Kinds
+
+This GEP intentionally ships HTTPRoute-only in its first experimental
+iteration, but the API shape is deliberately structured so that other route
+kinds can be added without renaming, moving, or forking `httpPreRoutingFilters`:
+
+* **`GRPCRoute`.** GRPCRoute is HTTP/2 in practice. If community consensus
+  extends pre-routing to GRPCRoute, no new field is required: the same
+  `Listener.httpPreRoutingFilters` (on an HTTP/HTTPS listener) applies. A
+  future revision would loosen the "HTTPRoute only" restriction in godoc and
+  extend conformance to cover GRPCRoute matching.
+* **`TCPRoute`, `TLSRoute`, `UDPRoute` (L4).** These need protocol-appropriate
+  filter payloads (source-IP blocking, SNI-based decisions, per-connection
+  rate limits) that do not fit the HTTP-shaped `HTTPPreRoutingFilter` type. The
+  extension path is to add a **parallel** field on `Listener` — for example
+  `tlsPreRoutingFilters []TLSPreRoutingFilter`, `tcpPreRoutingFilters
+  []TCPPreRoutingFilter`, `udpPreRoutingFilters []UDPPreRoutingFilter` —
+  each with an element type defined by a follow-up GEP. The existing
+  `httpPreRoutingFilters` field stays put and keeps its HTTP semantics; L4
+  pre-routing does not share a type with HTTP pre-routing.
+
+The naming convention (`<protocol>PreRoutingFilters` per protocol family)
+keeps each phase attached to a phase-appropriate payload type without
+collapsing them into a single polymorphic list — which would force
+implementations to inspect and validate cross-protocol combinations that
+don't make sense. The HTTP prefix on today's field is not a placeholder; it
+is the permanent name for the HTTP-family flavor.
+
+### Status Reporting
+
+Two new Listener status condition types are introduced to surface
+pre-routing configuration health:
+
+* `HTTPPreRoutingFiltersAccepted` — set to `True` when every element of
+  `httpPreRoutingFilters` is understood and admitted, `False` otherwise. The
+  message MUST name the offending filter by its `Name`.
+* `HTTPPreRoutingFiltersResolvedRefs` — set to `True` when every `ExtensionRef`,
+  `ExternalAuth.backendRef`, and `RequestMirror.backendRef` in the list is
+  resolvable, `False` otherwise. The message MUST name the offending filter
+  by its `Name` and identify which reference failed.
+
+These conditions live on the per-listener status stanza on the Gateway,
+alongside the existing `Accepted`, `Programmed`, `Conflicted`, and
+`ResolvedRefs` conditions.
+
+### Conformance
+
+* **Feature name:** `GatewayHTTPPreRoutingFilters` (Extended). Implementations
+  advertise support via the standard Gateway API feature list.
+* **Sub-features:** one per permitted filter variant, so an implementation
+  can advertise partial support:
+  `HTTPPreRoutingRequestHeaderModifier`, `HTTPPreRoutingRequestMirror`,
+  `HTTPPreRoutingRequestRedirect`, `HTTPPreRoutingURLRewrite`,
+  `HTTPPreRoutingExternalAuth`, `HTTPPreRoutingExtensionRef`.
+* **Required conformance tests:**
+  1. **Strict ordering.** Two `RequestHeaderModifier` filters that set the
+     same header to different values MUST result in the second value winning.
+     Reversing the list order MUST reverse the observed outcome.
+  2. **Listener match invariance (HTTPS).** With two HTTPS listeners on the
+     same port carrying different hostnames and different pre-routing chains,
+     a request whose SNI selects Listener A but whose `URLRewrite` filter
+     rewrites `Host` to Listener B's hostname MUST continue to be handled by
+     Listener A. It MUST NOT be re-dispatched to Listener B's pre-routing
+     chain. It MAY affect HTTPRoute selection within Listener A, and MAY
+     result in a `421 Misdirected Request` or `404` per the existing
+     Listener spec if no HTTPRoute in Listener A matches.
+  3. **Listener match invariance (cleartext HTTP).** With two HTTP listeners
+     on the same port carrying different hostnames and different pre-routing
+     chains, a request whose initial `Host` header selects Listener A but
+     whose `RequestHeaderModifier` filter rewrites `Host` to Listener B's
+     hostname MUST continue to be handled by Listener A's pre-routing chain
+     and HTTPRoute set. It MUST NOT be re-dispatched to Listener B. If no
+     HTTPRoute in Listener A matches the mutated request, the response MUST
+     be `404`, not a re-dispatch to Listener B.
+  4. **Single-pass route matching.** A `RequestHeaderModifier` that mutates
+     a header the HTTPRoute matches on MUST cause HTTPRoute matching to
+     observe the mutated value; a second HTTPRoute that would match the
+     *original* value MUST NOT be selected. HTTPRoute matching MUST run
+     exactly once.
+  5. **Unsupported-filter rejection.** A listener listing a filter variant
+     the implementation does not support MUST be rejected with
+     `Accepted=False`, `Reason=UnsupportedValue`, and the message MUST
+     name the offending filter.
+  6. **Short-circuit.** An `ExternalAuth` filter that returns deny MUST
+     prevent subsequent pre-routing filters and HTTPRoute matching from
+     running.
+  7. **Name uniqueness.** A listener with two entries sharing the same
+     `Name` MUST be rejected at admission by CEL validation.
+
+## Alternatives Considered
+
+The following API shapes and semantic choices were evaluated and rejected in
+favor of the design in [API](#api). Each is captured here with the reasoning
+so that the decision is auditable if the design needs to be revisited.
+
+### Top-level `HTTPPreRoutingFilterPolicy` CRD via Policy Attachment (GEP-713)
+
+**Considered.** Introduce a new CRD (analogous to
+[`BackendTrafficPolicy`](../gep-3388/index.md)) with `targetRefs` pointing at
+`Gateway`, `Listener` (via `sectionName`), or `ListenerSet`. Filters live in
+the policy `spec.filters`.
+
+**Rejected for v1** because:
+
+* Cross-cutting ordering across multiple attached policies requires a
+  merge/priority mechanism.
+* Ordering is load-bearing here (see [Filter Ordering](#filter-ordering-strict))
+  and is unambiguous when it lives on a single ordered list on a single
+  resource. A separate policy CRD reintroduces the "whose list wins?"
+  question every time two policies target the same listener.
+* The Listener already owns the notion of "traffic terminating here"; putting
+  the filter list on the Listener keeps the ordering scope obvious.
+* A future revision *may* add a Policy overlay for cross-listener reuse
+  without removing the embedded field. Nothing about the Listener-embedded
+  design forecloses that option.
+
+### Attach at Gateway (`GatewaySpec.httpPreRoutingFilters`)
+
+**Considered.** A single shared list at Gateway scope, applied uniformly to
+every listener on the Gateway.
+
+**Rejected for v1** because:
+
+* Filter payloads depend on protocol (an HTTP filter on a TCP listener is
+  meaningless). Listener scope makes protocol-appropriateness expressible
+  directly, without additional per-protocol validation on a Gateway-wide list.
+* Different listeners on the same Gateway routinely need different
+  pre-routing configurations. For example, an internal-only listener that
+  skips auth. A Gateway-wide list forces every listener to share.
+* Users who *want* to share a filter set across listeners can already do so
+  with [GEP-1713 ListenerSets](../gep-1713/index.md), which shares listener
+  definitions (and their `httpPreRoutingFilters`) across Gateways. We do not
+  need a second sharing mechanism specifically for pre-routing.
+
+### Attach at ListenerSet (dedicated ListenerSet field)
+
+**Considered.** Add `httpPreRoutingFilters` directly to the `ListenerSet`
+resource rather than to individual `Listener` entries.
+
+**Not adopted, but not conflicting.** A `ListenerSet` is a collection of
+`Listener` definitions. Putting `httpPreRoutingFilters` on individual
+`Listener` structs inside a `ListenerSet` already works transparently — users
+who want to share pre-routing filters across Gateways define a `ListenerSet`
+with the appropriate filters set on each `Listener` inside it. No dedicated
+ListenerSet-level field is required. If aggregate ListenerSet-scope semantics
+are wanted later, they can be added additively.
+
+### Reuse `HTTPRouteFilter` directly in a `[]HTTPRouteFilter` on the Listener
+
+**Considered.** Embed `HTTPRouteFilters []HTTPRouteFilter` on the Listener
+and add a MUST-ordering rule scoped to that particular container.
+
+**Rejected** because:
+
+* The MUST-vs-SHOULD ordering distinction between the two phases would live
+  on the *container* rather than the *element type*. Godoc that says "the
+  ordering rule depends on where this filter appears" is subtle and easy for
+  implementations to miss.
+* Any future divergence. A pre-routing-only filter variant, or narrowing
+  the pre-routing legal set would either bloat `HTTPRouteFilter` or force
+  a fork after the fact.
+* A dedicated `HTTPPreRoutingFilter` type keeps the ordering guarantee
+  visually attached to the element via godoc and gives us room to diverge
+  without breaking `HTTPRouteFilter` consumers.
+
+### Add pre-routing filters as a field on `HTTPRoute`
+
+**Considered.** Express pre-routing filters via a new field on `HTTPRoute`
+(analogous to `HTTPRouteRule.Filters` but at the top of the resource).
+
+**Rejected** because HTTPRoute matching has not happened yet when pre-routing
+filters run, so a filter attached to an HTTPRoute cannot influence *which*
+HTTPRoute is selected. This is a fundamental chicken-and-egg conflict with
+the phase definition established in
+[Pre-Routing vs. Post-Routing](#pre-routing-vs-post-routing-the-core-distinction).
+
+### Multiple ordered filter policies with a priority integer
+
+**Considered.** Allow multiple `HTTPPreRoutingFilterPolicy` resources per
+listener and use an integer `priority` field to order them.
+
+**Rejected** because:
+
+* Priority collisions and re-numbering are operationally painful in
+  practice.
+* A single ordered list is unambiguous, matches
+  [`HTTPRouteRule.Filters`](../../reference/api-types/httproute.md#filters-optional)'s
+  existing shape, and does not require the API to define collision behavior.
+
+### Multi-pass route matching with a loop guard
+
+**Considered.** Allow HTTPRoute matching to re-invoke the pre-routing chain
+if a filter after HTTPRoute selection mutates a matching input.
+
+**Rejected for v1** because:
+
+* Introduces loop-detection semantics that different data planes model very
+  differently. For example,NGINX rewrite loops, Envoy `clearRouteCache()`, and
+  HAProxy frontend/backend split.
+* Single-pass matches the provisional position and mirrors GEP-5091.
+* Complex enough to warrant its own follow-up GEP if a concrete use case
+  emerges.
+
+### Applying MUST ordering retroactively to `HTTPRouteRule.Filters`
+
+**Considered.** Rather than a new list with strict ordering, elevate
+`HTTPRouteRule.Filters` from `SHOULD` to `MUST` and add pre-routing filters
+into the same list.
+
+**Rejected** because:
+
+* `HTTPRouteRule.Filters` is GA. A retroactive `SHOULD` -> `MUST` change would
+  invalidate previously-conforming implementations, which is a
+  compatibility break Gateway API does not typically accept for stable APIs.
+* Establishing strict ordering on a *new* container (the pre-routing list)
+  gives us the guarantee where we need it without touching existing
+  implementations. This is the resolution
+  [#5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194)
+  converged on.
 
 ## Open Questions
 
-* **How does a pre-routing mutation interact with route selection precisely?**
-  The provisional position is single-pass: pre-routing filters run in order,
-  then matching evaluates the mutated request once. This must be reconciled
-  with data-plane behaviors such as Envoy's route-cache invalidation and
-  NGINX's rewrite-triggered re-selection.
-* **What is the relationship to identity and `ExternalAuth`?** Some routing
-  decisions depend on verified identity. Whether identity establishment can or
-  should run in the pre-routing phase, and how that orders against the existing
-  post-routing `ExternalAuth` filter ([GEP-1494][gep-1494]), is open.
 * **What is the relationship to implementation-specific matches
-  ([GEP-3965](https://gateway-api.sigs.k8s.io/geps/gep-3965/))?** Some data
+  ([GEP-3965](../gep-3965/index.md))?** Some data
   planes can match on a derived signal natively without a project-into-header
   step. The user-facing UX should be consistent whether or not the
   intermediate projection is needed.
@@ -437,6 +1039,24 @@ Experimental stage.
   are kinds of processing that will often want to run pre-routing. The seam
   between "the phase" (this GEP) and "the processing" (the other two) must stay
   clean so the pieces compose without overlap.
+* **How should conformance handle implementations that support pre-routing
+  only via an external component?** Some cloud load balancers cannot express
+  arbitrary pre-routing filter chains natively. Whether such implementations
+  can conform by delegating to a sidecar, whether they must decline
+  `httpPreRoutingFilters` entirely, or whether a partial conformance level
+  is defined, is left open.
+* **Does `ExternalAuth` need pre-routing-specific configuration knobs?** The
+  identical `HTTPExternalAuthFilter` payload works in both phases today, but
+  pre-routing usage may motivate additional fields (for example, whether the
+  extauth response can rewrite `Host` for the purposes of subsequent
+  HTTPRoute matching) that don't make sense post-routing. Whether such
+  fields belong on `HTTPExternalAuthFilter` or on a new pre-routing-specific
+  variant is deferred.
+* **Extension to other route kinds.** Extending pre-routing to `GRPCRoute`
+  (HTTP/2, likely reuses `httpPreRoutingFilters`), and to L4 route kinds
+  (`TCPRoute`, `TLSRoute`, `UDPRoute` — likely parallel fields with distinct
+  element types) is deferred to follow-up GEPs. See
+  [Extensibility to Other Route Kinds](#extensibility-to-other-route-kinds).
 
 ## Relationship to Other Work
 
@@ -449,27 +1069,27 @@ Experimental stage.
 * **[GEP-1494: HTTP Auth / ExternalAuth][gep-1494]** — `ExternalAuth` is a
   post-routing filter today; identity-derived routing is a motivating
   pre-routing use case, so the two must be reconciled.
-* **[GEP-91: Client Certificate Validation](https://gateway-api.sigs.k8s.io/geps/gep-91/)**
-  and **[GEP-2643: TLS/SNI-based routing](https://gateway-api.sigs.k8s.io/geps/gep-2643/)**
+* **[GEP-91: Client Certificate Validation](../gep-91/index.md)**
+  and **[GEP-2643: TLS/SNI-based routing](../gep-2643/index.md)**
   — lower-layer pre-routing decisions (TLS handshake, SNI) that establish
   context an HTTP-layer pre-routing filter might consume.
-* **[GEP-713: Policy Attachment](https://gateway-api.sigs.k8s.io/geps/gep-713/)**
-  and **[GEP-1713: ListenerSets](https://gateway-api.sigs.k8s.io/geps/gep-1713/)**
+* **[GEP-713: Policy Attachment](../gep-713/index.md)**
+  and **[GEP-1713: ListenerSets](../gep-1713/index.md)**
   — candidate structural foundations for a before-routing attachment point.
 
-[gep-1494]: https://gateway-api.sigs.k8s.io/geps/gep-1494/
+[gep-1494]: ../gep-1494/index.md
 
 ## References
 
 * [GEP-5091: PayloadProcessor Resource (PR #5092)](https://github.com/kubernetes-sigs/gateway-api/pull/5092)
 * [Issue #5194: Filter ordering — support guaranteed order of filters](https://github.com/kubernetes-sigs/gateway-api/issues/5194)
-* [GEP-1494: HTTP Auth in Gateway API](https://gateway-api.sigs.k8s.io/geps/gep-1494/)
-* [GEP-1767: CORS Filter](https://gateway-api.sigs.k8s.io/geps/gep-1767/)
-* [GEP-713: Metaresources and Policy Attachment](https://gateway-api.sigs.k8s.io/geps/gep-713/)
-* [GEP-1713: ListenerSets](https://gateway-api.sigs.k8s.io/geps/gep-1713/)
-* [GEP-3965: HTTPRoute Implementation-Specific Matches](https://gateway-api.sigs.k8s.io/geps/gep-3965/)
-* [GEP-2643: TLS/SNI-based routing](https://gateway-api.sigs.k8s.io/geps/gep-2643/)
-* [GEP-91: Client Certificate Validation](https://gateway-api.sigs.k8s.io/geps/gep-91/)
+* [GEP-1494: HTTP Auth in Gateway API](../gep-1494/index.md)
+* [GEP-1767: CORS Filter](../gep-1767/index.md)
+* [GEP-713: Metaresources and Policy Attachment](../gep-713/index.md)
+* [GEP-1713: ListenerSets](../gep-1713/index.md)
+* [GEP-3965: HTTPRoute Implementation-Specific Matches](../gep-3965/index.md)
+* [GEP-2643: TLS/SNI-based routing](../gep-2643/index.md)
+* [GEP-91: Client Certificate Validation](../gep-91/index.md)
 * [Envoy: HTTP filters](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_filters)
 * [Envoy: HTTP routing](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_routing)
 * [NGINX: request processing phases](https://nginx.org/en/docs/dev/development_guide.html#http_phases)
