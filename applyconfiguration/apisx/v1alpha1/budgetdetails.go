@@ -33,11 +33,13 @@ type BudgetDetailsApplyConfiguration struct {
 	// be made up of retries.
 	//
 	// Support: Extended
+	//
 	Percent *int `json:"percent,omitempty"`
 	// Interval defines the duration in which requests will be considered
 	// for calculating the budget for retries.
 	//
 	// Support: Extended
+	//
 	Interval *v1.Duration `json:"interval,omitempty"`
 }
 

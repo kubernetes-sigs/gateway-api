@@ -196,7 +196,7 @@ func readReports(dir string) (ReportsMap, error) {
 			return err
 		}
 
-		reportVersion := strings.Split(relPath, "/")[0]
+		reportVersion, _, _ := strings.Cut(relPath, "/")
 		majorMinorVersion := semver.MajorMinor(reportVersion)
 
 		if !slices.Contains(ConformantVersions, majorMinorVersion) &&

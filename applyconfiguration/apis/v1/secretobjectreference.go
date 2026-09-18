@@ -37,8 +37,10 @@ import (
 type SecretObjectReferenceApplyConfiguration struct {
 	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
 	// When unspecified or empty string, core API group is inferred.
+	//
 	Group *apisv1.Group `json:"group,omitempty"`
 	// Kind is kind of the referent. For example "Secret".
+	//
 	Kind *apisv1.Kind `json:"kind,omitempty"`
 	// Name is the name of the referent.
 	Name *apisv1.ObjectName `json:"name,omitempty"`
@@ -51,6 +53,7 @@ type SecretObjectReferenceApplyConfiguration struct {
 	// documentation for details.
 	//
 	// Support: Core
+	//
 	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 }
 

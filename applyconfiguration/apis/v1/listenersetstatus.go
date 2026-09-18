@@ -36,8 +36,10 @@ type ListenerSetStatusApplyConfiguration struct {
 	//
 	// * "Accepted"
 	// * "Programmed"
+	//
 	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 	// Listeners provide status for each unique listener port defined in the Spec.
+	//
 	Listeners []ListenerEntryStatusApplyConfiguration `json:"listeners,omitempty"`
 }
 

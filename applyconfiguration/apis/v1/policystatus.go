@@ -53,6 +53,7 @@ type PolicyStatusApplyConfiguration struct {
 	// here. For example, if this list was full on BackendTLSPolicy, no
 	// additional Gateways would be able to reference the Service targeted by
 	// the BackendTLSPolicy.
+	//
 	Ancestors []PolicyAncestorStatusApplyConfiguration `json:"ancestors,omitempty"`
 }
 

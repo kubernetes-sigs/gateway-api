@@ -41,6 +41,7 @@ type ListenerFilterApplyConfiguration struct {
 	// Type identifies which variant of the discriminated union below is
 	// populated. Uses the same union-discriminator pattern as
 	// HTTPRouteFilter and GRPCRouteFilter.
+	//
 	Type         *apisv1.ListenerFilterType                `json:"type,omitempty"`
 	ExternalAuth *HTTPExternalAuthFilterApplyConfiguration `json:"externalAuth,omitempty"`
 	ExtensionRef *LocalObjectReferenceApplyConfiguration   `json:"extensionRef,omitempty"`

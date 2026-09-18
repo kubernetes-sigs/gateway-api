@@ -93,10 +93,8 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 						SNI:  "https-listener.org",
 					},
 					ExpectedRequest: &h.ExpectedRequest{
-						Request: h.Request{
-							Path: "/backendtlspolicy",
-							SNI:  "abc.example.com",
-						},
+						Path: "/backendtlspolicy",
+						SNI:  "abc.example.com",
 					},
 					Response: h.Response{StatusCodes: []int{200}},
 				})
@@ -179,10 +177,8 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 			// Create test specific ConfigMap with copied CA data
 			testCMName := "tls-checks-ca-certificate-reconcile-test"
 			testCM := &corev1.ConfigMap{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      testCMName,
-					Namespace: ns,
-				},
+				Name:      testCMName,
+				Namespace: ns,
 				Data: map[string]string{
 					"ca.crt": originalCAData,
 				},

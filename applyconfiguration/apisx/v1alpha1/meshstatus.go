@@ -33,6 +33,7 @@ type MeshStatusApplyConfiguration struct {
 	//
 	// Controllers should prefer to publish conditions using values
 	// of MeshConditionType for the type of each Condition.
+	//
 	Conditions []v1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 	// SupportedFeatures is the set of features the Mesh support.
 	// It MUST be sorted in ascending alphabetical order by the Name key.

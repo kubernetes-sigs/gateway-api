@@ -51,6 +51,7 @@ type ListenerSetSpecApplyConfiguration struct {
 	// parent or siblings are reported to avoid accidentally leaking
 	// sensitive information that the child would not otherwise have access
 	// to. This can include contents of secrets etc.
+	//
 	Listeners []ListenerEntryApplyConfiguration `json:"listeners,omitempty"`
 }
 

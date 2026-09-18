@@ -40,10 +40,12 @@ type ClusterTrustBundleObjectRefApplyConfiguration struct {
 	// Group is the group of the referent.
 	//
 	// Defaults to "certificates.k8s.io".
+	//
 	Group *apisv1.Group `json:"group,omitempty"`
 	// Kind is the kind of the referent.
 	//
 	// Defaults to "ClusterTrustBundle".
+	//
 	Kind *apisv1.Kind `json:"kind,omitempty"`
 	// Name is the name of the referent.
 	Name *apisv1.ObjectName `json:"name,omitempty"`

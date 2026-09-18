@@ -64,6 +64,7 @@ type ListenerSetApplyConfiguration struct {
 	// Spec defines the desired state of ListenerSet.
 	Spec *ListenerSetSpecApplyConfiguration `json:"spec,omitempty"`
 	// Status defines the current state of ListenerSet.
+	//
 	Status *ListenerSetStatusApplyConfiguration `json:"status,omitempty"`
 }
 

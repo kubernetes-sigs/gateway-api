@@ -187,14 +187,12 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 				"X-Header-Echo":     "echo",
 			},
 			ExpectedRequest: &http.ExpectedRequest{
-				Request: http.Request{
-					Path: "/response-and-request-header-modifiers",
-					Headers: map[string]string{
-						"X-Header-Add":        "header-val-1",
-						"X-Header-Set":        "set-overwrites-values",
-						"X-Header-Add-Append": "append-val-1,header-val-2",
-						"X-Header-Echo":       "echo",
-					},
+				Path: "/response-and-request-header-modifiers",
+				Headers: map[string]string{
+					"X-Header-Add":        "header-val-1",
+					"X-Header-Set":        "set-overwrites-values",
+					"X-Header-Add-Append": "append-val-1,header-val-2",
+					"X-Header-Echo":       "echo",
 				},
 				AbsentHeaders: []string{"X-Header-Remove"},
 			},

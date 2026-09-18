@@ -30,7 +30,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientset "k8s.io/client-go/kubernetes"
@@ -629,10 +628,8 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	profileReports.compileResults(suite.extendedSupportedFeatures, suite.extendedUnsupportedFeatures)
 
 	return &confv1.ConformanceReport{
-		TypeMeta: v1.TypeMeta{
-			APIVersion: confv1.GroupVersion.String(),
-			Kind:       "ConformanceReport",
-		},
+		APIVersion:                confv1.GroupVersion.String(),
+		Kind:                      "ConformanceReport",
 		Date:                      time.Now().Format(time.RFC3339),
 		Mode:                      suite.mode,
 		Implementation:            suite.implementation,

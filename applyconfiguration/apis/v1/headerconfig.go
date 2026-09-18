@@ -32,6 +32,7 @@ type HeaderConfigApplyConfiguration struct {
 	// maintain the session.
 	//
 	// Support: Core
+	//
 	Name *apisv1.HeaderName `json:"name,omitempty"`
 }
 

@@ -26,11 +26,13 @@ type TLSPortConfigApplyConfiguration struct {
 	// traffic that match this port.
 	//
 	// Support: Core
+	//
 	Port *int32 `json:"port,omitempty"`
 	// TLS store the configuration that will be applied to all Listeners handling
 	// HTTPS traffic and matching given port.
 	//
 	// Support: Core
+	//
 	TLS *TLSConfigApplyConfiguration `json:"tls,omitempty"`
 }
 

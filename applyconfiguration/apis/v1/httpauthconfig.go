@@ -33,6 +33,7 @@ type HTTPAuthConfigApplyConfiguration struct {
 	// stanza, and the validation regex will screen out invalid paths in the same way.
 	// Even with the validation, implementations MUST sanitize this input before using it
 	// directly.
+	//
 	Path *string `json:"path,omitempty"`
 	// AllowedRequestHeaders specifies what additional headers from the client request
 	// will be sent to the authorization server.
@@ -57,12 +58,14 @@ type HTTPAuthConfigApplyConfiguration struct {
 	// to `0`, then `Content-Length` must be `0`. If `forwardBody.maxSize` is set
 	// to anything other than `0`, then the `Content-Length` of the authorization
 	// request must be set to the actual number of bytes forwarded.
+	//
 	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
 	// AllowedResponseHeaders specifies what headers from the authorization response
 	// will be copied into the request to the backend.
 	//
 	// If this list is empty, then all headers from the authorization server
 	// except Authority or Host must be copied.
+	//
 	AllowedResponseHeaders []string `json:"allowedResponseHeaders,omitempty"`
 }
 

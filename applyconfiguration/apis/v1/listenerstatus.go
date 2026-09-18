@@ -39,6 +39,7 @@ type ListenerStatusApplyConfiguration struct {
 	// condition to "False" with the "InvalidRouteKinds" reason. If both valid
 	// and invalid Route kinds are specified, the implementation MUST
 	// reference the valid Route kinds that have been specified.
+	//
 	SupportedKinds []RouteGroupKindApplyConfiguration `json:"supportedKinds,omitempty"`
 	// AttachedRoutes represents the total number of Routes that have been
 	// successfully attached to this Listener.
@@ -91,6 +92,7 @@ type ListenerStatusApplyConfiguration struct {
 	// if relevant.)
 	//
 	// </gateway:util:excludeFromCRD>
+	//
 	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 

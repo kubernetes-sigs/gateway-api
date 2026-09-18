@@ -30,10 +30,8 @@ import (
 func TestValidateGateway(t *testing.T) {
 	ctx := context.Background()
 	baseGateway := gatewayv1.Gateway{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "foo",
-			Namespace: metav1.NamespaceDefault,
-		},
+		Name:      "foo",
+		Namespace: metav1.NamespaceDefault,
 		Spec: gatewayv1.GatewaySpec{
 			GatewayClassName: "foo",
 			Listeners: []gatewayv1.Listener{

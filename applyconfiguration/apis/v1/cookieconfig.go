@@ -40,6 +40,7 @@ type CookieConfigApplyConfiguration struct {
 	// </gateway:util:excludeFromCRD>
 	//
 	// Support: Extended
+	//
 	Name *apisv1.CookieName `json:"name,omitempty"`
 	// Path defines the cookie Path attribute. When not specified,
 	// implementations MUST default the cookie path to "/".
@@ -52,6 +53,7 @@ type CookieConfigApplyConfiguration struct {
 	// </gateway:util:excludeFromCRD>
 	//
 	// Support: Extended
+	//
 	Path *string `json:"path,omitempty"`
 	// LifetimeType specifies whether the cookie has a permanent or
 	// session-based lifetime. A permanent cookie persists until its
@@ -72,6 +74,7 @@ type CookieConfigApplyConfiguration struct {
 	// Support: Core for "Session" type
 	//
 	// Support: Extended for "Permanent" type
+	//
 	LifetimeType *apisv1.CookieLifetimeType `json:"lifetimeType,omitempty"`
 }
 

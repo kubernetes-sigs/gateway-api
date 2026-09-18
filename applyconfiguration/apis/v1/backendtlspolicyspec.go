@@ -94,6 +94,7 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// </gateway:util:excludeFromCRD>
 	TargetRefs []LocalPolicyTargetReferenceWithSectionNameApplyConfiguration `json:"targetRefs,omitempty"`
 	// Validation contains backend TLS validation configuration.
+	//
 	Validation *BackendTLSPolicyValidationApplyConfiguration `json:"validation,omitempty"`
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the
@@ -105,6 +106,7 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// Un-prefixed names are reserved for key names defined by Gateway API.
 	//
 	// Support: Implementation-specific
+	//
 	Options map[apisv1.AnnotationKey]apisv1.AnnotationValue `json:"options,omitempty"`
 }
 

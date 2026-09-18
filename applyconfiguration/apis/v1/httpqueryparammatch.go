@@ -38,6 +38,7 @@ type HTTPQueryParamMatchApplyConfiguration struct {
 	// conformance, implementations can support POSIX, PCRE or any other
 	// dialects of regular expressions. Please read the implementation's
 	// documentation to determine the supported dialect.
+	//
 	Type *apisv1.QueryParamMatchType `json:"type,omitempty"`
 	// Name is the name of the HTTP query param to be matched. This must be an
 	// exact string match. (See
@@ -58,6 +59,7 @@ type HTTPQueryParamMatchApplyConfiguration struct {
 	// themselves against potential differences in the implementations.
 	Name *apisv1.HTTPHeaderName `json:"name,omitempty"`
 	// Value is the value of HTTP query param to be matched.
+	//
 	Value *string `json:"value,omitempty"`
 }
 

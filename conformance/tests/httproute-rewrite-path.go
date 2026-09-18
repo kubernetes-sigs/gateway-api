@@ -53,9 +53,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 					Path: "/prefix/one/two",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/one/two",
-					},
+					Path: "/one/two",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
@@ -65,9 +63,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 					Path: "/strip-prefix/three",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/three",
-					},
+					Path: "/three",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
@@ -77,9 +73,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 					Path: "/strip-prefix",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/",
-					},
+					Path: "/",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
@@ -89,9 +83,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 					Path: "/full/one/two",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/one",
-					},
+					Path: "/one",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
@@ -106,13 +98,11 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/test",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
+					Path: "/test",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Set":        "set-overwrites-values",
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
@@ -129,13 +119,11 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/prefix/one",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
+					Path: "/prefix/one",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Set":        "set-overwrites-values",
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},

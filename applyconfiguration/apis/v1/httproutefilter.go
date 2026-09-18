@@ -74,11 +74,13 @@ type HTTPRouteFilterApplyConfiguration struct {
 	// headers.
 	//
 	// Support: Core
+	//
 	RequestHeaderModifier *HTTPHeaderFilterApplyConfiguration `json:"requestHeaderModifier,omitempty"`
 	// ResponseHeaderModifier defines a schema for a filter that modifies response
 	// headers.
 	//
 	// Support: Extended
+	//
 	ResponseHeaderModifier *HTTPHeaderFilterApplyConfiguration `json:"responseHeaderModifier,omitempty"`
 	// RequestMirror defines a schema for a filter that mirrors requests.
 	// Requests are sent to the specified destination, but responses from
@@ -89,20 +91,25 @@ type HTTPRouteFilterApplyConfiguration struct {
 	// backends.
 	//
 	// Support: Extended
+	//
+	//
 	RequestMirror *HTTPRequestMirrorFilterApplyConfiguration `json:"requestMirror,omitempty"`
 	// RequestRedirect defines a schema for a filter that responds to the
 	// request with an HTTP redirection.
 	//
 	// Support: Core
+	//
 	RequestRedirect *HTTPRequestRedirectFilterApplyConfiguration `json:"requestRedirect,omitempty"`
 	// URLRewrite defines a schema for a filter that modifies a request during forwarding.
 	//
 	// Support: Extended
+	//
 	URLRewrite *HTTPURLRewriteFilterApplyConfiguration `json:"urlRewrite,omitempty"`
 	// CORS defines a schema for a filter that responds to the
 	// cross-origin request based on HTTP response header.
 	//
 	// Support: Extended
+	//
 	CORS *HTTPCORSFilterApplyConfiguration `json:"cors,omitempty"`
 	// ExternalAuth configures settings related to sending request details
 	// to an external auth service. The external service MUST authenticate
@@ -123,6 +130,7 @@ type HTTPRouteFilterApplyConfiguration struct {
 	// This filter can be used multiple times within the same rule.
 	//
 	// Support: Implementation-specific
+	//
 	ExtensionRef *LocalObjectReferenceApplyConfiguration `json:"extensionRef,omitempty"`
 }
 
