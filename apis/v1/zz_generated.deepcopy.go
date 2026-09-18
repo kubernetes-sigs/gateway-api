@@ -1538,11 +1538,6 @@ func (in *HTTPRouteRetry) DeepCopyInto(out *HTTPRouteRetry) {
 		*out = make([]HTTPRouteRetryStatusCode, len(*in))
 		copy(*out, *in)
 	}
-	if in.Attempts != nil {
-		in, out := &in.Attempts, &out.Attempts
-		*out = new(int)
-		**out = **in
-	}
 	if in.Backoff != nil {
 		in, out := &in.Backoff, &out.Backoff
 		*out = new(Duration)
