@@ -149,7 +149,7 @@ type BackendTLSPolicySpec struct {
 
 // BackendTLSPolicyValidation contains backend TLS validation configuration.
 // +kubebuilder:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
-// +kubebuilder:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
+// +kubebuilder:validation:XValidation:message="must specify at least one of CACertificateRefs, WellKnownCACertificates, or ClusterTrustBundleRef",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\" || has(self.clusterTrustBundleRef))"
 type BackendTLSPolicyValidation struct {
 	// CACertificateRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to
@@ -201,6 +201,26 @@ type BackendTLSPolicyValidation struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	CACertificateRefs []LocalObjectReference `json:"caCertificateRefs,omitempty"`
+
+	// ClusterTrustBundleRef is an optional reference to a cluster-scoped
+	// ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
+	// PEM-encoded CA certificates in the referenced bundle are used as trust
+	// anchors for backend TLS validation, in addition to any certificates
+	// provided via CACertificateRefs.
+	//
+	// The referenced bundle MUST exist, be readable by the implementation, and
+	// contain at least one valid PEM-encoded CA certificate. If any of these
+	// conditions are not met, the implementation MUST set ResolvedRefs=False
+	// with reason InvalidCACertificateRef. A ReferenceGrant is not required.
+	//
+	// Implementations that do not support ClusterTrustBundle references MUST set
+	// ResolvedRefs=False with reason InvalidKind when this field is specified.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	// +optional
+	ClusterTrustBundleRef *ClusterObjectReference `json:"clusterTrustBundleRef,omitempty"`
 
 	// WellKnownCACertificates specifies whether a well-known set of CA certificates
 	// may be used in the TLS handshake between the gateway and backend pod.

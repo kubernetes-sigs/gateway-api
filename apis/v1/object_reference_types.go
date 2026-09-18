@@ -39,6 +39,32 @@ type LocalObjectReference struct {
 	Name ObjectName `json:"name"`
 }
 
+// ClusterObjectReference identifies an API object that is cluster-scoped.
+// The API object must be valid in the cluster; the Group and Kind must
+// be registered in the cluster for this reference to be valid.
+//
+// Unlike LocalObjectReference, this type is intended exclusively for
+// cluster-scoped resources. The absence of a Namespace field is intentional
+// and correct — it MUST NOT be used with namespace-scoped resources.
+//
+// References to objects with invalid Group and Kind are not valid, and must
+// be rejected by the implementation, with appropriate Conditions set
+// on the containing object.
+type ClusterObjectReference struct {
+	// Group is the group of the referent. For example, "certificates.k8s.io".
+	// When unspecified or empty string, core API group is inferred.
+	// +required
+	Group Group `json:"group"`
+
+	// Kind is kind of the referent. For example "ClusterTrustBundle".
+	// +required
+	Kind Kind `json:"kind"`
+
+	// Name is the name of the referent.
+	// +required
+	Name ObjectName `json:"name"`
+}
+
 // SecretObjectReference identifies an API object including its namespace,
 // defaulting to Secret.
 //
