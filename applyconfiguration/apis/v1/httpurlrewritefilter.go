@@ -35,10 +35,12 @@ type HTTPURLRewriteFilterApplyConfiguration struct {
 	// forwarding.
 	//
 	// Support: Extended
+	//
 	Hostname *apisv1.PreciseHostname `json:"hostname,omitempty"`
 	// Path defines a path rewrite.
 	//
 	// Support: Extended
+	//
 	Path *HTTPPathModifierApplyConfiguration `json:"path,omitempty"`
 }
 

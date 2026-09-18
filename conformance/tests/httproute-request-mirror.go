@@ -53,17 +53,13 @@ var HTTPRouteRequestMirror = confsuite.ConformanceTest{
 					Path: "/mirror",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/mirror",
-					},
+					Path: "/mirror",
 				},
 				Backend: confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV2,
-							Namespace: ns,
-						},
+						Name:      confsuite.InfraBackendServiceNameV2,
+						Namespace: ns,
 					},
 				},
 				Namespace: ns,
@@ -77,13 +73,11 @@ var HTTPRouteRequestMirror = confsuite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/mirror-and-modify-headers",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
+					Path: "/mirror-and-modify-headers",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Set":        "set-overwrites-values",
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
@@ -91,10 +85,8 @@ var HTTPRouteRequestMirror = confsuite.ConformanceTest{
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV2,
-							Namespace: ns,
-						},
+						Name:      confsuite.InfraBackendServiceNameV2,
+						Namespace: ns,
 					},
 				},
 			},

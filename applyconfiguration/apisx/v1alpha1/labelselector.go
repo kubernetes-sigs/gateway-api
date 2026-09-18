@@ -30,6 +30,7 @@ type LabelSelectorApplyConfiguration struct {
 	// MatchLabels contains a set of required {key,value} pairs.
 	// An object must match every label in this map to be selected.
 	// The matching logic is an AND operation on all entries.
+	//
 	MatchLabels map[v1.LabelKey]v1.LabelValue `json:"matchLabels,omitempty"`
 }
 

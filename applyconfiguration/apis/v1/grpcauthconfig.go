@@ -33,6 +33,7 @@ type GRPCAuthConfigApplyConfiguration struct {
 	// If this list is empty, then all headers must be sent.
 	//
 	// If the list has entries, only those entries must be sent.
+	//
 	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
 }
 

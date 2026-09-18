@@ -62,6 +62,7 @@ type TLSRouteSpecApplyConfiguration struct {
 	// `False` in the corresponding RouteParentStatus.
 	//
 	// Support: Core
+	//
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of TLS matchers and actions.
 	//

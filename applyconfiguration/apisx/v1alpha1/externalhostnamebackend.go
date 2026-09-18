@@ -38,6 +38,7 @@ type ExternalHostnameBackendApplyConfiguration struct {
 	// Service FQDNs MUST also enforce that hostnames ending with those trust
 	// domains (e.g. .cluster.local) are not allowed.
 	// </gateway:util:excludeFromCRD>
+	//
 	Hostname *v1.PreciseHostname `json:"hostname,omitempty"`
 }
 

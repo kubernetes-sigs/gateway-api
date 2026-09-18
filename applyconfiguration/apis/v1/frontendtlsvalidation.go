@@ -71,6 +71,7 @@ type FrontendTLSValidationApplyConfiguration struct {
 	//
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
+	//
 	CACertificateRefs []ObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 	// FrontendValidationMode defines the mode for validating the client certificate.
 	// There are two possible modes:
@@ -88,6 +89,7 @@ type FrontendTLSValidationApplyConfiguration struct {
 	// Defaults to AllowValidOnly.
 	//
 	// Support: Core
+	//
 	Mode *apisv1.FrontendValidationModeType `json:"mode,omitempty"`
 }
 

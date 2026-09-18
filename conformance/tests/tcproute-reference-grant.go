@@ -72,10 +72,8 @@ var TCPRouteReferenceGrant = confsuite.ConformanceTest{
 		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout)
 		defer cancel()
 		rg := v1.ReferenceGrant{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "tcp-reference-grant",
-				Namespace: confsuite.WebBackendNamespace,
-			},
+			Name:      "tcp-reference-grant",
+			Namespace: confsuite.WebBackendNamespace,
 		}
 		require.NoError(t, suite.Client.Delete(ctx, &rg))
 

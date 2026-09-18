@@ -100,7 +100,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 		{
 			name: "conditions where all match the generation pass verification",
-			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			obj:  &gatewayv1.Gateway{Name: "fake-gateway", Generation: 20},
 			conditions: []metav1.Condition{
 				{Type: "FakeCondition1", ObservedGeneration: 20},
 				{Type: "FakeCondition2", ObservedGeneration: 20},
@@ -109,7 +109,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 		{
 			name: "a StaleConditionType condition is exempt from the generation check",
-			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			obj:  &gatewayv1.Gateway{Name: "fake-gateway", Generation: 20},
 			conditions: []metav1.Condition{
 				{Type: "FakeCondition1", ObservedGeneration: 20},
 				{Type: StaleConditionType, ObservedGeneration: 3},
@@ -117,7 +117,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 		{
 			name: "the StaleConditionType exemption does not extend to other conditions",
-			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			obj:  &gatewayv1.Gateway{Name: "fake-gateway", Generation: 20},
 			conditions: []metav1.Condition{
 				{Type: "FakeCondition1", ObservedGeneration: 19},
 				{Type: StaleConditionType, ObservedGeneration: 3},
@@ -126,7 +126,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 		{
 			name: "conditions where one does not match the generation fail verification",
-			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			obj:  &gatewayv1.Gateway{Name: "fake-gateway", Generation: 20},
 			conditions: []metav1.Condition{
 				{Type: "FakeCondition1", ObservedGeneration: 20},
 				{Type: "FakeCondition2", ObservedGeneration: 19},
@@ -136,7 +136,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 		{
 			name: "conditions where most do not match the generation fail verification",
-			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			obj:  &gatewayv1.Gateway{Name: "fake-gateway", Generation: 20},
 			conditions: []metav1.Condition{
 				{Type: "FakeCondition1", ObservedGeneration: 18},
 				{Type: "FakeCondition2", ObservedGeneration: 18},
@@ -167,10 +167,8 @@ func TestHTTPRouteMustBeAcceptedAndResolved(t *testing.T) {
 
 	gwNamespace := gatewayv1.Namespace(gatewayNN.Namespace)
 	route := &gatewayv1.HTTPRoute{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      routeNN.Name,
-			Namespace: routeNN.Namespace,
-		},
+		Name:      routeNN.Name,
+		Namespace: routeNN.Namespace,
 		Status: gatewayv1.HTTPRouteStatus{
 			RouteStatus: gatewayv1.RouteStatus{
 				Parents: []gatewayv1.RouteParentStatus{
@@ -423,11 +421,9 @@ func TestRouteMustHaveParentsIgnoresStaleControllerEntries(t *testing.T) {
 	}
 
 	route := &gatewayv1.HTTPRoute{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:       routeNN.Name,
-			Namespace:  routeNN.Namespace,
-			Generation: 2,
-		},
+		Name:       routeNN.Name,
+		Namespace:  routeNN.Namespace,
+		Generation: 2,
 		Status: gatewayv1.HTTPRouteStatus{
 			RouteStatus: gatewayv1.RouteStatus{
 				Parents: []gatewayv1.RouteParentStatus{
@@ -480,7 +476,7 @@ func Test_staleParentStatus(t *testing.T) {
 		otherController = gatewayv1.GatewayController("example.com/other-controller")
 	)
 
-	route := &gatewayv1.HTTPRoute{ObjectMeta: metav1.ObjectMeta{Generation: 2}}
+	route := &gatewayv1.HTTPRoute{Generation: 2}
 
 	parent := func(controller gatewayv1.GatewayController, observedGeneration int64) gatewayv1.RouteParentStatus {
 		return gatewayv1.RouteParentStatus{
@@ -567,11 +563,9 @@ func TestBackendTLSPolicyMustHaveConditionIgnoresStaleAncestors(t *testing.T) {
 	}
 
 	policy := &gatewayv1.BackendTLSPolicy{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:       policyNN.Name,
-			Namespace:  policyNN.Namespace,
-			Generation: 2,
-		},
+		Name:       policyNN.Name,
+		Namespace:  policyNN.Namespace,
+		Generation: 2,
 		Status: gatewayv1.PolicyStatus{
 			Ancestors: []gatewayv1.PolicyAncestorStatus{
 				ancestor(gatewayv1.ObjectName(gwNN.Name), ownController, 2),
@@ -612,11 +606,9 @@ func TestRouteMustHaveParentsChecksTheStatusItJustRead(t *testing.T) {
 	gwNamespace := gatewayv1.Namespace("default")
 
 	route := &gatewayv1.HTTPRoute{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:       routeNN.Name,
-			Namespace:  routeNN.Namespace,
-			Generation: 2,
-		},
+		Name:       routeNN.Name,
+		Namespace:  routeNN.Namespace,
+		Generation: 2,
 		Status: gatewayv1.HTTPRouteStatus{
 			RouteStatus: gatewayv1.RouteStatus{
 				Parents: []gatewayv1.RouteParentStatus{{

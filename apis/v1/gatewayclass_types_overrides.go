@@ -31,11 +31,10 @@ import (
 
 func (s *SupportedFeature) UnmarshalJSON(data []byte) error {
 	var oldSupportedFeature oldSupportedFeature
-	var unmarshalTypeErr *json.UnmarshalTypeError
 	if err := json.Unmarshal(data, &oldSupportedFeature); err == nil {
 		s.Name = FeatureName(oldSupportedFeature)
 		return nil
-	} else if !errors.As(err, &unmarshalTypeErr) {
+	} else if _, ok := errors.AsType[*json.UnmarshalTypeError](err); !ok {
 		// If the error is not a type error, return it
 		return err
 	}

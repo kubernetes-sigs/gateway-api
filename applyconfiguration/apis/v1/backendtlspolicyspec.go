@@ -105,6 +105,7 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// Un-prefixed names are reserved for key names defined by Gateway API.
 	//
 	// Support: Implementation-specific
+	//
 	Options map[apisv1.AnnotationKey]apisv1.AnnotationValue `json:"options,omitempty"`
 }
 

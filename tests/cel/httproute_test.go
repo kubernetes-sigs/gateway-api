@@ -122,22 +122,16 @@ func TestHTTPPathMatch(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			route := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
 				Spec: gatewayv1.HTTPRouteSpec{
 					Rules: []gatewayv1.HTTPRouteRule{{
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: tc.path,
 						}},
 						BackendRefs: []gatewayv1.HTTPBackendRef{{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: gatewayv1.BackendObjectReference{
-									Name: gatewayv1.ObjectName("test"),
-									Port: new(gatewayv1.PortNumber(8080)),
-								},
-							},
+							Name: gatewayv1.ObjectName("test"),
+							Port: new(gatewayv1.PortNumber(8080)),
 						}},
 					}},
 				},
@@ -215,16 +209,12 @@ func TestBackendObjectReference(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			route := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
 				Spec: gatewayv1.HTTPRouteSpec{
 					Rules: []gatewayv1.HTTPRouteRule{{
 						BackendRefs: []gatewayv1.HTTPBackendRef{{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: tc.backendRef,
-							},
+							BackendObjectReference: tc.backendRef,
 						}},
 					}},
 				},
@@ -408,10 +398,8 @@ func TestHTTPRouteFilter(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			route := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
 				Spec: gatewayv1.HTTPRouteSpec{
 					Rules: []gatewayv1.HTTPRouteRule{{
 						Filters: []gatewayv1.HTTPRouteFilter{tc.routeFilter},
@@ -444,13 +432,9 @@ func TestHTTPRouteRule(t *testing.T) {
 					},
 					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: gatewayv1.BackendObjectReference{
-									Name: testService,
-									Port: new(gatewayv1.PortNumber(8080)),
-								},
-								Weight: new(int32(100)),
-							},
+							Name:   testService,
+							Port:   new(gatewayv1.PortNumber(8080)),
+							Weight: new(int32(100)),
 						},
 					},
 				},
@@ -642,12 +626,8 @@ func TestHTTPRouteRule(t *testing.T) {
 					},
 					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: gatewayv1.BackendObjectReference{
-									Name: testService,
-									Port: new(gatewayv1.PortNumber(80)),
-								},
-							},
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(80)),
 						},
 					},
 				},
@@ -683,12 +663,8 @@ func TestHTTPRouteRule(t *testing.T) {
 					},
 					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: gatewayv1.BackendObjectReference{
-									Name: testService,
-									Port: new(gatewayv1.PortNumber(80)),
-								},
-							},
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(80)),
 						},
 					},
 				},
@@ -700,12 +676,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				{
 					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: gatewayv1.BackendObjectReference{
-									Name: testService,
-									Port: new(gatewayv1.PortNumber(80)),
-								},
-							},
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(80)),
 						},
 					},
 				},
@@ -872,12 +844,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				},
 				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1.BackendRef{
-							BackendObjectReference: gatewayv1.BackendObjectReference{
-								Name: testService,
-								Port: new(gatewayv1.PortNumber(80)),
-							},
-						},
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
 						Filters: []gatewayv1.HTTPRouteFilter{{
 							Type: gatewayv1.HTTPRouteFilterURLRewrite,
 							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
@@ -911,12 +879,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				},
 				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1.BackendRef{
-							BackendObjectReference: gatewayv1.BackendObjectReference{
-								Name: testService,
-								Port: new(gatewayv1.PortNumber(80)),
-							},
-						},
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
 						Filters: []gatewayv1.HTTPRouteFilter{{
 							Type: gatewayv1.HTTPRouteFilterURLRewrite,
 							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
@@ -944,12 +908,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				},
 				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1.BackendRef{
-							BackendObjectReference: gatewayv1.BackendObjectReference{
-								Name: testService,
-								Port: new(gatewayv1.PortNumber(80)),
-							},
-						},
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
 						Filters: []gatewayv1.HTTPRouteFilter{{
 							Type: gatewayv1.HTTPRouteFilterURLRewrite,
 							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
@@ -976,12 +936,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				},
 				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1.BackendRef{
-							BackendObjectReference: gatewayv1.BackendObjectReference{
-								Name: testService,
-								Port: new(gatewayv1.PortNumber(80)),
-							},
-						},
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
 						Filters: []gatewayv1.HTTPRouteFilter{{
 							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
@@ -1015,12 +971,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				},
 				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1.BackendRef{
-							BackendObjectReference: gatewayv1.BackendObjectReference{
-								Name: testService,
-								Port: new(gatewayv1.PortNumber(80)),
-							},
-						},
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
 						Filters: []gatewayv1.HTTPRouteFilter{{
 							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
@@ -1048,12 +1000,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				},
 				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1.BackendRef{
-							BackendObjectReference: gatewayv1.BackendObjectReference{
-								Name: testService,
-								Port: new(gatewayv1.PortNumber(80)),
-							},
-						},
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
 						Filters: []gatewayv1.HTTPRouteFilter{{
 							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
@@ -1296,11 +1244,9 @@ func TestHTTPRouteRule(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			route := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
-				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
+				Spec:      gatewayv1.HTTPRouteSpec{Rules: tc.rules},
 			}
 			validateHTTPRoute(t, route, tc.wantErrors)
 		})
@@ -1332,12 +1278,8 @@ func TestHTTPBackendRef(t *testing.T) {
 					},
 					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: gatewayv1.BackendObjectReference{
-									Name: testService,
-									Port: new(gatewayv1.PortNumber(80)),
-								},
-							},
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(80)),
 							Filters: []gatewayv1.HTTPRouteFilter{
 								{
 									Type: gatewayv1.HTTPRouteFilterURLRewrite,
@@ -1380,11 +1322,9 @@ func TestHTTPBackendRef(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			route := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
-				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
+				Spec:      gatewayv1.HTTPRouteSpec{Rules: tc.rules},
 			}
 			validateHTTPRoute(t, route, tc.wantErrors)
 		})
@@ -1447,10 +1387,8 @@ func TestHTTPPathModifier(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			pathModifier := tc.pathModifier
 			route := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
 				Spec: gatewayv1.HTTPRouteSpec{
 					Rules: []gatewayv1.HTTPRouteRule{
 						{
@@ -1672,10 +1610,8 @@ func TestHTTPRouteCORS(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			route := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
 				Spec: gatewayv1.HTTPRouteSpec{Rules: []gatewayv1.HTTPRouteRule{
 					{
 						Filters: []gatewayv1.HTTPRouteFilter{

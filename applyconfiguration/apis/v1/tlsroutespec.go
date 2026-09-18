@@ -74,8 +74,10 @@ type TLSRouteSpecApplyConfiguration struct {
 	// Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`.
 	// Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`.
 	// </gateway:util:excludeFromCRD>
+	//
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of actions.
+	//
 	Rules []TLSRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 

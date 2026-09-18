@@ -55,13 +55,9 @@ func TestBuildSummary(t *testing.T) {
 					},
 				},
 				Extended: &confv1.ExtendedStatus{
-					Status: confv1.Status{
-						Result: confv1.Failure,
-						Statistics: confv1.Statistics{
-							Passed: 2,
-							Failed: 1,
-						},
-					},
+					Result: confv1.Failure,
+					Passed: 2,
+					Failed: 1,
 				},
 			},
 			expectedSummary: "Core tests succeeded. Extended tests failed with 1 test failures.",
@@ -78,12 +74,8 @@ func TestBuildSummary(t *testing.T) {
 					},
 				},
 				Extended: &confv1.ExtendedStatus{
-					Status: confv1.Status{
-						Result: confv1.Success,
-						Statistics: confv1.Statistics{
-							Passed: 2,
-						},
-					},
+					Result: confv1.Success,
+					Passed: 2,
 				},
 			},
 			expectedSummary: "Core tests partially succeeded with 2 test skips. Extended tests succeeded.",
@@ -99,13 +91,9 @@ func TestBuildSummary(t *testing.T) {
 					},
 				},
 				Extended: &confv1.ExtendedStatus{
-					Status: confv1.Status{
-						Result: confv1.Partial,
-						Statistics: confv1.Statistics{
-							Passed:  2,
-							Skipped: 1,
-						},
-					},
+					Result:  confv1.Partial,
+					Passed:  2,
+					Skipped: 1,
 				},
 			},
 			expectedSummary: "Core tests succeeded. Extended tests partially succeeded with 1 test skips.",

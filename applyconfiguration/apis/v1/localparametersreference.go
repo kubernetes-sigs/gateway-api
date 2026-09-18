@@ -33,6 +33,7 @@ type LocalParametersReferenceApplyConfiguration struct {
 	// Kind is kind of the referent.
 	Kind *apisv1.Kind `json:"kind,omitempty"`
 	// Name is the name of the referent.
+	//
 	Name *string `json:"name,omitempty"`
 }
 
