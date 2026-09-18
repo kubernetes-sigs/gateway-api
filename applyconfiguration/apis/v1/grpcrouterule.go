@@ -137,6 +137,8 @@ type GRPCRouteRuleApplyConfiguration struct {
 	//
 	// Support for weight: Core
 	BackendRefs []GRPCBackendRefApplyConfiguration `json:"backendRefs,omitempty"`
+	// Deprecated: use the Backend resource for session persistence (GEP-4894).
+	//
 	// SessionPersistence defines and configures session persistence
 	// for the route rule.
 	//
