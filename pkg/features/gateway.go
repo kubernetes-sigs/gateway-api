@@ -57,6 +57,13 @@ const (
 	// of HTTP listeners.
 	SupportGatewayHTTPListenerIsolation FeatureName = "GatewayHTTPListenerIsolation"
 
+	// SupportGatewayHTTPSAndTLSPassthroughSamePort option indicates support for
+	// serving an HTTPS listener and a TLS Passthrough listener on the same port
+	// when their hostnames overlap without being identical. Claiming it commits
+	// an implementation to carrying both and to selecting between them by the
+	// most specific matching hostname.
+	SupportGatewayHTTPSAndTLSPassthroughSamePort FeatureName = "GatewayHTTPSAndTLSPassthroughSamePort"
+
 	// SupportGatewayHTTPSListenerDetectMisdirectedRequests option indicates
 	// support for detecting and rejecting misdirected HTTPS requests, returning
 	// HTTP 421 (Misdirected Request) when appropriate.
@@ -105,6 +112,11 @@ var (
 		Name:    SupportGatewayHTTPListenerIsolation,
 		Channel: FeatureChannelStandard,
 	}
+	// GatewayHTTPSAndTLSPassthroughSamePortFeature contains metadata for the GatewayHTTPSAndTLSPassthroughSamePort feature.
+	GatewayHTTPSAndTLSPassthroughSamePortFeature = Feature{
+		Name:    SupportGatewayHTTPSAndTLSPassthroughSamePort,
+		Channel: FeatureChannelExperimental,
+	}
 	// GatewayHTTPSListenerDetectMisdirectedRequestsFeature contains metadata for the SupportGatewayHTTPSListenerDetectMisdirectedRequests feature.
 	GatewayHTTPSListenerDetectMisdirectedRequestsFeature = Feature{
 		Name:    SupportGatewayHTTPSListenerDetectMisdirectedRequests,
@@ -151,6 +163,7 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayPort8080Feature,
 	GatewayStaticAddressesFeature,
 	GatewayHTTPListenerIsolationFeature,
+	GatewayHTTPSAndTLSPassthroughSamePortFeature,
 	GatewayHTTPSListenerDetectMisdirectedRequestsFeature,
 	GatewayInfrastructureFeature,
 	GatewayEmptyAddressFeature,
