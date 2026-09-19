@@ -5,7 +5,7 @@ title: "GEP-5075: Support ClusterTrustBundle as a valid caCertificateRef"
 * Issue: [#5075](https://github.com/kubernetes-sigs/gateway-api/issues/5075)
   * Related to [#1897](https://github.com/kubernetes-sigs/gateway-api/issues/1897)
   * Related to but distinct from [#3787](https://github.com/kubernetes-sigs/gateway-api/issues/3787)
-* Status: Provisional
+* Status: Implementable
 
 [Ana]: /docs/concepts/roles-and-personas/#ana
 [Chihiro]: /docs/concepts/roles-and-personas/#chihiro
@@ -74,10 +74,181 @@ A key question during community GEP reviews is whether referencing a cluster-sco
 *   **Default ServiceAccount Access:** Kubernetes grants default read permissions (`get`, `list`, `watch`) on ClusterTrustBundles to all authenticated users and all ServiceAccounts in the cluster via default system ClusterRoles.
 *   **Alignment with Security Boundary:** Because any pod in a namespace can already read these bundles through standard projected volumes, referencing them in a `BackendTLSPolicy` or `Gateway` listener does not introduce new attack vectors or leak private data. It aligns perfectly with standard cluster RBAC models.
 
-## 6. Next Steps & Graduation Criteria
+## 6. Technical Design & API Changes
 
-This GEP is proposed as **Provisional** to establish community alignment on goals and schemas. Upon approval, we will graduate the GEP to **Implementable** by delivering:
+Gateway API resources validate TLS paths using the `caCertificateRefs` field,
+which is defined as an array of `LocalObjectReference`:
 
-1.  API Schema modifications in the experimental release channel.
-2.  Integration test suites verifying controller resolution of explicit name references.
-3.  Comprehensive conformance tests ensuring correct TLS handshake failures when invalid `ClusterTrustBundle` references are provided.
+```go
+type LocalObjectReference struct {
+    Group Group      `json:"group"`
+    Kind  Kind       `json:"kind"`
+    Name  ObjectName `json:"name"`
+}
+```
+
+Since `LocalObjectReference` lacks a `Namespace` field, referencing a
+namespace-scoped resource assumes the local namespace. However, when
+referencing a cluster-scoped resource (such as `ClusterTrustBundle`), the
+absence of a namespace field is structurally correct and elegant. The
+controller evaluates the kind and resolves it against the cluster scope.
+
+The same `group` / `kind` / `name` reference is used for Gateway frontend
+validation. That field is `ObjectReference` (optional `namespace`) at
+`Gateway.spec.tls.frontend.default.validation.caCertificateRefs` (and
+`perPort[].tls.validation`), not on `spec.listeners[].tls`. For
+`ClusterTrustBundle`, `namespace` MUST be unset. A `ReferenceGrant` is not
+required because a cluster-scoped object has no target namespace.
+
+### Approach 1: Referencing by Explicit Resource Name
+
+The most straightforward integration uses the explicit global name of a
+`ClusterTrustBundle`.
+
+#### Cluster-Scoped Trust Anchor Definition:
+
+```yaml
+apiVersion: certificates.k8s.io/v1
+kind: ClusterTrustBundle
+metadata:
+  name: redhat.com:internal-signer:v1
+spec:
+  signerName: "redhat.com/internal-signer"
+  trustBundle: |
+    -----BEGIN CERTIFICATE-----
+    MIIF6TCCA9GgAwIBAgIURX... (Red Hat Corporate Root CA)
+    -----END CERTIFICATE-----
+```
+
+#### Consumer Policy (Namespace-Scoped):
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: secure-inventory-validation
+  namespace: dev-ana
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: inventory-db
+  validation:
+    hostname: db.internal.redhat.com
+    caCertificateRefs:
+      - group: certificates.k8s.io
+        kind: ClusterTrustBundle
+        name: redhat.com:internal-signer:v1
+```
+
+### Approach 2: Querying via Signer Name & Label Selector
+
+To facilitate seamless CA transitions and dynamic scaling, `ClusterTrustBundle`
+resources support selection by a target `signerName` and custom
+`labelSelector`. This allows controllers to aggregate public trust anchors
+dynamically.
+
+Because `LocalObjectReference` only supports direct name-based lookup,
+providing dynamic selection in Gateway API requires extending the validation
+schema. We propose introducing a sibling field `caCertificateSelector` within
+the TLS validation blocks:
+
+```go
+type BackendTLSPolicyValidation struct {
+    // Existing name-based reference array
+    caCertificateRefs []LocalObjectReference `json:"caCertificateRefs,omitempty"`
+
+    // Proposed selector-based reference block
+    caCertificateSelector *ClusterTrustBundleSelector `json:"caCertificateSelector,omitempty"`
+}
+
+type ClusterTrustBundleSelector struct {
+    // SignerName represents the associated signer in the cluster
+    SignerName string `json:"signerName"`
+
+    // LabelSelector filters ClusterTrustBundles under the given SignerName
+    LabelSelector *metav1.LabelSelector `json:"labelSelector,omitempty"`
+}
+```
+
+The same sibling field applies to Gateway frontend TLS validation blocks
+(`Gateway.spec.tls.frontend.default.validation` and per-port overrides).
+
+#### Consumer Policy using Dynamic Selectors:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: secure-inventory-dynamic
+  namespace: dev-ana
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: inventory-db
+  validation:
+    hostname: db.internal.redhat.com
+    caCertificateSelector:
+      signerName: "redhat.com/internal-signer"
+      labelSelector:
+        matchLabels:
+          environment: production
+```
+
+In this mode, the Gateway controller must query all matching
+ClusterTrustBundles in the cluster, merge their public `trustBundle`
+certificate arrays, and program the data plane with the unified CA root set.
+
+### Support and Validation
+
+`ClusterTrustBundle` name references and `caCertificateSelector` have
+**Extended** support. The existing Core support for a single namespaced
+`ConfigMap` remains unchanged.
+
+An implementation that supports this feature MUST:
+
+1. For a named `caCertificateRefs` entry with `group: certificates.k8s.io` and
+   `kind: ClusterTrustBundle`, read `ClusterTrustBundle.spec.trustBundle` and
+   use its PEM-encoded certificates as the trust anchors for the relevant
+   backend or frontend TLS validation.
+2. For `caCertificateSelector`, list `ClusterTrustBundle` objects that match
+   `signerName` and `labelSelector`, merge their `spec.trustBundle` PEM
+   arrays, and use that union as the trust anchors.
+3. Treat a nonexistent named bundle, an unreadable bundle, a bundle whose
+   `spec.trustBundle` cannot be parsed as a CA certificate bundle, or a
+   selector that matches no usable bundle as an invalid CA certificate
+   reference.
+4. Use the existing invalid-reference condition semantics of the containing
+   `BackendTLSPolicy` or Gateway. In particular, it MUST set
+   `ResolvedRefs=False` with the existing `InvalidCACertificateRef` reason for
+   an unresolved or malformed bundle, and it MUST NOT use the bundle for TLS
+   validation.
+5. Continue to evaluate every entry in `caCertificateRefs`. The existing rule
+   that multiple references are implementation-specific remains unchanged.
+
+Implementations MUST NOT require a `ReferenceGrant` for a valid
+`ClusterTrustBundle` name reference.
+
+## 7. Conformance
+
+This is an Extended conformance feature. Conformance coverage will verify that
+an implementation claiming this feature can:
+
+* Resolve a named `ClusterTrustBundle` from `caCertificateRefs` and use it for
+  backend TLS validation and Gateway frontend client certificate validation.
+* Resolve `caCertificateSelector` via `signerName` and `labelSelector`, merge
+  matching `trustBundle` PEMs, and use the result for TLS validation.
+* Treat nonexistent named bundles, unparsable `trustBundle` values, and
+  selectors that match no usable bundle with the existing invalid-reference
+  conditions, and not permit a successful TLS handshake.
+
+## 8. Alternatives Considered
+
+* **Copy the trust bundle to namespaced ConfigMaps.** This retains Core support
+  but duplicates data and makes rotation the responsibility of every consuming
+  namespace.
+* **Use `ReferenceGrant`.** `ReferenceGrant` expresses consent by the owner of
+  a target namespace. It cannot apply to a cluster-scoped resource and adds no
+  protection beyond the Kubernetes RBAC already governing
+  `ClusterTrustBundle` access.
