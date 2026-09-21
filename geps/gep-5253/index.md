@@ -35,9 +35,9 @@ Without a common specification, each implementation exposes its own native synta
 
 ## Design Principles
 
-1. **Flat Key Namespace:** Each entry in this dictionary represents an individual fully-qualified attribute key (for example, `http.request.method` is valid, whereas an entire sub-tree object like `http.request` is not). This avoids complex object hierarchies and ensures predictable behavior in both key-value configurations and expressions evaluators.
+1. **Flat Key Namespace:** Each entry in this dictionary represents an individual fully-qualified attribute key (for example, `http.request.method` is valid, whereas an entire sub-tree object like `http.request` is not). This avoids complex object hierarchies and ensures predictable behavior in both key-value configurations and expression evaluators.
 2. **Strict Stability Boundary:** Only attributes formally categorized as **stable** in upstream OpenTelemetry are included. All other attributes are excluded from the dictionary to prevent breaking changes.
-3. **Implementation Decoupling:** Implementations MUST translate these standard keys into their internal variables and MUST NOT expose vendor-specific command strings in portable APIs.
+3. **Implementation Decoupling:** Implementations MUST translate these standard keys into their internal variables. While implementations MAY support custom attributes outside the dictionary, they SHOULD follow attribute naming conventions rather than embedding proxy-native templating syntax.
 
 ## The Attribute Dictionary
 
@@ -88,19 +88,28 @@ Gateway API resources and policies may reference the following attributes. For e
 | [k8s.cluster.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/k8s/#k8s-cluster-name) | string |
 | [k8s.cluster.uid](https://opentelemetry.io/docs/specs/semconv/registry/attributes/k8s/#k8s-cluster-uid) | string |
 
-# Usage Guidelines Across Gateway API
+## Usage Guidelines Across Gateway API
 
 1. **Cross-API Portability:** Any Gateway API feature that accepts attribute references SHOULD use the keys defined in this dictionary.
 2. **Missing or Unavailable Attributes:** If an attribute is referenced in a context where it is not yet available (e.g., evaluating `http.response.status_code` during pre-routing request filtering), the evaluation engine SHOULD treat the attribute value as `null`, empty, or unset, rather than failing the transaction.
 3. **Type Consistency:** Consumers of these attributes can rely on the data types defined above (e.g., `http.response.status_code` is always an integer; `http.request.method` is always a string).
+4. **Syntax Across Enums and Expression Languages:** Attribute naming remains uniform across both static references (enums/string lists) and dynamic expression languages (e.g., CEL). For attributes containing dynamic sub-keys (such as HTTP headers):
+   * **In static enum/string references:** Use dot notation, e.g., `http.request.header.x-request-id`.
+   * **In expression languages (e.g., CEL):** Use index/map access notation to avoid ambiguity with punctuation in header names, e.g., `http.request.header["x-request-id"]`.
 
-## Attributes outside the dictionary
+## Attributes Outside the Dictionary
 
-An API MAY permit keys outside the dictionary. Such keys carry no portability guarantee and SHOULD be documented as implementation-specific. Such keys MUST NOT collide with the OTel namespaces the dictionary has adopted. Vendor or organization keys MUST be namespaced, e.g. `example.com/tenant`.
+An API MAY permit keys outside the dictionary. Such keys carry no portability guarantee and MUST be treated as implementation-specific. 
 
-Several **experimental** OTel attributes are directly relevant to Gateway API today, among them `tls.*` for Listener and BackendTLSPolicy observability, `rpc.*` for GRPCRoute, `gen_ai.*`, `mcp.*`, etc. Each becomes a candidate for admission when OTel stabilizes it.
+To maintain a clean user experience and avoid the migration pitfalls described in [RFC 6648](https://www.rfc-editor.org/info/rfc6648/), Gateway API does not mandate vendor prefixes (such as `example.com/` or `unstable.`) on custom attributes. However, adopting unreserved keys in the shared namespace comes with an explicit contract:
 
-# Lifecycle
+* **No Portability Guarantee:** Non-dictionary keys are not portable across implementations.
+* **Risk of Upstream Collision:** If an implementation exposes an unstandardized key and Gateway API or OpenTelemetry subsequently standardizes that key with differing semantics or types, the implementation bears full responsibility for managing migration, backward compatibility, or aliasing.
+* **Optional Namespacing:** Implementations wishing to guarantee collision-free extensions MAY still use reverse-domain notation (e.g., `com.example.custom_attribute`).
+
+Several **experimental** OTel attributes are directly relevant to Gateway API today, among them `tls.*` for Listener and BackendTLSPolicy observability, `rpc.*` for GRPCRoute, `gen_ai.*`, `mcp.*`, etc. Each becomes a candidate for formal admission into this dictionary once stabilized upstream by OpenTelemetry.
+
+## Lifecycle
 
 * **Upstream Semantic Convention Changes:** If OpenTelemetry deprecates a stable attribute, Gateway API will retain support through a standard deprecation cycle before considering removal.
 * **Handling Unsupported Attributes:** If a user configuration requests an attribute that an implementation does not support, the implementation SHOULD omit the attribute gracefully or surface a warning condition on the corresponding policy status. Implementations MUST NOT crash or fail unrelated routing operations.
