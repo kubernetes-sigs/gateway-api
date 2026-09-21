@@ -241,7 +241,7 @@ Some common examples, with recommendations, are below.
 ### Route precedence resolution
 
 {{< details title="Extended Support Feature: GatewayRouteHostnameIntersectionPrecedence" open="true" >}}
-This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
+This feature is part of extended support, but is expected to graduate to Core conformance soon. Implementations are strongly encouraged to support this behavior. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
 
