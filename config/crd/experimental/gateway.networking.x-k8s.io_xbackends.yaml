@@ -460,21 +460,23 @@ spec:
           status:
             description: Status defines the current state of XBackend.
             properties:
-              parents:
+              ancestors:
                 description: |-
-                  Ancestors is a list of parent resources associated with this Backend,
-                  and the status of the Backend with respect to each parent.
+                  Ancestors is a list of ancestor resources (usually Gateways) that are
+                  associated with this Backend, and the status of the Backend with respect
+                  to each ancestor.
 
-                  A maximum of 32 parents will be represented in this list. An empty list
-                  indicates that the Backend is not associated with any parents.
+                  A maximum of 32 ancestors will be represented in this list. An empty list
+                  indicates that the Backend is not associated with any ancestors.
                 items:
                   description: |-
                     BackendAncestorStatus describes the status of a Backend with respect to a
-                    specific parent resource (typically a Gateway).
+                    specific ancestor resource (typically a Gateway).
                   properties:
                     ancestorRef:
-                      description: AncestorRef identifies the parent resource that
-                        this status is associated with.
+                      description: |-
+                        AncestorRef identifies the ancestor resource that this status is
+                        associated with.
                       properties:
                         group:
                           default: gateway.networking.k8s.io

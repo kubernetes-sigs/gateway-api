@@ -9909,7 +9909,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendAncestorStatus describes the status of a Backend with respect to a specific parent resource (typically a Gateway).",
+				Description: "BackendAncestorStatus describes the status of a Backend with respect to a specific ancestor resource (typically a Gateway).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"controllerName": {
@@ -9922,7 +9922,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 					},
 					"ancestorRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AncestorRef identifies the parent resource that this status is associated with.",
+							Description: "AncestorRef identifies the ancestor resource that this status is associated with.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 						},
@@ -10048,14 +10048,14 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref common.Refere
 				Description: "BackendStatus defines the observed state of a Backend.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"parents": {
+					"ancestors": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
 								"x-kubernetes-list-type": "atomic",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Ancestors is a list of parent resources associated with this Backend, and the status of the Backend with respect to each parent.\n\nA maximum of 32 parents will be represented in this list. An empty list indicates that the Backend is not associated with any parents.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller that manages the Backend must add an entry for each parent it manages and remove the entry when the controller no longer considers the Backend to be associated with that parent.\n\nfor little benefit. It may also be unnecessarily complex for implementations to manage. If so, we'll remove the ancestor-based grouping and make it controller only. </gateway:util:excludeFromCRD>",
+							Description: "Ancestors is a list of ancestor resources (usually Gateways) that are associated with this Backend, and the status of the Backend with respect to each ancestor.\n\nA maximum of 32 ancestors will be represented in this list. An empty list indicates that the Backend is not associated with any ancestors.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller that manages the Backend must add an entry for each ancestor it manages and remove the entry when the controller no longer considers the Backend to be associated with that ancestor.\n\nfor little benefit. It may also be unnecessarily complex for implementations to manage. If so, we'll remove the ancestor-based grouping and make it controller only. </gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{

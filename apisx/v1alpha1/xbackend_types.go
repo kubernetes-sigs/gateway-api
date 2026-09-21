@@ -320,18 +320,19 @@ type BackendTLS struct {
 
 // BackendStatus defines the observed state of a Backend.
 type BackendStatus struct {
-	// Ancestors is a list of parent resources associated with this Backend,
-	// and the status of the Backend with respect to each parent.
+	// Ancestors is a list of ancestor resources (usually Gateways) that are
+	// associated with this Backend, and the status of the Backend with respect
+	// to each ancestor.
 	//
-	// A maximum of 32 parents will be represented in this list. An empty list
-	// indicates that the Backend is not associated with any parents.
+	// A maximum of 32 ancestors will be represented in this list. An empty list
+	// indicates that the Backend is not associated with any ancestors.
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:
 	//
-	// A controller that manages the Backend must add an entry for each parent
+	// A controller that manages the Backend must add an entry for each ancestor
 	// it manages and remove the entry when the controller no longer considers
-	// the Backend to be associated with that parent.
+	// the Backend to be associated with that ancestor.
 	//
 	// TODO: We may discover that this creates unnecessary apiserver/informer overhead
 	// for little benefit. It may also be unnecessarily complex for implementations to manage.
@@ -341,11 +342,11 @@ type BackendStatus struct {
 	// +kubebuilder:validation:MaxItems=32
 	// +optional
 	// +listType=atomic
-	Ancestors []BackendAncestorStatus `json:"parents,omitempty"`
+	Ancestors []BackendAncestorStatus `json:"ancestors,omitempty"`
 }
 
 // BackendAncestorStatus describes the status of a Backend with respect to a
-// specific parent resource (typically a Gateway).
+// specific ancestor resource (typically a Gateway).
 type BackendAncestorStatus struct {
 	// ControllerName is a domain/path string that indicates the name of the
 	// controller that manages the Backend.
@@ -367,7 +368,8 @@ type BackendAncestorStatus struct {
 	// +required
 	ControllerName v1.GatewayController `json:"controllerName"`
 
-	// AncestorRef identifies the parent resource that this status is associated with.
+	// AncestorRef identifies the ancestor resource that this status is
+	// associated with.
 	//
 	// +required
 	AncestorRef v1.ParentReference `json:"ancestorRef"`

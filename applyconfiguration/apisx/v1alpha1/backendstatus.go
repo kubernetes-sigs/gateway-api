@@ -23,24 +23,25 @@ package v1alpha1
 //
 // BackendStatus defines the observed state of a Backend.
 type BackendStatusApplyConfiguration struct {
-	// Ancestors is a list of parent resources associated with this Backend,
-	// and the status of the Backend with respect to each parent.
+	// Ancestors is a list of ancestor resources (usually Gateways) that are
+	// associated with this Backend, and the status of the Backend with respect
+	// to each ancestor.
 	//
-	// A maximum of 32 parents will be represented in this list. An empty list
-	// indicates that the Backend is not associated with any parents.
+	// A maximum of 32 ancestors will be represented in this list. An empty list
+	// indicates that the Backend is not associated with any ancestors.
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:
 	//
-	// A controller that manages the Backend must add an entry for each parent
+	// A controller that manages the Backend must add an entry for each ancestor
 	// it manages and remove the entry when the controller no longer considers
-	// the Backend to be associated with that parent.
+	// the Backend to be associated with that ancestor.
 	//
 	// TODO: We may discover that this creates unnecessary apiserver/informer overhead
 	// for little benefit. It may also be unnecessarily complex for implementations to manage.
 	// If so, we'll remove the ancestor-based grouping and make it controller only.
 	// </gateway:util:excludeFromCRD>
-	Ancestors []BackendAncestorStatusApplyConfiguration `json:"parents,omitempty"`
+	Ancestors []BackendAncestorStatusApplyConfiguration `json:"ancestors,omitempty"`
 }
 
 // BackendStatusApplyConfiguration constructs a declarative configuration of the BackendStatus type for use with
