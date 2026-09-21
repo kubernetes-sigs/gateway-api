@@ -21572,7 +21572,7 @@
 			]
 		},
 		"io.x-k8s.networking.gateway.v1alpha1.BackendAncestorStatus": {
-			"description": "BackendAncestorStatus describes the status of a Backend with respect to a specific parent resource (typically a Gateway).",
+			"description": "BackendAncestorStatus describes the status of a Backend with respect to a specific ancestor resource (typically a Gateway).",
 			"type": "object",
 			"required": [
 				"controllerName",
@@ -21580,7 +21580,7 @@
 			],
 			"properties": {
 				"ancestorRef": {
-					"description": "AncestorRef identifies the parent resource that this status is associated with.",
+					"description": "AncestorRef identifies the ancestor resource that this status is associated with.",
 					"default": {},
 					"$ref": "io.k8s.networking.gateway.v1.ParentReference"
 				},
@@ -21660,8 +21660,8 @@
 			"description": "BackendStatus defines the observed state of a Backend.",
 			"type": "object",
 			"properties": {
-				"parents": {
-					"description": "Ancestors is a list of parent resources associated with this Backend, and the status of the Backend with respect to each parent.\n\nA maximum of 32 parents will be represented in this list. An empty list indicates that the Backend is not associated with any parents.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller that manages the Backend must add an entry for each parent it manages and remove the entry when the controller no longer considers the Backend to be associated with that parent.\n\nfor little benefit. It may also be unnecessarily complex for implementations to manage. If so, we'll remove the ancestor-based grouping and make it controller only. </gateway:util:excludeFromCRD>",
+				"ancestors": {
+					"description": "Ancestors is a list of ancestor resources (usually Gateways) that are associated with this Backend, and the status of the Backend with respect to each ancestor.\n\nA maximum of 32 ancestors will be represented in this list. An empty list indicates that the Backend is not associated with any ancestors.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller that manages the Backend must add an entry for each ancestor it manages and remove the entry when the controller no longer considers the Backend to be associated with that ancestor.\n\nfor little benefit. It may also be unnecessarily complex for implementations to manage. If so, we'll remove the ancestor-based grouping and make it controller only. </gateway:util:excludeFromCRD>",
 					"type": "array",
 					"items": {
 						"$ref": "io.x-k8s.networking.gateway.v1alpha1.BackendAncestorStatus"

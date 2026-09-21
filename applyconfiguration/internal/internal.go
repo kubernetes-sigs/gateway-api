@@ -2251,7 +2251,7 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendStatus
   map:
     fields:
-    - name: parents
+    - name: ancestors
       type:
         list:
           elementType:
