@@ -239,7 +239,7 @@ type LabelSelector struct {
 
 // BackendProtocol defines the protocol used when connecting to a backend.
 //
-// +kubebuilder:validation:Enum=TCP;HTTP;HTTP2;HTTP11;H2C;MCP
+// +kubebuilder:validation:Enum=TCP;HTTP;HTTP2;HTTP11;H2C;MCP;GRPC
 type BackendProtocol string
 
 const (
@@ -315,7 +315,7 @@ type BackendTLS struct {
 	// Validation contains TLS validation configuration for the backend connection.
 	//
 	// +optional
-	Validation v1.BackendTLSPolicyValidation `json:"validation,omitempty"`
+	Validation *v1.BackendTLSPolicyValidation `json:"validation,omitempty"`
 }
 
 // BackendStatus defines the observed state of a Backend.

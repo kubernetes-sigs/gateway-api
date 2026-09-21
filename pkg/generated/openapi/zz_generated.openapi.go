@@ -10098,7 +10098,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref common.Reference
 					"validation": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Validation contains TLS validation configuration for the backend connection.",
-							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation"),
 						},
 					},

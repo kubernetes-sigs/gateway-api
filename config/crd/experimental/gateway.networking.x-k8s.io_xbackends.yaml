@@ -161,6 +161,7 @@ spec:
                 - HTTP11
                 - H2C
                 - MCP
+                - GRPC
                 type: string
               tls:
                 description: |-
