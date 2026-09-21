@@ -7,7 +7,7 @@ implementation:
   - https://github.com/cilium/community/blob/main/roles/Maintainers.md
   organization: cilium
   project: cilium
-  url: github.com/cilium/cilium
+  url: https://github.com/cilium/cilium
   version: v1.20.0
 kind: ConformanceReport
 mode: default
