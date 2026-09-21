@@ -315,7 +315,7 @@ type BackendTLS struct {
 	// Validation contains TLS validation configuration for the backend connection.
 	//
 	// +optional
-	Validation v1.BackendTLSPolicyValidation `json:"validation,omitempty"`
+	Validation *v1.BackendTLSPolicyValidation `json:"validation,omitempty"`
 }
 
 // BackendStatus defines the observed state of a Backend.

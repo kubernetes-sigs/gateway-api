@@ -2270,7 +2270,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: validation
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.BackendTLSPolicyValidation
-      default: {}
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTrafficPolicySpec
   map:
     fields:

@@ -21688,7 +21688,6 @@
 				},
 				"validation": {
 					"description": "Validation contains TLS validation configuration for the backend connection.",
-					"default": {},
 					"$ref": "io.k8s.networking.gateway.v1.BackendTLSPolicyValidation"
 				}
 			}
