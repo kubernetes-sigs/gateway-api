@@ -4,10 +4,10 @@ gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.4.1
 implementation:
   contact:
-  - github.com/kgateway-dev/kgateway/issues/new/choose
+  - https://github.com/kgateway-dev/kgateway/issues/new/choose
   organization: kgateway-dev
   project: kgateway
-  url: github.com/kgateway-dev/kgateway
+  url: https://github.com/kgateway-dev/kgateway
   version: v2.2.1
 kind: ConformanceReport
 mode: default
