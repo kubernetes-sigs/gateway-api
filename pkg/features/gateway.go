@@ -92,6 +92,8 @@ const (
 	// for resolving HTTPRoute, GRPCRoute, and TLSRoute precedence using original
 	// route hostname specificity rather than the calculated listener/route
 	// hostname intersection.
+	// Note: This feature is expected to move to Core conformance soon, so
+	// implementations are strongly encouraged to support it.
 	SupportGatewayRouteHostnameIntersectionPrecedence FeatureName = "GatewayRouteHostnameIntersectionPrecedence"
 )
 
