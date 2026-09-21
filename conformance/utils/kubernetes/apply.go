@@ -344,6 +344,7 @@ func getContentsFromPathOrURL(manifestFS []fs.FS, location string, timeoutConfig
 	}
 
 	var buffer bytes.Buffer
+	found := false
 	for _, mfs := range manifestFS {
 		buf, err := fs.ReadFile(mfs, location)
 		if err != nil && errors.Is(err, fs.ErrNotExist) {
@@ -351,10 +352,14 @@ func getContentsFromPathOrURL(manifestFS []fs.FS, location string, timeoutConfig
 		} else if err != nil {
 			return nil, err
 		}
+		found = true
 		_, err = buffer.Write(buf)
 		if err != nil {
 			return nil, err
 		}
+	}
+	if !found {
+		return nil, fmt.Errorf("manifest %q not found in any manifest filesystem: %w", location, fs.ErrNotExist)
 	}
 	return &buffer, nil
 }
