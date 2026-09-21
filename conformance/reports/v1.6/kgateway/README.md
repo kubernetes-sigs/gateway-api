@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                                                     | Mode    | Report                                              |
 |--------------|----------------------------------------------------------------------------|---------|-----------------------------------------------------|
-| experimental | [v2.4.0-rc.1](https://github.com/kgateway-dev/kgateway/releases/tag/v2.4.0-rc.1) | default | [Link](./v2.4.0-rc.1-report.yaml) |
+| experimental | [v2.4.5](https://github.com/kgateway-dev/kgateway/releases/tag/v2.4.5) | default | [Link](./v2.4.5-report.yaml) |
 
 ## Reproduce
 
@@ -13,7 +13,7 @@
 1. Clone the kgateway repository:
 
    ```sh
-   export VERSION="v2.4.0-rc.1"
+   export VERSION="v2.4.5"
    git clone https://github.com/kgateway-dev/kgateway.git && cd kgateway && git checkout $VERSION
    ```
 
