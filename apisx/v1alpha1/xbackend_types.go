@@ -239,7 +239,7 @@ type LabelSelector struct {
 
 // BackendProtocol defines the protocol used when connecting to a backend.
 //
-// +kubebuilder:validation:Enum=TCP;HTTP;HTTP2;HTTP11;H2C;MCP
+// +kubebuilder:validation:Enum=TCP;HTTP;HTTP2;HTTP11;H2C;MCP;GRPC
 type BackendProtocol string
 
 const (
