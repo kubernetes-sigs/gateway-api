@@ -81,13 +81,6 @@ Gateway API resources and policies may reference the following attributes. For e
 | [network.transport](https://opentelemetry.io/docs/specs/semconv/registry/attributes/network/#network-transport) | string |
 | [network.type](https://opentelemetry.io/docs/specs/semconv/registry/attributes/network/#network-type) | string |
 
-### Infrastructure
-
-| Attribute | OTel Data Type |
-| --- | --- |
-| [k8s.cluster.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/k8s/#k8s-cluster-name) | string |
-| [k8s.cluster.uid](https://opentelemetry.io/docs/specs/semconv/registry/attributes/k8s/#k8s-cluster-uid) | string |
-
 ## Usage Guidelines Across Gateway API
 
 1. **Cross-API Portability:** Any Gateway API feature that accepts attribute references SHOULD use the keys defined in this dictionary.
