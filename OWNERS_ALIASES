@@ -35,10 +35,10 @@ aliases:
     - candita
     - davidjumani
     - kl52752
-    - snorwin
 
   gateway-api-conformance-approvers:
     - LiorLieberman
+    - snorwin
 
   gateway-api-gep-reviewers:
     - candita
@@ -53,3 +53,4 @@ aliases:
     - candita
     - mikemorris
     - kflynn
+    - snorwin
