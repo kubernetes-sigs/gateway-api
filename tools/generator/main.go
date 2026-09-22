@@ -194,11 +194,12 @@ func applyGatewayTypeValidations(parser *crd.Parser, channel string) {
 }
 
 func applyGatewayTypeValidation(channel, name, description string, schema apiext.JSONSchemaProps) apiext.JSONSchemaProps {
-	if !strings.Contains(description, fmt.Sprintf("<gateway:%s:validation:", channel)) {
+	schema.Description = description
+	res := gatewayTweaks(channel, name, schema)
+	if res == nil {
 		return schema
 	}
-	schema.Description = description
-	return *gatewayTweaks(channel, name, schema)
+	return *res
 }
 
 // updateVAP updates the hand-maintained ValidatingAdmissionPolicy manifest
