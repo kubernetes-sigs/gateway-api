@@ -152,22 +152,14 @@ type BackendSpec struct {
 }
 
 // BackendPort describes the port the implementation should use when connecting
-// to a Backend. Inspired by discoveryv1.EndpointPort.
+// to a Backend.
+//
+// +kubebuilder:validation:MinProperties=1
 type BackendPort struct {
-	// Name represents the name of this port. All ports in a Backend must have
-	// a unique name. Name must either be an empty string or pass DNS_LABEL
-	// validation (lowercase alphanumeric or '-', starting and ending with an
-	// alphanumeric character, at most 63 characters).
+	// Number represents the port number of the destination.
 	//
 	// +optional
-	// +kubebuilder:validation:MaxLength=63
-	// +kubebuilder:validation:XValidation:rule="size(self) == 0 || !format.dns1123Label().validate(self).hasValue()",message="Name must be a valid DNS label"
-	Name *string `json:"name,omitempty"`
-
-	// Port represents the port number of the endpoint.
-	//
-	// +required
-	Port PortNumber `json:"port,omitempty"`
+	Number PortNumber `json:"number,omitempty"`
 }
 
 // ExternalHostnameBackend specifies the configuration for a backend that
@@ -213,7 +205,7 @@ type EndpointSelectorBackend struct {
 	// produce EndpointSlices; Service-level behaviors (including but not limited
 	// to internalTrafficPolicy, externalTrafficPolicy, sessionAffinity, and
 	// trafficDistribution) play no role. The Service port (ClusterIP frontend)
-	// is unused; the targetPort SHOULD be set to Backend.spec.port.
+	// is unused; the targetPort SHOULD be set to Backend.spec.port.number.
 	// Implementations SHOULD create the Service as headless (clusterIP: None),
 	// since no ClusterIP or kube-proxy load balancing is needed.
 	// Implementations MUST name the Service with generateName rather than a

@@ -116,26 +116,14 @@ spec:
                   Port defines the port to connect to on this backend.
                   For ExternalHostname, this is the port on the external host.
                   For EndpointSelector, this specifies which endpoint port to connect to.
+                minProperties: 1
                 properties:
-                  name:
-                    description: |-
-                      Name represents the name of this port. All ports in a Backend must have
-                      a unique name. Name must either be an empty string or pass DNS_LABEL
-                      validation (lowercase alphanumeric or '-', starting and ending with an
-                      alphanumeric character, at most 63 characters).
-                    maxLength: 63
-                    type: string
-                    x-kubernetes-validations:
-                    - message: Name must be a valid DNS label
-                      rule: size(self) == 0 || !format.dns1123Label().validate(self).hasValue()
-                  port:
-                    description: Port represents the port number of the endpoint.
+                  number:
+                    description: Number represents the port number of the destination.
                     format: int32
                     maximum: 65535
                     minimum: 1
                     type: integer
-                required:
-                - port
                 type: object
               protocol:
                 description: |-
