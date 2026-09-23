@@ -202,7 +202,7 @@ ordered list of stages rather than by a `backendRef`. A Gateway listener opts in
 
 ### Stages reference routes; routes do not attach to stages
 
-A stage names the route that fulfills it. The referenced route is unmodified and unaware that it takes part in a composition. Three reasons:
+A stage references the route that fulfills it. The referenced route is unmodified and unaware that it takes part in a composition. Three reasons:
 
 **It avoids duplicating the route schema.** If a stage declared its own backend, matching, filters and networking configuration inline, `MultiStageRoute` would
 have to restate most of a route, and restate it again for every protocol it wanted to support. Referencing gives each stage exactly the schema of the route
@@ -217,9 +217,7 @@ composition lets one route be used standalone, or by several different `MultiSta
 
 Cross-namespace references follow the existing rules for references made from a route ([GEP-709], [ReferenceGrant]).
 
-One consequence is worth stating: a referenced route that omits `parentRefs` is not attached to any Gateway and so is not independently reachable, it exists only to
-be used as a stage. Adding `parentRefs` makes the same route reachable on its own as well. Reachability stays the route author's decision, composition stays the
-pipeline author's, and neither has to know about the other.
+A route used as a stage doesn't necessarily need to be attached to a Gateway; whether it's additionally reachable on its own follows the normal route-attachment rules, including [GEP-3793].
 
 ### Relationship to Payload Processing (reuse, not redefine)
 
@@ -255,7 +253,7 @@ be worked out together with the payload processing authors.
 | Field | Purpose |
 |---|---|
 | `name` | Identifies the stage, for `stage()` references and for status. |
-| `routeRefs` | The route(s), and optionally the named rule that fulfills this stage. |
+| `routeRefs` | The route(s), and optionally the named rule that fulfills this stage. Route is referenced by group/kind/namespace/name/sectionName, with defaults similar to `ParentReference`, notably `namespace`, which defaults to the local namespace when omitted. |
 | `when` | Condition under which the stage runs. Omitted means always. |
 | `filters` | Payload processing applied when building this stage's request, typically deriving fields from earlier stages. |
 | `onResponse` | What this stage's outcome means for the rest of the logical request. |
@@ -373,9 +371,6 @@ spec:
     timeouts: {request: 60s}
 ```
 
-Neither route declares `parentRefs`. They are reachable only as stages of the `MultiStageRoute` above. Adding a `parentRef` to either would additionally
-make it reachable in its own right, without changing how the pipeline uses it.
-
 `onResponse` on the `decode-probe` stage above expresses the one piece of control flow this example needs. The probe asks a decode backend to serve the
 request only if it can do so immediately; `Complete` ends the logical request and returns that response to the client, and `Continue` moves on to the
 next stage. Both actions are decided per request, from that request's actual response status.
@@ -410,5 +405,6 @@ open, and it should be resolved with them rather than separately here.
 [ReferenceGrant]:https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/
 [GEP-709]:https://gateway-api.sigs.k8s.io/geps/gep-709/
 [GEP-1742]:https://gateway-api.sigs.k8s.io/geps/gep-1742/
+[GEP-3793]:https://gateway-api.sigs.k8s.io/geps/gep-3793/
 [gateway-api#5194]:https://github.com/kubernetes-sigs/gateway-api/issues/5194
 [JSON Pointer]:https://www.rfc-editor.org/rfc/rfc6901
