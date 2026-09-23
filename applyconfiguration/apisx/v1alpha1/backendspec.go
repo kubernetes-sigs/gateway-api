@@ -57,7 +57,7 @@ type BackendSpecApplyConfiguration struct {
 	//
 	// Support: Core - HTTP, HTTP2, H2C, and HTTP11
 	//
-	// Support: Extended - GRPC, MCP, TCP
+	// Support: Extended - GRPC, MCP, TCP, WSS
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:

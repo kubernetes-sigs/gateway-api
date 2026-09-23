@@ -87,6 +87,32 @@ func TestXBackendSpec(t *testing.T) {
 			},
 			wantErrors: []string{},
 		},
+		{
+			name: "protocol WSS without tls",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Port: 8080},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolWSS),
+				TLS:      nil,
+			},
+			wantErrors: []string{"tls must be set when protocol is WSS"},
+		},
+		{
+			name: "protocol WSS with tls",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Port: 8080},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolWSS),
+				TLS:      &xgatewayv1alpha1.BackendTLS{Mode: xgatewayv1alpha1.BackendTLSModeNone},
+			},
+			wantErrors: []string{},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
