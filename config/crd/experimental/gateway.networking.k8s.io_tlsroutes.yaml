@@ -529,6 +529,10 @@ spec:
                   first sees the route and MUST update the entry as appropriate when the
                   route or gateway is modified.
 
+                  Routes that fall out of scope of a controller (e.g. because a Gateway they
+                  were attached to changes GatewayClass) SHOULD NOT have their status updated
+                  by that controller.
+
                   Note that parent references that cannot be resolved by an implementation
                   of this API will not be added to this list. Implementations of this API
                   can only populate Route status for the Gateways/parent resources they are
@@ -1326,6 +1330,10 @@ spec:
                   first sees the route and MUST update the entry as appropriate when the
                   route or gateway is modified.
 
+                  Routes that fall out of scope of a controller (e.g. because a Gateway they
+                  were attached to changes GatewayClass) SHOULD NOT have their status updated
+                  by that controller.
+
                   Note that parent references that cannot be resolved by an implementation
                   of this API will not be added to this list. Implementations of this API
                   can only populate Route status for the Gateways/parent resources they are
@@ -2108,6 +2116,10 @@ spec:
                   manages the parent must add an entry to this list when the controller
                   first sees the route and MUST update the entry as appropriate when the
                   route or gateway is modified.
+
+                  Routes that fall out of scope of a controller (e.g. because a Gateway they
+                  were attached to changes GatewayClass) SHOULD NOT have their status updated
+                  by that controller.
 
                   Note that parent references that cannot be resolved by an implementation
                   of this API will not be added to this list. Implementations of this API
