@@ -87,23 +87,24 @@ func main() {
 	}
 
 	generator := &crd.Generator{}
-
-	parser := &crd.Parser{
-		Collector: &markers.Collector{Registry: &markers.Registry{}},
-		Checker: &loader.TypeChecker{
-			NodeFilters: []loader.NodeFilter{generator.CheckFilter()},
-		},
+	newParser := func() *crd.Parser {
+		parser := &crd.Parser{
+			Collector: &markers.Collector{Registry: &markers.Registry{}},
+			Checker: &loader.TypeChecker{
+				NodeFilters: []loader.NodeFilter{generator.CheckFilter()},
+			},
+		}
+		if err := generator.RegisterMarkers(parser.Collector.Registry); err != nil {
+			log.Fatalf("failed to register markers: %s", err)
+		}
+		crd.AddKnownTypes(parser)
+		for _, r := range roots {
+			parser.NeedPackage(r)
+		}
+		return parser
 	}
 
-	err = generator.RegisterMarkers(parser.Collector.Registry)
-	if err != nil {
-		log.Fatalf("failed to register markers: %s", err)
-	}
-
-	crd.AddKnownTypes(parser)
-	for _, r := range roots {
-		parser.NeedPackage(r)
-	}
+	parser := newParser()
 
 	metav1Pkg := crd.FindMetav1(roots)
 	if metav1Pkg == nil {
@@ -116,6 +117,8 @@ func main() {
 	}
 
 	for _, channel := range channels {
+		parser = newParser()
+		applyGatewayTypeValidations(parser, channel)
 		for _, groupKind := range kubeKinds {
 			if channel == "standard" && !standardKinds[groupKind.Kind] {
 				continue
@@ -178,6 +181,25 @@ func main() {
 	if loader.PrintErrors(roots, packages.TypeError) {
 		log.Fatalf("not all generators ran successfully")
 	}
+}
+
+func applyGatewayTypeValidations(parser *crd.Parser, channel string) {
+	prefix := fmt.Sprintf("<gateway:%s:validation:", channel)
+	for ident, info := range parser.Types {
+		if strings.Contains(info.Doc, prefix) {
+			parser.NeedSchemaFor(ident)
+			parser.Schemata[ident] = applyGatewayTypeValidation(channel, ident.Name, info.Doc, parser.Schemata[ident])
+		}
+	}
+}
+
+func applyGatewayTypeValidation(channel, name, description string, schema apiext.JSONSchemaProps) apiext.JSONSchemaProps {
+	schema.Description = description
+	res := gatewayTweaks(channel, name, schema)
+	if res == nil {
+		return schema
+	}
+	return *res
 }
 
 // updateVAP updates the hand-maintained ValidatingAdmissionPolicy manifest

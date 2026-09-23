@@ -72,6 +72,31 @@ func TestMarshalCRDManifestOmitsTopLevelStatus(t *testing.T) {
 	}
 }
 
+func TestApplyGatewayTypeValidation(t *testing.T) {
+	t.Run("with tag", func(t *testing.T) {
+		schema := applyGatewayTypeValidation(
+			"experimental",
+			"BackendObjectReference",
+			`BackendObjectReference.
+			<gateway:experimental:validation:XValidation:message="must be valid",rule="true">`,
+			apiext.JSONSchemaProps{Type: "object"},
+		)
+		if len(schema.XValidations) != 1 {
+			t.Fatalf("expected one type-level validation, got %d", len(schema.XValidations))
+		}
+		if got := schema.XValidations[0]; got.Message != "must be valid" || got.Rule != "true" {
+			t.Fatalf("unexpected validation: %+v", got)
+		}
+	})
+	t.Run("without tag", func(t *testing.T) {
+		orig := apiext.JSONSchemaProps{Type: "object"}
+		schema := applyGatewayTypeValidation("standard", "BackendObjectReference", "Plain description.", orig)
+		if len(schema.XValidations) != 0 {
+			t.Fatalf("expected no validations, got %d", len(schema.XValidations))
+		}
+	})
+}
+
 // vapFixture mimics the structure of the hand-maintained VAP manifests: the
 // bundle-version annotation appears on annotation lines in two documents and
 // inside a CEL expression, and the standard-channel prohibition pattern
