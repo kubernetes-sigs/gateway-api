@@ -196,7 +196,8 @@ sequenceDiagram
     Note right of C: [cookie] indicates a request<br> with one or more cookies
     C->>+G: Request Web Page<br>[cookie]
     G->>G: Consistent lookup of<br>server using cookie value
-    G->>+B: Request<br>[cookie]
+    G->>+B: Request<br>[cookie]*
+    Note right of G: *The Gateway-generated persistence<br>cookie MAY be removed before forwarding.
     B-->>-G: Response
     G-->>-C: Response
 ```
@@ -351,7 +352,8 @@ these two configurations.
 
 In this section, we will explore the questions and design elements associated with a session persistence API.
 
-Session persistence is configured as an inline field on the [Backend](../gep-4894/index.md) resource.
+Session persistence is configured within the `spec.endpointSelector` field of the
+[Backend](../gep-4894/index.md) resource and is only available when the Backend type is `EndpointSelector`.
 
 ### Backend API
 
@@ -359,8 +361,18 @@ Session persistence is configured as an inline field on the [Backend](../gep-489
 type BackendSpec struct {
     [...]
 
+    // EndpointSelector specifies the configuration for an EndpointSelector
+    // backend.
+    //
+    // +optional
+    EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
+}
+
+type EndpointSelectorBackend struct {
+    [...]
+
     // SessionPersistence defines and configures session persistence
-    // for the backend.
+    // across the endpoints selected by this backend.
     //
     // Support: Extended
     //
@@ -598,6 +610,14 @@ and will be removed once Backend session persistence reaches Standard. Implement
 route-inline support (NGINX Gateway Fabric, Envoy Gateway, kgateway) may need to support both during the transition.
 How these implementations handle the intersection is left to the implementation.
 
+### Backend Protocol Relationship
+
+The `Backend` object's `spec.protocol` defines the protocol between the Gateway and the backend endpoints. If this
+protocol does not support HTTP cookies or headers, the persistence cookie or header cannot be forwarded to the backend.
+This is acceptable because this GEP does not guarantee that either reaches the backend. Session persistence is applied
+by the Gateway when selecting an endpoint and does not depend on the persistence cookie or header being understood by
+the backend. See [Session Initiation Guidelines](#session-initiation-guidelines) for forwarding behavior.
+
 ### Traffic Splitting
 
 In scenarios involving traffic splitting, session persistence operates after backend selection. Traffic splitting
@@ -728,6 +748,11 @@ persistent session). In general, inserting an additional cookie is a generally s
 implementations to exercise their own discretion. However, regardless of the implementation's design choice, the
 implementation MUST be able to handle multiple cookies.
 
+For [gateway-initiated](#gateway-initiated-session-example) cookie-based or header-based session persistence,
+implementations MAY remove the Gateway-generated persistence cookie or header before forwarding the request to the
+selected backend. Backends should not rely on receiving a Gateway-generated persistence cookie or header. This does not
+affect the normal forwarding of application cookies or headers that are unrelated to Gateway-managed session persistence.
+
 ### Session Persistence Failure Behavior
 
 In a situation where session persistence is configured and the backend becomes unhealthy or is draining, this GEP doesn't
@@ -764,19 +789,23 @@ kind: Backend
 metadata:
   name: backend-v1
 spec:
-  sessionPersistence:
-    type: Cookie
-    cookie:
-      name: split-route-cookie
+  type: EndpointSelector
+  endpointSelector:
+    sessionPersistence:
+      type: Cookie
+      cookie:
+        name: split-route-cookie
 ---
 kind: Backend
 metadata:
   name: backend-v2
 spec:
-  sessionPersistence:
-    type: Cookie
-    cookie:
-      name: split-route-cookie
+  type: EndpointSelector
+  endpointSelector:
+    sessionPersistence:
+      type: Cookie
+      cookie:
+        name: split-route-cookie
 ```
 
 This is an invalid configuration as two separate sessions cannot have the same cookie name. Implementations SHOULD
@@ -805,19 +834,23 @@ kind: Backend
 metadata:
   name: backend-v1
 spec:
-  sessionPersistence:
-    type: Cookie
-    cookie:
-      name: session-v1
+  type: EndpointSelector
+  endpointSelector:
+    sessionPersistence:
+      type: Cookie
+      cookie:
+        name: session-v1
 ---
 kind: Backend
 metadata:
   name: backend-v2
 spec:
-  sessionPersistence:
-    type: Cookie
-    cookie:
-      name: session-v2
+  type: EndpointSelector
+  endpointSelector:
+    sessionPersistence:
+      type: Cookie
+      cookie:
+        name: session-v2
 ```
 
 Traffic splitting selects a backend based on the `weight` configuration. Once a backend is selected and session
