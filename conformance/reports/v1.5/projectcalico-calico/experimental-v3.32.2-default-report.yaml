@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-09-23T11:27:02Z"
+date: "2026-09-23T16:44:29Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.5.1
 implementation:
@@ -16,47 +16,16 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 18
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 5
-      Skipped: 0
-    supportedFeatures:
-    - GatewayAddressEmpty
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidation
-    - GatewayFrontendClientCertificateValidationInsecureFallback
-    - GatewayHTTPListenerIsolation
-    - GatewayPort8080
-    - TLSRouteModeMixed
-    - TLSRouteModeTerminate
-    unsupportedFeatures:
-    - GatewayHTTPSListenerDetectMisdirectedRequests
-    - GatewayInfrastructurePropagation
-    - GatewayStaticAddresses
-    - ListenerSet
-  name: GATEWAY-TLS
-  summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
       Passed: 33
       Skipped: 0
   extended:
-    result: partial
-    skippedTests:
-    - BackendTLSPolicySANValidation
+    result: success
     statistics:
       Failed: 0
       Passed: 41
-      Skipped: 1
+      Skipped: 0
     supportedFeatures:
     - BackendTLSPolicy
-    - BackendTLSPolicySANValidation
     - GatewayAddressEmpty
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
@@ -87,12 +56,13 @@ profiles:
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
     unsupportedFeatures:
+    - BackendTLSPolicySANValidation
     - GatewayHTTPSListenerDetectMisdirectedRequests
     - GatewayInfrastructurePropagation
     - GatewayStaticAddresses
     - ListenerSet
   name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests partially succeeded with 1 test skips.
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -118,6 +88,34 @@ profiles:
     - GatewayStaticAddresses
     - ListenerSet
   name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 18
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 5
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayPort8080
+    - TLSRouteModeMixed
+    - TLSRouteModeTerminate
+    unsupportedFeatures:
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - ListenerSet
+  name: GATEWAY-TLS
   summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GRPCRouteNamedRule

@@ -23,6 +23,9 @@ from v3.32.2.
    ```bash
    git fetch origin release-v3.33
    git checkout FETCH_HEAD -- e2e/cmd/gateway hack/test/kind/gateway-setup.sh
+   # In e2e/cmd/gateway/e2e_test.go, move BackendTLSPolicySANValidation from
+   # the curated SkipTests to skipFeatures, so it is reported as unsupported
+   # (https://github.com/envoyproxy/gateway/issues/9687).
    go get sigs.k8s.io/gateway-api@v1.5.1 sigs.k8s.io/gateway-api/conformance@v1.5.1
    go test ./e2e/cmd/gateway -c -o e2e/bin/gateway/e2e.test
    ```
