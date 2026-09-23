@@ -534,14 +534,14 @@ lives on the pre-routing container and does not perturb the
 // route selection or can already be expressed post-routing with equal
 // expressiveness. See the GEP text for details.
 type HTTPListenerFilter struct {
-    // Name is a required, list-unique identifier for this filter. It is used
-    // as a stable key in Gateway status conditions and in implementation
+    // Name is an optional, list-unique identifier for this filter. It is optionally
+    // included in Gateway status conditions and in implementation
     // diagnostics (for example, to report which filter rejected a request).
     //
-    // +required
+    // +optional
     // +kubebuilder:validation:MinLength=1
     // +kubebuilder:validation:MaxLength=253
-    Name SectionName `json:"name"`
+    Name SectionName `json:"name,omitempty"`
 
     // Type identifies which variant of the discriminated union below is
     // populated. Uses the same union-discriminator pattern as HTTPRouteFilter.
@@ -661,17 +661,13 @@ converged on.
 
 Route matching is **single-pass**:
 
-1. Every entry in `httpFilters` executes, in order, on the incoming
+1. Every entry in `httpListenerFilters` executes, in order, on the incoming
    request.
-2. After the last pre-routing filter completes (or one short-circuits), the
+2. After the last pre-routing filter completes, the
    implementation performs HTTPRoute matching against the (potentially
    mutated) request.
-3. Implementations MUST NOT re-run any `httpFilters` entries after
-   HTTPRoute matching begins.
-4. Implementations MAY invalidate an internal route cache after a
-   pre-routing filter mutates a matching input (for example, Envoy's
-   `clearRouteCache`), but this is an implementation detail; from the API's
-   perspective there is exactly one HTTPRoute match evaluation per request.
+3. Implementations MUST NOT re-run any `httpListenerFilters` entries after
+   the pre-routing stage completes.
 
 Single-pass matching is chosen because it (a) eliminates loop-detection
 semantics that different data planes model differently (NGINX rewrite loops vs. Envoy route-cache
@@ -818,9 +814,7 @@ does not break any prior configuration.
 * **`RequestMirror`.** Mirroring clones the request to a separate backend
   and discards the mirror's response. It does **not** mutate the primary
   request in any way, so by construction it cannot influence which route
-  the primary is matched to. The pre-routing phase is defined as the phase
-  whose output *can* influence route selection. A variant that provably
-  cannot doesn't belong.
+  the primary is matched to.
 
 * **`ResponseHeaderModifier`.** This filter mutates headers on the response
   path. During the pre-routing phase, no backend has been selected, no
@@ -908,7 +902,7 @@ at all.
 **Message content:**
 
 When `httpListenerFilters` is the cause of a `False` condition, the `Message` field
-SHOULD name the offending filter by its `Name` and describe the specific
+SHOULD name the offending filter by its `Name` (if defined) and describe the specific
 failure — for example, `"httpListenerFilters[verify-jwt]: ExternalAuth.backendRef
 refers to Service default/jwt-verifier which does not exist"`. This mirrors
 existing Gateway API practice for `InvalidCertificateRef` and similar
@@ -916,7 +910,7 @@ reasons.
 
 ### Conformance
 
-* **Feature name:** `GatewayHTTPFilters` (Extended). Implementations
+* **Feature name:** `HTTPListenerFilters` (Extended). Implementations
   advertise support via the standard Gateway API feature list.
 * **Sub-features:** one per permitted filter variant, so an implementation
   can advertise partial support:
@@ -965,11 +959,11 @@ reasons.
   6. **Wrong-protocol rejection.** A listener with `Protocol` set to a value
      other than `HTTP` or `HTTPS` (for example, `TCP`) whose `httpFilters`
      is non-empty MUST be rejected with `Accepted=False`,
-     `Reason=InvalidHTTPFilter`.
-  7. **Unresolvable filter reference.** A listener whose `httpFilters`
+     `Reason=InvalidListenerFilter`.
+  7. **Unresolvable filter reference.** A listener whose `httpListenerFilters`
      contains an `ExternalAuth.backendRef` (or `ExtensionRef`) that does
      not exist MUST have `ResolvedRefs=False`,
-     `Reason=InvalidHTTPFilterRef`, and the message MUST identify which
+     `Reason=InvalidListenerFilterRef`, and the message MUST identify which
      filter's reference failed to resolve. A cross-namespace
      `ExternalAuth.backendRef` without a matching ReferenceGrant MUST have
      `ResolvedRefs=False`, `Reason=RefNotPermitted`.
