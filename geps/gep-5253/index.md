@@ -97,7 +97,7 @@ An API MAY permit keys outside the dictionary. Such keys carry no portability gu
 To maintain a clean user experience and avoid the migration pitfalls described in [RFC 6648](https://www.rfc-editor.org/info/rfc6648/), Gateway API does not mandate vendor prefixes (such as `example.com/` or `unstable.`) on custom attributes. However, adopting unreserved keys in the shared namespace comes with an explicit contract:
 
 * **No Portability Guarantee:** Non-dictionary keys are not portable across implementations.
-* **Risk of Upstream Collision:** If an implementation exposes an unstandardized key and Gateway API or OpenTelemetry subsequently standardizes that key with differing semantics or types, the implementation bears full responsibility for managing migration, backward compatibility, or aliasing.
+* **Risk of Upstream Collision:** If an implementation exposes an unstandardized key and Gateway API or OpenTelemetry subsequently standardizes that key with differing semantics or types, the implementation bears full responsibility for managing migration, backward compatibility, or aliasing. Gateway API will choose names of future attributes without any consideration for custom names that implementations may already be using.
 * **Optional Namespacing:** Implementations wishing to guarantee collision-free extensions MAY still use reverse-domain notation (e.g., `com.example.custom_attribute`).
 
 Several **experimental** OTel attributes are directly relevant to Gateway API today, among them `tls.*` for Listener and BackendTLSPolicy observability, `rpc.*` for GRPCRoute, `gen_ai.*`, `mcp.*`, etc. Each becomes a candidate for formal admission into this dictionary once stabilized upstream by OpenTelemetry.
