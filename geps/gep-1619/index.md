@@ -749,9 +749,10 @@ implementations to exercise their own discretion. However, regardless of the imp
 implementation MUST be able to handle multiple cookies.
 
 For [gateway-initiated](#gateway-initiated-session-example) cookie-based or header-based session persistence,
-implementations MAY remove the Gateway-generated persistence cookie or header before forwarding the request to the
-selected backend. Backends should not rely on receiving a Gateway-generated persistence cookie or header. This does not
-affect the normal forwarding of application cookies or headers that are unrelated to Gateway-managed session persistence.
+implementations SHOULD forward the Gateway-generated persistence cookie or header to the selected backend when supported
+by the backend protocol. Backends should not rely on receiving a Gateway-generated persistence cookie or header. This
+does not affect the normal forwarding of application cookies or headers that are unrelated to Gateway-managed session
+persistence.
 
 ### Session Persistence Failure Behavior
 
