@@ -50,6 +50,7 @@ type HTTPRequestMirrorFilterApplyConfiguration struct {
 	// If the backend service requires TLS, use BackendTLSPolicy to tell the
 	// implementation to supply the TLS details to be used to connect to that
 	// backend.
+	//
 	BackendRef *BackendObjectReferenceApplyConfiguration `json:"backendRef,omitempty"`
 	// Percent represents the percentage of requests that should be
 	// mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
@@ -57,12 +58,14 @@ type HTTPRequestMirrorFilterApplyConfiguration struct {
 	//
 	// Only one of Fraction or Percent may be specified. If neither field
 	// is specified, 100% of requests will be mirrored.
+	//
 	Percent *int32 `json:"percent,omitempty"`
 	// Fraction represents the fraction of requests that should be
 	// mirrored to BackendRef.
 	//
 	// Only one of Fraction or Percent may be specified. If neither field
 	// is specified, 100% of requests will be mirrored.
+	//
 	Fraction *FractionApplyConfiguration `json:"fraction,omitempty"`
 }
 

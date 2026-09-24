@@ -71,10 +71,8 @@ var UDPRouteReferenceGrant = confsuite.ConformanceTest{
 		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout)
 		defer cancel()
 		rg := v1.ReferenceGrant{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "udp-reference-grant",
-				Namespace: confsuite.AppBackendNamespace,
-			},
+			Name:      "udp-reference-grant",
+			Namespace: confsuite.AppBackendNamespace,
 		}
 		require.NoError(t, suite.Client.Delete(ctx, &rg))
 

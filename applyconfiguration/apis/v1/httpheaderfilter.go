@@ -43,6 +43,7 @@ type HTTPHeaderFilterApplyConfiguration struct {
 	// Output:
 	// GET /foo HTTP/1.1
 	// my-header: bar
+	//
 	Set []HTTPHeaderApplyConfiguration `json:"set,omitempty"`
 	// Add adds the given header(s) (name, value) to the request
 	// before the action. It appends to any existing values associated
@@ -60,6 +61,7 @@ type HTTPHeaderFilterApplyConfiguration struct {
 	// Output:
 	// GET /foo HTTP/1.1
 	// my-header: foo,bar,baz
+	//
 	Add []HTTPHeaderApplyConfiguration `json:"add,omitempty"`
 	// Remove the given header(s) from the HTTP request before the action. The
 	// value of Remove is a list of HTTP header names. Note that the header
@@ -78,6 +80,7 @@ type HTTPHeaderFilterApplyConfiguration struct {
 	// Output:
 	// GET /foo HTTP/1.1
 	// my-header2: bar
+	//
 	Remove []string `json:"remove,omitempty"`
 }
 

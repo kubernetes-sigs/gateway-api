@@ -29,6 +29,7 @@ import (
 // TLSRouteRule is the configuration for a given rule.
 type TLSRouteRuleApplyConfiguration struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+	//
 	Name *v1.SectionName `json:"name,omitempty"`
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent. If unspecified or invalid (refers to a nonexistent resource or
@@ -51,6 +52,7 @@ type TLSRouteRuleApplyConfiguration struct {
 	// Support for weight: Extended
 	//
 	// Support for BackendTLSPolicy: Extended
+	//
 	BackendRefs []apisv1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 

@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"sigs.k8s.io/gateway-api/pkg/consts"
 )
@@ -31,13 +30,9 @@ func TestMarshalCRDManifestOmitsTopLevelStatus(t *testing.T) {
 	t.Parallel()
 
 	crd := apiext.CustomResourceDefinition{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: apiext.SchemeGroupVersion.String(),
-			Kind:       "CustomResourceDefinition",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "httproutes.gateway.networking.k8s.io",
-		},
+		APIVersion: apiext.SchemeGroupVersion.String(),
+		Kind:       "CustomResourceDefinition",
+		Name:       "httproutes.gateway.networking.k8s.io",
 		Spec: apiext.CustomResourceDefinitionSpec{
 			Group: "gateway.networking.k8s.io",
 			Names: apiext.CustomResourceDefinitionNames{

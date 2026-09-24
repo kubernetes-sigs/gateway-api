@@ -35,7 +35,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -86,12 +85,10 @@ func formatSecret(cert bytes.Buffer, privateKey bytes.Buffer, namespace string, 
 	}
 
 	newSecret := &corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: namespace,
-			Name:      secretName,
-		},
-		Type: corev1.SecretTypeTLS,
-		Data: data,
+		Namespace: namespace,
+		Name:      secretName,
+		Type:      corev1.SecretTypeTLS,
+		Data:      data,
 	}
 
 	return newSecret
@@ -179,10 +176,8 @@ func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string) (*
 
 	// Store the certificate in a ConfigMap.
 	caConfigMap := &corev1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: namespace,
-			Name:      configMapName,
-		},
+		Namespace: namespace,
+		Name:      configMapName,
 		Data: map[string]string{
 			"ca.crt": certData.String(),
 		},

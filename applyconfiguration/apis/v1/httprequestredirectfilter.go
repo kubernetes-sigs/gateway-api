@@ -42,18 +42,21 @@ type HTTPRequestRedirectFilterApplyConfiguration struct {
 	// Reason of `UnsupportedValue`.
 	//
 	// Support: Extended
+	//
 	Scheme *string `json:"scheme,omitempty"`
 	// Hostname is the hostname to be used in the value of the `Location`
 	// header in the response.
 	// When empty, the hostname in the `Host` header of the request is used.
 	//
 	// Support: Core
+	//
 	Hostname *apisv1.PreciseHostname `json:"hostname,omitempty"`
 	// Path defines parameters used to modify the path of the incoming request.
 	// The modified path is then used to construct the `Location` header. When
 	// empty, the request path is used as-is.
 	//
 	// Support: Extended
+	//
 	Path *HTTPPathModifierApplyConfiguration `json:"path,omitempty"`
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
@@ -77,6 +80,8 @@ type HTTPRequestRedirectFilterApplyConfiguration struct {
 	// the Listener protocol or the Scheme field) _and_ use port 443.
 	//
 	// Support: Extended
+	//
+	//
 	Port *int32 `json:"port,omitempty"`
 	// StatusCode is the HTTP status code to be used in response.
 	//
@@ -95,6 +100,7 @@ type HTTPRequestRedirectFilterApplyConfiguration struct {
 	// HTTPRoute307RedirectStatusCode, and
 	// HTTPRoute308RedirectStatusCode
 	// </gateway:util:excludeFromCRD>
+	//
 	StatusCode *int `json:"statusCode,omitempty"`
 }
 

@@ -53,7 +53,7 @@ type RouteStatusApplyConfiguration struct {
 	// `controllerName` for that implementation.
 	// * Implementations MUST NOT update entries with non-matching `controllerName`
 	// fields.
-	// * Implementations MUST treat each `parentRef“ in the Route separately and
+	// * Implementations MUST treat each `parentRef`` in the Route separately and
 	// update its status based on the relationship with that parent.
 	// * Implementations MUST perform a read-modify-write cycle on this field
 	// before modifying it. That is, when modifying this field, implementations
@@ -61,6 +61,7 @@ type RouteStatusApplyConfiguration struct {
 	// and ensure that changes they make are on that recent version.
 	//
 	// </gateway:util:excludeFromCRD>
+	//
 	Parents []RouteParentStatusApplyConfiguration `json:"parents,omitempty"`
 }
 

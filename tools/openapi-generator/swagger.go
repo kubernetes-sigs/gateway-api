@@ -51,14 +51,10 @@ func convertFromCrds(crds []*extensionv1.CustomResourceDefinition) ([]*spec.Swag
 
 func createStaticSpec(title string, version string) *spec.Swagger {
 	return &spec.Swagger{
-		SwaggerProps: spec.SwaggerProps{
-			Info: &spec.Info{
-				InfoProps: spec.InfoProps{
-					Title:   title,
-					Version: version,
-				},
-			},
-			Swagger: "2.0",
+		Info: &spec.Info{
+			Title:   title,
+			Version: version,
 		},
+		Swagger: "2.0",
 	}
 }

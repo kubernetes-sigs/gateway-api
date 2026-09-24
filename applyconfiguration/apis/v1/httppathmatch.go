@@ -32,8 +32,10 @@ type HTTPPathMatchApplyConfiguration struct {
 	// Support: Core (Exact, PathPrefix)
 	//
 	// Support: Implementation-specific (RegularExpression)
+	//
 	Type *apisv1.PathMatchType `json:"type,omitempty"`
 	// Value of the HTTP path to match against.
+	//
 	Value *string `json:"value,omitempty"`
 }
 
