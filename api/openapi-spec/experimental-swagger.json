@@ -17979,7 +17979,7 @@
 					"type": "string"
 				},
 				"sessionPersistence": {
-					"description": "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
+					"description": "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
 					"$ref": "io.k8s.networking.gateway.v1.SessionPersistence"
 				}
 			}
@@ -18954,7 +18954,7 @@
 					"$ref": "io.k8s.networking.gateway.v1.HTTPRouteRetry"
 				},
 				"sessionPersistence": {
-					"description": "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
+					"description": "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
 					"$ref": "io.k8s.networking.gateway.v1.SessionPersistence"
 				},
 				"timeouts": {
@@ -21704,7 +21704,7 @@
 					"$ref": "io.x-k8s.networking.gateway.v1alpha1.RetryConstraint"
 				},
 				"sessionPersistence": {
-					"description": "SessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
+					"description": "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
 					"$ref": "io.k8s.networking.gateway.v1.SessionPersistence"
 				},
 				"targetRefs": {
