@@ -901,8 +901,7 @@ type HTTPRouteFilter struct {
 	// Support: Extended
 	//
 	// +optional
-	//
-	// +kubebuilder:validation:AtMostOneOf=percent;fraction
+
 	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
 	// RequestRedirect defines a schema for a filter that responds to the
