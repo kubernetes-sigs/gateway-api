@@ -1341,9 +1341,10 @@ spec:
                                   - backendRef
                                   type: object
                                   x-kubernetes-validations:
-                                  - message: Only one of percent or fraction may be
-                                      specified in HTTPRequestMirrorFilter
-                                    rule: '!(has(self.percent) && has(self.fraction))'
+                                  - message: at most one of the fields in [percent
+                                      fraction] may be set
+                                    rule: (has(self.percent)?1:0)+(has(self.fraction)?1:0)
+                                      <= 1
                                 requestRedirect:
                                   description: |-
                                     RequestRedirect defines a schema for a filter that responds to the
@@ -2868,9 +2869,10 @@ spec:
                             - backendRef
                             type: object
                             x-kubernetes-validations:
-                            - message: Only one of percent or fraction may be specified
-                                in HTTPRequestMirrorFilter
-                              rule: '!(has(self.percent) && has(self.fraction))'
+                            - message: at most one of the fields in [percent fraction]
+                                may be set
+                              rule: (has(self.percent)?1:0)+(has(self.fraction)?1:0)
+                                <= 1
                           requestRedirect:
                             description: |-
                               RequestRedirect defines a schema for a filter that responds to the
@@ -3592,10 +3594,6 @@ spec:
                                 'PathPrefix']
                               rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/.'')
                                 : true'
-                            - message: type must be one of ['Exact', 'PathPrefix',
-                                'RegularExpression']
-                              rule: self.type in ['Exact','PathPrefix'] || self.type
-                                == 'RegularExpression'
                             - message: must only contain valid characters (matching
                                 ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$)
                                 for types ['Exact', 'PathPrefix']
@@ -5647,9 +5645,10 @@ spec:
                                   - backendRef
                                   type: object
                                   x-kubernetes-validations:
-                                  - message: Only one of percent or fraction may be
-                                      specified in HTTPRequestMirrorFilter
-                                    rule: '!(has(self.percent) && has(self.fraction))'
+                                  - message: at most one of the fields in [percent
+                                      fraction] may be set
+                                    rule: (has(self.percent)?1:0)+(has(self.fraction)?1:0)
+                                      <= 1
                                 requestRedirect:
                                   description: |-
                                     RequestRedirect defines a schema for a filter that responds to the
@@ -7174,9 +7173,10 @@ spec:
                             - backendRef
                             type: object
                             x-kubernetes-validations:
-                            - message: Only one of percent or fraction may be specified
-                                in HTTPRequestMirrorFilter
-                              rule: '!(has(self.percent) && has(self.fraction))'
+                            - message: at most one of the fields in [percent fraction]
+                                may be set
+                              rule: (has(self.percent)?1:0)+(has(self.fraction)?1:0)
+                                <= 1
                           requestRedirect:
                             description: |-
                               RequestRedirect defines a schema for a filter that responds to the
@@ -7898,10 +7898,6 @@ spec:
                                 'PathPrefix']
                               rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/.'')
                                 : true'
-                            - message: type must be one of ['Exact', 'PathPrefix',
-                                'RegularExpression']
-                              rule: self.type in ['Exact','PathPrefix'] || self.type
-                                == 'RegularExpression'
                             - message: must only contain valid characters (matching
                                 ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$)
                                 for types ['Exact', 'PathPrefix']

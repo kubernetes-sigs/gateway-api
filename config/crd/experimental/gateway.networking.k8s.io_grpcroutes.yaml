@@ -793,9 +793,10 @@ spec:
                                   - backendRef
                                   type: object
                                   x-kubernetes-validations:
-                                  - message: Only one of percent or fraction may be
-                                      specified in HTTPRequestMirrorFilter
-                                    rule: '!(has(self.percent) && has(self.fraction))'
+                                  - message: at most one of the fields in [percent
+                                      fraction] may be set
+                                    rule: (has(self.percent)?1:0)+(has(self.fraction)?1:0)
+                                      <= 1
                                 responseHeaderModifier:
                                   description: |-
                                     ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -1464,9 +1465,10 @@ spec:
                             - backendRef
                             type: object
                             x-kubernetes-validations:
-                            - message: Only one of percent or fraction may be specified
-                                in HTTPRequestMirrorFilter
-                              rule: '!(has(self.percent) && has(self.fraction))'
+                            - message: at most one of the fields in [percent fraction]
+                                may be set
+                              rule: (has(self.percent)?1:0)+(has(self.fraction)?1:0)
+                                <= 1
                           responseHeaderModifier:
                             description: |-
                               ResponseHeaderModifier defines a schema for a filter that modifies response
