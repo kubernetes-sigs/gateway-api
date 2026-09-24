@@ -137,7 +137,6 @@ body-based routing, but each is independently useful.
 
 ## Non-Goals
 
-* Defining the concrete API shape, field names, or expression language.
 * Defining the exhaustive set of supported value sources.
 * Extending `ResponseHeaderModifier`. Response header dynamism has a
   different set of value sources (backend response headers, response
