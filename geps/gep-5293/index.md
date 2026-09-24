@@ -16,18 +16,17 @@ accept only static string literals in `HTTPHeaderFilter.value`. There is
 no portable way to say "set `x-model` from the JSON `model` field in the
 request body," or "set `x-tenant` from the `tenant_id` claim on the
 caller's JWT," or "set `x-client-cn` from the client certificate's Common
-Name," even though every established data plane can express some form of
-this natively.
+Name," even though data planes can express some form of this natively.
 
-This provisional revision is scoped to the *what*, *who*, and *why*. It
-establishes that dynamic header modification is a first-class capability
+This GEP establishes that dynamic header modification is a first-class capability
 that belongs in Gateway API, distinct from body processing, external
-callouts, or pre-routing phase attachment. The concrete API shape (the
-field(s) added to `HTTPHeaderFilter`, the expression language, whether
-value derivation runs in-process or via an out-of-process `backendRef`,
-and which value sources are in scope) is deliberately left open here and
-enumerated as *options under consideration*. They will be resolved at the
-Experimental stage.
+callouts, or pre-routing phase attachment. Value derivation is scoped to
+running **in-process** in the data plane; out-of-process derivation (via
+a `backendRef` to an external service such as `ext_proc`, `ext_authz`,
+`ForwardAuth`, or SPOE) is out of scope. The concrete API shape (the
+field(s) added to `HTTPHeaderFilter`, the expression language, and which
+value sources are in scope) is deliberately left open here and enumerated
+as *options under consideration*.
 
 Because `HTTPHeaderFilter` is the type used by both
 `HTTPRouteFilter.RequestHeaderModifier` and
@@ -88,8 +87,7 @@ None of these can be expressed today with a static
 Because Gateway API does not model dynamic values, implementations
 diverge. Envoy Gateway silently interprets `RequestHeaderModifier.value`
 as an Envoy substitution string. agentgateway uses a separate
-`AgentgatewayPolicy` with CEL. Kgateway / Gloo uses a
-`TrafficPolicy.transformation` block with Inja templates. Istio exposes
+`AgentgatewayPolicy` with CEL. Istio exposes
 JWT claim projection natively but requires `WasmPlugin` or `ext_proc` for
 body access. NGINX Gateway Fabric *rejects* variable-like syntax in the
 field and is tracking a separate design
@@ -101,18 +99,20 @@ bespoke component in front of the Gateway.
 
 ### Relationship to Pre-Routing
 
-Dynamic `RequestHeaderModifier` is separable from
-[GEP-5224 (Pre-Routing Filters)](https://gateway-api.sigs.k8s.io/geps/gep-5224/)
-but strongly complementary. Pre-routing is *when* a filter runs (before
-route selection, so its output can influence routing). Dynamic
-`RequestHeaderModifier` is *what* a filter can express (a header value
-derived at request time). Body-based routing, the motivating example on
-both GEPs, requires both: the dynamic value has to be produced, and it
-has to be produced before matching. Pre-routing without a dynamic
-`RequestHeaderModifier` has no portable body-based mechanism to admit;
-a dynamic `RequestHeaderModifier` without pre-routing can still enrich
-requests for post-routing filters and backends, but cannot influence
-route selection.
+Dynamic `RequestHeaderModifier` is a filter capability that could be
+utilized in the pre-routing phase, as described in
+[GEP-5224 (Pre-Routing Filters)](https://gateway-api.sigs.k8s.io/geps/gep-5224/).
+Dynamic `RequestHeaderModifier` is a general capability that applies to
+filters in any phase. When used in a post-routing filter, it can enrich
+requests for later filters and backends, but it cannot influence route
+selection. When used in a pre-routing filter, the derived header value
+is available as an input to route matching.
+
+Body-based routing is the motivating use case for both GEPs and requires
+both capabilities together: the value must be derived from the request
+body (dynamic `RequestHeaderModifier`), *and* it must be derived before
+route selection (pre-routing). Neither GEP alone is sufficient for
+body-based routing, but each is independently useful.
 
 ## Goals
 
@@ -127,8 +127,10 @@ route selection.
   includes body fields, JWT and other verified security context, and
   request context (headers, query parameters, cookies, connection info,
   client certificate fields). Do not prematurely commit to a specific set.
-* Frame the in-process vs out-of-process split as an architectural design
-  dimension to be resolved at Experimental, not an implementation detail.
+* Scope value derivation to **in-process** evaluation in the data plane.
+  Out-of-process derivation via a `backendRef` to an external service
+  (mirroring `ext_proc`, `ext_authz`, `ForwardAuth`, or SPOE) is
+  explicitly out of scope for this GEP.
 * Preserve full backwards compatibility: any existing configuration using
   static string values in `RequestHeaderModifier` continues to work
   unchanged.
@@ -167,7 +169,7 @@ route selection.
 **As a Gateway API Implementation Author:**
 
 > "My data plane already supports request-time header values through a
-> substitution language or an out-of-process callout. I want a Gateway
+> substitution language or expression evaluation. I want a Gateway
 > API surface I can implement conformantly, rather than silently
 > extending `RequestHeaderModifier.value` or asking my users to leave
 > Gateway API for an implementation-specific CRD."
@@ -183,10 +185,9 @@ capability has three consequences:
    categorically cannot read the request body in their configuration
    surface. Naming the capability lets it be feature-flagged, tiered, and
    conformance-tested independently of the base `RequestHeaderModifier`.
-2. **Its own cost model.** Dynamic values may require body buffering,
-   expression evaluation, or an out-of-process callout. Users opting into
-   a dynamic value are opting into that cost; the API should make the
-   choice explicit.
+2. **Its own cost model.** Dynamic values may require body buffering or
+   expression evaluation. Users opting into a dynamic value are opting
+   into that cost; the API should make the choice explicit.
 3. **Composition with pre-routing.** Only a dynamic value can encode a
    signal that route matching needs to see. The pre-routing filter list
    ([GEP-5224](https://gateway-api.sigs.k8s.io/geps/gep-5224/)) is
@@ -194,7 +195,7 @@ capability has three consequences:
 
 ## Prior Art
 
-The dynamic header modification pattern exists in every serious data plane;
+The dynamic header modification pattern exists in many data planes;
 what varies is *how* it is expressed and what value sources are reachable.
 
 * **Envoy** exposes substitution command operators (`%REQ()%`,
@@ -206,22 +207,18 @@ what varies is *how* it is expressed and what value sources are reachable.
   out-of-process. JWT claim projection is first-class through
   `jwt_authn.claim_to_headers`. **Envoy Gateway**
   already interprets `RequestHeaderModifier.value` as an Envoy substitution
-  string, delivering dynamic values today off-spec. **agentgateway**
-  evaluates CEL expressions like `json(request.body).model` in a
-  `PreRouting` phase. **Kgateway/Gloo** uses Inja or MiniJinja templates
-  with `body()`, `header(...)`, and `extraction(...)` functions. **Istio**
-  wraps `jwt_authn` as `RequestAuthentication.outputClaimToHeaders`. Body
-  projection in Istio goes through `WasmPlugin`, `EnvoyFilter`, or
-  `ext_proc` (for example the Gateway API Inference Extension's
-  Body-Based Router).
+  string, delivering dynamic values today off-spec.
+* **agentgateway** evaluates CEL expressions like `json(request.body).model` in a
+  `PreRouting` phase.
+* **Istio** wraps `jwt_authn` as `RequestAuthentication.outputClaimToHeaders`. Body
+  projection in Istio goes through `WasmPlugin` or `EnvoyFilter`.
 * **HAProxy** is the closest existing prior art for *declarative* dynamic
   values without scripting. `http-request set-header X-Model
   %[req.body,json_query('$.model')]` composes a sample fetch (`req.body`,
   `http_auth_bearer`, `ssl_c_s_dn(cn)`, `src`, and others) with converters
   (`json_query`, `jwt_payload_query`, `regsub`, and others). Body access
   requires `option http-buffer-request` or `http-request wait-for-body`
-  and is bounded by `tune.bufsize`. SPOE provides the out-of-process
-  equivalent.
+  and is bounded by `tune.bufsize`.
 * **NGINX** expands variables in `proxy_set_header` covering headers
   (`$http_<name>`), query (`$arg_<name>`), cookies, connection info, and
   TLS/mTLS fields; JWT claims are available in NGINX Plus. Body access
@@ -245,23 +242,24 @@ what varies is *how* it is expressed and what value sources are reachable.
 Across the surveyed implementations the *capability* is universal, the
 common *value sources* overlap heavily on request context and verified
 identity, and the *body-access* path is where the strongest divergence
-sits. Every implementation supports both an in-process and an
-out-of-process pattern; managed cloud load balancers are the only class
-that cannot support body access in-process.
+sits. Every implementation supports an in-process pattern for at least
+some value sources; managed cloud load balancers are the only class that
+cannot support body access in-process. Out-of-process callout patterns
+(such as `ext_proc`, `ext_authz`, `ForwardAuth`, and SPOE) exist in most
+data planes as well but are out of scope for this GEP.
 
 ## Options Under Consideration
 
 These design dimensions are enumerated so that agreement on motivation is
 not blocked on any one of them. All are deferred to the Experimental stage.
 
-* **In-process vs out-of-process.** Whether dynamic values are computed in
-  the data plane (via a substitution language, CEL, or a bounded expression
-  set) or delegated to an external service reached via a `backendRef`
-  (mirroring `ext_proc`, `ext_authz`, `auth_request`, `ForwardAuth`, or
-  SPOE), or both. Every implementation supports one or both patterns
-  natively; the trade-off is between latency/throughput (in-process wins)
-  and expressiveness / body-safety / managed-LB portability (out-of-process
-  wins).
+* **In-process vs out-of-process.** *Resolved.* Value derivation is
+  scoped to in-process evaluation in the data plane. Out-of-process
+  derivation via a `backendRef` (mirroring `ext_proc`, `ext_authz`,
+  `ForwardAuth`, or SPOE) is out of scope for this GEP. Users needing
+  that pattern are directed to existing external-service GEPs
+  ([GEP-1494 ExternalAuth](https://gateway-api.sigs.k8s.io/geps/gep-1494/))
+  or implementation-specific mechanisms.
 * **Enumerated value sources.** Which sources are in scope. Candidates
   include body fields, JWT and other verified security context,
   individual request headers, query parameters, cookies, TLS/mTLS fields,
@@ -291,18 +289,13 @@ not blocked on any one of them. All are deferred to the Experimental stage.
 
 ## Open Questions
 
-* **How is failure handled?** If a JWT is absent, a body is not JSON, an
-  expression does not evaluate, or a `backendRef` callout fails, does the
-  header stay unset, take a default, or does the request fail? Does the
-  answer differ by value source?
+* **How is failure handled?** If a JWT is absent, a body is not JSON, or
+  an expression does not evaluate, does the header stay unset, take a
+  default, or does the request fail? Does the answer differ by value
+  source?
 * **How does this interact with static `set` on the same header name?**
   If the same header is set statically in one filter and dynamically in
   another, or in the same filter, what is the precedence?
-* **How does this compose with `ExternalAuth`?** `ExternalAuth`
-  ([GEP-1494](https://gateway-api.sigs.k8s.io/geps/gep-1494/)) can already
-  inject headers into a request as a side effect of authorization. When
-  the two overlap, does a dynamic `RequestHeaderModifier` run before or
-  after `ExternalAuth`, and how is ordering surfaced to the user?
 * **How is this presented to the user in status?** When an implementation
   cannot honor a particular value source, does it reject the filter at
   admission time, degrade at runtime, or surface a route/listener
