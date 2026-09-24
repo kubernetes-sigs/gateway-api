@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-05-20T23:56:32Z"
+date: "2026-09-18T16:12:11Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.5.1
 implementation:
@@ -8,10 +8,63 @@ implementation:
   organization: istio
   project: istio
   url: https://istio.io/
-  version: "1.30.1"
+  version: "1.30.5"
 kind: ConformanceReport
 mode: default
 profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 18
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 15
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - TLSRouteModeMixed
+    - TLSRouteModeTerminate
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+    supportedFeatures:
+    - MeshConsumerRoute
+    - MeshHTTPRouteBackendRequestHeaderModification
+    - MeshHTTPRouteNamedRouteRule
+    - MeshHTTPRouteQueryParamMatching
+    - MeshHTTPRouteRedirectPath
+    - MeshHTTPRouteRedirectPort
+    - MeshHTTPRouteRewritePath
+    - MeshHTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - MeshClusterIPMatching
+  name: MESH-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -22,7 +75,7 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 38
+      Passed: 47
       Skipped: 0
     supportedFeatures:
     - BackendTLSPolicy
@@ -55,12 +108,12 @@ profiles:
     - HTTPRouteRequestTimeout
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
+    - ListenerSet
     unsupportedFeatures:
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPSListenerDetectMisdirectedRequests
-    - ListenerSet
   name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
 - core:
@@ -73,7 +126,7 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 3
+      Passed: 10
       Skipped: 0
     supportedFeatures:
     - GatewayAddressEmpty
@@ -81,66 +134,13 @@ profiles:
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - GatewayStaticAddresses
+    - ListenerSet
     unsupportedFeatures:
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPSListenerDetectMisdirectedRequests
-    - ListenerSet
   name: GATEWAY-GRPC
-  summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 18
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 7
-      Skipped: 0
-    supportedFeatures:
-    - GatewayAddressEmpty
-    - GatewayHTTPListenerIsolation
-    - GatewayInfrastructurePropagation
-    - GatewayPort8080
-    - GatewayStaticAddresses
-    - TLSRouteModeMixed
-    - TLSRouteModeTerminate
-    unsupportedFeatures:
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidation
-    - GatewayFrontendClientCertificateValidationInsecureFallback
-    - GatewayHTTPSListenerDetectMisdirectedRequests
-    - ListenerSet
-  name: GATEWAY-TLS
-  summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 7
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 7
-      Skipped: 0
-    supportedFeatures:
-    - MeshConsumerRoute
-    - MeshHTTPRouteBackendRequestHeaderModification
-    - MeshHTTPRouteNamedRouteRule
-    - MeshHTTPRouteQueryParamMatching
-    - MeshHTTPRouteRedirectPath
-    - MeshHTTPRouteRedirectPort
-    - MeshHTTPRouteRewritePath
-    - MeshHTTPRouteSchemeRedirect
-    unsupportedFeatures:
-    - MeshClusterIPMatching
-  name: MESH-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GRPCRouteNamedRule
