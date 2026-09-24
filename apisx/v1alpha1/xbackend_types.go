@@ -223,6 +223,14 @@ type EndpointSelectorBackend struct {
 	//
 	// +required
 	LabelSelector `json:",inline"`
+
+	// SessionPersistence defines and configures session persistence
+	// across the endpoints selected by this backend.
+	//
+	// Support: Extended
+	//
+	// +optional
+	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
 // LabelSelector defines a query for resources based on their labels.

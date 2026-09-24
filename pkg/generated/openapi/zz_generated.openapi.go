@@ -10210,10 +10210,18 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_EndpointSelectorBackend(ref com
 							},
 						},
 					},
+					"sessionPersistence": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionPersistence defines and configures session persistence across the endpoints selected by this backend.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
+						},
+					},
 				},
 				Required: []string{"matchLabels"},
 			},
 		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"},
 	}
 }
 
