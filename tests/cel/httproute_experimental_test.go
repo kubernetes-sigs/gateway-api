@@ -569,6 +569,67 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 	}
 }
 
+func TestBackendRefPortExperimental(t *testing.T) {
+	portPtr := func(n int) *gatewayv1.PortNumber {
+		//nolint:gosec
+		return new(gatewayv1.PortNumber(n))
+	}
+
+	groupPtr := func(g string) *gatewayv1.Group {
+		return new(gatewayv1.Group(g))
+	}
+
+	kindPtr := func(k string) *gatewayv1.Kind {
+		return new(gatewayv1.Kind(k))
+	}
+
+	tests := []struct {
+		name       string
+		wantErrors []string
+		backendRef gatewayv1.BackendObjectReference
+	}{
+		{
+			name: "XBackend ref with no port",
+			backendRef: gatewayv1.BackendObjectReference{
+				Group: groupPtr("gateway.networking.x-k8s.io"),
+				Kind:  kindPtr("XBackend"),
+				Name:  "backend",
+			},
+		},
+		{
+			name:       "XBackend ref with port",
+			wantErrors: []string{"Must not have port for Backend reference"},
+			backendRef: gatewayv1.BackendObjectReference{
+				Group: groupPtr("gateway.networking.x-k8s.io"),
+				Kind:  kindPtr("XBackend"),
+				Name:  "backend",
+				Port:  portPtr(443),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{
+					Rules: []gatewayv1.HTTPRouteRule{{
+						BackendRefs: []gatewayv1.HTTPBackendRef{{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: tc.backendRef,
+							},
+						}},
+					}},
+				},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}
+
 func TestHTTPExternalAuthFilterExperimental(t *testing.T) {
 	tests := []struct {
 		name       string

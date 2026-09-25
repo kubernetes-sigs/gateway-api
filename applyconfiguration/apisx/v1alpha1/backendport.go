@@ -26,15 +26,10 @@ import (
 // with apply.
 //
 // BackendPort describes the port the implementation should use when connecting
-// to a Backend. Inspired by discoveryv1.EndpointPort.
+// to a Backend.
 type BackendPortApplyConfiguration struct {
-	// Name represents the name of this port. All ports in a Backend must have
-	// a unique name. Name must either be an empty string or pass DNS_LABEL
-	// validation (lowercase alphanumeric or '-', starting and ending with an
-	// alphanumeric character, at most 63 characters).
-	Name *string `json:"name,omitempty"`
-	// Port represents the port number of the endpoint.
-	Port *apisxv1alpha1.PortNumber `json:"port,omitempty"`
+	// Number represents the port number of the destination.
+	Number *apisxv1alpha1.PortNumber `json:"number,omitempty"`
 }
 
 // BackendPortApplyConfiguration constructs a declarative configuration of the BackendPort type for use with
@@ -43,18 +38,10 @@ func BackendPort() *BackendPortApplyConfiguration {
 	return &BackendPortApplyConfiguration{}
 }
 
-// WithName sets the Name field in the declarative configuration to the given value
+// WithNumber sets the Number field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Name field is set to the value of the last call.
-func (b *BackendPortApplyConfiguration) WithName(value string) *BackendPortApplyConfiguration {
-	b.Name = &value
-	return b
-}
-
-// WithPort sets the Port field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Port field is set to the value of the last call.
-func (b *BackendPortApplyConfiguration) WithPort(value apisxv1alpha1.PortNumber) *BackendPortApplyConfiguration {
-	b.Port = &value
+// If called multiple times, the Number field is set to the value of the last call.
+func (b *BackendPortApplyConfiguration) WithNumber(value apisxv1alpha1.PortNumber) *BackendPortApplyConfiguration {
+	b.Number = &value
 	return b
 }

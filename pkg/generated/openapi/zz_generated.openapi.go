@@ -2947,7 +2947,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendObjectReference(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendObjectReference defines how an ObjectReference that is specific to BackendRef. It includes a few additional fields and features than a regular ObjectReference.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\nThe API object must be valid in the cluster; the Group and Kind must be registered in the cluster for this reference to be valid.\n\nReferences to objects with invalid Group and Kind are not valid, and must be rejected by the implementation, with appropriate Conditions set on the containing object.\n\nIf the backend service requires TLS, use BackendTLSPolicy to tell the implementation to supply the TLS details to be used to connect to that backend.",
+				Description: "BackendObjectReference defines how an ObjectReference that is specific to BackendRef. It includes a few additional fields and features than a regular ObjectReference.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\nThe API object must be valid in the cluster; the Group and Kind must be registered in the cluster for this reference to be valid.\n\nReferences to objects with invalid Group and Kind are not valid, and must be rejected by the implementation, with appropriate Conditions set on the containing object.\n\nIf the backend service requires TLS, use BackendTLSPolicy to tell the implementation to supply the TLS details to be used to connect to that backend.\n\n<gateway:experimental:validation:XValidation:message=\"Must not have port for Backend reference\",rule=\"(self.group == 'gateway.networking.x-k8s.io' && self.kind == 'XBackend') ? !has(self.port) : true\">",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
@@ -9961,25 +9961,17 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendPort describes the port the implementation should use when connecting to a Backend. Inspired by discoveryv1.EndpointPort.",
+				Description: "BackendPort describes the port the implementation should use when connecting to a Backend.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"name": {
+					"number": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name represents the name of this port. All ports in a Backend must have a unique name. Name must either be an empty string or pass DNS_LABEL validation (lowercase alphanumeric or '-', starting and ending with an alphanumeric character, at most 63 characters).",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"port": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Port represents the port number of the endpoint.",
+							Description: "Number represents the port number of the destination.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 				},
-				Required: []string{"port"},
 			},
 		},
 	}

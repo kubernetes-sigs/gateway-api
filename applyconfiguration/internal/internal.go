@@ -2219,10 +2219,7 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendPort
   map:
     fields:
-    - name: name
-      type:
-        scalar: string
-    - name: port
+    - name: number
       type:
         scalar: numeric
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendSpec

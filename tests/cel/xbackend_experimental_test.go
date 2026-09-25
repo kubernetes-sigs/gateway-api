@@ -33,34 +33,20 @@ func TestXBackendBa(t *testing.T) {
 	tests := []struct {
 		name       string
 		wantErrors []string
-		portName   *string
+		port       xgatewayv1alpha1.BackendPort
 	}{
 		{
-			name:       "no port name",
-			portName:   nil,
-			wantErrors: []string{},
+			name:       "port without number is rejected",
+			wantErrors: []string{"should have at least 1 properties"},
 		},
 		{
-			name:       "empty port name",
-			portName:   new(""),
-			wantErrors: []string{},
-		},
-		{
-			name:       "simple lowercase port name",
-			portName:   new("http"),
-			wantErrors: []string{},
-		},
-		{
-			name:       "port name with whitespace is rejected",
-			portName:   new("my port"),
-			wantErrors: []string{"Name must be a valid DNS label"},
-		},
-		{
-			name:       "port name with uppercase characters are rejected",
-			portName:   new("HTTP"),
-			wantErrors: []string{"Name must be a valid DNS label"},
+			name: "port with number is accepted",
+			port: xgatewayv1alpha1.BackendPort{
+				Number: xgatewayv1alpha1.PortNumber(8080),
+			},
 		},
 	}
+
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			backend := &xgatewayv1alpha1.XBackend{
@@ -73,10 +59,7 @@ func TestXBackendBa(t *testing.T) {
 					ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
 						Hostname: "example.com",
 					},
-					Port: xgatewayv1alpha1.BackendPort{
-						Name: tc.portName,
-						Port: 80,
-					},
+					Port: tc.port,
 				},
 			}
 			validateXBackend(t, backend, tc.wantErrors)

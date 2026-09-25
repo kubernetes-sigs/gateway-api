@@ -49,7 +49,7 @@ type EndpointSelectorBackendApplyConfiguration struct {
 	// produce EndpointSlices; Service-level behaviors (including but not limited
 	// to internalTrafficPolicy, externalTrafficPolicy, sessionAffinity, and
 	// trafficDistribution) play no role. The Service port (ClusterIP frontend)
-	// is unused; the targetPort SHOULD be set to Backend.spec.port.
+	// is unused; the targetPort SHOULD be set to Backend.spec.port.number.
 	// Implementations SHOULD create the Service as headless (clusterIP: None),
 	// since no ClusterIP or kube-proxy load balancing is needed.
 	// Implementations MUST name the Service with generateName rather than a

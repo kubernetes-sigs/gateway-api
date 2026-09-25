@@ -44,6 +44,8 @@ import (
 // If the backend service requires TLS, use BackendTLSPolicy to tell the
 // implementation to supply the TLS details to be used to connect to that
 // backend.
+//
+// <gateway:experimental:validation:XValidation:message="Must not have port for Backend reference",rule="(self.group == 'gateway.networking.x-k8s.io' && self.kind == 'XBackend') ? !has(self.port) : true">
 type BackendObjectReferenceApplyConfiguration struct {
 	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
 	// When unspecified or empty string, core API group is inferred.

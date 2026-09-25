@@ -208,21 +208,25 @@ const (
 
 // +kubebuilder:validation:XValidation:rule="self.type == 'ExternalHostname' ? has(self.externalHostname) : !has(self.externalHostname)",message="externalHostname must be set when type is ExternalHostname and must be unset otherwise"
 // +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' ? has(self.endpointSelector) : !has(self.endpointSelector)",message="endpointSelector must be set when type is EndpointSelector and must be unset otherwise"
+// TODO: Add these CEL rules when spec.port.name and selectorRef are introduced:
+// +kubebuilder:validation:XValidation:rule="self.type == 'ExternalHostname' ? !has(self.port.name) : true",message="port.name must not be set when type is ExternalHostname"
+// +kubebuilder:validation:XValidation:rule="(self.type == 'EndpointSelector' && !has(self.endpointSelector.selectorRef)) ? !has(self.port.name) : true",message="port.name must not be set for inline EndpointSelector"
 type BackendSpec struct {
   // Type defines the backend type
   // +unionDiscriminator
   // +required
   Type BackendType `json:"type"`
+
   // Port defines the port to connect to on this backend.
   // For ExternalHostname, this is the port on the external host.
   // For EndpointSelector, this specifies which endpoint port to connect to.
+  //
   // +required
-  Port BackendPort `json:"port,omitempty"`
+  Port BackendPort `json:"port"`
 
   // ExternalHostname specifies the configuration for an ExternalHostname backend. Only used if type is ExternalHostname.
   // Support: Extended
   // +optional
-
   ExternalHostname *ExternalHostnameBackend `json:"externalHostname,omitempty"`
 
   // EndpointSelector specifies the configuration for an EndpointSelector backend. Only used if type is EndpointSelector.
@@ -269,27 +273,32 @@ const (
   BackendTLSModeClientAndServer BackendTLSMode = "ClientAndServer"
 )
 
-// Inspired by discoveryv1.EndpointPort. No Protocol or AppProtocol is necessary
-// since that's directly on the Backend resource.
+// BackendPort describes the port the implementation should use when connecting
+// to a Backend.
 //
-// TODO: We probably want to use this type for EndpointSelector as well.
-// In fact, this should probably be defined by EndpointSelector and referenced
-// here.
+// No Protocol or AppProtocol is necessary since that's directly on the Backend resource.
+//
+// +kubebuilder:validation:MinProperties=1
 type BackendPort struct {
-  // Name represents the name of this port. All ports in a Backend must have a unique name.
-  // If the EndpointSlice is derived from a Kubernetes service, this corresponds to the Service.ports[].name.
-  // Name must either be an empty string or pass DNS_LABEL validation:
-  // * must be no more than 63 characters long.
-  // * must consist of lower case alphanumeric characters or '-'.
-  // * must start and end with an alphanumeric character.
-  // Default is empty string.
-  Name *string `json:"name,omitempty" protobuf:"bytes,1,name=name"`
+  // Name represents the name of this port. Only valid for an EndpointSelector
+  // referenced via selectorRef.
+  //
+  // Name must either be an empty string or pass DNS_LABEL
+  // validation (lowercase alphanumeric or '-', starting and ending with an
+  // alphanumeric character, at most 63 characters).
+  //
+  // TODO: Add Name to the API when selectorRef is introduced.
+  //       For ExternalHostname and inline EndpointSelector (single
+  //       auto-created port), Name has no value.
+  // +optional
+  // +kubebuilder:validation:MaxLength=63
+  // +kubebuilder:validation:XValidation:rule="size(self) == 0 || !format.dns1123Label().validate(self).hasValue()",message="Name must be a valid DNS label"
+  Name *string `json:"name,omitempty"`
 
-  // port represents the port number of the endpoint.
-  // If the EndpointSlice is derived from a Kubernetes service, this must be set
-  // to the service's target port. EndpointSlices used for other purposes may have
-  // a nil port.
-  Port PortNumber `json:"port,omitempty" protobuf:"bytes,3,opt,name=port"`
+  // Number represents the port number of the destination.
+  //
+  // +optional
+  Number PortNumber `json:"number,omitempty"`
 }
 
 // LabelSelector defines a query for resources based on their labels.
@@ -320,7 +329,7 @@ type EndpointSelectorBackend struct {
   // so the created resource's lifecycle is tied to this Backend. This Service only exists to produce EndpointSlices;
   // Service-level behaviors (including but not limited to internalTrafficPolicy, externalTrafficPolicy,
   // sessionAffinity, and trafficDistribution) play no role. The Service port (ClusterIP frontend) is unused;
-  // the targetPort SHOULD be set to Backend.spec.port. Implementations SHOULD create the
+  // the targetPort SHOULD be set to Backend.spec.port.number. Implementations SHOULD create the
   // Service as headless (clusterIP: None), since no ClusterIP or kube-proxy load balancing is needed.
   // Implementations MUST name the Service with generateName rather than a predictable name, so that a
   // name like <backend-name>-backend.svc.cluster.local does not become a relied-upon DNS entry.
@@ -412,6 +421,20 @@ const (
   // This reason is used with the "Accepted" condition when the Backend has been accepted.
   BackendReasonAccepted BackendConditionReason = "Accepted"
 )
+```
+
+### Route BackendRef Port CEL
+
+The Backend resource owns its port, so `backendRef.port` should not be set when
+referencing a Backend. Unlike Service, which exposes multiple ports and requires
+the backendRef to select one, Backend defines a single port directly, so there
+is nothing for the backendRef to select. The `BackendObjectReference` type (used
+by xRoutes for `backendRefs`) already has a CEL rule requiring port for Service
+references. This adds the inverse for Backend:
+
+```go
+// On BackendObjectReference (apis/v1/object_reference_types.go):
+// +kubebuilder:validation:XValidation:message="Must not have port for Backend reference",rule="(self.group == 'gateway.networking.k8s.io' && self.kind == 'Backend') ? !has(self.port) : true"
 ```
 
 ### ExternalHostname Backend Configuration
@@ -517,7 +540,8 @@ spec:
     mode: ClientAndServer
     clientCertificateRef:
       name: openai-client-cert
-  port: 443
+  port:
+    number: 443
 
 ---
 # HTTPRoute referencing Backend
@@ -529,7 +553,6 @@ spec:
     - name: openai-api
       kind: Backend
       group: gateway.networking.k8s.io
-      port: 443
 ```
 
 ## Security Model and RBAC Considerations
@@ -732,7 +755,8 @@ spec:
   endpointSelector:
     matchLabels:
       app: my-service
-  port: 8080
+  port:
+    number: 8080
   tls:
     mode: ServerOnly
   # Future inline fields (illustrative, not proposed in this GEP):
@@ -816,7 +840,6 @@ back with an upstream EndpointSelector once KEP-6116 is available, with no user-
 - Should cross-namespace Route -> Backend references be supported (via ReferenceGrant)?
 - Should the `Backend` surface a status condition reporting whether the `Selector` resolved to any endpoints (for
   example, to flag a selector that matches no pods)?
-- What should the structure of `Backend.spec.port` be to align with Service and the future EndpointSelector backing?
 - What is the long-term relationship between the `Backend` resource and `BackendTLSPolicy`? Inline TLS on `Backend`
   serves the common, backend-owner-authored case, but `BackendTLSPolicy` may still be the better fit where the
   configuring persona differs from the backend owner (for example, a Gateway or cluster operator enforcing trust
