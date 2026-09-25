@@ -809,7 +809,7 @@ type FrontendTLSValidation struct {
 	//
 	// <gateway:experimental>
 	// +optional
-	ClusterTrustBundleRef *ClusterObjectReference `json:"clusterTrustBundleRef,omitempty"`
+	ClusterTrustBundleRef *ClusterTrustBundleObjectRef `json:"clusterTrustBundleRef,omitempty"`
 
 	// FrontendValidationMode defines the mode for validating the client certificate.
 	// There are two possible modes:

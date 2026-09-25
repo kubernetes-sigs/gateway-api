@@ -363,6 +363,79 @@ func gatewayTweaks(channel string, name string, jsonProps apiext.JSONSchemaProps
 			numValid++
 			jsonProps.Pattern = patternMatch[1]
 		}
+
+		atLeastOneOfRe := regexp.MustCompile(validationPrefix + "AtLeastOneOf=([A-Za-z,]*)>")
+		atLeastOneOfMatches := atLeastOneOfRe.FindAllStringSubmatch(jsonProps.Description, 64)
+		for _, atLeastOneOfMatch := range atLeastOneOfMatches {
+			if len(atLeastOneOfMatch) != 2 {
+				log.Fatalf("Invalid %s AtLeastOneOf tag for %s", validationPrefix, name)
+			}
+
+			numValid++
+			var conditions []string
+			for field := range strings.SplitSeq(atLeastOneOfMatch[1], ",") {
+				if field == "" {
+					continue
+				}
+				prop, ok := jsonProps.Properties[field]
+				if !ok {
+					log.Fatalf("AtLeastOneOf field %q not found in %s", field, name)
+				}
+				switch {
+				case prop.Type == "array":
+					conditions = append(conditions, fmt.Sprintf("(has(self.%s) && size(self.%s) > 0)", field, field))
+				case prop.Type == "string":
+					conditions = append(conditions, fmt.Sprintf("(has(self.%s) && self.%s != \"\")", field, field))
+				default:
+					conditions = append(conditions, fmt.Sprintf("has(self.%s)", field))
+				}
+			}
+			if len(conditions) == 0 {
+				log.Fatalf("AtLeastOneOf tag for %s must specify at least one field", name)
+			}
+			fields := strings.Split(atLeastOneOfMatch[1], ",")
+			jsonProps.XValidations = append(jsonProps.XValidations, apiext.ValidationRule{
+				Message: fmt.Sprintf("must specify at least one of %s", strings.Join(fields, ", ")),
+				Rule:    strings.Join(conditions, " || "),
+			})
+		}
+
+		exactlyOneOfRe := regexp.MustCompile(validationPrefix + "ExactlyOneOf=([A-Za-z;]*)>")
+		exactlyOneOfMatches := exactlyOneOfRe.FindAllStringSubmatch(jsonProps.Description, 64)
+		for _, exactlyOneOfMatch := range exactlyOneOfMatches {
+			if len(exactlyOneOfMatch) != 2 {
+				log.Fatalf("Invalid %s ExactlyOneOf tag for %s", validationPrefix, name)
+			}
+
+			numValid++
+			var conditions []string
+			var fields []string
+			for field := range strings.SplitSeq(exactlyOneOfMatch[1], ";") {
+				if field == "" {
+					continue
+				}
+				fields = append(fields, field)
+				prop, ok := jsonProps.Properties[field]
+				if !ok {
+					log.Fatalf("ExactlyOneOf field %q not found in %s", field, name)
+				}
+				switch {
+				case prop.Type == "array":
+					conditions = append(conditions, fmt.Sprintf("((has(self.%s) && size(self.%s) > 0) ? 1 : 0)", field, field))
+				case prop.Type == "string":
+					conditions = append(conditions, fmt.Sprintf("((has(self.%s) && self.%s != \"\") ? 1 : 0)", field, field))
+				default:
+					conditions = append(conditions, fmt.Sprintf("(has(self.%s) ? 1 : 0)", field))
+				}
+			}
+			if len(conditions) == 0 {
+				log.Fatalf("ExactlyOneOf tag for %s must specify at least one field", name)
+			}
+			jsonProps.XValidations = append(jsonProps.XValidations, apiext.ValidationRule{
+				Message: fmt.Sprintf("must specify exactly one of %s", strings.Join(fields, ", ")),
+				Rule:    strings.Join(conditions, " + ") + " == 1",
+			})
+		}
 	}
 
 	if numValid < numExpressions {

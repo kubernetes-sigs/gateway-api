@@ -77,20 +77,32 @@ A key question during community GEP reviews is whether referencing a cluster-sco
 
 ## 6. Technical Design & API Changes
 
-This GEP introduces a dedicated `ClusterObjectReference` type for cluster-scoped resources and a new optional `clusterTrustBundleRef` field on the relevant validation structs. Using a named type distinct from `LocalObjectReference` makes the cluster-scope semantics explicit and avoids ambiguity.
+This GEP introduces a dedicated `ClusterTrustBundleObjectRef` type for cluster-scoped `ClusterTrustBundle` resources and a new optional `clusterTrustBundleRef` field on the relevant validation structs. Using a named type distinct from `LocalObjectReference` makes the cluster-scope semantics explicit and avoids ambiguity.
 
-### New Type: `ClusterObjectReference`
+### New Type: `ClusterTrustBundleObjectRef`
 
 ```go
-// ClusterObjectReference identifies an API object that is cluster-scoped.
-// Unlike LocalObjectReference, this type MUST NOT be used with namespace-scoped
-// resources; the absence of a Namespace field is intentional and correct.
-type ClusterObjectReference struct {
-    // Group is the group of the referent. For example, "certificates.k8s.io".
-    Group Group `json:"group"`
-    // Kind is kind of the referent. For example "ClusterTrustBundle".
-    Kind Kind `json:"kind"`
+// ClusterTrustBundleObjectRef identifies a ClusterTrustBundle.
+//
+// The Group defaults to "certificates.k8s.io" and the Kind defaults to
+// "ClusterTrustBundle", so users only need to specify the name.
+type ClusterTrustBundleObjectRef struct {
+    // Group is the group of the referent.
+    //
+    // Defaults to "certificates.k8s.io".
+    //
+    // +optional
+    Group *Group `json:"group,omitempty"`
+
+    // Kind is the kind of the referent.
+    //
+    // Defaults to "ClusterTrustBundle".
+    //
+    // +optional
+    Kind *Kind `json:"kind,omitempty"`
+
     // Name is the name of the referent.
+    // +required
     Name ObjectName `json:"name"`
 }
 ```
@@ -114,7 +126,7 @@ type BackendTLSPolicyValidation struct {
     //
     // <gateway:experimental>
     // +optional
-    ClusterTrustBundleRef *ClusterObjectReference `json:"clusterTrustBundleRef,omitempty"`
+    ClusterTrustBundleRef *ClusterTrustBundleObjectRef `json:"clusterTrustBundleRef,omitempty"`
 }
 ```
 
@@ -133,7 +145,7 @@ type FrontendTLSValidation struct {
     //
     // <gateway:experimental>
     // +optional
-    ClusterTrustBundleRef *ClusterObjectReference `json:"clusterTrustBundleRef,omitempty"`
+    ClusterTrustBundleRef *ClusterTrustBundleObjectRef `json:"clusterTrustBundleRef,omitempty"`
 }
 ```
 
@@ -172,8 +184,6 @@ spec:
   validation:
     hostname: db.internal.example.com
     clusterTrustBundleRef:
-      group: certificates.k8s.io
-      kind: ClusterTrustBundle
       name: example.com:internal-signer:v1
 ```
 
@@ -208,20 +218,19 @@ This is an Extended (Experimental) conformance feature.
 
 ### Feature Names
 
-* `BackendTLSPolicyClusterTrustBundle` — Extended (Experimental) feature indicating support for `clusterTrustBundleRef` in `BackendTLSPolicyValidation`.
-* `GatewayFrontendClusterTrustBundle` — Extended (Experimental) feature indicating support for `clusterTrustBundleRef` in Gateway frontend TLS validation.
+* `ClusterTrustBundle` — Extended (Experimental) feature indicating support for `clusterTrustBundleRef` in `BackendTLSPolicyValidation` and Gateway frontend TLS validation.
 
 ### Conformance Tests
 
 | Description | Outcome | Feature |
 |---|---|---|
-| Resolve a named `ClusterTrustBundle` via `clusterTrustBundleRef` and use it for backend TLS validation. | `BackendTLSPolicy` MUST have `ResolvedRefs=True`. TLS handshake to backend MUST succeed. | `BackendTLSPolicyClusterTrustBundle` |
-| Reference a nonexistent `ClusterTrustBundle` via `clusterTrustBundleRef`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef`. TLS handshake MUST fail. | `BackendTLSPolicyClusterTrustBundle` |
-| Configure `clusterTrustBundleRef` on a cluster where the `certificates.k8s.io` API is unavailable. | `ResolvedRefs=False` with reason `InvalidKind` MUST be set; other trust sources and unrelated resources MUST continue to be reconciled. | `BackendTLSPolicyClusterTrustBundle` |
-| Reference a `ClusterTrustBundle` with an empty or unparsable `spec.trustBundle`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef` and `Accepted=False` with reason `NoValidCACertificate`. TLS handshake MUST fail. | `BackendTLSPolicyClusterTrustBundle` |
-| Update `spec.trustBundle` of a referenced `ClusterTrustBundle`. | Implementation MUST reconcile the change. Effective trust configuration MUST reflect the updated bundle after reconciliation. | `BackendTLSPolicyClusterTrustBundle` |
-| Delete the referenced `ClusterTrustBundle`. | `BackendTLSPolicy` MUST move to `ResolvedRefs=False` with reason `InvalidCACertificateRef`. Previously established TLS sessions MAY continue but new sessions MUST fail. | `BackendTLSPolicyClusterTrustBundle` |
-| Resolve a named `ClusterTrustBundle` via `clusterTrustBundleRef` for Gateway frontend client certificate validation. | All targeted HTTPS listeners MUST have `ResolvedRefs=True`. Frontend mTLS MUST succeed with a certificate signed by the bundle's CA. | `GatewayFrontendClusterTrustBundle` |
+| Resolve a named `ClusterTrustBundle` via `clusterTrustBundleRef` and use it for backend TLS validation. | `BackendTLSPolicy` MUST have `ResolvedRefs=True`. TLS handshake to backend MUST succeed. | `ClusterTrustBundle` |
+| Reference a nonexistent `ClusterTrustBundle` via `clusterTrustBundleRef`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef`. TLS handshake MUST fail. | `ClusterTrustBundle` |
+| Configure `clusterTrustBundleRef` on a cluster where the `certificates.k8s.io` API is unavailable. | `ResolvedRefs=False` with reason `InvalidKind` MUST be set; other trust sources and unrelated resources MUST continue to be reconciled. | `ClusterTrustBundle` |
+| Reference a `ClusterTrustBundle` with an empty or unparsable `spec.trustBundle`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef` and `Accepted=False` with reason `NoValidCACertificate`. TLS handshake MUST fail. | `ClusterTrustBundle` |
+| Update `spec.trustBundle` of a referenced `ClusterTrustBundle`. | Implementation MUST reconcile the change. Effective trust configuration MUST reflect the updated bundle after reconciliation. | `ClusterTrustBundle` |
+| Delete the referenced `ClusterTrustBundle`. | `BackendTLSPolicy` MUST move to `ResolvedRefs=False` with reason `InvalidCACertificateRef`. Previously established TLS sessions MAY continue but new sessions MUST fail. | `ClusterTrustBundle` |
+| Resolve a named `ClusterTrustBundle` via `clusterTrustBundleRef` for Gateway frontend client certificate validation. | All targeted HTTPS listeners MUST have `ResolvedRefs=True`. Frontend mTLS MUST succeed with a certificate signed by the bundle's CA. | `ClusterTrustBundle` |
 
 ## 8. Alternatives Considered
 
