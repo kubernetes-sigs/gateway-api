@@ -192,6 +192,16 @@ An implementation that supports this feature MUST:
 
 Implementations that do NOT support this feature MUST set `ResolvedRefs=False` with reason `InvalidKind` (for `BackendTLSPolicy`) or `InvalidCACertificateKind` (for Gateway frontend TLS) when `clusterTrustBundleRef` is specified.
 
+### API Availability
+
+`ClusterTrustBundle` is a core Kubernetes API (`certificates.k8s.io/v1`, GA in Kubernetes v1.37). On clusters where the API is not available — e.g., Kubernetes versions older than v1.30, or clusters with the `ClusterTrustBundle` feature gate disabled — implementations MUST:
+
+1. Detect availability at startup and at periodic intervals by probing the discovery document (`GET /api`) for the `certificates.k8s.io` group, rather than by issuing client requests that would fail.
+2. Report support dynamically: the associated conformance feature MUST be advertised only when the API is present, so that the reported feature set reflects the cluster, not just the binary.
+3. If a resource with `clusterTrustBundleRef` is configured while the API is unavailable, set `ResolvedRefs=False` with reason `InvalidKind` (the kind is unresolvable) and, if it is the sole trust source, `Accepted=False` with reason `NoValidCACertificate`. Existing workloads using `caCertificateRefs` MUST continue to function, and the controller MUST NOT crash, fail to start, or drop reconciliation of other resources.
+
+This keeps `InvalidKind` as the single reason for "kind not available" and `InvalidCACertificateRef` for "API present but the specific bundle is invalid", which lets users distinguish a cluster-provisioning problem from a misconfiguration.
+
 ## 7. Conformance
 
 This is an Extended (Experimental) conformance feature.
@@ -207,6 +217,7 @@ This is an Extended (Experimental) conformance feature.
 |---|---|---|
 | Resolve a named `ClusterTrustBundle` via `clusterTrustBundleRef` and use it for backend TLS validation. | `BackendTLSPolicy` MUST have `ResolvedRefs=True`. TLS handshake to backend MUST succeed. | `BackendTLSPolicyClusterTrustBundle` |
 | Reference a nonexistent `ClusterTrustBundle` via `clusterTrustBundleRef`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef`. TLS handshake MUST fail. | `BackendTLSPolicyClusterTrustBundle` |
+| Configure `clusterTrustBundleRef` on a cluster where the `certificates.k8s.io` API is unavailable. | `ResolvedRefs=False` with reason `InvalidKind` MUST be set; other trust sources and unrelated resources MUST continue to be reconciled. | `BackendTLSPolicyClusterTrustBundle` |
 | Reference a `ClusterTrustBundle` with an empty or unparsable `spec.trustBundle`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef` and `Accepted=False` with reason `NoValidCACertificate`. TLS handshake MUST fail. | `BackendTLSPolicyClusterTrustBundle` |
 | Update `spec.trustBundle` of a referenced `ClusterTrustBundle`. | Implementation MUST reconcile the change. Effective trust configuration MUST reflect the updated bundle after reconciliation. | `BackendTLSPolicyClusterTrustBundle` |
 | Delete the referenced `ClusterTrustBundle`. | `BackendTLSPolicy` MUST move to `ResolvedRefs=False` with reason `InvalidCACertificateRef`. Previously established TLS sessions MAY continue but new sessions MUST fail. | `BackendTLSPolicyClusterTrustBundle` |

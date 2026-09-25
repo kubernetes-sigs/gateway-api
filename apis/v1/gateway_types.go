@@ -796,6 +796,11 @@ type FrontendTLSValidation struct {
 	// with reason InvalidCACertificateRef on all targeted HTTPS listeners.
 	// A ReferenceGrant is not required.
 	//
+	// If the certificates.k8s.io API is not available in the cluster, the
+	// reference is treated as an unknown kind: the implementation MUST set
+	// ResolvedRefs=False with reason InvalidCACertificateKind on all targeted
+	// HTTPS listeners.
+	//
 	// Implementations that do not support ClusterTrustBundle references MUST set
 	// ResolvedRefs=False with reason InvalidCACertificateKind when this field
 	// is specified.

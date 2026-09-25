@@ -213,6 +213,10 @@ type BackendTLSPolicyValidation struct {
 	// conditions are not met, the implementation MUST set ResolvedRefs=False
 	// with reason InvalidCACertificateRef. A ReferenceGrant is not required.
 	//
+	// If the certificates.k8s.io API is not available in the cluster, the
+	// reference is treated as an unknown kind: the implementation MUST set
+	// ResolvedRefs=False with reason InvalidKind.
+	//
 	// Implementations that do not support ClusterTrustBundle references MUST set
 	// ResolvedRefs=False with reason InvalidKind when this field is specified.
 	//
