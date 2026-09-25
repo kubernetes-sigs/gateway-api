@@ -1,4 +1,7 @@
 meshName: "partial-only"
+serviceCIDRs:
+  - "10.96.0.0/12"
+  - "fd00:1234::/108"
 timeoutConfig:
   deleteTimeout: "5s"
   requiredConsecutiveSuccesses: 5

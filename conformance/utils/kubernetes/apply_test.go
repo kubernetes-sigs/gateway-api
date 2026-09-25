@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
@@ -237,6 +238,59 @@ spec:
 
 			require.NoError(t, err, "unexpected error preparing resources")
 			require.Equal(t, tc.expected, resources)
+		})
+	}
+}
+
+func TestPrepareGatewayPreservesAddressRoutability(t *testing.T) {
+	tests := []struct {
+		name      string
+		addresses []any
+		usable    []gatewayv1.GatewaySpecAddress
+		want      []any
+	}{
+		{
+			name: "ordinary address",
+			addresses: []any{map[string]any{
+				"type":        "IPAddress",
+				"routability": "testing.gateway.networking.k8s.io/sentinel",
+			}},
+			want: []any{map[string]any{
+				"type":        "IPAddress",
+				"routability": "testing.gateway.networking.k8s.io/sentinel",
+			}},
+		},
+		{
+			name: "address pool placeholder",
+			addresses: []any{
+				map[string]any{"type": "IPAddress", "routability": "example.com/scope"},
+				map[string]any{"value": "PLACEHOLDER_USABLE_ADDRS", "routability": "Cluster"},
+			},
+			usable: []gatewayv1.GatewaySpecAddress{{Value: "192.0.2.10"}},
+			want: []any{
+				map[string]any{"type": "IPAddress", "routability": "example.com/scope"},
+				map[string]any{"type": "IPAddress", "value": "192.0.2.10", "routability": "Cluster"},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			gateway := &unstructured.Unstructured{Object: map[string]any{
+				"apiVersion": "gateway.networking.k8s.io/v1",
+				"kind":       "Gateway",
+				"metadata":   map[string]any{"name": "test"},
+				"spec": map[string]any{
+					"gatewayClassName": "original",
+					"addresses":        tc.addresses,
+				},
+			}}
+			applier := Applier{GatewayClass: "test-class", UsableNetworkAddresses: tc.usable}
+			applier.prepareGateway(t, gateway)
+			addresses, found, err := unstructured.NestedSlice(gateway.Object, "spec", "addresses")
+			require.NoError(t, err)
+			require.True(t, found)
+			require.Equal(t, tc.want, addresses)
 		})
 	}
 }
