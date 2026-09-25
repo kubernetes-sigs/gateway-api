@@ -28,12 +28,19 @@ import (
 // GatewayStatusAddress describes a network address that is bound to a Gateway.
 type GatewayStatusAddressApplyConfiguration struct {
 	// Type of the address.
+	//
 	Type *apisv1.AddressType `json:"type,omitempty"`
 	// Value of the address. The validity of the values will depend
 	// on the type and support by the controller.
 	//
 	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	//
 	Value *string `json:"value,omitempty"`
+	// Routability reports the reachability scope of this address. When empty or
+	// unset, this field uses the implementation's default routability behavior.
+	//
+	// <gateway:experimental>
+	Routability *apisv1.GatewayAddressRoutabilityType `json:"routability,omitempty"`
 }
 
 // GatewayStatusAddressApplyConfiguration constructs a declarative configuration of the GatewayStatusAddress type for use with
@@ -55,5 +62,13 @@ func (b *GatewayStatusAddressApplyConfiguration) WithType(value apisv1.AddressTy
 // If called multiple times, the Value field is set to the value of the last call.
 func (b *GatewayStatusAddressApplyConfiguration) WithValue(value string) *GatewayStatusAddressApplyConfiguration {
 	b.Value = &value
+	return b
+}
+
+// WithRoutability sets the Routability field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Routability field is set to the value of the last call.
+func (b *GatewayStatusAddressApplyConfiguration) WithRoutability(value apisv1.GatewayAddressRoutabilityType) *GatewayStatusAddressApplyConfiguration {
+	b.Routability = &value
 	return b
 }

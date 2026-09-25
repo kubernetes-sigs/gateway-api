@@ -101,6 +101,21 @@ spec:
                           enum:
                           - IPAddress
                   properties:
+                    routability:
+                      description: |-
+                        Routability specifies the requested reachability scope of this address.
+                        When unset or empty, this field uses the implementation's default
+                        routability behavior.
+
+                        Support: Extended
+                      maxLength: 253
+                      type: string
+                      x-kubernetes-validations:
+                      - message: Routability must be empty, Cluster, or an implementation-specific
+                          prefixed path; gateway.networking.k8s.io is reserved
+                        rule: size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$')
+                          && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue()
+                          && !self.startsWith('gateway.networking.k8s.io/'))
                     type:
                       default: IPAddress
                       description: Type of the address.
@@ -1402,6 +1417,18 @@ spec:
                           enum:
                           - IPAddress
                   properties:
+                    routability:
+                      description: |-
+                        Routability reports the reachability scope of this address. When empty or
+                        unset, this field uses the implementation's default routability behavior.
+                      maxLength: 253
+                      type: string
+                      x-kubernetes-validations:
+                      - message: Routability must be empty, Cluster, or an implementation-specific
+                          prefixed path; gateway.networking.k8s.io is reserved
+                        rule: size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$')
+                          && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue()
+                          && !self.startsWith('gateway.networking.k8s.io/'))
                     type:
                       default: IPAddress
                       description: Type of the address.
@@ -1468,6 +1495,7 @@ spec:
                   * "Accepted"
                   * "Programmed"
                   * "Ready"
+                  * "AddressesAssigned"
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.
@@ -1758,6 +1786,21 @@ spec:
                           enum:
                           - IPAddress
                   properties:
+                    routability:
+                      description: |-
+                        Routability specifies the requested reachability scope of this address.
+                        When unset or empty, this field uses the implementation's default
+                        routability behavior.
+
+                        Support: Extended
+                      maxLength: 253
+                      type: string
+                      x-kubernetes-validations:
+                      - message: Routability must be empty, Cluster, or an implementation-specific
+                          prefixed path; gateway.networking.k8s.io is reserved
+                        rule: size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$')
+                          && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue()
+                          && !self.startsWith('gateway.networking.k8s.io/'))
                     type:
                       default: IPAddress
                       description: Type of the address.
@@ -3059,6 +3102,18 @@ spec:
                           enum:
                           - IPAddress
                   properties:
+                    routability:
+                      description: |-
+                        Routability reports the reachability scope of this address. When empty or
+                        unset, this field uses the implementation's default routability behavior.
+                      maxLength: 253
+                      type: string
+                      x-kubernetes-validations:
+                      - message: Routability must be empty, Cluster, or an implementation-specific
+                          prefixed path; gateway.networking.k8s.io is reserved
+                        rule: size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$')
+                          && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue()
+                          && !self.startsWith('gateway.networking.k8s.io/'))
                     type:
                       default: IPAddress
                       description: Type of the address.
@@ -3125,6 +3180,7 @@ spec:
                   * "Accepted"
                   * "Programmed"
                   * "Ready"
+                  * "AddressesAssigned"
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.

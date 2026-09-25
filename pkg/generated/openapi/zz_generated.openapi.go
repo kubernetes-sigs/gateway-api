@@ -4508,6 +4508,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.Referenc
 							Format:      "",
 						},
 					},
+					"routability": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Routability specifies the requested reachability scope of this address. When unset or empty, this field uses the implementation's default routability behavior.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},
@@ -4549,7 +4556,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Conditions describe the current conditions of the Gateway.\n\nImplementations should prefer to express Gateway conditions using the `GatewayConditionType` and `GatewayConditionReason` constants so that operators and tools can converge on a common vocabulary to describe Gateway state.\n\nKnown condition types are:\n\n* \"Accepted\" * \"Programmed\" * \"Ready\"\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nConditions are a listType `map`, which means that they function like a map with a key of the `type` field _in the k8s apiserver_.\n\nThis means that implementations must obey some rules when updating this section.\n\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n* Implementations MUST NOT remove or reorder Conditions that they are not\n  directly responsible for. For example, if an implementation sees a Condition\n  with type `special.io/SomeField`, it MUST NOT remove, change or update that\n  Condition.\n* Implementations MUST always _merge_ changes into Conditions of the same Type,\n  rather than creating more than one Condition of the same Type.\n* Implementations MUST always update the `observedGeneration` field of the\n  Condition to the `metadata.generation` of the Gateway at the time of update creation.\n* If the `observedGeneration` of a Condition is _greater than_ the value the\n  implementation knows about, then it MUST NOT perform the update on that Condition,\n  but must wait for a future reconciliation and status update. (The assumption is that\n  the implementation's copy of the object is stale and an update will be re-triggered\n  if relevant.)\n</gateway:util:excludeFromCRD>",
+							Description: "Conditions describe the current conditions of the Gateway.\n\nImplementations should prefer to express Gateway conditions using the `GatewayConditionType` and `GatewayConditionReason` constants so that operators and tools can converge on a common vocabulary to describe Gateway state.\n\nKnown condition types are:\n\n* \"Accepted\" * \"Programmed\" * \"Ready\" * \"AddressesAssigned\"\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nConditions are a listType `map`, which means that they function like a map with a key of the `type` field _in the k8s apiserver_.\n\nThis means that implementations must obey some rules when updating this section.\n\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n* Implementations MUST NOT remove or reorder Conditions that they are not\n  directly responsible for. For example, if an implementation sees a Condition\n  with type `special.io/SomeField`, it MUST NOT remove, change or update that\n  Condition.\n* Implementations MUST always _merge_ changes into Conditions of the same Type,\n  rather than creating more than one Condition of the same Type.\n* Implementations MUST always update the `observedGeneration` field of the\n  Condition to the `metadata.generation` of the Gateway at the time of update creation.\n* If the `observedGeneration` of a Condition is _greater than_ the value the\n  implementation knows about, then it MUST NOT perform the update on that Condition,\n  but must wait for a future reconciliation and status update. (The assumption is that\n  the implementation's copy of the object is stale and an update will be re-triggered\n  if relevant.)\n</gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -4614,6 +4621,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref common.Refere
 						SchemaProps: spec.SchemaProps{
 							Description: "Value of the address. The validity of the values will depend on the type and support by the controller.\n\nExamples: `1.2.3.4`, `128::1`, `my-ip-address`.",
 							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"routability": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Routability reports the reachability scope of this address. When empty or unset, this field uses the implementation's default routability behavior.\n\n<gateway:experimental>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
