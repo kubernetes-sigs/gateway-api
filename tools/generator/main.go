@@ -29,6 +29,7 @@ import (
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-tools/pkg/crd"
+	crdmarkers "sigs.k8s.io/controller-tools/pkg/crd/markers"
 	"sigs.k8s.io/controller-tools/pkg/loader"
 	"sigs.k8s.io/controller-tools/pkg/markers"
 	"sigs.k8s.io/yaml"
@@ -41,6 +42,14 @@ type customResourceDefinitionManifest struct {
 	metav1.ObjectMeta `json:"metadata,omitzero"`
 	Spec              apiext.CustomResourceDefinitionSpec `json:"spec"`
 }
+
+var experimentalValidationRegistry = func() *markers.Registry {
+	registry := &markers.Registry{}
+	if err := crdmarkers.Register(registry); err != nil {
+		panic(err)
+	}
+	return registry
+}()
 
 var standardKinds = map[string]bool{
 	"GatewayClass":     true,
@@ -118,7 +127,9 @@ func main() {
 
 	for _, channel := range channels {
 		parser = newParser()
-		applyGatewayTypeValidations(parser, channel)
+		if err := applyGatewayTypeValidations(parser, channel); err != nil {
+			log.Fatalf("failed to apply Gateway validation markers: %s", err)
+		}
 		for _, groupKind := range kubeKinds {
 			if channel == "standard" && !standardKinds[groupKind.Kind] {
 				continue
@@ -183,23 +194,46 @@ func main() {
 	}
 }
 
-func applyGatewayTypeValidations(parser *crd.Parser, channel string) {
+func applyGatewayTypeValidations(parser *crd.Parser, channel string) error {
 	prefix := fmt.Sprintf("<gateway:%s:validation:", channel)
+	for _, info := range parser.Types {
+		if info.Markers == nil {
+			info.Markers = markers.MarkerValues{}
+		}
+		values, err := experimentalValidationMarkerValues(info.Doc, prefix, markers.DescribesType)
+		if err != nil {
+			return fmt.Errorf("type %s: %w", info.Name, err)
+		}
+		for name, values := range values {
+			info.Markers[name] = append(info.Markers[name], values...)
+		}
+		for i := range info.Fields {
+			if info.Fields[i].Markers == nil {
+				info.Fields[i].Markers = markers.MarkerValues{}
+			}
+			values, err := experimentalValidationMarkerValues(info.Fields[i].Doc, prefix, markers.DescribesField)
+			if err != nil {
+				return fmt.Errorf("type %s field %s: %w", info.Name, info.Fields[i].Name, err)
+			}
+			for name, values := range values {
+				info.Fields[i].Markers[name] = append(info.Fields[i].Markers[name], values...)
+			}
+		}
+	}
+
 	for ident, info := range parser.Types {
 		if strings.Contains(info.Doc, prefix) {
 			parser.NeedSchemaFor(ident)
-			parser.Schemata[ident] = applyGatewayTypeValidation(channel, ident.Name, info.Doc, parser.Schemata[ident])
+			continue
+		}
+		for _, field := range info.Fields {
+			if strings.Contains(field.Doc, prefix) {
+				parser.NeedSchemaFor(ident)
+				break
+			}
 		}
 	}
-}
-
-func applyGatewayTypeValidation(channel, name, description string, schema apiext.JSONSchemaProps) apiext.JSONSchemaProps {
-	schema.Description = description
-	res := gatewayTweaks(channel, name, schema)
-	if res == nil {
-		return schema
-	}
-	return *res
+	return nil
 }
 
 // updateVAP updates the hand-maintained ValidatingAdmissionPolicy manifest
@@ -342,56 +376,6 @@ func gatewayTweaks(channel string, name string, jsonProps apiext.JSONSchemaProps
 		jsonProps.Type = "string"
 	}
 
-	validationPrefix := fmt.Sprintf("<gateway:%s:validation:", channel)
-	numExpressions := strings.Count(jsonProps.Description, validationPrefix)
-	numValid := 0
-	if numExpressions > 0 {
-		enumRe := regexp.MustCompile(validationPrefix + "Enum=([A-Za-z;]*)>")
-		enumMatches := enumRe.FindAllStringSubmatch(jsonProps.Description, 64)
-		for _, enumMatch := range enumMatches {
-			if len(enumMatch) != 2 {
-				log.Fatalf("Invalid %s Enum tag for %s", validationPrefix, name)
-			}
-
-			numValid++
-			jsonProps.Enum = []apiext.JSON{}
-			for val := range strings.SplitSeq(enumMatch[1], ";") {
-				jsonProps.Enum = append(jsonProps.Enum, apiext.JSON{Raw: []byte("\"" + val + "\"")})
-			}
-		}
-
-		celRe := regexp.MustCompile(validationPrefix + "XValidation:message=\"([^\"]*)\",rule=\"([^\"]*)\">")
-		celMatches := celRe.FindAllStringSubmatch(jsonProps.Description, 64)
-		for _, celMatch := range celMatches {
-			if len(celMatch) != 3 {
-				log.Fatalf("Invalid %s CEL tag for %s", validationPrefix, name)
-			}
-
-			numValid++
-			jsonProps.XValidations = append(jsonProps.XValidations, apiext.ValidationRule{
-				Message: celMatch[1],
-				Rule:    celMatch[2],
-			})
-		}
-
-		patternRe := regexp.MustCompile(validationPrefix + "Pattern=`([^`]*)`")
-		patternMatches := patternRe.FindAllStringSubmatch(jsonProps.Description, 64)
-		if len(patternMatches) == 1 && jsonProps.Pattern == "" {
-			patternMatch := patternMatches[0]
-			if len(patternMatch) != 2 {
-				log.Fatalf("Invalid %s Pattern tag for %s", validationPrefix, name)
-			}
-
-			numValid++
-			jsonProps.Pattern = patternMatch[1]
-		}
-	}
-
-	if numValid < numExpressions {
-		fmt.Printf("Description: %s\n", jsonProps.Description)
-		log.Fatalf("Found %d Gateway validation expressions, but only %d were valid", numExpressions, numValid)
-	}
-
 	jsonProps.Description = formatDescription(jsonProps.Description, channel, name)
 
 	if len(jsonProps.Properties) > 0 {
@@ -401,6 +385,76 @@ func gatewayTweaks(channel string, name string, jsonProps apiext.JSONSchemaProps
 	}
 
 	return &jsonProps
+}
+
+func experimentalValidationMarkerValues(description, prefix string, target markers.TargetType) (markers.MarkerValues, error) {
+	values := markers.MarkerValues{}
+	markersInDescription, err := experimentalValidationMarkers(description, prefix)
+	if err != nil {
+		return nil, err
+	}
+	for _, marker := range markersInDescription {
+		rawMarker := "+kubebuilder:validation:" + marker
+		definition := experimentalValidationRegistry.Lookup(rawMarker, target)
+		if definition == nil {
+			return nil, fmt.Errorf("unsupported %s marker %q", prefix, marker)
+		}
+
+		value, err := definition.Parse(rawMarker)
+		if err != nil {
+			return nil, fmt.Errorf("invalid %s marker %q: %w", prefix, marker, err)
+		}
+		values[definition.Name] = append(values[definition.Name], value)
+	}
+	return values, nil
+}
+
+func experimentalValidationMarkers(description, prefix string) ([]string, error) {
+	var result []string
+	for offset := 0; offset < len(description); {
+		start := strings.Index(description[offset:], prefix)
+		if start < 0 {
+			break
+		}
+		start += offset
+		end := start + len(prefix)
+		quoted := byte(0)
+		escaped := false
+		closed := false
+		for ; end < len(description); end++ {
+			c := description[end]
+			if escaped {
+				escaped = false
+				continue
+			}
+			if c == '\\' {
+				if quoted == '"' {
+					escaped = true
+				}
+				continue
+			}
+			if c == '`' || c == '"' {
+				switch quoted {
+				case 0:
+					quoted = c
+				case c:
+					quoted = 0
+				}
+				continue
+			}
+			if c == '>' && quoted == 0 {
+				marker := description[start+len(prefix) : end]
+				result = append(result, marker)
+				offset = end + 1
+				closed = true
+				break
+			}
+		}
+		if !closed {
+			return nil, fmt.Errorf("unterminated validation tag %q", description[start:])
+		}
+	}
+	return result, nil
 }
 
 func formatDescription(description string, channel string, name string) string {

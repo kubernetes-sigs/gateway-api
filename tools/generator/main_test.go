@@ -23,6 +23,9 @@ import (
 
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-tools/pkg/crd"
+	"sigs.k8s.io/controller-tools/pkg/loader"
+	"sigs.k8s.io/controller-tools/pkg/markers"
 
 	"sigs.k8s.io/gateway-api/pkg/consts"
 )
@@ -72,29 +75,113 @@ func TestMarshalCRDManifestOmitsTopLevelStatus(t *testing.T) {
 	}
 }
 
-func TestApplyGatewayTypeValidation(t *testing.T) {
-	t.Run("with tag", func(t *testing.T) {
-		schema := applyGatewayTypeValidation(
-			"experimental",
-			"BackendObjectReference",
-			`BackendObjectReference.
-			<gateway:experimental:validation:XValidation:message="must be valid",rule="true">`,
-			apiext.JSONSchemaProps{Type: "object"},
-		)
-		if len(schema.XValidations) != 1 {
-			t.Fatalf("expected one type-level validation, got %d", len(schema.XValidations))
+func TestGatewayValidationItemsMarkerGeneratesSchema(t *testing.T) {
+	parser, pkg := newValidationTestParser(t)
+	info := parser.LookupType(pkg, "HTTPRouteSpec")
+	if info == nil {
+		t.Fatal("HTTPRouteSpec was not loaded")
+	}
+	for i := range info.Fields {
+		if info.Fields[i].Name == "Hostnames" {
+			info.Fields[i].Doc += "\n<gateway:experimental:validation:items:MaxLength=88>"
 		}
-		if got := schema.XValidations[0]; got.Message != "must be valid" || got.Rule != "true" {
-			t.Fatalf("unexpected validation: %+v", got)
+	}
+
+	if err := applyGatewayTypeValidations(parser, "experimental"); err != nil {
+		t.Fatalf("apply Gateway validations: %v", err)
+	}
+	ident := crd.TypeIdent{Package: pkg, Name: "HTTPRouteSpec"}
+	schema := parser.Schemata[ident]
+	hostnames := schema.Properties["hostnames"]
+	if hostnames.Items == nil || hostnames.Items.Schema == nil {
+		t.Fatal("expected hostnames item schema")
+	}
+	if got := hostnames.Items.Schema.MaxLength; got == nil || *got != 88 {
+		t.Fatalf("expected hostnames item maxLength 88, got %v", got)
+	}
+}
+
+func TestGatewayValidationTypeMarkerGeneratesSchemaForItsChannel(t *testing.T) {
+	for _, tc := range []struct {
+		channel string
+		want    int64
+	}{
+		{channel: "standard", want: 77},
+		{channel: "experimental", want: 88},
+	} {
+		t.Run(tc.channel, func(t *testing.T) {
+			parser, pkg := newValidationTestParser(t)
+			info := parser.LookupType(pkg, "Hostname")
+			if info == nil {
+				t.Fatal("Hostname was not loaded")
+			}
+			info.Doc += "\n<gateway:standard:validation:MaxLength=77>" +
+				"\n<gateway:experimental:validation:MaxLength=88>"
+
+			if err := applyGatewayTypeValidations(parser, tc.channel); err != nil {
+				t.Fatalf("apply Gateway validations: %v", err)
+			}
+			schema := parser.Schemata[crd.TypeIdent{Package: pkg, Name: "Hostname"}]
+			if got := schema.MaxLength; got == nil || *got != tc.want {
+				t.Fatalf("expected %s channel maxLength %d, got %v", tc.channel, tc.want, got)
+			}
+		})
+	}
+}
+
+func TestGatewayExactlyOneOfGeneratesTypeValidation(t *testing.T) {
+	parser, pkg := newValidationTestParser(t)
+	info := parser.LookupType(pkg, "GatewaySpecAddress")
+	if info == nil {
+		t.Fatal("GatewaySpecAddress was not loaded")
+	}
+	info.Doc += "\n<gateway:experimental:validation:ExactlyOneOf=type;value>"
+
+	if err := applyGatewayTypeValidations(parser, "experimental"); err != nil {
+		t.Fatalf("apply Gateway validations: %v", err)
+	}
+	schema := parser.Schemata[crd.TypeIdent{Package: pkg, Name: "GatewaySpecAddress"}]
+	for _, validation := range schema.XValidations {
+		if validation.Message == "exactly one of the fields in [type value] must be set" &&
+			strings.Contains(validation.Rule, "has(self.type)") && strings.Contains(validation.Rule, "has(self.value)") {
+			return
 		}
-	})
-	t.Run("without tag", func(t *testing.T) {
-		orig := apiext.JSONSchemaProps{Type: "object"}
-		schema := applyGatewayTypeValidation("standard", "BackendObjectReference", "Plain description.", orig)
-		if len(schema.XValidations) != 0 {
-			t.Fatalf("expected no validations, got %d", len(schema.XValidations))
-		}
-	})
+	}
+	t.Fatalf("expected ExactlyOneOf validation in schema, got %+v", schema.XValidations)
+}
+
+func TestGatewayValidationRejectsUnterminatedTag(t *testing.T) {
+	parser, pkg := newValidationTestParser(t)
+	info := parser.LookupType(pkg, "Hostname")
+	if info == nil {
+		t.Fatal("Hostname was not loaded")
+	}
+	info.Doc += "\n<gateway:experimental:validation:MaxLength=88"
+
+	if err := applyGatewayTypeValidations(parser, "experimental"); err == nil || !strings.Contains(err.Error(), "unterminated validation tag") {
+		t.Fatalf("expected unterminated validation tag error, got %v", err)
+	}
+}
+
+func newValidationTestParser(t *testing.T) (*crd.Parser, *loader.Package) {
+	t.Helper()
+	roots, err := loader.LoadRoots("sigs.k8s.io/gateway-api/apis/v1")
+	if err != nil {
+		t.Fatalf("load API package: %v", err)
+	}
+	generator := &crd.Generator{}
+	parser := &crd.Parser{
+		Collector: &markers.Collector{Registry: &markers.Registry{}},
+		Checker: &loader.TypeChecker{
+			NodeFilters: []loader.NodeFilter{generator.CheckFilter()},
+		},
+	}
+	if err := generator.RegisterMarkers(parser.Collector.Registry); err != nil {
+		t.Fatalf("register CRD markers: %v", err)
+	}
+	crd.AddKnownTypes(parser)
+	parser.NeedPackage(roots[0])
+	return parser, roots[0]
 }
 
 // vapFixture mimics the structure of the hand-maintained VAP manifests: the
