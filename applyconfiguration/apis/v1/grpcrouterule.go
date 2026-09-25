@@ -28,6 +28,16 @@ import (
 // GRPCRouteRule defines the semantics for matching a gRPC request based on
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
+//
+// <gateway:util:excludeFromCRD>
+// The service and method character-class checks are applied from here rather
+// than on GRPCMethodMatch. The apiserver prices a CEL rule statically as its
+// cost times the maxItems of every enclosing list, so a regex rule on
+// GRPCMethodMatch is charged rules x matches (64 x 64) times and exceeds the
+// per-rule budget. Iterating over a literal list of match indexes from the
+// rule level is charged per rule instead, and the 64 indexes are split across
+// four rules per check to stay within budget.
+// </gateway:util:excludeFromCRD>
 type GRPCRouteRuleApplyConfiguration struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 	//

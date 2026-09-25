@@ -28,6 +28,16 @@ import (
 // HTTPRouteRule defines semantics for matching an HTTP request based on
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
+//
+// <gateway:util:excludeFromCRD>
+// The path.value character-class check is applied from here rather than on
+// HTTPPathMatch. The apiserver prices a CEL rule statically as its cost times
+// the maxItems of every enclosing list, so a regex rule on HTTPPathMatch is
+// charged rules x matches (64 x 64) times and exceeds the per-rule budget.
+// Iterating over a literal list of match indexes from the rule level is
+// charged per rule instead, and the 64 indexes are split across four rules to
+// stay within budget.
+// </gateway:util:excludeFromCRD>
 type HTTPRouteRuleApplyConfiguration struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 	//

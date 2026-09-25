@@ -1251,7 +1251,7 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name:       "too many matches and rules",
-			wantErrors: []string{"total number of matches across all rules in a route must be less than 128"},
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
 			rules: func() []gatewayv1.HTTPRouteRule {
 				match := gatewayv1.HTTPRouteMatch{
 					Path: &gatewayv1.HTTPPathMatch{
@@ -1263,6 +1263,106 @@ func TestHTTPRouteRule(t *testing.T) {
 				for range 7 { // rules
 					rule := gatewayv1.HTTPRouteRule{}
 					for range 20 { // matches
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "64 rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.HTTPRouteRule {
+				var rules []gatewayv1.HTTPRouteRule
+				for range 64 {
+					rules = append(rules, gatewayv1.HTTPRouteRule{})
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "65 rules",
+			wantErrors: []string{"must have at most 64 items"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				var rules []gatewayv1.HTTPRouteRule
+				for range 65 {
+					rules = append(rules, gatewayv1.HTTPRouteRule{})
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "invalid path characters at match index 17",
+			wantErrors: []string{"must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				rule := gatewayv1.HTTPRouteRule{}
+				for i := range 20 {
+					value := fmt.Sprintf("/m%d", i)
+					if i == 17 {
+						value = "/[]"
+					}
+					rule.Matches = append(rule.Matches, gatewayv1.HTTPRouteMatch{Path: &gatewayv1.HTTPPathMatch{
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new(value),
+					}})
+				}
+				return []gatewayv1.HTTPRouteRule{rule}
+			}(),
+		},
+		{
+			name:       "invalid path characters at match index 63",
+			wantErrors: []string{"must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				rule := gatewayv1.HTTPRouteRule{}
+				for i := range 64 {
+					value := fmt.Sprintf("/m%d", i)
+					if i == 63 {
+						value = "/^"
+					}
+					rule.Matches = append(rule.Matches, gatewayv1.HTTPRouteMatch{Path: &gatewayv1.HTTPPathMatch{
+						Type:  new(gatewayv1.PathMatchType("Exact")),
+						Value: new(value),
+					}})
+				}
+				return []gatewayv1.HTTPRouteRule{rule}
+			}(),
+		},
+		{
+			name:       "matches are counted across all rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				match := gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new("/"),
+					},
+				}
+				var rules []gatewayv1.HTTPRouteRule
+				for range 20 { // rules
+					rule := gatewayv1.HTTPRouteRule{}
+					for range 7 { // matches: 140 in total, 112 within the first 16 rules
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "exactly 128 matches across rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.HTTPRouteRule {
+				match := gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new("/"),
+					},
+				}
+				var rules []gatewayv1.HTTPRouteRule
+				for range 2 { // rules
+					rule := gatewayv1.HTTPRouteRule{}
+					for range 64 { // matches
 						rule.Matches = append(rule.Matches, match)
 					}
 					rules = append(rules, rule)
