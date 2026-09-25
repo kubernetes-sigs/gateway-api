@@ -19,7 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
+	v1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
 // EndpointSelectorBackendApplyConfiguration represents a declarative configuration of the EndpointSelectorBackend type for use
@@ -57,6 +58,11 @@ type EndpointSelectorBackendApplyConfiguration struct {
 	// does not become a relied-upon DNS entry.
 	// </gateway:util:excludeFromCRD>
 	LabelSelectorApplyConfiguration `json:""`
+	// SessionPersistence defines and configures session persistence
+	// across the endpoints selected by this backend.
+	//
+	// Support: Extended
+	SessionPersistence *v1.SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 
 // EndpointSelectorBackendApplyConfiguration constructs a declarative configuration of the EndpointSelectorBackend type for use with
@@ -69,12 +75,20 @@ func EndpointSelectorBackend() *EndpointSelectorBackendApplyConfiguration {
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the MatchLabels field,
 // overwriting an existing map entries in MatchLabels field with the same key.
-func (b *EndpointSelectorBackendApplyConfiguration) WithMatchLabels(entries map[v1.LabelKey]v1.LabelValue) *EndpointSelectorBackendApplyConfiguration {
+func (b *EndpointSelectorBackendApplyConfiguration) WithMatchLabels(entries map[apisv1.LabelKey]apisv1.LabelValue) *EndpointSelectorBackendApplyConfiguration {
 	if b.LabelSelectorApplyConfiguration.MatchLabels == nil && len(entries) > 0 {
-		b.LabelSelectorApplyConfiguration.MatchLabels = make(map[v1.LabelKey]v1.LabelValue, len(entries))
+		b.LabelSelectorApplyConfiguration.MatchLabels = make(map[apisv1.LabelKey]apisv1.LabelValue, len(entries))
 	}
 	for k, v := range entries {
 		b.LabelSelectorApplyConfiguration.MatchLabels[k] = v
 	}
+	return b
+}
+
+// WithSessionPersistence sets the SessionPersistence field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the SessionPersistence field is set to the value of the last call.
+func (b *EndpointSelectorBackendApplyConfiguration) WithSessionPersistence(value *v1.SessionPersistenceApplyConfiguration) *EndpointSelectorBackendApplyConfiguration {
+	b.SessionPersistence = value
 	return b
 }

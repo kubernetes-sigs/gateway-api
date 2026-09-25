@@ -15860,6 +15860,10 @@
 					"additionalProperties": {
 						"type": "string"
 					}
+				},
+				"sessionPersistence": {
+					"description": "SessionPersistence defines and configures session persistence across the endpoints selected by this backend.\n\nSupport: Extended",
+					"$ref": "io.k8s.networking.gateway.v1.SessionPersistence"
 				}
 			}
 		},

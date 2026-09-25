@@ -69,7 +69,7 @@ The current approach to adding Gateway-specific behavior to Services is through 
 - **Introduce Backend resource** as a namespace-scoped, consumer-focused resource for representing destinations and their Gateway-specific connection metadata
 - **Decorate internal endpoints**: Allow `Backend` of type `EndpointSelector` to add TLS, protocol, and other connection configuration to a selected set of pods, without a user-authored `Service`
 - **Support external destinations**: Provide first-class `ExternalHostname` support as an Extended feature, replacing the need for synthetic `ExternalName` Services
-- **Provide a home for backend-level configuration**: Inline TLS, protocol metadata, and (in the future) retries, session persistence, load balancing, and other destination-bound settings
+- **Provide a home for backend-level configuration**: Inline TLS, protocol metadata, session persistence, and future features such as retries, load balancing, and other destination-bound settings
 - **Maintain Service compatibility**: Existing Service-based `backendRef`s continue to work indefinitely; Backend is additive, not a replacement
 - **Enable incremental adoption**: At Core, a `Backend` of type `EndpointSelector` does what `Service` already does for Gateway API. Extended features (ExternalHostname, TLS, MCP protocol, etc.) can be adopted independently by implementations.
 
@@ -151,6 +151,7 @@ The Backend resource is designed with a clear separation between Core and Extend
 | `ExternalHostname` type | Extended | First-class external FQDN support, replacing `ExternalName` Services |
 | Inline TLS | Extended | TLS configuration inlined on the Backend resource |
 | `MCP` protocol | Extended | Higher-level protocol metadata for AI/agentic use cases |
+| [Session persistence](../gep-1619/index.md) | Extended | Session persistence across endpoints selected by an `EndpointSelector` Backend |
 
 This layering allows the Backend resource itself to move to Standard quickly (Core tests just validate "does Backend do what Service does"), while Extended features mature independently.
 
@@ -242,7 +243,7 @@ type BackendSpec struct {
   // TODO: Define full semantics in protocol negotation.
   //
   // These protocols are also used for validation of future protocol-specific
-  // fields that may be added to the Backend resource (e.g. retries, session persistence, etc.)
+  // fields that may be added to the Backend resource (e.g. retries).
   //
   // Support: Extended for MCP, Core for TCP, HTTP, HTTP2, and H2C
   // TODO: Not sure if the above is allowed or viable.
@@ -330,6 +331,10 @@ type EndpointSelectorBackend struct {
   //
   // +required
   LabelSelector
+
+  // SessionPersistence configures session persistence as described in GEP-1619.
+  // +optional
+  SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
 // +kubebuilder:validation:XValidation:rule="self.mode == 'ClientAndServer' ? has(self.clientCertificateRef) : !has(self.clientCertificateRef)",message="clientCertificateRef must be set if and only if mode is ClientAndServer"
@@ -714,7 +719,6 @@ spec:
 The Backend resource is designed to be the home for backend-level connection concerns that have historically required separate policy CRDs. Future GEPs will propose adding inline configuration for common concerns such as:
 
 - **Retries**: Max retries, backoff strategy, retryable status codes
-- **Session persistence**: Cookie-based, header-based, or connection-based affinity
 - **Timeouts**: Connection timeout, request timeout, idle timeout
 - **Load balancing**: Algorithm selection (round-robin, least-connections, consistent hashing)
 - **Health checks**: Active health checking configuration for the destination from the consumer dataplane perspective
@@ -742,8 +746,6 @@ spec:
   # timeouts:
   #   connect: 5s
   #   request: 30s
-  # sessionPersistence:
-  #   type: Cookie
 ```
 
 Note: Policy attachment to Backend remains available for vendor-specific or niche configuration that doesn't warrant standardization in the upstream API.
