@@ -28,6 +28,7 @@ import (
 // GatewaySpecAddress describes an address that can be bound to a Gateway.
 type GatewaySpecAddressApplyConfiguration struct {
 	// Type of the address.
+	//
 	Type *apisv1.AddressType `json:"type,omitempty"`
 	// When a value is unspecified, an implementation SHOULD automatically
 	// assign an address matching the requested type if possible.
@@ -36,7 +37,16 @@ type GatewaySpecAddressApplyConfiguration struct {
 	// "Programmed" condition in status to False with a reason of "AddressNotAssigned".
 	//
 	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	//
 	Value *string `json:"value,omitempty"`
+	// Routability specifies the requested reachability scope of this address.
+	// When unset or empty, this field uses the implementation's default
+	// routability behavior.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	Routability *apisv1.GatewayAddressRoutabilityType `json:"routability,omitempty"`
 }
 
 // GatewaySpecAddressApplyConfiguration constructs a declarative configuration of the GatewaySpecAddress type for use with
@@ -58,5 +68,13 @@ func (b *GatewaySpecAddressApplyConfiguration) WithType(value apisv1.AddressType
 // If called multiple times, the Value field is set to the value of the last call.
 func (b *GatewaySpecAddressApplyConfiguration) WithValue(value string) *GatewaySpecAddressApplyConfiguration {
 	b.Value = &value
+	return b
+}
+
+// WithRoutability sets the Routability field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Routability field is set to the value of the last call.
+func (b *GatewaySpecAddressApplyConfiguration) WithRoutability(value apisv1.GatewayAddressRoutabilityType) *GatewaySpecAddressApplyConfiguration {
+	b.Routability = &value
 	return b
 }

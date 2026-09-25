@@ -85,10 +85,9 @@ A new optional `routability` field is added to both `GatewaySpecAddress` and `Ga
 // The `gateway.networking.k8s.io` prefix is reserved and cannot be used until
 // Gateway API defines a value for it.
 //
-// +kubebuilder:validation:MaxLength=253
-// Prefixed values require only a non-empty prefix and path; the prefix is not
-// validated as a domain name.
-// +kubebuilder:validation:XValidation:message="Routability must be empty, Cluster, or an implementation-specific prefixed path; gateway.networking.k8s.io is reserved",rule="self == '' || self == 'Cluster' || (self.matches(r\"\"\"^[^/]+/.+$\"\"\") && !self.startsWith('gateway.networking.k8s.io/'))"
+// <gateway:experimental:validation:MaxLength=253>
+// Prefixed values require a valid DNS subdomain prefix and a non-empty path.
+// <gateway:experimental:validation:XValidation:message="Routability must be empty, Cluster, or an implementation-specific prefixed path; gateway.networking.k8s.io is reserved",rule="size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$') && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue() && !self.startsWith('gateway.networking.k8s.io/'))">
 type GatewayAddressRoutabilityType string
 
 const (
@@ -137,7 +136,7 @@ type GatewayStatusAddress struct {
 }
 ```
 
-CRD validation MUST accept empty, `Cluster`, and implementation-specific values with a non-empty prefix and path. It MUST reject other unprefixed values and values using the reserved `gateway.networking.k8s.io` prefix. Prefixed values are implementation-specific: a valid value is not necessarily supported by every implementation.
+CRD validation MUST accept empty, `Cluster`, and implementation-specific values with a valid DNS subdomain prefix and a non-empty path. It MUST reject other unprefixed values, invalid prefixes, and values using the reserved `gateway.networking.k8s.io` prefix. Prefixed values are implementation-specific: a valid value is not necessarily supported by every implementation.
 
 ### Well-Known Values
 
@@ -145,11 +144,11 @@ The set of well-known values is intentionally open-ended. Because the field is a
 
 The default and `Cluster` model below is a portable starting point, not a ceiling: if experience (e.g. multi-network Kubernetes, [KEP-3700](https://github.com/kubernetes/enhancements/pull/3700)) or expansion of LoadBalancer semantics ([KEP-6128](https://github.com/kubernetes/enhancements/pull/6129)) shows that additional scopes are needed, they can be introduced without disrupting existing Gateways.
 
-* **Empty**: An omitted or empty value uses the implementation's default routability behavior without imposing a routability requirement. `null` is not a supported representation. In `status`, an implementation claiming `GatewayAddressRoutability` MUST explicitly report an empty value for an address without another reported routability value. The empty value has no portable reachability guarantee and no ServiceCIDR validation applies.
+* **Empty**: An omitted or empty value uses the implementation's default routability behavior without imposing a routability requirement. In `status`, an implementation claiming `GatewayAddressRoutability` MUST explicitly report an empty value for an address without another reported routability value. The empty value has no portable reachability guarantee and no ServiceCIDR validation applies.
 
 * **`Cluster`**: For `IPAddress` addresses, the reported address MUST be a ClusterIP in Kubernetes Service terms: it MUST be in the cluster's ServiceCIDR and MUST be reachable from within the cluster. It MAY be routable outside the cluster at the network administrator's discretion. It SHOULD use a non-globally-routable address (for example, RFC 1918 or RFC 4193) unless the cluster, including its ServiceCIDR, uses globally routable addresses.
 
-The field also accepts prefixed values (for example, `example.com/CorpWan` or `example.com/PublicVPC`) for implementation-specific scopes or internal address ranges (RFC 1918, RFC 4193, RFC 6598). Unlike `AddressType`, the prefix is not validated as a domain name. These values have no portability guarantee and are defined by the implementation that supports them. Values using the `gateway.networking.k8s.io` prefix are invalid until Gateway API defines a corresponding well-known value.
+The field also accepts prefixed values (for example, `example.com/CorpWan` or `example.com/PublicVPC`) for implementation-specific scopes or internal address ranges (RFC 1918, RFC 4193, RFC 6598). The prefix must be a valid DNS subdomain. These values have no portability guarantee and are defined by the implementation that supports them. Values using the `gateway.networking.k8s.io` prefix are invalid until Gateway API defines a corresponding well-known value.
 
 `testing.gateway.networking.k8s.io/sentinel` is reserved for conformance. It carries no routability guarantee. Implementations claiming `GatewayAddressRoutability` MUST support and report it for the conformance request. Other values using the `testing.gateway.networking.k8s.io` prefix are reserved and MUST be treated as unsupported. This reservation is semantic only; CRD validation intentionally does not special-case it.
 
@@ -165,7 +164,9 @@ If a requested routability cannot be satisfied, the correct behavior is to leave
 
 `spec.addresses` MAY contain entries with different routability values and may combine them with requests for specific addresses. Implementations MUST evaluate each address request separately.
 
-When `spec.addresses` is nonempty, `status.addresses` MUST contain exactly one distinct matching address for every satisfied spec entry and MUST NOT contain an address that does not match a spec entry. List order has no semantic meaning. A status address matches an entry when its effective type matches, its value matches when requested, and its routability matches for a `Cluster` or prefixed request. An unset or empty request matches either an explicit empty value or `Cluster`. If every spec entry is satisfied, `status.addresses` contains the same number of entries as `spec.addresses`. If only some entries are satisfied, `status.addresses` contains only the successful entries.
+When `spec.addresses` is nonempty, `status.addresses` MUST contain exactly one distinct matching address for every satisfied spec entry. It MUST NOT contain an address that does not match a spec entry, except an address that remains active after an update that the implementation cannot apply. A retained address MUST NOT count as satisfaction of a spec entry and MUST be removed from status when it is no longer active. List order has no semantic meaning. A status address matches an entry when its effective type matches, its value matches when requested, and its routability matches for a `Cluster` or prefixed request. An unset or empty request matches either an explicit empty value or `Cluster`. If every spec entry is satisfied and there are no retained active addresses, `status.addresses` contains the same number of entries as `spec.addresses`. If only some entries are satisfied, `status.addresses` contains only the successful entries, plus any retained active addresses.
+
+The implicit-to-explicit transition described in [Open Questions](#implicit-to-explicit-address-transitions) is excluded from these status rules until the behavior is defined for GA.
 
 When `spec.addresses` is empty, implementations continue to populate `status.addresses` as they do today. Implementations claiming `GatewayAddressRoutability` MUST populate routability for every status address.
 
@@ -192,13 +193,13 @@ If ***all*** requested entries can be satisfied, or if default address selection
 If ***some***, but not all, entries can be satisfied, the implementation SHOULD program the Gateway using the addresses it can satisfy. In either case, it:
 
 * MUST set `AddressesAssigned=False` with reason `PartiallyAssigned`, with a message enumerating the unsatisfied entries.
-* MUST display *only* satisfied addresses in `status.addresses`.
+* MUST display all satisfied addresses in `status.addresses`; it MAY also display retained active addresses.
 
 Vendors that opt to reject partially satisfied address entries MUST follow the same semantics as the "no entries can be satisfied" behavior below.
 
-If ***no*** entries can be satisfied, the Gateway MUST NOT be programmed. The implementation
+If ***no*** entries can be satisfied, the Gateway MUST NOT be programmed unless it is still using a retained active address. The implementation
 
-* MUST set `Programmed=False` with reason `AddressNotAssigned`
+* MUST set `Programmed=False` with reason `AddressNotAssigned` unless it is still using a retained active address
 * MUST set `AddressesAssigned=False` with reason `NotAssigned`
 
 `Programmed` otherwise retains its existing meaning: it reports whether the proxy is actually deployed and ready. A Gateway with all addresses assigned may still have `Programmed=False` for an unrelated reason.
@@ -267,9 +268,19 @@ status:
 
 ## Open Questions
 
+### Implicit-to-explicit address transitions
+
+{{% alert color="warning" %}}
+
+**Open question for GA:** Changing `spec.addresses` from empty, which uses implementation-selected addresses, to a nonempty explicit address request is intentionally not fully defined in the Experimental phase. The implementation-specific behavior may include retaining the old address, replacing it, or rejecting the update. Users SHOULD treat this update as potentially disruptive.
+
+{{% /alert %}}
+
+This GEP does not define whether the old address must be retained or removed, when the new address becomes active, how assignment conditions represent the transition, or whether traffic continuity is provided. Portable conformance does not test this transition. GA must define the transition contract, including status and condition semantics, handoff guarantees, and whether an explicit opt-in or migration mechanism is required.
+
 ### Routability updates
 
-`routability` is mutable at the API level. An implementation MAY accept or reject a routability update. When it rejects an update, it MUST treat the updated entry as unsatisfied, remove any status address that no longer matches the spec, and report the result through the assignment-condition semantics in this GEP. The explanatory status message and any address-transition behavior are implementation-specific. Portable conformance does not test update behavior.
+Except for the implicit-to-explicit transition described above, `routability` is mutable at the API level. An implementation MAY accept or reject a routability update. When it rejects an update, it MUST treat the updated entry as unsatisfied and report the result through the assignment-condition semantics in this GEP. If the previous address remains active because it cannot be removed or replaced, the implementation MAY retain it in status until it is no longer active. The explanatory status message and any address-transition behavior are implementation-specific. Portable conformance does not test update behavior.
 
 ### Per-address attributes
 
@@ -287,15 +298,17 @@ status:
 
 Conformance tests for `GatewayAddressRoutability` will cover the following scenarios:
 
-* API validation accepts an empty string, `Cluster`, and prefixed values with a non-empty prefix and path, including `testing.gateway.networking.k8s.io/sentinel`. It rejects an unknown bare value, malformed prefixed values, and values using the reserved `gateway.networking.k8s.io` prefix. The validation is tested on both spec and status addresses.
+* API validation accepts an empty string, `Cluster`, and prefixed values with a valid DNS subdomain prefix and non-empty path, including `testing.gateway.networking.k8s.io/sentinel`. It rejects an unknown bare value, malformed prefixed values, invalid prefixes, and values using the reserved `gateway.networking.k8s.io` prefix. The validation is tested on both spec and status addresses.
+* A GatewayClass claiming `GatewayAddressRoutabilityCluster` also claims `GatewayAddressRoutability`.
 * A GatewayClass claiming `GatewayAddressRoutability` accepts a `testing.gateway.networking.k8s.io/sentinel` request and reports that exact routability value in status. This verifies support for routability reporting; it does not validate the assigned address or a routability guarantee.
-* A GatewayClass claiming `GatewayAddressRoutabilityCluster` reports a `Cluster` `IPAddress` request with `routability: Cluster`; the address is in the configured or discovered ServiceCIDR and reachable from an in-cluster client.
+* A GatewayClass claiming `GatewayAddressRoutabilityCluster` reports a `Cluster` `IPAddress` request with `routability: Cluster`; the address is in the configured or discovered ServiceCIDR. In-cluster reachability is an implementation integration check, not a portable conformance assertion.
 * A GatewayClass claiming `GatewayAddressRoutabilityCluster` with one empty and one `Cluster` request reports exactly one matching status address for each, regardless of list order, and `AddressesAssigned=True` with reason `Assigned`. The empty request is reported as `Cluster` if it satisfies the `Cluster` requirements; otherwise it is explicitly reported as empty.
-* A `Cluster` `IPAddress` request with a static value outside the ServiceCIDR is unsatisfied. Combined with a satisfiable empty request, it reports only the successful address and `AddressesAssigned=False` with reason `PartiallyAssigned`; on its own, it reports `Programmed=False` with reason `AddressNotAssigned` and `AddressesAssigned=False` with reason `NotAssigned`. This scenario requires `SupportGatewayStaticAddresses` and `GatewayAddressRoutabilityCluster`.
+* A `Cluster` `IPAddress` request with a static value outside the ServiceCIDR is unsatisfied. Combined with a satisfiable empty request, an implementation that permits partial assignment reports only the successful address and `AddressesAssigned=False` with reason `PartiallyAssigned`, with a message identifying the unsatisfied request. An implementation that rejects partial assignment follows the no-entries-can-be-satisfied behavior. On its own, the unsatisfied request reports `Programmed=False` with reason `AddressNotAssigned` and `AddressesAssigned=False` with reason `NotAssigned`. This scenario requires `SupportGatewayStaticAddresses` and `GatewayAddressRoutabilityCluster`.
+* A `Cluster` `IPAddress` request with a static value in the ServiceCIDR reports that exact value with `routability: Cluster`. This scenario requires `SupportGatewayStaticAddresses` and `GatewayAddressRoutabilityCluster`.
 * A Gateway with `spec.addresses` unset has `AddressesAssigned=True` with reason `Assigned` after default address selection. A claiming implementation reports `Cluster` for each resulting address that satisfies the `Cluster` requirements when it claims `GatewayAddressRoutabilityCluster`; otherwise it explicitly reports an empty value.
 * A claiming implementation with `spec.addresses[].routability` unset or explicitly empty reports `Cluster` when the resulting address satisfies the `Cluster` requirements and it claims `GatewayAddressRoutabilityCluster`; otherwise it explicitly reports an empty value.
 
-The suite may discover ServiceCIDRs from the cluster or receive them through conformance configuration. Tests for valid but unsupported prefixed values require configuration identifying a prefix that the implementation does not support and are not mandatory portable conformance tests. `Hostname`, `NamedAddress`, and implementation-specific address types are excluded from portable conformance for this feature.
+The suite may discover ServiceCIDRs from the cluster or receive them through the `serviceCIDRs` conformance option. In-cluster reachability is not asserted by the portable suite because it does not provide a client workload in the target cluster. Tests for valid but unsupported prefixed values require configuration identifying a prefix that the implementation does not support and are not mandatory portable conformance tests. Address retention during rejected updates is excluded from portable conformance. `Hostname`, `NamedAddress`, and implementation-specific address types are excluded from portable conformance for this feature.
 
 ## Alternatives Considered
 

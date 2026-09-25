@@ -27,6 +27,7 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
@@ -129,6 +130,82 @@ func TestGatewayInfrastructureLabels(t *testing.T) {
 			}
 			if len(missingErrorStrings) != 0 {
 				t.Errorf("Unexpected response while creating Gateway; got err=\n%v\n;missing strings within error=%q", err, missingErrorStrings)
+			}
+		})
+	}
+}
+
+func TestGatewayAddressRoutability(t *testing.T) {
+	tests := []struct {
+		name          string
+		routability   any
+		statusAddress bool
+		wantError     bool
+	}{
+		{name: "empty spec", routability: ""},
+		{name: "cluster spec", routability: "Cluster"},
+		{name: "prefixed spec", routability: "example.com/scope"},
+		{name: "sentinel spec", routability: "testing.gateway.networking.k8s.io/sentinel"},
+		{name: "unknown spec", routability: "Unknown", wantError: true},
+		{name: "empty prefix spec", routability: "/scope", wantError: true},
+		{name: "empty path spec", routability: "example.com/", wantError: true},
+		{name: "invalid prefix spec", routability: "example..com/scope", wantError: true},
+		{name: "reserved spec", routability: "gateway.networking.k8s.io/sentinel", wantError: true},
+		{name: "empty status", routability: "", statusAddress: true},
+		{name: "cluster status", routability: "Cluster", statusAddress: true},
+		{name: "prefixed status", routability: "example.com/scope", statusAddress: true},
+		{name: "sentinel status", routability: "testing.gateway.networking.k8s.io/sentinel", statusAddress: true},
+		{name: "unknown status", routability: "Unknown", statusAddress: true, wantError: true},
+		{name: "empty prefix status", routability: "/scope", statusAddress: true, wantError: true},
+		{name: "empty path status", routability: "example.com/", statusAddress: true, wantError: true},
+		{name: "invalid prefix status", routability: "example..com/scope", statusAddress: true, wantError: true},
+		{name: "reserved status", routability: "gateway.networking.k8s.io/sentinel", statusAddress: true, wantError: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			name := fmt.Sprintf("routability-%d", time.Now().UnixNano())
+			obj := &unstructured.Unstructured{Object: map[string]any{
+				"apiVersion": "gateway.networking.k8s.io/v1",
+				"kind":       "Gateway",
+				"metadata": map[string]any{
+					"name":      name,
+					"namespace": metav1.NamespaceDefault,
+				},
+				"spec": map[string]any{
+					"gatewayClassName": "foo",
+					"addresses": []any{map[string]any{
+						"type":        "IPAddress",
+						"value":       "1.2.3.4",
+						"routability": tc.routability,
+					}},
+					"listeners": []any{map[string]any{
+						"name":     "http",
+						"protocol": "HTTP",
+						"port":     int64(80),
+					}},
+				},
+			}}
+			var status map[string]any
+			if tc.statusAddress {
+				obj.Object["spec"].(map[string]any)["addresses"] = []any{}
+				status = map[string]any{
+					"addresses": []any{map[string]any{
+						"type":        "IPAddress",
+						"value":       "1.2.3.4",
+						"routability": tc.routability,
+					}},
+				}
+			}
+
+			ctx := context.Background()
+			err := k8sClient.Create(ctx, obj)
+			if err == nil && tc.statusAddress {
+				obj.Object["status"] = status
+				err = k8sClient.Status().Update(ctx, obj)
+			}
+			if (err != nil) != tc.wantError {
+				t.Fatalf("unexpected validation result: got err=%v, want error=%v", err, tc.wantError)
 			}
 		})
 	}

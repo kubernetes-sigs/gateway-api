@@ -707,6 +707,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewaySpecAddress
   map:
     fields:
+    - name: routability
+      type:
+        scalar: string
     - name: type
       type:
         scalar: string
@@ -744,6 +747,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewayStatusAddress
   map:
     fields:
+    - name: routability
+      type:
+        scalar: string
     - name: type
       type:
         scalar: string
