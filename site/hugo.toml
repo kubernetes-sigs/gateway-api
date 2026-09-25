@@ -119,3 +119,9 @@ enableEmoji = true
     source = "../examples"
     target = "content/examples"
  
+
+[[menu.main]]
+    name = "GitHub"
+    weight = 99
+    pre = "<i class='fab fa-github pr-2'></i>"
+    url = "https://github.com/kubernetes-sigs/gateway-api"
