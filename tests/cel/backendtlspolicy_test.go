@@ -19,6 +19,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -275,7 +276,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		{
 			name:             "invalid BackendTLSPolicyValidation with missing fields",
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{},
-			wantErrors:       []string{"spec.validation.hostname in body should be at least 1 chars long", "must specify either CACertificateRefs or WellKnownCACertificates"},
+			wantErrors:       []string{"spec.validation.hostname in body should be at least 1 chars long"},
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with both CACertificateRefs and WellKnownCACertificates",
@@ -539,5 +540,86 @@ func validateBackendTLSPolicy(t *testing.T, policy *gatewayv1.BackendTLSPolicy, 
 	}
 	if len(missingErrorStrings) != 0 {
 		t.Errorf("Unexpected response while creating BackendTLSPolicy %q; got err=\n%v\n;missing strings within error=%q", fmt.Sprintf("%v/%v", policy.Namespace, policy.Name), err, missingErrorStrings)
+	}
+}
+
+func TestBackendTLSPolicyValidationClusterTrustBundle(t *testing.T) {
+	if os.Getenv("CRD_CHANNEL") != "experimental" {
+		t.Skip("ClusterTrustBundleRef is only supported in experimental CRDs")
+	}
+
+	tests := []struct {
+		name             string
+		wantErrors       []string
+		policyValidation gatewayv1.BackendTLSPolicyValidation
+	}{
+		{
+			name: "valid BackendTLSPolicyValidation with ClusterTrustBundleRef",
+			policyValidation: gatewayv1.BackendTLSPolicyValidation{
+				ClusterTrustBundleRef: &gatewayv1.ClusterTrustBundleObjectRef{
+					Name: "example.com:internal-signer:v1",
+				},
+				Hostname: "foo.example.com",
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with ClusterTrustBundleRef and CACertificateRefs",
+			policyValidation: gatewayv1.BackendTLSPolicyValidation{
+				CACertificateRefs: []gatewayv1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				ClusterTrustBundleRef: &gatewayv1.ClusterTrustBundleObjectRef{
+					Name: "example.com:internal-signer:v1",
+				},
+				Hostname: "foo.example.com",
+			},
+			wantErrors: []string{"must specify exactly one of caCertificateRefs, clusterTrustBundleRef, wellKnownCACertificates"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with ClusterTrustBundleRef and WellKnownCACertificates",
+			policyValidation: gatewayv1.BackendTLSPolicyValidation{
+				ClusterTrustBundleRef: &gatewayv1.ClusterTrustBundleObjectRef{
+					Name: "example.com:internal-signer:v1",
+				},
+				WellKnownCACertificates: new(gatewayv1.WellKnownCACertificatesType("System")),
+				Hostname:                "foo.example.com",
+			},
+			wantErrors: []string{"must not contain WellKnownCACertificates together with CACertificateRefs or ClusterTrustBundleRef"},
+		},
+		{
+			name:             "invalid BackendTLSPolicyValidation with no trust source",
+			policyValidation: gatewayv1.BackendTLSPolicyValidation{Hostname: "foo.example.com"},
+			wantErrors:       []string{"must specify exactly one of caCertificateRefs, clusterTrustBundleRef, wellKnownCACertificates"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			policy := &gatewayv1.BackendTLSPolicy{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.BackendTLSPolicySpec{
+					TargetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{
+						{
+							LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
+								Group: "group",
+								Kind:  "kind",
+								Name:  "name",
+							},
+							SectionName: new(gatewayv1.SectionName("section")),
+						},
+					},
+					Validation: tc.policyValidation,
+				},
+			}
+			validateBackendTLSPolicy(t, policy, tc.wantErrors)
+		})
 	}
 }

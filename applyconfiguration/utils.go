@@ -54,6 +54,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.BackendTLSPolicySpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("BackendTLSPolicyValidation"):
 		return &apisv1.BackendTLSPolicyValidationApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ClusterTrustBundleObjectRef"):
+		return &apisv1.ClusterTrustBundleObjectRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CommonRouteSpec"):
 		return &apisv1.CommonRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CookieConfig"):

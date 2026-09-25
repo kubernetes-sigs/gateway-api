@@ -94,6 +94,9 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// </gateway:util:excludeFromCRD>
 	TargetRefs []LocalPolicyTargetReferenceWithSectionNameApplyConfiguration `json:"targetRefs,omitempty"`
 	// Validation contains backend TLS validation configuration.
+	//
+	// <gateway:experimental:validation:XValidation:message="must not contain WellKnownCACertificates together with CACertificateRefs or ClusterTrustBundleRef",rule="!(has(self.wellKnownCACertificates) && self.wellKnownCACertificates != ” && ((has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0) || has(self.clusterTrustBundleRef)))">
+	// <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>
 	Validation *BackendTLSPolicyValidationApplyConfiguration `json:"validation,omitempty"`
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the

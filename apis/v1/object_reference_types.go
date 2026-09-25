@@ -39,26 +39,35 @@ type LocalObjectReference struct {
 	Name ObjectName `json:"name"`
 }
 
-// ClusterObjectReference identifies an API object that is cluster-scoped.
-// The API object must be valid in the cluster; the Group and Kind must
-// be registered in the cluster for this reference to be valid.
+// ClusterTrustBundleObjectRef identifies a ClusterTrustBundle.
 //
-// Unlike LocalObjectReference, this type is intended exclusively for
-// cluster-scoped resources. The absence of a Namespace field is intentional
-// and correct — it MUST NOT be used with namespace-scoped resources.
+// The Group defaults to "certificates.k8s.io" and the Kind defaults to
+// "ClusterTrustBundle", so users only need to specify the name.
 //
-// References to objects with invalid Group and Kind are not valid, and must
-// be rejected by the implementation, with appropriate Conditions set
-// on the containing object.
-type ClusterObjectReference struct {
-	// Group is the group of the referent. For example, "certificates.k8s.io".
-	// When unspecified or empty string, core API group is inferred.
-	// +required
-	Group Group `json:"group"`
+// This type is intended exclusively for cluster-scoped ClusterTrustBundle
+// resources. The absence of a Namespace field is intentional and correct -
+// it MUST NOT be used with namespace-scoped resources.
+//
+// A ReferenceGrant is not required because ClusterTrustBundle is cluster-scoped
+// and has no target namespace.
+//
+// +kubebuilder:validation:XValidation:message="must reference a ClusterTrustBundle",rule="self.group == 'certificates.k8s.io' && self.kind == 'ClusterTrustBundle'"
+type ClusterTrustBundleObjectRef struct {
+	// Group is the group of the referent.
+	//
+	// Defaults to "certificates.k8s.io".
+	//
+	// +optional
+	// +kubebuilder:default=certificates.k8s.io
+	Group *Group `json:"group,omitempty"`
 
-	// Kind is kind of the referent. For example "ClusterTrustBundle".
-	// +required
-	Kind Kind `json:"kind"`
+	// Kind is the kind of the referent.
+	//
+	// Defaults to "ClusterTrustBundle".
+	//
+	// +optional
+	// +kubebuilder:default=ClusterTrustBundle
+	Kind *Kind `json:"kind,omitempty"`
 
 	// Name is the name of the referent.
 	// +required

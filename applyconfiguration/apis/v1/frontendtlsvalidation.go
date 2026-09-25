@@ -72,6 +72,31 @@ type FrontendTLSValidationApplyConfiguration struct {
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
 	CACertificateRefs []ObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
+	// ClusterTrustBundleRef is an optional reference to a cluster-scoped
+	// ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
+	// PEM-encoded CA certificates in the referenced bundle are used as trust
+	// anchors for frontend client certificate validation, in addition to any
+	// certificates provided via CACertificateRefs.
+	//
+	// The referenced bundle MUST exist, be readable by the implementation, and
+	// contain at least one valid PEM-encoded CA certificate. If any of these
+	// conditions are not met, the implementation MUST set ResolvedRefs=False
+	// with reason InvalidCACertificateRef on all targeted HTTPS listeners.
+	// A ReferenceGrant is not required.
+	//
+	// If the certificates.k8s.io API is not available in the cluster, the
+	// reference is treated as an unknown kind: the implementation MUST set
+	// ResolvedRefs=False with reason InvalidCACertificateKind on all targeted
+	// HTTPS listeners.
+	//
+	// Implementations that do not support ClusterTrustBundle references MUST set
+	// ResolvedRefs=False with reason InvalidCACertificateKind when this field
+	// is specified.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	ClusterTrustBundleRef *ClusterTrustBundleObjectRefApplyConfiguration `json:"clusterTrustBundleRef,omitempty"`
 	// FrontendValidationMode defines the mode for validating the client certificate.
 	// There are two possible modes:
 	//
@@ -107,6 +132,14 @@ func (b *FrontendTLSValidationApplyConfiguration) WithCACertificateRefs(values .
 		}
 		b.CACertificateRefs = append(b.CACertificateRefs, *values[i])
 	}
+	return b
+}
+
+// WithClusterTrustBundleRef sets the ClusterTrustBundleRef field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the ClusterTrustBundleRef field is set to the value of the last call.
+func (b *FrontendTLSValidationApplyConfiguration) WithClusterTrustBundleRef(value *ClusterTrustBundleObjectRefApplyConfiguration) *FrontendTLSValidationApplyConfiguration {
+	b.ClusterTrustBundleRef = value
 	return b
 }
 
