@@ -30,7 +30,6 @@ import (
 	"github.com/stretchr/testify/require"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -39,6 +38,14 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
+)
+
+// Address values that manifests use to request an address pool from the suite.
+const (
+	usableAddressesPlaceholder          = "PLACEHOLDER_USABLE_ADDRS"
+	unusableAddressesPlaceholder        = "PLACEHOLDER_UNUSABLE_ADDRS"
+	usableClusterAddressesPlaceholder   = "PLACEHOLDER_USABLE_CLUSTER_ADDRS"
+	unusableClusterAddressesPlaceholder = "PLACEHOLDER_UNUSABLE_CLUSTER_ADDRS"
 )
 
 // Applier prepares manifests depending on the available options and applies
@@ -63,6 +70,12 @@ type Applier struct {
 	// UnusableNetworkAddresses is a list of addresses that are expected to be
 	// supported, but not usable for Gateways in the underlying implementation.
 	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
+
+	// UsableClusterNetworkAddresses is a list of addresses in the ServiceCIDR.
+	UsableClusterNetworkAddresses []gatewayv1.GatewaySpecAddress
+
+	// UnusableClusterNetworkAddresses is a list of addresses outside the ServiceCIDR.
+	UnusableClusterNetworkAddresses []gatewayv1.GatewaySpecAddress
 }
 
 // prepareGateway adjusts the gatewayClassName.
@@ -73,28 +86,17 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 	err := unstructured.SetNestedField(uObj.Object, a.GatewayClass, "spec", "gatewayClassName")
 	require.NoErrorf(t, err, "error setting `spec.gatewayClassName` on Gateway %s/%s", ns, name)
 
-	rawSpec, hasSpec, err := unstructured.NestedFieldCopy(uObj.Object, "spec")
-	require.NoError(t, err, "error retrieving spec.addresses to verify if any static addresses were present on Gateway resource %s/%s", ns, name)
-	require.True(t, hasSpec)
-
-	rawSpecMap, ok := rawSpec.(map[string]any)
-	require.True(t, ok, "expected gw spec received %T", rawSpec)
-
-	gwspec := &gatewayv1.GatewaySpec{}
-	require.NoError(t, runtime.DefaultUnstructuredConverter.FromUnstructured(rawSpecMap, gwspec))
+	addresses, _, err := unstructured.NestedSlice(uObj.Object, "spec", "addresses")
+	require.NoError(t, err, "error retrieving spec.addresses on Gateway %s/%s", ns, name)
 
 	// for tests which have placeholders for static gateway addresses we will
 	// inject real addresses from the address pools the caller provided.
-	if len(gwspec.Addresses) > 0 {
+	if len(addresses) > 0 {
 		// this is a hack because we don't have any other great way to inject custom
 		// values into the test YAML at the time of writing: Gateways that include
-		// addresses with the following values:
-		//
-		//   * PLACEHOLDER_USABLE_ADDRS
-		//   * PLACEHOLDER_UNUSABLE_ADDRS
-		//
-		// indicate that they expect the caller of the test suite to have provided
-		// relevant addresses (usable, or unusable ones) in the test suite, and those
+		// addresses with one of the placeholder values defined above indicate that
+		// they expect the caller of the test suite to have provided relevant
+		// addresses (usable, or unusable ones) in the test suite, and those
 		// addresses will be injected into the Gateway and the placeholders removed.
 		//
 		// A special "test/fake-invalid-type" can be provided as well in the test to
@@ -104,33 +106,23 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 		//
 		// Note: I would really love to find a better way to do this kind of
 		// thing in the future.
-		var overlayUsable, overlayUnusable bool
-		var specialAddrs []gatewayv1.GatewaySpecAddress
-		for _, addr := range gwspec.Addresses {
-			switch addr.Value {
-			case "PLACEHOLDER_USABLE_ADDRS":
-				overlayUsable = true
-			case "PLACEHOLDER_UNUSABLE_ADDRS":
-				overlayUnusable = true
-			}
-
-			if addr.Type != nil && *addr.Type == "test/fake-invalid-type" {
-				specialAddrs = append(specialAddrs, addr)
-			}
+		pools := map[string][]gatewayv1.GatewaySpecAddress{
+			usableAddressesPlaceholder:          a.UsableNetworkAddresses,
+			unusableAddressesPlaceholder:        a.UnusableNetworkAddresses,
+			usableClusterAddressesPlaceholder:   a.UsableClusterNetworkAddresses,
+			unusableClusterAddressesPlaceholder: a.UnusableClusterNetworkAddresses,
 		}
-
 		var primOverlayAddrs []any
-		if len(specialAddrs) > 0 {
-			tlog.Logf(t, "the test provides %d special addresses that will be kept", len(specialAddrs))
-			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(specialAddrs)...)
-		}
-		if overlayUnusable {
-			tlog.Logf(t, "address pool of %d unusable addresses will be overlaid", len(a.UnusableNetworkAddresses))
-			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UnusableNetworkAddresses)...)
-		}
-		if overlayUsable {
-			tlog.Logf(t, "address pool of %d usable addresses will be overlaid", len(a.UsableNetworkAddresses))
-			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UsableNetworkAddresses)...)
+		for _, rawAddr := range addresses {
+			addr, _ := rawAddr.(map[string]any)
+			value, _ := addr["value"].(string)
+			pool, isPlaceholder := pools[value]
+			if !isPlaceholder {
+				primOverlayAddrs = append(primOverlayAddrs, rawAddr)
+				continue
+			}
+			tlog.Logf(t, "%s will be replaced by an address pool of %d addresses", value, len(pool))
+			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(pool, addr["routability"])...)
 		}
 
 		err = unstructured.SetNestedSlice(uObj.Object, primOverlayAddrs, "spec", "addresses")
@@ -367,16 +359,20 @@ func getContentsFromPathOrURL(manifestFS []fs.FS, location string, timeoutConfig
 // convertGatewayAddrsToPrimitives converts a slice of Gateway addresses
 // to a slice of primitive types and then returns them as a []any so that
 // they can be applied back to an unstructured Gateway.
-func convertGatewayAddrsToPrimitives(gwaddrs []gatewayv1.GatewaySpecAddress) (raw []any) {
+func convertGatewayAddrsToPrimitives(gwaddrs []gatewayv1.GatewaySpecAddress, routability any) (raw []any) {
 	for _, addr := range gwaddrs {
 		addrType := string(gatewayv1.IPAddressType)
 		if addr.Type != nil {
 			addrType = string(*addr.Type)
 		}
-		raw = append(raw, map[string]any{
+		converted := map[string]any{
 			"type":  addrType,
 			"value": addr.Value,
-		})
+		}
+		if routability != nil {
+			converted["routability"] = routability
+		}
+		raw = append(raw, converted)
 	}
 	return
 }
