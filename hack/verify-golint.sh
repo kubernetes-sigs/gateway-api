@@ -18,7 +18,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly VERSION="v2.11.4"
+# Pinned by digest so the tag can't be repointed to a different image.
+readonly GOLANGCI_LINT_IMAGE="golangci/golangci-lint@sha256:67dfc9eeeb0eb13fc1a36329c2c378197dc561f1edf1a7792e3f771606bb0e15" # v2.11.4
 readonly KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd "${KUBE_ROOT}"
@@ -44,7 +45,7 @@ for module in $(find . -name "go.mod" | xargs -n1 dirname); do
     -e GOFLAGS="-buildvcs=false" \
     -e GOOS="js" \
     -e GOARCH="wasm" \
-    "golangci/golangci-lint:$VERSION" \
+    "${GOLANGCI_LINT_IMAGE}" \
     golangci-lint run ./... || failed=true
 done
 
