@@ -56,33 +56,36 @@ import (
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
 type ConformanceTestSuite struct {
-	Client                   client.Client
-	ClientOptions            client.Options
-	Clientset                clientset.Interface
-	RESTClient               *rest.RESTClient
-	RestConfig               *rest.Config
-	RoundTripper             roundtripper.RoundTripper
-	GRPCClient               grpc.Client
-	WebSocketDialer          websocket.Dialer
-	GatewayClassName         string
-	MeshName                 string
-	ControllerName           string
-	Debug                    bool
-	Cleanup                  bool
-	CleanupTestResources     bool
-	BaseManifests            string
-	MeshManifests            string
-	Applier                  kubernetes.Applier
-	SupportedFeatures        FeaturesSet
-	TimeoutConfig            config.TimeoutConfig
-	SkipTests                sets.Set[string]
-	SkipProvisionalTests     bool
-	DisableParallelTests     bool
-	RunTest                  string
-	Hook                     func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
-	ManifestFS               []fs.FS
-	UsableNetworkAddresses   []gatewayv1.GatewaySpecAddress
-	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
+	Client                          client.Client
+	ClientOptions                   client.Options
+	Clientset                       clientset.Interface
+	RESTClient                      *rest.RESTClient
+	RestConfig                      *rest.Config
+	RoundTripper                    roundtripper.RoundTripper
+	GRPCClient                      grpc.Client
+	WebSocketDialer                 websocket.Dialer
+	GatewayClassName                string
+	MeshName                        string
+	ControllerName                  string
+	Debug                           bool
+	Cleanup                         bool
+	CleanupTestResources            bool
+	BaseManifests                   string
+	MeshManifests                   string
+	Applier                         kubernetes.Applier
+	SupportedFeatures               FeaturesSet
+	TimeoutConfig                   config.TimeoutConfig
+	SkipTests                       sets.Set[string]
+	SkipProvisionalTests            bool
+	DisableParallelTests            bool
+	RunTest                         string
+	Hook                            func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
+	ManifestFS                      []fs.FS
+	UsableNetworkAddresses          []gatewayv1.GatewaySpecAddress
+	UnusableNetworkAddresses        []gatewayv1.GatewaySpecAddress
+	UsableClusterNetworkAddresses   []gatewayv1.GatewaySpecAddress
+	UnusableClusterNetworkAddresses []gatewayv1.GatewaySpecAddress
+	ServiceCIDRs                    []string
 
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
@@ -178,6 +181,15 @@ type ConfigurableOptions struct {
 	// Gateways for tests which need to test failures with manual Gateway
 	// address assignment.
 	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"unusableNetworkAddresses"`
+
+	// UsableClusterNetworkAddresses is an optional pool of addresses in the ServiceCIDR.
+	UsableClusterNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"usableClusterNetworkAddresses"`
+
+	// UnusableClusterNetworkAddresses is an optional pool of addresses outside the ServiceCIDR.
+	UnusableClusterNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"unusableClusterNetworkAddresses"`
+
+	// ServiceCIDRs overrides discovery for clusters without the ServiceCIDR API.
+	ServiceCIDRs []string `json:"serviceCIDRs"`
 }
 
 // ConformanceOptions can be used to initialize a ConformanceTestSuite.
@@ -319,26 +331,29 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 			NamespaceLabels:      options.NamespaceLabels,
 			NamespaceAnnotations: options.NamespaceAnnotations,
 		},
-		SupportedFeatures:           supportedFeatures,
-		TimeoutConfig:               options.TimeoutConfig,
-		SkipTests:                   sets.New(options.SkipTests...),
-		RunTest:                     options.RunTest,
-		SkipProvisionalTests:        options.SkipProvisionalTests,
-		DisableParallelTests:        options.DisableParallelTests,
-		ManifestFS:                  options.ManifestFS,
-		UsableNetworkAddresses:      options.UsableNetworkAddresses,
-		UnusableNetworkAddresses:    options.UnusableNetworkAddresses,
-		results:                     make(map[string]testResult),
-		extendedUnsupportedFeatures: extendedUnsupportedFeatures,
-		extendedSupportedFeatures:   extendedSupportedFeatures,
-		conformanceProfiles:         sets.New(options.ConformanceProfiles...),
-		implementation:              options.Implementation,
-		mode:                        options.Mode,
-		apiVersion:                  apiVersion,
-		apiChannel:                  apiChannel,
-		supportedFeaturesSource:     source,
-		Hook:                        options.Hook,
-		failFast:                    options.FailFast,
+		SupportedFeatures:               supportedFeatures,
+		TimeoutConfig:                   options.TimeoutConfig,
+		SkipTests:                       sets.New(options.SkipTests...),
+		RunTest:                         options.RunTest,
+		SkipProvisionalTests:            options.SkipProvisionalTests,
+		DisableParallelTests:            options.DisableParallelTests,
+		ManifestFS:                      options.ManifestFS,
+		UsableNetworkAddresses:          options.UsableNetworkAddresses,
+		UnusableNetworkAddresses:        options.UnusableNetworkAddresses,
+		UsableClusterNetworkAddresses:   options.UsableClusterNetworkAddresses,
+		UnusableClusterNetworkAddresses: options.UnusableClusterNetworkAddresses,
+		ServiceCIDRs:                    options.ServiceCIDRs,
+		results:                         make(map[string]testResult),
+		extendedUnsupportedFeatures:     extendedUnsupportedFeatures,
+		extendedSupportedFeatures:       extendedSupportedFeatures,
+		conformanceProfiles:             sets.New(options.ConformanceProfiles...),
+		implementation:                  options.Implementation,
+		mode:                            options.Mode,
+		apiVersion:                      apiVersion,
+		apiChannel:                      apiChannel,
+		supportedFeaturesSource:         source,
+		Hook:                            options.Hook,
+		failFast:                        options.FailFast,
 	}
 
 	// apply defaults
@@ -366,6 +381,8 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 	suite.Applier.ManifestFS = suite.ManifestFS
 	suite.Applier.UsableNetworkAddresses = suite.UsableNetworkAddresses
 	suite.Applier.UnusableNetworkAddresses = suite.UnusableNetworkAddresses
+	suite.Applier.UsableClusterNetworkAddresses = suite.UsableClusterNetworkAddresses
+	suite.Applier.UnusableClusterNetworkAddresses = suite.UnusableClusterNetworkAddresses
 
 	supportsGateway := suite.SupportedFeatures.Has(features.SupportGateway)
 	supportsMesh := suite.SupportedFeatures.Has(features.SupportMesh)

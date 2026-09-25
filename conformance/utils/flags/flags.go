@@ -168,6 +168,33 @@ func init() {
 			}
 		},
 	)
+	registerStringFlag("usable-cluster-address", "", "Usable address in the ServiceCIDR for GatewayAddressRoutabilityClusterStatic test",
+		func(o *suite.ConfigurableOptions, v string) {
+			if v != "" {
+				o.UsableClusterNetworkAddresses = []v1.GatewaySpecAddress{parseAddress(v)}
+			} else {
+				o.UsableClusterNetworkAddresses = nil
+			}
+		},
+	)
+	registerStringFlag("unusable-cluster-address", "", "Unusable address outside the ServiceCIDR for GatewayAddressRoutabilityClusterStatic test",
+		func(o *suite.ConfigurableOptions, v string) {
+			if v != "" {
+				o.UnusableClusterNetworkAddresses = []v1.GatewaySpecAddress{parseAddress(v)}
+			} else {
+				o.UnusableClusterNetworkAddresses = nil
+			}
+		},
+	)
+	registerStringFlag("service-cidrs", "", "Comma-separated list of ServiceCIDRs for GatewayAddressRoutabilityCluster tests; discovered from the cluster when unset",
+		func(o *suite.ConfigurableOptions, v string) {
+			if v == "" {
+				o.ServiceCIDRs = nil
+				return
+			}
+			o.ServiceCIDRs = strings.Split(v, ",")
+		},
+	)
 	registerStringFlag("timeout-config-overrides", "", "Semicolon-separated list of timeout configuration overrides",
 		func(o *suite.ConfigurableOptions, v string) {
 			conformanceconfig.ParseTimeoutOverrides(&o.TimeoutConfig, v)
