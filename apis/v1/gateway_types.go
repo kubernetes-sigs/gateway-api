@@ -911,6 +911,22 @@ type RouteGroupKind struct {
 	Kind Kind `json:"kind"`
 }
 
+// GatewayAddressRoutabilityType describes where a Gateway address is expected to
+// be reachable from.
+//
+// Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
+// The `gateway.networking.k8s.io` prefix is reserved and cannot be used until
+// Gateway API defines a value for it.
+//
+// <gateway:experimental:validation:MaxLength=253>
+// <gateway:experimental:validation:XValidation:message="Routability must be empty, Cluster, or an implementation-specific prefixed path; gateway.networking.k8s.io is reserved",rule="size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$') && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue() && !self.startsWith('gateway.networking.k8s.io/'))">
+type GatewayAddressRoutabilityType string
+
+const (
+	GatewayAddressRoutabilityDefault GatewayAddressRoutabilityType = ""
+	GatewayAddressRoutabilityCluster GatewayAddressRoutabilityType = "Cluster"
+)
+
 // GatewaySpecAddress describes an address that can be bound to a Gateway.
 //
 // +kubebuilder:validation:XValidation:message="Hostname value must be empty or contain only valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? (!has(self.value) || self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\")): true"
@@ -932,6 +948,16 @@ type GatewaySpecAddress struct {
 	// +optional
 	// +kubebuilder:validation:MaxLength=253
 	Value string `json:"value,omitempty"`
+
+	// Routability specifies the requested reachability scope of this address.
+	// When unset or empty, this field uses the implementation's default
+	// routability behavior.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Routability GatewayAddressRoutabilityType `json:"routability,omitempty,omitzero"`
 }
 
 // GatewayStatusAddress describes a network address that is bound to a Gateway.
@@ -953,6 +979,13 @@ type GatewayStatusAddress struct {
 	// +kubebuilder:validation:MaxLength=253
 	// +required
 	Value string `json:"value"`
+
+	// Routability reports the reachability scope of this address. When empty or
+	// unset, this field uses the implementation's default routability behavior.
+	//
+	// +optional
+	// <gateway:experimental>
+	Routability *GatewayAddressRoutabilityType `json:"routability,omitempty"`
 }
 
 // GatewayStatus defines the observed state of Gateway.
@@ -985,6 +1018,7 @@ type GatewayStatus struct {
 	// * "Accepted"
 	// * "Programmed"
 	// * "Ready"
+	// * "AddressesAssigned"
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementors:
@@ -1128,6 +1162,21 @@ type GatewayConditionType string
 type GatewayConditionReason string
 
 const (
+	// This condition indicates whether all requested Gateway addresses were
+	// successfully assigned.
+	GatewayConditionAddressesAssigned GatewayConditionType = "AddressesAssigned"
+
+	// This reason is used when all requested Gateway addresses were assigned.
+	GatewayReasonAddressesAssigned GatewayConditionReason = "Assigned"
+
+	// This reason is used when some, but not all, requested Gateway addresses
+	// were assigned.
+	GatewayReasonAddressesPartiallyAssigned GatewayConditionReason = "PartiallyAssigned"
+
+	// This reason is used when none of the requested Gateway addresses were
+	// assigned.
+	GatewayReasonAddressesNotAssigned GatewayConditionReason = "NotAssigned"
+
 	// This condition indicates whether a Gateway has generated some
 	// configuration that is assumed to be ready soon in the underlying data
 	// plane.
