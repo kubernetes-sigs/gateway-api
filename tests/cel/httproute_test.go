@@ -1704,7 +1704,7 @@ func TestHTTPRequestMirrorFilter(t *testing.T) {
 	}{
 		{
 			name:       "HTTPRoute - Invalid because both percent and fraction are specified",
-			wantErrors: []string{"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter"},
+			wantErrors: []string{"Invalid value: at most one of the fields in [percent fraction] may be set"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Filters: []gatewayv1.HTTPRouteFilter{{
 					Type: gatewayv1.HTTPRouteFilterRequestMirror,
