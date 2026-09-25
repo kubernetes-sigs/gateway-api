@@ -194,7 +194,11 @@ existing post-routing filters.
   [Extensibility to Other Route Kinds](#extensibility-to-other-route-kinds))
   can be added as a `filters.connection` sibling to `filters.requests`
   by a follow-up GEP without renaming or moving the outer `filters`
-  field.
+  field. UDP-oriented pre-routing is a separate deferred question because
+  UDP fits neither the request nor connection lifecycle assumed by these
+  sub-lists; see
+  [UDP and the TCP/HTTP Transport Assumption](#udp-and-the-tcphttp-transport-assumption)
+  for detail.
 * **Shipping GRPCRoute conformance in this GEP.** The API mechanism defined
   here is route-kind-agnostic and covers `GRPCRoute` alongside `HTTPRoute`
   by construction, since both attach to HTTP/HTTPS listeners. The initial
@@ -834,14 +838,23 @@ moving, or forking the outer `filters` field:
   of whether the eventual match resolves via HTTPRoute or GRPCRoute. No API
   change is required. A follow-up will extend the conformance suite to cover
   GRPCRoute matching after pre-routing filters.
-* **`TCPRoute`, `TLSRoute`, `UDPRoute` (L4).** These need protocol-appropriate
-  filter payloads (source-IP blocking, SNI-based decisions, per-connection
-  rate limits) that do not fit the request-shaped `ListenerFilter` type.
-  The extension path is to add a sibling sub-list on `ListenerFilters`,
-  for example `filters.connection []ConnectionListenerFilter`, with an
-  element type defined by a follow-up GEP. The existing
-  `filters.requests` list stays put and keeps its request-phase
-  semantics; L4 pre-routing does not share a type with HTTP pre-routing.
+* **`TCPRoute` and `TLSRoute` (connection-oriented L4).** These need
+  protocol-appropriate filter payloads (source-IP blocking, SNI-based
+  decisions, per-connection rate limits) that do not fit the request-shaped
+  `ListenerFilter` type. The extension path is to add a sibling sub-list
+  on `ListenerFilters`, for example
+  `filters.connection []ConnectionListenerFilter`, with an element type
+  defined by a follow-up GEP. The existing `filters.requests` list stays
+  put and keeps its request-phase semantics; L4 pre-routing does not share
+  a type with HTTP pre-routing.
+* **`UDPRoute` (connectionless L4).** Explicitly deferred. UDP does not have
+  the request or connection lifecycle that `filters.requests` and
+  `filters.connection` assume; see
+  [UDP and the TCP/HTTP Transport Assumption](#udp-and-the-tcphttp-transport-assumption)
+  below for why, and for a sketch of a possible `filters.datagram`
+  sibling. Nothing in this GEP forecloses adding UDP support later; the
+  outer `filters` container is deliberately shaped so a new sub-list can
+  be introduced additively.
 
 The naming convention (one sub-list per pre-routing phase, each with its
 own element type) keeps each phase attached to a phase-appropriate payload
@@ -849,6 +862,57 @@ type without collapsing them into a single polymorphic list that would
 force implementations to inspect and validate cross-phase combinations
 that don't make sense. `filters.requests` is not a placeholder; it is
 the permanent name for the request-phase flavor.
+
+#### UDP and the TCP/HTTP Transport Assumption
+
+The request-phase sub-list defined by this GEP (`filters.requests`)
+and the future connection-phase sub-list foreshadowed for a follow-up
+(`filters.connection`, not defined here) both assume a transport with
+a lifecycle: a session that a filter can hook into either "per-request"
+(L7) or "per-connection" (L4, TCP-family). UDP has neither.
+
+Concretely:
+
+* **`filters.requests`** (defined by this GEP) binds one filter
+  execution to one HTTP request. UDP has no request/response framing,
+  so there is no unit of work for a request-phase filter to operate on.
+* **`filters.connection`** (not defined here; sketched as a future
+  sibling for `TCPRoute`/`TLSRoute` in
+  [Extensibility to Other Route Kinds](#extensibility-to-other-route-kinds))
+  would bind one filter execution to one connection and run before the
+  routing decision that assigns that connection to a route. UDP is
+  connectionless: there is no handshake, no session lifecycle, and no
+  "before route selection for the connection" moment. Implementations
+  that synthesize a flow from the 5-tuple (source IP, source port,
+  destination IP, destination port, protocol) do so differently, and
+  the "flow" is a data-plane construct rather than a wire-protocol
+  notion. Reusing the future `filters.connection` shape for UDP would
+  ship a phase whose semantics depend on an implementation choice.
+
+A UDP-shaped phase would run once per datagram (or once per synthesized
+flow), on inputs that are per-datagram (source IP, ports, payload) or
+per-flow (rate, packet count, time since first datagram). The natural
+API shape is a third sibling sub-list, tentatively named
+`filters.datagram []DatagramListenerFilter`, with an element type
+defined by the follow-up UDP GEP. That GEP would also decide:
+
+* Whether the phase runs per-datagram, per-flow, or both, and how the
+  choice is expressed.
+* What "route matching MUST run exactly once after all pre-routing
+  filters have run" means when there is no single request or connection
+  to match against.
+* Whether short-circuit semantics (dropping a datagram vs. rejecting a
+  flow) are per-datagram or per-flow.
+* Whether the Listener protocol CEL rule is loosened to admit `UDP` on
+  the outer `filters` field, or whether UDPRoute pre-routing is attached
+  via a separate top-level field to keep the HTTP-family CEL rule intact.
+
+Introducing a `filters.datagram` sub-list is additive: existing
+configurations that only populate `filters.requests` (and, in the
+future, `filters.connection`) remain valid, and no rename is required
+on the outer `filters` container. Deferring the decision keeps this
+GEP focused on the HTTP-family cases where the transport assumption
+holds cleanly.
 
 ### Status Reporting
 
@@ -1095,12 +1159,17 @@ into the same list.
   Whether pre-routing usage motivates additional fields, and whether they
   belong on `HTTPExternalAuthFilter` or on a new pre-routing-specific
   variant, is deferred.
-* **Extension to L4 route kinds.** Extending pre-routing to L4 route kinds
-  (`TCPRoute`, `TLSRoute`, `UDPRoute`, likely as a sibling
-  `filters.connection` list with a distinct element type) is deferred to
-  a follow-up GEP. `GRPCRoute` is covered by the mechanism defined here
-  and is not deferred; only its conformance tests are follow-up. See
-  [Extensibility to Other Route Kinds](#extensibility-to-other-route-kinds).
+* **Extension to L4 route kinds.** Extending pre-routing to connection-oriented
+  L4 route kinds (`TCPRoute`, `TLSRoute`) is deferred to a follow-up GEP that
+  would introduce a `filters.connection` sibling with a distinct element type.
+  `UDPRoute` is a further-deferred separate question because UDP does not fit
+  the request or connection lifecycle assumed by the current sub-lists; a
+  follow-up would likely introduce a `filters.datagram` sibling.
+  `GRPCRoute` is covered by the mechanism defined here and is not deferred;
+  only its conformance tests are follow-up. See
+  [Extensibility to Other Route Kinds](#extensibility-to-other-route-kinds)
+  and
+  [UDP and the TCP/HTTP Transport Assumption](#udp-and-the-tcphttp-transport-assumption).
 
 ## Relationship to Other Work
 
