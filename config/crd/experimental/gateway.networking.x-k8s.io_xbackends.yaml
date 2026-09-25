@@ -312,6 +312,59 @@ spec:
                         maxItems: 8
                         type: array
                         x-kubernetes-list-type: atomic
+                      clusterTrustBundleRef:
+                        description: |-
+                          ClusterTrustBundleRef is an optional reference to a cluster-scoped
+                          ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
+                          PEM-encoded CA certificates in the referenced bundle are used as trust
+                          anchors for backend TLS validation, in addition to any certificates
+                          provided via CACertificateRefs.
+
+                          The referenced bundle MUST exist, be readable by the implementation, and
+                          contain at least one valid PEM-encoded CA certificate. If any of these
+                          conditions are not met, the implementation MUST set ResolvedRefs=False
+                          with reason InvalidCACertificateRef. A ReferenceGrant is not required.
+
+                          If the certificates.k8s.io API is not available in the cluster, the
+                          reference is treated as an unknown kind: the implementation MUST set
+                          ResolvedRefs=False with reason InvalidKind.
+
+                          Implementations that do not support ClusterTrustBundle references MUST set
+                          ResolvedRefs=False with reason InvalidKind when this field is specified.
+
+                          Support: Extended
+                        properties:
+                          group:
+                            default: certificates.k8s.io
+                            description: |-
+                              Group is the group of the referent.
+
+                              Defaults to "certificates.k8s.io".
+                            maxLength: 253
+                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                            type: string
+                          kind:
+                            default: ClusterTrustBundle
+                            description: |-
+                              Kind is the kind of the referent.
+
+                              Defaults to "ClusterTrustBundle".
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                            type: string
+                          name:
+                            description: Name is the name of the referent.
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                        required:
+                        - name
+                        type: object
+                        x-kubernetes-validations:
+                        - message: must reference a ClusterTrustBundle
+                          rule: self.group == 'certificates.k8s.io' && self.kind ==
+                            'ClusterTrustBundle'
                       hostname:
                         description: |-
                           Hostname is used for two purposes in the connection between Gateways and
@@ -427,10 +480,6 @@ spec:
                       rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
                         > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
                         != "")'
-                    - message: must specify either CACertificateRefs or WellKnownCACertificates
-                      rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                        > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                        != "")
                 required:
                 - mode
                 type: object

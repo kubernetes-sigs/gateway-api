@@ -87,6 +87,10 @@ const (
 	// SupportGatewayFrontendClientCertificateValidationInsecureFallback option indicates support
 	// for the `AllowInsecureFallback` client certificate validation mode.
 	SupportGatewayFrontendClientCertificateValidationInsecureFallback FeatureName = "GatewayFrontendClientCertificateValidationInsecureFallback"
+
+	// SupportClusterTrustBundle option indicates support for ClusterTrustBundle
+	// references in BackendTLSPolicyValidation and Gateway frontend TLS validation.
+	SupportClusterTrustBundle FeatureName = "ClusterTrustBundle"
 )
 
 var (
@@ -143,6 +147,13 @@ var (
 		Name:    SupportGatewayFrontendClientCertificateValidationInsecureFallback,
 		Channel: FeatureChannelStandard,
 	}
+
+	// ClusterTrustBundleFeature contains metadata for the ClusterTrustBundle reference
+	// feature, used by both BackendTLSPolicy and Gateway frontend TLS validation.
+	ClusterTrustBundleFeature = Feature{
+		Name:    SupportClusterTrustBundle,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -157,5 +168,6 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayBackendClientCertificateFeature,
 	GatewayFrontendClientCertificateValidationFeature,
 	GatewayFrontendClientCertificateValidationInsecureFallbackFeature,
+	ClusterTrustBundleFeature,
 	ListenerSetFeature,
 )

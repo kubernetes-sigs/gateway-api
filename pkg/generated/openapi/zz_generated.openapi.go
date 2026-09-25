@@ -93,6 +93,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyList":                            schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicySpec":                            schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation":                      schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef":                     schema_sigsk8sio_gateway_api_apis_v1_ClusterTrustBundleObjectRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                                 schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CookieConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ForwardBodyConfig":                               schema_sigsk8sio_gateway_api_apis_v1_ForwardBodyConfig(ref),
@@ -3175,7 +3176,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref common.Refere
 					},
 					"validation": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Validation contains backend TLS validation configuration.",
+							Description: "Validation contains backend TLS validation configuration.\n\n<gateway:experimental:validation:XValidation:message=\"must not contain WellKnownCACertificates together with CACertificateRefs or ClusterTrustBundleRef\",rule=\"!(has(self.wellKnownCACertificates) && self.wellKnownCACertificates != '' && ((has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0) || has(self.clusterTrustBundleRef)))\"> <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation"),
 						},
@@ -3229,6 +3230,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 							},
 						},
 					},
+					"clusterTrustBundleRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ClusterTrustBundleRef is an optional reference to a cluster-scoped ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the PEM-encoded CA certificates in the referenced bundle are used as trust anchors for backend TLS validation, in addition to any certificates provided via CACertificateRefs.\n\nThe referenced bundle MUST exist, be readable by the implementation, and contain at least one valid PEM-encoded CA certificate. If any of these conditions are not met, the implementation MUST set ResolvedRefs=False with reason InvalidCACertificateRef. A ReferenceGrant is not required.\n\nIf the certificates.k8s.io API is not available in the cluster, the reference is treated as an unknown kind: the implementation MUST set ResolvedRefs=False with reason InvalidKind.\n\nImplementations that do not support ClusterTrustBundle references MUST set ResolvedRefs=False with reason InvalidKind when this field is specified.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef"),
+						},
+					},
 					"wellKnownCACertificates": {
 						SchemaProps: spec.SchemaProps{
 							Description: "WellKnownCACertificates specifies whether a well-known set of CA certificates may be used in the TLS handshake between the gateway and backend pod.\n\nIf WellKnownCACertificates is unspecified or empty (\"\"), then CACertificateRefs must be specified with at least one entry for a valid configuration. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If an implementation does not support the WellKnownCACertificates field, or the supplied value is not recognized, the implementation MUST ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `Invalid`.\n\nValid values include: * \"System\" - indicates that well-known system CA certificates should be used.\n\nImplementations MAY define their own sets of CA certificates. Such definitions MUST use an implementation-specific, prefixed name, such as `mycompany.com/my-custom-ca-certificates`.\n\nSupport: Implementation-specific",
@@ -3267,7 +3274,43 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apis/v1.SubjectAltName"},
+			"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apis/v1.SubjectAltName"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ClusterTrustBundleObjectRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ClusterTrustBundleObjectRef identifies a ClusterTrustBundle.\n\nThe Group defaults to \"certificates.k8s.io\" and the Kind defaults to \"ClusterTrustBundle\", so users only need to specify the name.\n\nThis type is intended exclusively for cluster-scoped ClusterTrustBundle resources. The absence of a Namespace field is intentional and correct - it MUST NOT be used with namespace-scoped resources.\n\nA ReferenceGrant is not required because ClusterTrustBundle is cluster-scoped and has no target namespace.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent.\n\nDefaults to \"certificates.k8s.io\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is the kind of the referent.\n\nDefaults to \"ClusterTrustBundle\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referent.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
 	}
 }
 
@@ -3460,6 +3503,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 							},
 						},
 					},
+					"clusterTrustBundleRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ClusterTrustBundleRef is an optional reference to a cluster-scoped ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the PEM-encoded CA certificates in the referenced bundle are used as trust anchors for frontend client certificate validation, in addition to any certificates provided via CACertificateRefs.\n\nThe referenced bundle MUST exist, be readable by the implementation, and contain at least one valid PEM-encoded CA certificate. If any of these conditions are not met, the implementation MUST set ResolvedRefs=False with reason InvalidCACertificateRef on all targeted HTTPS listeners. A ReferenceGrant is not required.\n\nIf the certificates.k8s.io API is not available in the cluster, the reference is treated as an unknown kind: the implementation MUST set ResolvedRefs=False with reason InvalidCACertificateKind on all targeted HTTPS listeners.\n\nImplementations that do not support ClusterTrustBundle references MUST set ResolvedRefs=False with reason InvalidCACertificateKind when this field is specified.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef"),
+						},
+					},
 					"mode": {
 						SchemaProps: spec.SchemaProps{
 							Description: "FrontendValidationMode defines the mode for validating the client certificate. There are two possible modes:\n\n- AllowValidOnly: In this mode, the gateway will accept connections only if\n  the client presents a valid certificate. This certificate must successfully\n  pass validation against the CA certificates specified in `CACertificateRefs`.\n- AllowInsecureFallback: In this mode, the gateway will accept connections\n  even if the client certificate is not presented or fails verification.\n\n  This approach delegates client authorization to the backend and introduce\n  a significant security risk. It should be used in testing environments or\n  on a temporary basis in non-testing environments.\n\nDefaults to AllowValidOnly.\n\nSupport: Core",
@@ -3472,7 +3521,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef", "sigs.k8s.io/gateway-api/apis/v1.ObjectReference"},
 	}
 }
 

@@ -39,6 +39,41 @@ type LocalObjectReference struct {
 	Name ObjectName `json:"name"`
 }
 
+// ClusterTrustBundleObjectRef identifies a ClusterTrustBundle.
+//
+// The Group defaults to "certificates.k8s.io" and the Kind defaults to
+// "ClusterTrustBundle", so users only need to specify the name.
+//
+// This type is intended exclusively for cluster-scoped ClusterTrustBundle
+// resources. The absence of a Namespace field is intentional and correct -
+// it MUST NOT be used with namespace-scoped resources.
+//
+// A ReferenceGrant is not required because ClusterTrustBundle is cluster-scoped
+// and has no target namespace.
+//
+// +kubebuilder:validation:XValidation:message="must reference a ClusterTrustBundle",rule="self.group == 'certificates.k8s.io' && self.kind == 'ClusterTrustBundle'"
+type ClusterTrustBundleObjectRef struct {
+	// Group is the group of the referent.
+	//
+	// Defaults to "certificates.k8s.io".
+	//
+	// +optional
+	// +kubebuilder:default=certificates.k8s.io
+	Group *Group `json:"group,omitempty"`
+
+	// Kind is the kind of the referent.
+	//
+	// Defaults to "ClusterTrustBundle".
+	//
+	// +optional
+	// +kubebuilder:default=ClusterTrustBundle
+	Kind *Kind `json:"kind,omitempty"`
+
+	// Name is the name of the referent.
+	// +required
+	Name ObjectName `json:"name"`
+}
+
 // SecretObjectReference identifies an API object including its namespace,
 // defaulting to Secret.
 //

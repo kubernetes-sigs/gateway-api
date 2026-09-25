@@ -53,4 +53,5 @@ var BackendTLSPolicyCoreFeatures = sets.New(
 // BackendTLSPolicy API at a Extended level of support.
 var BackendTLSPolicyExtendedFeatures = sets.New(
 	BackendTLSPolicySanValidationFeature,
+	ClusterTrustBundleFeature,
 )
