@@ -427,8 +427,10 @@ func experimentalValidationMarkers(description, prefix string) ([]string, error)
 				escaped = false
 				continue
 			}
-			if c == '\\' && quoted == '"' {
-				escaped = true
+			if c == '\\' {
+				if quoted == '"' {
+					escaped = true
+				}
 				continue
 			}
 			if c == '`' || c == '"' {
