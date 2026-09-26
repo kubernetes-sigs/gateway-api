@@ -26,3 +26,19 @@ spec:
     - name: invalid
       port: 1111
       protocol: INVALID
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: gateway-supported-and-unsupported-protocols-control
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: gateway-supported-and-unsupported-protocols
+      sectionName: http
+  hostnames:
+    - unsupported-protocol.example.com
+  rules:
+    - backendRefs:
+        - name: infra-backend-v1
+          port: 8080

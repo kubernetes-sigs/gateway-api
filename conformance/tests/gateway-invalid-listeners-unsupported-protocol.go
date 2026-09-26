@@ -17,14 +17,18 @@ limitations under the License.
 package tests
 
 import (
+	"net"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tcp"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -37,6 +41,7 @@ var GatewayListenerUnsupportedProtocol = suite.ConformanceTest{
 	Description: "A Gateway should set the Accepted condition to False with reason UnsupportedProtocol on listeners whose protocol is not supported. The Gateway itself should only be Accepted if at least one of its listeners is accepted.",
 	Features: []features.FeatureName{
 		features.SupportGateway,
+		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/gateway-invalid-listeners-unsupported-protocol.yaml"},
 	Parallel:  true,
@@ -67,9 +72,8 @@ var GatewayListenerUnsupportedProtocol = suite.ConformanceTest{
 			})
 		})
 		t.Run("Gateway with at least one accepted listeners should be accepted and the listeners should have the Accepted condition set accordingly", func(t *testing.T) {
-			t.Parallel()
-
 			gwNN := types.NamespacedName{Name: "gateway-supported-and-unsupported-protocols", Namespace: suite.InfrastructureNamespace}
+			controlRouteNN := types.NamespacedName{Name: "gateway-supported-and-unsupported-protocols-control", Namespace: suite.InfrastructureNamespace}
 
 			kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 			kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
@@ -78,30 +82,34 @@ var GatewayListenerUnsupportedProtocol = suite.ConformanceTest{
 				Reason: string(gatewayv1.GatewayReasonListenersNotValid),
 			})
 
-			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, []gatewayv1.ListenerStatus{
-				{
-					Name: gatewayv1.SectionName("http"),
-					SupportedKinds: []gatewayv1.RouteGroupKind{{
-						Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-						Kind:  gatewayv1.Kind("HTTPRoute"),
-					}},
-					Conditions: []metav1.Condition{{
-						Type:   string(gatewayv1.ListenerConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: string(gatewayv1.ListenerReasonAccepted),
-					}},
-					AttachedRoutes: 0,
-				},
-				{
-					Name:           gatewayv1.SectionName("invalid"),
-					SupportedKinds: []gatewayv1.RouteGroupKind{},
-					Conditions: []metav1.Condition{{
-						Type:   string(gatewayv1.ListenerConditionAccepted),
-						Status: metav1.ConditionFalse,
-						Reason: string(gatewayv1.ListenerReasonUnsupportedProtocol),
-					}},
-					AttachedRoutes: 0,
-				},
+			kubernetes.GatewayListenerMustHaveConditions(t, s.Client, s.TimeoutConfig, gwNN, "http", []metav1.Condition{{
+				Type:   string(gatewayv1.ListenerConditionAccepted),
+				Status: metav1.ConditionTrue,
+				Reason: string(gatewayv1.ListenerReasonAccepted),
+			}})
+			kubernetes.GatewayListenerMustHaveConditions(t, s.Client, s.TimeoutConfig, gwNN, "invalid", []metav1.Condition{{
+				Type:   string(gatewayv1.ListenerConditionAccepted),
+				Status: metav1.ConditionFalse,
+				Reason: string(gatewayv1.ListenerReasonUnsupportedProtocol),
+			}})
+
+			gwAddr, err := kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, kubernetes.NewGatewayRef(gwNN, "http"))
+			require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+
+			t.Run("Valid listener is fully programmed", func(t *testing.T) {
+				kubernetes.HTTPRouteMustHaveRouteAcceptedConditionsTrue(t, s.Client, s.TimeoutConfig, controlRouteNN, gwNN)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
+					Request:   http.Request{Host: "unsupported-protocol.example.com", Path: "/"},
+					Response:  http.Response{StatusCode: 200},
+					Backend:   suite.InfraBackendServiceNameV1,
+					Namespace: suite.InfrastructureNamespace,
+				})
+			})
+
+			t.Run("Invalid listener does not accept connections", func(t *testing.T) {
+				gwIP, _, err := net.SplitHostPort(gwAddr)
+				require.NoErrorf(t, err, "failed to split Gateway address %q", gwAddr)
+				tcp.MakeTCPConnectionAndExpectEventuallyConsistentFailure(t, s.TimeoutConfig, net.JoinHostPort(gwIP, "1111"))
 			})
 		})
 	},
