@@ -21,6 +21,15 @@ spec:
     - jsonPath: .spec.hostnames
       name: Hostnames
       type: string
+    - jsonPath: .status.parents[0].parentRef.name
+      name: Gateway
+      type: string
+    - jsonPath: .status.parents[0].conditions[?(@.type=="Accepted")].status
+      name: Accepted
+      type: string
+    - jsonPath: .status.parents[0].conditions[?(@.type=="Programmed")].status
+      name: Programmed
+      type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
@@ -3470,6 +3479,15 @@ spec:
   - additionalPrinterColumns:
     - jsonPath: .spec.hostnames
       name: Hostnames
+      type: string
+    - jsonPath: .status.parents[0].parentRef.name
+      name: Gateway
+      type: string
+    - jsonPath: .status.parents[0].conditions[?(@.type=="Accepted")].status
+      name: Accepted
+      type: string
+    - jsonPath: .status.parents[0].conditions[?(@.type=="Programmed")].status
+      name: Programmed
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
