@@ -19,8 +19,11 @@ package tests
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -43,8 +46,25 @@ var HTTPRouteNoBackendRefs = confsuite.ConformanceTest{
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "omitted-backendrefs", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig, kubernetes.NewGatewayRef(gwNN))
+		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+
+		parentRef := parentRefTo(gwNN)
+		// Set the namespace to nil since it is in the same namespace as the parent
+		parentRef.Namespace = nil
+		parents := []v1.RouteParentStatus{{
+			ParentRef:      parentRef,
+			ControllerName: v1.GatewayController(suite.ControllerName),
+			Conditions: []metav1.Condition{
+				{
+					Type:   string(v1.RouteConditionAccepted),
+					Status: metav1.ConditionTrue,
+					Reason: "", // any reason
+				},
+			},
+		}}
+		kubernetes.HTTPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN, parents, true)
 
 		testCases := []http.ExpectedResponse{
 			{
