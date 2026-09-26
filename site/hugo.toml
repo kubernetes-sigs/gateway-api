@@ -44,7 +44,7 @@ enableEmoji = true
   favicon = "favicon.png"
   github_repo = "https://github.com/kubernetes-sigs/gateway-api"
   github_branch = "main"
-  github_subdir = "site/content/en"
+  github_subdir = "site"
 
   # Search settings
   offlineSearch = true
