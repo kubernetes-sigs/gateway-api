@@ -84,7 +84,6 @@ type HTTPRouteSpecApplyConfiguration struct {
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
-	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	// <gateway:util:excludeFromCRD>
 	// Validates that the total number of matches across all rules does not exceed 128.
 	// CEL does not support aggregate functions like sum() over lists, so each of the
