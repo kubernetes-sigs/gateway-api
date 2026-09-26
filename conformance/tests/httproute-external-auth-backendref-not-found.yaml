@@ -1,0 +1,52 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: external-auth-unknown-backendref
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /external-auth/unknown-backendref
+    filters:
+    - type: ExternalAuth
+      externalAuth:
+        protocol: HTTP
+        backendRef:
+          name: nonexistent-auth-service
+          port: 9002
+        http:
+          allowedHeaders: ~
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: external-auth-backendref-invalid-port
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /external-auth/invalid-port
+    filters:
+    - type: ExternalAuth
+      externalAuth:
+        protocol: HTTP
+        backendRef:
+          name: external-auth-http
+          port: 9999
+        http:
+          allowedHeaders: ~
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
