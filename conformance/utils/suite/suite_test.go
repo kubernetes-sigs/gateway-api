@@ -18,14 +18,17 @@ package suite
 
 import (
 	"errors"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	xnetws "golang.org/x/net/websocket"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -776,6 +779,75 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 	if suite.SupportedFeatures.HasAny(features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures).UnsortedList()...) {
 		t.Errorf("Mesh features should be skipped, got: %v", suite.SupportedFeatures.UnsortedList())
 	}
+}
+
+// TestRunHookRunsBeforeCleanupOnAbruptTestExit is a regression test for the Hook
+// ordering fix: Hook must run even when a test body exits abruptly (as
+// t.Fatal/require.* do via t.FailNow -> runtime.Goexit), it must run before
+// any resources that test registered for cleanup are deleted, and it must do
+// so independently for every test in the run - including running once per
+// failure when multiple tests fail, not just once for the whole suite.
+//
+// It can't call t.Fatal directly to simulate a failing test: FailNow marks the
+// sub-test failed, and that failure propagates up into this very test.
+// Instead it uses t.SkipNow, which relies on the identical mechanism (mark the
+// test finished, then runtime.Goexit to unwind the goroutine) without marking
+// anything failed, making it a faithful stand-in for the abrupt-exit path
+// this test needs to exercise.
+func TestRunHookRunsBeforeCleanupOnAbruptTestExit(t *testing.T) {
+	var mu sync.Mutex
+	var order []string
+	record := func(name string) {
+		mu.Lock()
+		defer mu.Unlock()
+		order = append(order, name)
+	}
+
+	makeTest := func(shortName string, abrupt bool) ConformanceTest {
+		return ConformanceTest{
+			ShortName: shortName,
+			Test: func(subT *testing.T, _ *ConformanceTestSuite) {
+				subT.Cleanup(func() {
+					record(shortName + ":cleanup")
+				})
+				if abrupt {
+					subT.SkipNow()
+				}
+			},
+		}
+	}
+
+	// Two failing tests (simulated via SkipNow, see above) sandwiching a
+	// passing one, so the assertions below cover: the Hook firing once per
+	// test regardless of outcome, correct hook-before-cleanup ordering on
+	// both the abrupt-exit and normal-return paths, and each Hook call
+	// receiving the right test's identity rather than e.g. the last test in
+	// the slice (a classic loop-variable-capture bug).
+	tests := []ConformanceTest{
+		makeTest("abruptOne", true),
+		makeTest("passing", false),
+		makeTest("abruptTwo", true),
+	}
+
+	var hookCalls int
+	s := &ConformanceTestSuite{
+		RestConfig: &rest.Config{},
+		Hook: func(_ *testing.T, test ConformanceTest, _ *ConformanceTestSuite) {
+			mu.Lock()
+			hookCalls++
+			mu.Unlock()
+			record(test.ShortName + ":hook")
+		},
+		SupportedFeatures: FeaturesSet{},
+	}
+
+	require.NoError(t, s.Run(t, tests))
+	require.Equal(t, len(tests), hookCalls, "Hook should run once per test, including every failed one")
+	require.Equal(t, []string{
+		"abruptOne:hook", "abruptOne:cleanup",
+		"passing:hook", "passing:cleanup",
+		"abruptTwo:hook", "abruptTwo:cleanup",
+	}, order)
 }
 
 func featureNamesToSet(set []string) []gatewayv1.SupportedFeature {
