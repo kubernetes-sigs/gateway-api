@@ -1,7 +1,7 @@
 ---
 title: "Gateway infrastructure labels and annotations"
 linkTitle: "Infrastructure attributes"
-weight: 17
+weight: 18
 ---
 
 {{< details title="Extended Support Feature: GatewayInfrastructurePropagation" open="true" >}}

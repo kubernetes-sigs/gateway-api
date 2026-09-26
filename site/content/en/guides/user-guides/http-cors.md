@@ -1,7 +1,7 @@
 ---
 title: "Cross-Origin Resource Sharing (CORS)"
 linkTitle: "HTTP CORS"
-weight: 10
+weight: 11
 ---
 
 {{< details title="Extended Support Feature: HTTPRouteCORS" open="true" >}}
