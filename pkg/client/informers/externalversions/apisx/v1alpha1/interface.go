@@ -30,6 +30,8 @@ type Interface interface {
 	XBackendTrafficPolicies() TypedXBackendTrafficPolicyInformer
 	// XMeshes returns a XMeshInformer.
 	XMeshes() TypedXMeshInformer
+	// XTelemetryPolicies returns a XTelemetryPolicyInformer.
+	XTelemetryPolicies() TypedXTelemetryPolicyInformer
 }
 
 type version struct {
@@ -56,4 +58,9 @@ func (v *version) XBackendTrafficPolicies() TypedXBackendTrafficPolicyInformer {
 // XMeshes returns a TypedXMeshInformer.
 func (v *version) XMeshes() TypedXMeshInformer {
 	return &xMeshInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// XTelemetryPolicies returns a TypedXTelemetryPolicyInformer.
+func (v *version) XTelemetryPolicies() TypedXTelemetryPolicyInformer {
+	return &xTelemetryPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

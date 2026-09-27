@@ -37,3 +37,11 @@ type XBackendTrafficPolicyNamespaceListerExpansion interface{}
 // XMeshListerExpansion allows custom methods to be added to
 // XMeshLister.
 type XMeshListerExpansion interface{}
+
+// XTelemetryPolicyListerExpansion allows custom methods to be added to
+// XTelemetryPolicyLister.
+type XTelemetryPolicyListerExpansion interface{}
+
+// XTelemetryPolicyNamespaceListerExpansion allows custom methods to be added to
+// XTelemetryPolicyNamespaceLister.
+type XTelemetryPolicyNamespaceListerExpansion interface{}
