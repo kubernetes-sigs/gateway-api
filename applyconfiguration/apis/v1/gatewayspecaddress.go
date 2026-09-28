@@ -28,7 +28,6 @@ import (
 // GatewaySpecAddress describes an address that can be bound to a Gateway.
 type GatewaySpecAddressApplyConfiguration struct {
 	// Type of the address.
-	//
 	Type *apisv1.AddressType `json:"type,omitempty"`
 	// When a value is unspecified, an implementation SHOULD automatically
 	// assign an address matching the requested type if possible.
@@ -37,9 +36,10 @@ type GatewaySpecAddressApplyConfiguration struct {
 	// "Programmed" condition in status to False with a reason of "AddressNotAssigned".
 	//
 	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
-	//
 	Value *string `json:"value,omitempty"`
 	// Routability specifies the requested reachability scope of this address.
+	// Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
+	// The `k8s.io` domain and all its subdomains are reserved.
 	// When unset or empty, this field uses the implementation's default
 	// routability behavior.
 	//

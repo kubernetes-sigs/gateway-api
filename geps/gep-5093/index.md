@@ -82,16 +82,21 @@ A new optional `routability` field is added to both `GatewaySpecAddress` and `Ga
 // be reachable from.
 //
 // Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
-// The `gateway.networking.k8s.io` prefix is reserved and cannot be used until
-// Gateway API defines a value for it.
+// The `k8s.io` domain and all its subdomains are reserved and cannot be used
+// until Gateway API defines a value for them.
 //
 // <gateway:experimental:validation:MaxLength=253>
 // Prefixed values require a valid DNS subdomain prefix and a non-empty path.
-// <gateway:experimental:validation:XValidation:message="Routability must be empty, Cluster, or an implementation-specific prefixed path; gateway.networking.k8s.io is reserved",rule="size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$') && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue() && !self.startsWith('gateway.networking.k8s.io/'))">
+// <gateway:experimental:validation:XValidation:message="Routability must be empty, Cluster, or an implementation-specific prefixed path; k8s.io and its subdomains are reserved",rule="size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$') && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue() && self.split('/')[0] != 'k8s.io' && !self.split('/')[0].endsWith('.k8s.io'))">
 type GatewayAddressRoutabilityType string
 
 const (
+	// GatewayAddressRoutabilityDefault uses the implementation's default
+	// address provisioning behavior.
 	GatewayAddressRoutabilityDefault GatewayAddressRoutabilityType = ""
+
+	// GatewayAddressRoutabilityCluster indicates that an IPAddress is a
+	// Kubernetes Service ClusterIP.
 	GatewayAddressRoutabilityCluster GatewayAddressRoutabilityType = "Cluster"
 )
 
@@ -100,8 +105,8 @@ type GatewaySpecAddress struct {
 
 	// Routability specifies the requested reachability scope of this address.
 	// Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
-	// The `gateway.networking.k8s.io` prefix is reserved and cannot be used until
-	// Gateway API defines a value for it. When unset or empty, this field uses the
+	// The `k8s.io` domain and all its subdomains are reserved and cannot be used
+	// until Gateway API defines a value for them. When unset or empty, this field uses the
 	// implementation's default routability behavior.
 	// Support: Extended
 	//
@@ -136,7 +141,7 @@ type GatewayStatusAddress struct {
 }
 ```
 
-CRD validation MUST accept empty, `Cluster`, and implementation-specific values with a valid DNS subdomain prefix and a non-empty path. It MUST reject other unprefixed values, invalid prefixes, and values using the reserved `gateway.networking.k8s.io` prefix. Prefixed values are implementation-specific: a valid value is not necessarily supported by every implementation.
+CRD validation MUST accept empty, `Cluster`, and implementation-specific values with a valid DNS subdomain prefix and a non-empty path. It MUST reject other unprefixed values, invalid prefixes, and values whose DNS subdomain prefix is `k8s.io` or ends in `.k8s.io`. Prefixed values are implementation-specific: a valid value is not necessarily supported by every implementation.
 
 ### Well-Known Values
 
@@ -148,9 +153,9 @@ The default and `Cluster` model below is a portable starting point, not a ceilin
 
 * **`Cluster`**: For `IPAddress` addresses, the reported address MUST be a ClusterIP in Kubernetes Service terms: it MUST be in the cluster's ServiceCIDR and MUST be reachable from within the cluster. It MAY be routable outside the cluster at the network administrator's discretion. It SHOULD use a non-globally-routable address (for example, RFC 1918 or RFC 4193) unless the cluster, including its ServiceCIDR, uses globally routable addresses.
 
-The field also accepts prefixed values (for example, `example.com/CorpWan` or `example.com/PublicVPC`) for implementation-specific scopes or internal address ranges (RFC 1918, RFC 4193, RFC 6598). The prefix must be a valid DNS subdomain. These values have no portability guarantee and are defined by the implementation that supports them. Values using the `gateway.networking.k8s.io` prefix are invalid until Gateway API defines a corresponding well-known value.
+The field also accepts prefixed values (for example, `example.com/CorpWan` or `example.com/PublicVPC`) for implementation-specific scopes or internal address ranges (RFC 1918, RFC 4193, RFC 6598). The prefix must be a valid DNS subdomain. These values have no portability guarantee and are defined by the implementation that supports them. Prefixes equal to `k8s.io` or ending in `.k8s.io` are reserved until Gateway API defines a corresponding well-known value.
 
-`testing.gateway.networking.k8s.io/sentinel` is reserved for conformance. It carries no routability guarantee. Implementations claiming `GatewayAddressRoutability` MUST support and report it for the conformance request. Other values using the `testing.gateway.networking.k8s.io` prefix are reserved and MUST be treated as unsupported. This reservation is semantic only; CRD validation intentionally does not special-case it.
+`testing.x-k8s.io/sentinel` is reserved for conformance. It carries no routability guarantee. Implementations claiming `GatewayAddressRoutability` MUST support and report it for the conformance request. Other values using the `testing.x-k8s.io` prefix are reserved and MUST be treated as unsupported. This reservation is semantic only; CRD validation intentionally does not special-case it.
 
 ### Spec Semantics
 
@@ -178,7 +183,7 @@ A new `AddressesAssigned` condition is added to Gateway status to surface addres
 const (
 	GatewayConditionAddressesAssigned GatewayConditionType = "AddressesAssigned"
 
-	GatewayReasonAddressesAssigned          GatewayConditionReason = "Assigned"
+	GatewayReasonAddressesAssigned          GatewayConditionReason = "AddressesAssigned"
 	GatewayReasonAddressesPartiallyAssigned GatewayConditionReason = "PartiallyAssigned"
 	GatewayReasonAddressesNotAssigned       GatewayConditionReason = "NotAssigned"
 )
@@ -290,7 +295,7 @@ Except for the implicit-to-explicit transition described above, `routability` is
 
 ### Feature Names
 
-`GatewayAddressRoutability` is an Extended feature. A GatewayClass that claims it through `status.supportedFeatures` MUST support the default behavior for omitted and empty `IPAddress` requests, support and report `testing.gateway.networking.k8s.io/sentinel`, report routability on every status address, and implement the assignment-condition semantics in this GEP. Other implementation-specific routability values remain implementation-specific.
+`GatewayAddressRoutability` is an Extended feature. A GatewayClass that claims it through `status.supportedFeatures` MUST support the default behavior for omitted and empty `IPAddress` requests, support and report `testing.x-k8s.io/sentinel`, report routability on every status address, and implement the assignment-condition semantics in this GEP. Other implementation-specific routability values remain implementation-specific.
 
 `GatewayAddressRoutabilityCluster` is an Extended feature. It MUST only be claimed with `GatewayAddressRoutability`. A GatewayClass that claims it MUST support `Cluster` `IPAddress` requests and the corresponding status and assignment semantics. Prefixed scopes and non-IP `Cluster` support remain implementation-specific.
 
@@ -298,9 +303,9 @@ Except for the implicit-to-explicit transition described above, `routability` is
 
 Conformance tests for `GatewayAddressRoutability` will cover the following scenarios:
 
-* API validation accepts an empty string, `Cluster`, and prefixed values with a valid DNS subdomain prefix and non-empty path, including `testing.gateway.networking.k8s.io/sentinel`. It rejects an unknown bare value, malformed prefixed values, invalid prefixes, and values using the reserved `gateway.networking.k8s.io` prefix. The validation is tested on both spec and status addresses.
+* API validation accepts an empty string, `Cluster`, and prefixed values with a valid DNS subdomain prefix and non-empty path, including `testing.x-k8s.io/sentinel`. It rejects an unknown bare value, malformed prefixed values, invalid prefixes, and values whose prefix is `k8s.io` or ends in `.k8s.io`. The validation is tested on both spec and status addresses, including reserved-prefix examples such as `k8s.io/value`, `example.k8s.io/value`, and `gateway.networking.k8s.io/value`.
 * A GatewayClass claiming `GatewayAddressRoutabilityCluster` also claims `GatewayAddressRoutability`.
-* A GatewayClass claiming `GatewayAddressRoutability` accepts a `testing.gateway.networking.k8s.io/sentinel` request and reports that exact routability value in status. This verifies support for routability reporting; it does not validate the assigned address or a routability guarantee.
+* A GatewayClass claiming `GatewayAddressRoutability` accepts a `testing.x-k8s.io/sentinel` request and reports that exact routability value in status. This verifies support for routability reporting; it does not validate the assigned address or a routability guarantee.
 * A GatewayClass claiming `GatewayAddressRoutabilityCluster` reports a `Cluster` `IPAddress` request with `routability: Cluster`; the address is in the configured or discovered ServiceCIDR. In-cluster reachability is an implementation integration check, not a portable conformance assertion.
 * A GatewayClass claiming `GatewayAddressRoutabilityCluster` with one empty and one `Cluster` request reports exactly one matching status address for each, regardless of list order, and `AddressesAssigned=True` with reason `Assigned`. The empty request is reported as `Cluster` if it satisfies the `Cluster` requirements; otherwise it is explicitly reported as empty.
 * A `Cluster` `IPAddress` request with a static value outside the ServiceCIDR is unsatisfied. Combined with a satisfiable empty request, an implementation that permits partial assignment reports only the successful address and `AddressesAssigned=False` with reason `PartiallyAssigned`, with a message identifying the unsatisfied request. An implementation that rejects partial assignment follows the no-entries-can-be-satisfied behavior. On its own, the unsatisfied request reports `Programmed=False` with reason `AddressNotAssigned` and `AddressesAssigned=False` with reason `NotAssigned`. This scenario requires `SupportGatewayStaticAddresses` and `GatewayAddressRoutabilityCluster`.
