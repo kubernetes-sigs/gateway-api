@@ -78,6 +78,11 @@ func (in *BackendSpec) DeepCopyInto(out *BackendSpec) {
 		*out = new(EndpointSelectorBackend)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.SessionPersistence != nil {
+		in, out := &in.SessionPersistence, &out.SessionPersistence
+		*out = new(SessionPersistence)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Protocol != nil {
 		in, out := &in.Protocol, &out.Protocol
 		*out = new(BackendProtocol)

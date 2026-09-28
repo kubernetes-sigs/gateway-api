@@ -2244,6 +2244,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: protocol
       type:
         scalar: string
+    - name: sessionPersistence
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
     - name: tls
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTLS

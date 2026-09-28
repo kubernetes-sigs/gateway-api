@@ -10025,6 +10025,12 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend"),
 						},
 					},
+					"sessionPersistence": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionPersistence defines and configures session persistence across the endpoints selected by this backend.\n\nThis field can only be configured when type is EndpointSelector.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
+						},
+					},
 					"protocol": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - HTTP, HTTP2, H2C, and HTTP11\n\nSupport: Extended - GRPC, MCP, TCP, WSS\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend. </gateway:util:excludeFromCRD>",
@@ -10043,7 +10049,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS", "sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"},
+			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS", "sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"},
 	}
 }
 

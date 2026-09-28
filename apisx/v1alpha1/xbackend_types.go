@@ -85,6 +85,7 @@ const (
 // +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'H2C' || !has(self.tls) || self.tls.mode == 'None'",message="tls must be disabled when protocol is H2C, use protocol HTTP2 for HTTP/2 with tls"
 // +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'HTTP2' || (has(self.tls) && self.tls.mode != 'None')",message="tls must be enabled when protocol is HTTP2, use protocol H2C for HTTP/2 without tls"
 // +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'WSS' || (has(self.tls) && self.tls.mode != 'None')",message="tls must be enabled when protocol is WSS"
+// +kubebuilder:validation:XValidation:rule="has(self.sessionPersistence) ? self.type == 'EndpointSelector' : true",message="sessionPersistence can only be set when type is EndpointSelector"
 type BackendSpec struct {
 	// Type defines the backend type.
 	//
@@ -114,6 +115,16 @@ type BackendSpec struct {
 	//
 	// +optional
 	EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
+
+	// SessionPersistence defines and configures session persistence
+	// across the endpoints selected by this backend.
+	//
+	// This field can only be configured when type is EndpointSelector.
+	//
+	// Support: Extended
+	//
+	// +optional
+	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 
 	// Protocol defines the protocol for backend communication.
 	//
@@ -216,7 +227,7 @@ type EndpointSelectorBackend struct {
 	// does not become a relied-upon DNS entry.
 	// </gateway:util:excludeFromCRD>
 	//
-	// +required
+	// +optional
 	LabelSelector `json:",inline"`
 }
 
