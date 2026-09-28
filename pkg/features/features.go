@@ -54,6 +54,8 @@ var (
 	AllFeatures = sets.New[Feature]().
 			Insert(GatewayCoreFeatures.UnsortedList()...).
 			Insert(GatewayExtendedFeatures.UnsortedList()...).
+			Insert(BackendCoreFeatures.UnsortedList()...).
+			Insert(BackendExtendedFeatures.UnsortedList()...).
 			Insert(ReferenceGrantCoreFeatures.UnsortedList()...).
 			Insert(HTTPRouteCoreFeatures.UnsortedList()...).
 			Insert(HTTPRouteExtendedFeatures.UnsortedList()...).

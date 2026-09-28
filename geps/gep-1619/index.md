@@ -885,33 +885,28 @@ supported by some implementations due to their current designs.
 
 **Note**: Conformance tests are still WIP, and additional test coverage will be added in future PRs.
 
-###  Feature Names
+### Feature Names
 
-* HTTPRouteSessionPersistence - Core feature for session persistence support (Extended).
-* HTTPRouteSessionPersistenceCookieLifetimeTypePermanent - Permanent Lifetime for cookie-based session persistence (Extended).
+* BackendSessionPersistence - Cookie-based session persistence support.
+* BackendSessionPersistenceAbsoluteTimeout - Absolute timeout for session persistence.
+* BackendSessionPersistenceHeader - Header-based session persistence.
+* BackendSessionPersistenceCookieName - Configurable cookie name.
+* BackendSessionPersistenceCookiePath - Configurable cookie path.
+* BackendSessionPersistenceCookieLifetimeTypePermanent - Permanent lifetime for cookie-based session persistence.
 
-### HTTPRoute Conformance tests
+### Backend Conformance Tests
 
-| Description | Outcome | Features |
-| :---- | :---- | :---- |
-| Simple Cookie Session Persistence: An HTTPRoute with sessionPersistence configured with type: Cookie (default) on a single backend in gateway-conformance-infra namespace. | HTTPRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie header in response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | HTTPRouteSessionPersistence |
-| Session Cookie Lifetime (Default): HTTPRoute with sessionPersistence and cookie.lifetimeType: Session (default). | HTTPRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age`. | HTTPRouteSessionPersistence |
-| Multiple Weighted Backends - Session Persistence Does Not Override Traffic Splitting: HTTPRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30) on a path. | HTTPRoute MUST have Accepted=True in parent status. Requests MUST respect weight distribution (~70/30 within statistical tolerance). Session persistence MUST NOT override backend selection. | HTTPRouteSessionPersistence |
-| Session Persistence with cookie.lifetimeType: Permanent and absoluteTimeout: 5min. | HTTPRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `Expires` or `Max-Age` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires. | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookieLifetimeTypePermanent |
-
-### GRPCRoute Feature Names
-
-* GRPCRouteSessionPersistence - Core feature for session persistence support on GRPCRoute (Extended).
-* GRPCRouteSessionPersistenceHeader - Header-based session persistence on GRPCRoute (Extended).
-
-### GRPCRoute Conformance tests
+These tests use HTTPRoute and GRPCRoute resources that reference Backends with
+session persistence configured. Unless otherwise noted, each scenario MUST be
+tested with both route types.
 
 | Description | Outcome | Features |
 | :---- | :---- | :---- |
-| Simple Cookie-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Cookie (default) on a single backend. The test client MUST explicitly extract the Set-Cookie response header and include it as a Cookie header in subsequent requests. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie response header. Subsequent requests with the cookie header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence |
-| Header-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Header on a single backend. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a session identity header in the response metadata. Subsequent requests with that header included in request metadata MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence, GRPCRouteSessionPersistenceHeader |
-| Session Cookie Lifetime (Default) (GRPCRoute): GRPCRoute with sessionPersistence and cookie.lifetimeType: Session (default). | GRPCRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age` attributes. | GRPCRouteSessionPersistence |
-| Multiple Weighted Backends - Session Persistence Does Not Override Traffic Splitting (GRPCRoute): GRPCRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30). | GRPCRoute MUST have Accepted=True in parent status. Requests MUST respect weight distribution (~70/30 within statistical tolerance). Session persistence MUST NOT override backend selection. | GRPCRouteSessionPersistence |
+| Simple Cookie Session Persistence: A Route references a Backend with sessionPersistence configured with type: Cookie (default). | The Route MUST have Accepted=True in parent status. The first request MUST receive a Set-Cookie header in the response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | BackendSessionPersistence |
+| Session Cookie Lifetime (Default): A Route references a Backend with cookie.lifetimeType: Session (default). | The Route MUST have Accepted=True in parent status. The cookie MUST NOT contain `Expires` or `Max-Age`. | BackendSessionPersistence |
+| Header-based Session Persistence: A Route references a Backend with sessionPersistence configured with type: Header. | The Route MUST have Accepted=True in parent status. The first request MUST receive a session identity header. Subsequent requests with that header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | BackendSessionPersistence, BackendSessionPersistenceHeader |
+| Multiple Weighted Backends - Session Persistence Does Not Override Traffic Splitting: A Route has multiple backendRefs with weights (e.g., 70/30) that reference Backends with session persistence configured. | The Route MUST have Accepted=True in parent status. Requests MUST respect weight distribution (~70/30 within statistical tolerance). Session persistence MUST NOT override backend selection. | BackendSessionPersistence |
+| Permanent Cookie Lifetime: A Route references a Backend with cookie.lifetimeType: Permanent and absoluteTimeout: 5min. | The Route MUST have Accepted=True in parent status. The response Set-Cookie header MUST contain an `Expires` or `Max-Age` attribute whose value corresponds to the configured absoluteTimeout duration. Session persistence MUST function correctly until the cookie expires. | BackendSessionPersistence, BackendSessionPersistenceAbsoluteTimeout, BackendSessionPersistenceCookieLifetimeTypePermanent |
 
 ## Alternatives
 
