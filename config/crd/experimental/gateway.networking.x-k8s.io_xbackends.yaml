@@ -156,7 +156,7 @@ spec:
                   SessionPersistence defines and configures session persistence
                   across the endpoints selected by this backend.
 
-                  This field must be unset when type is not EndpointSelector.
+                  This field can only be configured when type is EndpointSelector.
 
                   Support: Extended
                 properties:
@@ -581,8 +581,9 @@ spec:
             - message: tls must be enabled when protocol is WSS
               rule: '!has(self.protocol) || self.protocol != ''WSS'' || (has(self.tls)
                 && self.tls.mode != ''None'')'
-            - message: sessionPersistence must be unset when type is not EndpointSelector
-              rule: self.type == 'EndpointSelector' || !has(self.sessionPersistence)
+            - message: sessionPersistence can only be set when type is EndpointSelector
+              rule: 'has(self.sessionPersistence) ? self.type == ''EndpointSelector''
+                : true'
           status:
             description: Status defines the current state of XBackend.
             properties:

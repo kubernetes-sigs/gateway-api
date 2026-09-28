@@ -21647,7 +21647,7 @@
 					"type": "string"
 				},
 				"sessionPersistence": {
-					"description": "SessionPersistence defines and configures session persistence across the endpoints selected by this backend.\n\nThis field must be unset when type is not EndpointSelector.\n\nSupport: Extended",
+					"description": "SessionPersistence defines and configures session persistence across the endpoints selected by this backend.\n\nThis field can only be configured when type is EndpointSelector.\n\nSupport: Extended",
 					"$ref": "io.k8s.networking.gateway.v1.SessionPersistence"
 				},
 				"tls": {

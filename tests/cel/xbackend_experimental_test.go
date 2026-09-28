@@ -242,7 +242,7 @@ func TestXBackendSessionPersistence(t *testing.T) {
 					Cookie: &gatewayv1.CookieConfig{},
 				},
 			},
-			wantErrors: []string{"sessionPersistence must be unset when type is not EndpointSelector"},
+			wantErrors: []string{"sessionPersistence can only be set when type is EndpointSelector"},
 		},
 	}
 

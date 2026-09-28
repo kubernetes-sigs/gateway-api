@@ -85,7 +85,7 @@ const (
 // +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'H2C' || !has(self.tls) || self.tls.mode == 'None'",message="tls must be disabled when protocol is H2C, use protocol HTTP2 for HTTP/2 with tls"
 // +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'HTTP2' || (has(self.tls) && self.tls.mode != 'None')",message="tls must be enabled when protocol is HTTP2, use protocol H2C for HTTP/2 without tls"
 // +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'WSS' || (has(self.tls) && self.tls.mode != 'None')",message="tls must be enabled when protocol is WSS"
-// +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' || !has(self.sessionPersistence)",message="sessionPersistence must be unset when type is not EndpointSelector"
+// +kubebuilder:validation:XValidation:rule="has(self.sessionPersistence) ? self.type == 'EndpointSelector' : true",message="sessionPersistence can only be set when type is EndpointSelector"
 type BackendSpec struct {
 	// Type defines the backend type.
 	//
@@ -119,7 +119,7 @@ type BackendSpec struct {
 	// SessionPersistence defines and configures session persistence
 	// across the endpoints selected by this backend.
 	//
-	// This field must be unset when type is not EndpointSelector.
+	// This field can only be configured when type is EndpointSelector.
 	//
 	// Support: Extended
 	//

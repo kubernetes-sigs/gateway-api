@@ -340,10 +340,6 @@ type EndpointSelectorBackend struct {
   //
   // +required
   LabelSelector
-
-  // SessionPersistence configures session persistence as described in GEP-1619.
-  // +optional
-  SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
 // +kubebuilder:validation:XValidation:rule="self.mode == 'ClientAndServer' ? has(self.clientCertificateRef) : !has(self.clientCertificateRef)",message="clientCertificateRef must be set if and only if mode is ClientAndServer"

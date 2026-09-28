@@ -358,14 +358,14 @@ Backend type is `EndpointSelector`.
 ### Backend API
 
 ```go
-// +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' || !has(self.sessionPersistence)",message="sessionPersistence must be unset when type is not EndpointSelector"
+// +kubebuilder:validation:XValidation:rule="has(self.sessionPersistence) ? self.type == 'EndpointSelector' : true",message="sessionPersistence can only be set when type is EndpointSelector"
 type BackendSpec struct {
     [...]
 
     // SessionPersistence defines and configures session persistence
     // across the endpoints selected by this backend.
     //
-    // This field must be unset when type is not EndpointSelector.
+    // This field can only be configured when type is EndpointSelector.
     //
     // Support: Extended
     //

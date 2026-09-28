@@ -10027,7 +10027,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 					},
 					"sessionPersistence": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SessionPersistence defines and configures session persistence across the endpoints selected by this backend.\n\nThis field must be unset when type is not EndpointSelector.\n\nSupport: Extended",
+							Description: "SessionPersistence defines and configures session persistence across the endpoints selected by this backend.\n\nThis field can only be configured when type is EndpointSelector.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
 						},
 					},

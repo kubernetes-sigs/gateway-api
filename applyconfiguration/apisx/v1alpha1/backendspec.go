@@ -47,7 +47,7 @@ type BackendSpecApplyConfiguration struct {
 	// SessionPersistence defines and configures session persistence
 	// across the endpoints selected by this backend.
 	//
-	// This field must be unset when type is not EndpointSelector.
+	// This field can only be configured when type is EndpointSelector.
 	//
 	// Support: Extended
 	SessionPersistence *v1.SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
