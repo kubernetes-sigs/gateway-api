@@ -352,27 +352,20 @@ these two configurations.
 
 In this section, we will explore the questions and design elements associated with a session persistence API.
 
-Session persistence is configured within the `spec.endpointSelector` field of the
-[Backend](../gep-4894/index.md) resource and is only available when the Backend type is `EndpointSelector`.
+Session persistence is configured on the [Backend](../gep-4894/index.md) resource and is only available when the
+Backend type is `EndpointSelector`.
 
 ### Backend API
 
 ```go
+// +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' || !has(self.sessionPersistence)",message="sessionPersistence must be unset when type is not EndpointSelector"
 type BackendSpec struct {
-    [...]
-
-    // EndpointSelector specifies the configuration for an EndpointSelector
-    // backend.
-    //
-    // +optional
-    EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
-}
-
-type EndpointSelectorBackend struct {
     [...]
 
     // SessionPersistence defines and configures session persistence
     // across the endpoints selected by this backend.
+    //
+    // This field must be unset when type is not EndpointSelector.
     //
     // Support: Extended
     //
@@ -791,22 +784,26 @@ metadata:
   name: backend-v1
 spec:
   type: EndpointSelector
+  sessionPersistence:
+    type: Cookie
+    cookie:
+      name: split-route-cookie
   endpointSelector:
-    sessionPersistence:
-      type: Cookie
-      cookie:
-        name: split-route-cookie
+    matchLabels:
+      app: backend-v1
 ---
 kind: Backend
 metadata:
   name: backend-v2
 spec:
   type: EndpointSelector
+  sessionPersistence:
+    type: Cookie
+    cookie:
+      name: split-route-cookie
   endpointSelector:
-    sessionPersistence:
-      type: Cookie
-      cookie:
-        name: split-route-cookie
+    matchLabels:
+      app: backend-v2
 ```
 
 This is an invalid configuration as two separate sessions cannot have the same cookie name. Implementations SHOULD
@@ -836,22 +833,26 @@ metadata:
   name: backend-v1
 spec:
   type: EndpointSelector
+  sessionPersistence:
+    type: Cookie
+    cookie:
+      name: session-v1
   endpointSelector:
-    sessionPersistence:
-      type: Cookie
-      cookie:
-        name: session-v1
+    matchLabels:
+      app: backend-v1
 ---
 kind: Backend
 metadata:
   name: backend-v2
 spec:
   type: EndpointSelector
+  sessionPersistence:
+    type: Cookie
+    cookie:
+      name: session-v2
   endpointSelector:
-    sessionPersistence:
-      type: Cookie
-      cookie:
-        name: session-v2
+    matchLabels:
+      app: backend-v2
 ```
 
 Traffic splitting selects a backend based on the `weight` configuration. Once a backend is selected and session

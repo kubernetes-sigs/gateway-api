@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	v1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
 // BackendSpecApplyConfiguration represents a declarative configuration of the BackendSpec type for use
@@ -43,6 +44,13 @@ type BackendSpecApplyConfiguration struct {
 	// backend. This field must be set when type is EndpointSelector and must
 	// be unset otherwise.
 	EndpointSelector *EndpointSelectorBackendApplyConfiguration `json:"endpointSelector,omitempty"`
+	// SessionPersistence defines and configures session persistence
+	// across the endpoints selected by this backend.
+	//
+	// This field must be unset when type is not EndpointSelector.
+	//
+	// Support: Extended
+	SessionPersistence *v1.SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 	// Protocol defines the protocol for backend communication.
 	//
 	// In the common case, the underlying transport protocol for the
@@ -112,6 +120,14 @@ func (b *BackendSpecApplyConfiguration) WithExternalHostname(value *ExternalHost
 // If called multiple times, the EndpointSelector field is set to the value of the last call.
 func (b *BackendSpecApplyConfiguration) WithEndpointSelector(value *EndpointSelectorBackendApplyConfiguration) *BackendSpecApplyConfiguration {
 	b.EndpointSelector = value
+	return b
+}
+
+// WithSessionPersistence sets the SessionPersistence field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the SessionPersistence field is set to the value of the last call.
+func (b *BackendSpecApplyConfiguration) WithSessionPersistence(value *v1.SessionPersistenceApplyConfiguration) *BackendSpecApplyConfiguration {
+	b.SessionPersistence = value
 	return b
 }
 

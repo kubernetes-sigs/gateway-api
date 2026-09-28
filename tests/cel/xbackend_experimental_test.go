@@ -26,6 +26,7 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	xgatewayv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
 
@@ -187,6 +188,64 @@ func TestXBackendSpec(t *testing.T) {
 			wantErrors: []string{},
 		},
 	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			backend := &xgatewayv1alpha1.XBackend{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: tc.spec,
+			}
+			validateXBackend(t, backend, tc.wantErrors)
+		})
+	}
+}
+
+func TestXBackendSessionPersistence(t *testing.T) {
+	tests := []struct {
+		name       string
+		spec       xgatewayv1alpha1.BackendSpec
+		wantErrors []string
+	}{
+		{
+			name: "session persistence is supported for EndpointSelector",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeEndpointSelector,
+				EndpointSelector: &xgatewayv1alpha1.EndpointSelectorBackend{
+					LabelSelector: xgatewayv1alpha1.LabelSelector{
+						MatchLabels: map[gatewayv1.LabelKey]gatewayv1.LabelValue{
+							"app": "foo",
+						},
+					},
+				},
+				Port: xgatewayv1alpha1.BackendPort{
+					Number: xgatewayv1alpha1.PortNumber(80),
+				},
+				SessionPersistence: &xgatewayv1alpha1.SessionPersistence{
+					Cookie: &gatewayv1.CookieConfig{},
+				},
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "session persistence is rejected for ExternalHostname",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Port: xgatewayv1alpha1.BackendPort{
+					Number: xgatewayv1alpha1.PortNumber(80),
+				},
+				SessionPersistence: &xgatewayv1alpha1.SessionPersistence{
+					Cookie: &gatewayv1.CookieConfig{},
+				},
+			},
+			wantErrors: []string{"sessionPersistence must be unset when type is not EndpointSelector"},
+		},
+	}
+
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			backend := &xgatewayv1alpha1.XBackend{
