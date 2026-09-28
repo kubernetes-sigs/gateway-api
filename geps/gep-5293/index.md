@@ -89,9 +89,20 @@ diverge. Envoy Gateway silently interprets `RequestHeaderModifier.value`
 as an Envoy substitution string. agentgateway uses a separate
 `AgentgatewayPolicy` with CEL. Istio exposes
 JWT claim projection natively but requires `WasmPlugin` or `ext_proc` for
-body access. NGINX Gateway Fabric *rejects* variable-like syntax in the
-field and is tracking a separate design
-([nginx/nginx-gateway-fabric#5737](https://github.com/nginx/nginx-gateway-fabric/issues/5737)).
+body access. NGINX Gateway Fabric, as of
+[v2.6.0](https://github.com/nginx/nginx-gateway-fabric/blob/main/CHANGELOG.md),
+silently interprets `RequestHeaderModifier.value` as NGINX variable syntax
+(for example `$remote_addr`, `$http_x_forwarded_for`, `$jwt_claim_sub`),
+delivering dynamic values today off-spec
+([nginx/nginx-gateway-fabric#5008](https://github.com/nginx/nginx-gateway-fabric/pull/5008)
+resolving
+[nginx/nginx-gateway-fabric#2040](https://github.com/nginx/nginx-gateway-fabric/issues/2040)).
+The set of values that can be expressed this way is bounded by what NGINX
+itself exposes as a variable: request context and verified identity are
+covered, but body fields are not, and body-derived variables require the
+new `client_body_preread` / `json_parse` / `predicate` directives tracked
+in
+[nginx/nginx-gateway-fabric#5737](https://github.com/nginx/nginx-gateway-fabric/issues/5737).
 Cloud load balancers each expose their own closed set of predefined
 variables. A user who wants any of these behaviors currently picks an
 implementation-specific mechanism and accepts lock-in, or deploys a
@@ -225,6 +236,12 @@ what varies is *how* it is expressed and what value sources are reachable.
   `client_body_preread` / `json_parse` directives referenced by
   [nginx/nginx-gateway-fabric#5737](https://github.com/nginx/nginx-gateway-fabric/issues/5737).
   `auth_request` + `auth_request_set` is the out-of-process pattern.
+  **NGINX Gateway Fabric** exposes this to Gateway API users by
+  interpreting `RequestHeaderModifier.value` (and `ResponseHeaderModifier.value`)
+  as an NGINX variable reference when it parses as one, delivering dynamic
+  values today off-spec
+  ([nginx/nginx-gateway-fabric#5008](https://github.com/nginx/nginx-gateway-fabric/pull/5008),
+  shipped in v2.6.0).
 * **Kong**, **Apache**, and **Traefik** each expose comparable in-process
   substitution or expression languages (Kong `request-transformer-advanced`
   with `$(...)` Lua expressions and a `shared` scratchpad; Apache
@@ -338,7 +355,9 @@ not blocked on any one of them. All are deferred to the Experimental stage.
 * [PR #5092: GEP-5091 PayloadProcessor Resource (sketch of `valueFrom` on `HTTPHeader`)](https://github.com/kubernetes-sigs/gateway-api/pull/5092#discussion_r3852055666)
 * [GEP-5224: Pre-Routing Filters](https://gateway-api.sigs.k8s.io/geps/gep-5224/)
 * [Issue #5194: Filter ordering](https://github.com/kubernetes-sigs/gateway-api/issues/5194)
-* [nginx/nginx-gateway-fabric#5737: Predicate Routing](https://github.com/nginx/nginx-gateway-fabric/issues/5737)
+* [nginx/nginx-gateway-fabric#5737: Predicate Routing (body-based routing)](https://github.com/nginx/nginx-gateway-fabric/issues/5737)
+* [nginx/nginx-gateway-fabric#2040: Allow set of NGINX variables for RequestHeaderModifier](https://github.com/nginx/nginx-gateway-fabric/issues/2040)
+* [nginx/nginx-gateway-fabric#5008: Allow NGINX variables in request and response modifier filters](https://github.com/nginx/nginx-gateway-fabric/pull/5008)
 * [Gateway API Inference Extension Body-Based Router](https://github.com/kubernetes-sigs/gateway-api-inference-extension)
 * [Envoy: `jwt_authn` `claim_to_headers`](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/jwt_authn_filter)
 * [Envoy: `json_to_metadata` filter](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/json_to_metadata_filter)
