@@ -34,7 +34,7 @@ func init() {
 
 var GatewaySecretMissingReferenceGrant = suite.ConformanceTest{
 	ShortName:   "GatewaySecretMissingReferenceGrant",
-	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become programmed if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to the Secret does not exist",
+	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become programmed if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to the Secret does not exist, regardless of whether the Secret exists",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportReferenceGrant,
@@ -47,6 +47,18 @@ var GatewaySecretMissingReferenceGrant = suite.ConformanceTest{
 		t.Run("Gateway listener should have a false ResolvedRefs condition with reason RefNotPermitted", func(t *testing.T) {
 			listeners := []v1.ListenerStatus{{
 				Name: v1.SectionName("https"),
+				SupportedKinds: []v1.RouteGroupKind{{
+					Group: (*v1.Group)(&v1.GroupVersion.Group),
+					Kind:  v1.Kind("HTTPRoute"),
+				}},
+				Conditions: []metav1.Condition{{
+					Type:   string(v1.ListenerConditionResolvedRefs),
+					Status: metav1.ConditionFalse,
+					Reason: string(v1.ListenerReasonRefNotPermitted),
+				}},
+				AttachedRoutes: 0,
+			}, {
+				Name: v1.SectionName("https-nonexistent-secret"),
 				SupportedKinds: []v1.RouteGroupKind{{
 					Group: (*v1.Group)(&v1.GroupVersion.Group),
 					Kind:  v1.Kind("HTTPRoute"),
