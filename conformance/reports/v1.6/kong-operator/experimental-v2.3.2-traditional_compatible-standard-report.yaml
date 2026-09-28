@@ -1,22 +1,22 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-06-09T09:10:02Z"
+date: "2026-09-28T13:53:05Z"
 gatewayAPIChannel: experimental
-gatewayAPIVersion: v1.5.1
+gatewayAPIVersion: v1.6.2
 implementation:
   contact:
   - https://github.com/kong/kong-operator/issues/new/choose
   organization: Kong
   project: kong-operator
   url: https://github.com/kong/kong-operator
-  version: v2.2.0
+  version: v2.3.2
 kind: ConformanceReport
-mode: expressions
+mode: traditional_compatible-standard
 profiles:
 - core:
     result: success
     statistics:
       Failed: 0
-      Passed: 33
+      Passed: 37
       Skipped: 0
   extended:
     result: success
@@ -25,17 +25,16 @@ profiles:
       Passed: 7
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayInfrastructurePropagation
     - GatewayPort8080
+    - HTTPRouteBackendTimeout
     - HTTPRouteHostRewrite
-    - HTTPRouteMethodMatching
     - HTTPRoutePathRewrite
-    - HTTPRouteQueryParamMatching
     - HTTPRouteResponseHeaderModification
     unsupportedFeatures:
     - BackendTLSPolicy
     - BackendTLSPolicySANValidation
-    - GatewayAddressEmpty
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
@@ -48,43 +47,42 @@ profiles:
     - HTTPRouteBackendProtocolH2C
     - HTTPRouteBackendProtocolWebSocket
     - HTTPRouteBackendRequestHeaderModification
-    - HTTPRouteBackendTimeout
     - HTTPRouteCORS
     - HTTPRouteDestinationPortMatching
+    - HTTPRouteMethodMatching
     - HTTPRouteNamedRouteRule
     - HTTPRouteParentRefPort
     - HTTPRoutePathRedirect
     - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
     - HTTPRouteRequestMirror
     - HTTPRouteRequestMultipleMirrors
     - HTTPRouteRequestPercentageMirror
     - HTTPRouteRequestTimeout
+    - HTTPRouteRetry
+    - HTTPRouteRetryBackendTimeout
+    - HTTPRouteRetryConnectionError
     - HTTPRouteSchemeRedirect
     - ListenerSet
   name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
 - core:
-    result: partial
-    skippedTests:
-    - GRPCExactMethodMatching
-    - GRPCRouteHeaderMatching
-    - GRPCRouteListenerHostnameMatching
-    - GRPCRouteWeight
+    result: success
     statistics:
       Failed: 0
-      Passed: 9
-      Skipped: 4
+      Passed: 15
+      Skipped: 0
   extended:
     result: success
     statistics:
       Failed: 0
-      Passed: 1
+      Passed: 2
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     unsupportedFeatures:
-    - GatewayAddressEmpty
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
@@ -93,25 +91,52 @@ profiles:
     - GatewayStaticAddresses
     - ListenerSet
   name: GATEWAY-GRPC
-  summary: Core tests partially succeeded with 4 test skips. Extended tests succeeded.
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
       Failed: 0
-      Passed: 18
+      Passed: 19
       Skipped: 0
   extended:
     result: success
     statistics:
       Failed: 0
-      Passed: 4
+      Passed: 2
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - TCPRoute
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayStaticAddresses
+    - ListenerSet
+  name: GATEWAY-TCP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 20
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 5
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - TLSRouteModeTerminate
     unsupportedFeatures:
-    - GatewayAddressEmpty
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
@@ -122,6 +147,50 @@ profiles:
     - TLSRouteModeMixed
   name: GATEWAY-TLS
   summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 20
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - UDPRoute
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayStaticAddresses
+    - ListenerSet
+  name: GATEWAY-UDP
+  summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GatewayInfrastructure
+- GatewayOptionalAddressValue
+- TCPRouteInvalidBackendRefNonexistent
+- TCPRouteInvalidCrossNamespaceBackendRef
+- TCPRouteInvalidNonTCPListener
+- TCPRouteParentRefAttachAll
+- TCPRouteParentRefPortAndSectionName
+- TCPRouteReferenceGrant
+- TCPRouteWeightedRouting
 - TLSRouteTerminateSimpleSameNamespace
+- UDPRoute
+- UDPRouteInvalidBackendRefNonexistent
+- UDPRouteInvalidCrossNamespaceBackendRef
+- UDPRouteMultipleRoutesAttachment
+- UDPRouteNotAllowedByListeners
+- UDPRouteParentRefAttachAllListeners
+- UDPRouteParentRefPortAndSectionName
+- UDPRouteReferenceGrant
+- UDPRouteWeightedRouting

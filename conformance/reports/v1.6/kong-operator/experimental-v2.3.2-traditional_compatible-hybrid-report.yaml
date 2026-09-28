@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-09-09T05:43:18Z"
+date: "2026-09-28T13:54:20Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.6.2
 implementation:
@@ -8,64 +8,10 @@ implementation:
   organization: Kong
   project: kong-operator
   url: https://github.com/kong/kong-operator
-  version: v2.3.1
+  version: v2.3.2
 kind: ConformanceReport
 mode: traditional_compatible-hybrid
 profiles:
-- core:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 37
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 7
-      Skipped: 0
-    supportedFeatures:
-    - GatewayAddressEmpty
-    - GatewayInfrastructurePropagation
-    - GatewayPort8080
-    - HTTPRouteBackendTimeout
-    - HTTPRouteHostRewrite
-    - HTTPRoutePathRewrite
-    - HTTPRouteResponseHeaderModification
-    unsupportedFeatures:
-    - BackendTLSPolicy
-    - BackendTLSPolicySANValidation
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidation
-    - GatewayFrontendClientCertificateValidationInsecureFallback
-    - GatewayHTTPListenerIsolation
-    - GatewayHTTPSListenerDetectMisdirectedRequests
-    - GatewayStaticAddresses
-    - HTTPRoute303RedirectStatusCode
-    - HTTPRoute307RedirectStatusCode
-    - HTTPRoute308RedirectStatusCode
-    - HTTPRouteBackendProtocolH2C
-    - HTTPRouteBackendProtocolWebSocket
-    - HTTPRouteBackendRequestHeaderModification
-    - HTTPRouteCORS
-    - HTTPRouteDestinationPortMatching
-    - HTTPRouteMethodMatching
-    - HTTPRouteNamedRouteRule
-    - HTTPRouteParentRefPort
-    - HTTPRoutePathRedirect
-    - HTTPRoutePortRedirect
-    - HTTPRouteQueryParamMatching
-    - HTTPRouteRequestMirror
-    - HTTPRouteRequestMultipleMirrors
-    - HTTPRouteRequestPercentageMirror
-    - HTTPRouteRequestTimeout
-    - HTTPRouteRetry
-    - HTTPRouteRetryBackendTimeout
-    - HTTPRouteRetryConnectionError
-    - HTTPRouteSchemeRedirect
-    - ListenerSet
-  name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -173,6 +119,60 @@ profiles:
     - GatewayStaticAddresses
     - ListenerSet
   name: GATEWAY-UDP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 37
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - HTTPRouteBackendTimeout
+    - HTTPRouteHostRewrite
+    - HTTPRoutePathRewrite
+    - HTTPRouteResponseHeaderModification
+    unsupportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteRetry
+    - HTTPRouteRetryBackendTimeout
+    - HTTPRouteRetryConnectionError
+    - HTTPRouteSchemeRedirect
+    - ListenerSet
+  name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GatewayInfrastructure

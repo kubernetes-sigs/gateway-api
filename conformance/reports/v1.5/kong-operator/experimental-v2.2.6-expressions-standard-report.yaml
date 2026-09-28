@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-06-09T09:10:31Z"
+date: "2026-09-28T14:44:34Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.5.1
 implementation:
@@ -8,35 +8,34 @@ implementation:
   organization: Kong
   project: kong-operator
   url: https://github.com/kong/kong-operator
-  version: v2.2.0
+  version: v2.2.6
 kind: ConformanceReport
-mode: traditional_compatible
+mode: expressions
 profiles:
 - core:
-    result: partial
-    skippedTests:
-    - HTTPRouteHeaderMatching
-    - HTTPRouteInvalidBackendRefUnknownKind
+    result: success
     statistics:
       Failed: 0
-      Passed: 31
-      Skipped: 2
+      Passed: 33
+      Skipped: 0
   extended:
     result: success
     statistics:
       Failed: 0
-      Passed: 5
+      Passed: 8
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
     - HTTPRoutePathRewrite
+    - HTTPRouteQueryParamMatching
     - HTTPRouteResponseHeaderModification
     unsupportedFeatures:
     - BackendTLSPolicy
     - BackendTLSPolicySANValidation
-    - GatewayAddressEmpty
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
@@ -52,12 +51,10 @@ profiles:
     - HTTPRouteBackendTimeout
     - HTTPRouteCORS
     - HTTPRouteDestinationPortMatching
-    - HTTPRouteMethodMatching
     - HTTPRouteNamedRouteRule
     - HTTPRouteParentRefPort
     - HTTPRoutePathRedirect
     - HTTPRoutePortRedirect
-    - HTTPRouteQueryParamMatching
     - HTTPRouteRequestMirror
     - HTTPRouteRequestMultipleMirrors
     - HTTPRouteRequestPercentageMirror
@@ -65,7 +62,7 @@ profiles:
     - HTTPRouteSchemeRedirect
     - ListenerSet
   name: GATEWAY-HTTP
-  summary: Core tests partially succeeded with 2 test skips. Extended tests succeeded.
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: partial
     skippedTests:
@@ -81,13 +78,13 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 1
+      Passed: 2
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     unsupportedFeatures:
-    - GatewayAddressEmpty
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
@@ -107,14 +104,14 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 4
+      Passed: 5
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - TLSRouteModeTerminate
     unsupportedFeatures:
-    - GatewayAddressEmpty
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
@@ -127,4 +124,5 @@ profiles:
   summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GatewayInfrastructure
+- GatewayOptionalAddressValue
 - TLSRouteTerminateSimpleSameNamespace
