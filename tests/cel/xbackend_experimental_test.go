@@ -29,24 +29,164 @@ import (
 	xgatewayv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
 
-func TestXBackendBa(t *testing.T) {
+func TestXBackendSpec(t *testing.T) {
 	tests := []struct {
 		name       string
+		spec       xgatewayv1alpha1.BackendSpec
 		wantErrors []string
-		port       xgatewayv1alpha1.BackendPort
 	}{
 		{
-			name:       "port without number is rejected",
+			name: "port without number is rejected",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Port: xgatewayv1alpha1.BackendPort{},
+			},
 			wantErrors: []string{"should have at least 1 properties"},
 		},
 		{
 			name: "port with number is accepted",
-			port: xgatewayv1alpha1.BackendPort{
-				Number: xgatewayv1alpha1.PortNumber(8080),
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
 			},
+			wantErrors: []string{},
+		},
+		{
+			name: "protocol H2C without tls is accepted",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolH2C),
+				TLS:      nil,
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "protocol H2C with tls mode None is accepted",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolH2C),
+				TLS: &xgatewayv1alpha1.BackendTLS{
+					Mode: xgatewayv1alpha1.BackendTLSModeNone,
+				},
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "protocol H2C with tls mode ServerOnly is rejected",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolH2C),
+				TLS: &xgatewayv1alpha1.BackendTLS{
+					Mode: xgatewayv1alpha1.BackendTLSModeServerOnly,
+				},
+			},
+			wantErrors: []string{"tls must be disabled when protocol is H2C, use protocol HTTP2 for HTTP/2 with tls"},
+		},
+		{
+			name: "protocol HTTP2 without tls is rejected",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolHTTP2),
+				TLS:      nil,
+			},
+			wantErrors: []string{"tls must be enabled when protocol is HTTP2, use protocol H2C for HTTP/2 without tls"},
+		},
+		{
+			name: "protocol HTTP2 with tls mode None is rejected",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolHTTP2),
+				TLS: &xgatewayv1alpha1.BackendTLS{
+					Mode: xgatewayv1alpha1.BackendTLSModeNone,
+				},
+			},
+			wantErrors: []string{"tls must be enabled when protocol is HTTP2, use protocol H2C for HTTP/2 without tls"},
+		},
+		{
+			name: "protocol HTTP2 with tls mode ServerOnly is accepted",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolHTTP2),
+				TLS: &xgatewayv1alpha1.BackendTLS{
+					Mode: xgatewayv1alpha1.BackendTLSModeServerOnly,
+				},
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "protocol WSS without tls is rejected",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolWSS),
+				TLS:      nil,
+			},
+			wantErrors: []string{"tls must be enabled when protocol is WSS"},
+		},
+		{
+			name: "protocol WSS with tls mode None is rejected",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolWSS),
+				TLS: &xgatewayv1alpha1.BackendTLS{
+					Mode: xgatewayv1alpha1.BackendTLSModeNone,
+				},
+			},
+			wantErrors: []string{"tls must be enabled when protocol is WSS"},
+		},
+		{
+			name: "protocol WSS with tls mode ServerOnly is accepted",
+			spec: xgatewayv1alpha1.BackendSpec{
+				Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+				Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+				ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+					Hostname: "example.com",
+				},
+				Protocol: new(xgatewayv1alpha1.BackendProtocolWSS),
+				TLS: &xgatewayv1alpha1.BackendTLS{
+					Mode: xgatewayv1alpha1.BackendTLSModeServerOnly,
+				},
+			},
+			wantErrors: []string{},
 		},
 	}
-
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			backend := &xgatewayv1alpha1.XBackend{
@@ -54,13 +194,7 @@ func TestXBackendBa(t *testing.T) {
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: xgatewayv1alpha1.BackendSpec{
-					Type: xgatewayv1alpha1.BackendTypeExternalHostname,
-					ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
-						Hostname: "example.com",
-					},
-					Port: tc.port,
-				},
+				Spec: tc.spec,
 			}
 			validateXBackend(t, backend, tc.wantErrors)
 		})

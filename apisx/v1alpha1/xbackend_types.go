@@ -82,6 +82,9 @@ const (
 //
 // +kubebuilder:validation:XValidation:rule="self.type == 'ExternalHostname' ? has(self.externalHostname) : !has(self.externalHostname)",message="externalHostname must be set when type is ExternalHostname and must be unset otherwise"
 // +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' ? has(self.endpointSelector) : !has(self.endpointSelector)",message="endpointSelector must be set when type is EndpointSelector and must be unset otherwise"
+// +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'H2C' || !has(self.tls) || self.tls.mode == 'None'",message="tls must be disabled when protocol is H2C, use protocol HTTP2 for HTTP/2 with tls"
+// +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'HTTP2' || (has(self.tls) && self.tls.mode != 'None')",message="tls must be enabled when protocol is HTTP2, use protocol H2C for HTTP/2 without tls"
+// +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'WSS' || (has(self.tls) && self.tls.mode != 'None')",message="tls must be enabled when protocol is WSS"
 type BackendSpec struct {
 	// Type defines the backend type.
 	//
@@ -126,7 +129,7 @@ type BackendSpec struct {
 	//
 	// Support: Core - HTTP, HTTP2, H2C, and HTTP11
 	//
-	// Support: Extended - GRPC, MCP, TCP
+	// Support: Extended - GRPC, MCP, TCP, WSS
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:
@@ -231,7 +234,7 @@ type LabelSelector struct {
 
 // BackendProtocol defines the protocol used when connecting to a backend.
 //
-// +kubebuilder:validation:Enum=TCP;HTTP;HTTP2;HTTP11;H2C;MCP;GRPC
+// +kubebuilder:validation:Enum=TCP;HTTP;HTTP2;HTTP11;H2C;MCP;GRPC;WSS
 type BackendProtocol string
 
 const (
@@ -270,6 +273,11 @@ const (
 	//
 	// Support: Extended
 	BackendProtocolGRPC BackendProtocol = "GRPC"
+
+	// BackendProtocolWSS indicates WebSocket over TLS as described in RFC6445.
+	//
+	// Support: Extended
+	BackendProtocolWSS BackendProtocol = "WSS"
 )
 
 // BackendTLSMode defines the TLS mode for backend connections.
