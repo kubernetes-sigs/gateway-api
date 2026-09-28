@@ -82,9 +82,9 @@ const (
 //
 // +kubebuilder:validation:XValidation:rule="self.type == 'ExternalHostname' ? has(self.externalHostname) : !has(self.externalHostname)",message="externalHostname must be set when type is ExternalHostname and must be unset otherwise"
 // +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' ? has(self.endpointSelector) : !has(self.endpointSelector)",message="endpointSelector must be set when type is EndpointSelector and must be unset otherwise"
-// +kubebuilder:validation:XValidation:rule="self.protocol != 'H2C' || !has(self.tls)",message="tls must be unset when protocol is H2C, use protocol HTTP2 for HTTP/2 with tls"
-// +kubebuilder:validation:XValidation:rule="self.protocol != 'HTTP2' || has(self.tls)",message="tls must be set when protocol is HTTP2, use protocol H2C for HTTP/2 without tls"
-// +kubebuilder:validation:XValidation:rule="self.protocol != 'WSS' || has(self.tls)",message="tls must be set when protocol is WSS"
+// +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'H2C' || !has(self.tls) || self.tls.mode == 'None'",message="tls must be disabled when protocol is H2C, use protocol HTTP2 for HTTP/2 with tls"
+// +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'HTTP2' || (has(self.tls) && self.tls.mode != 'None')",message="tls must be enabled when protocol is HTTP2, use protocol H2C for HTTP/2 without tls"
+// +kubebuilder:validation:XValidation:rule="!has(self.protocol) || self.protocol != 'WSS' || (has(self.tls) && self.tls.mode != 'None')",message="tls must be enabled when protocol is WSS"
 type BackendSpec struct {
 	// Type defines the backend type.
 	//

@@ -447,14 +447,17 @@ spec:
                 and must be unset otherwise
               rule: 'self.type == ''EndpointSelector'' ? has(self.endpointSelector)
                 : !has(self.endpointSelector)'
-            - message: tls must be unset when protocol is H2C, use protocol HTTP2
+            - message: tls must be disabled when protocol is H2C, use protocol HTTP2
                 for HTTP/2 with tls
-              rule: self.protocol != 'H2C' || !has(self.tls)
-            - message: tls must be set when protocol is HTTP2, use protocol H2C for
-                HTTP/2 without tls
-              rule: self.protocol != 'HTTP2' || has(self.tls)
-            - message: tls must be set when protocol is WSS
-              rule: self.protocol != 'WSS' || has(self.tls)
+              rule: '!has(self.protocol) || self.protocol != ''H2C'' || !has(self.tls)
+                || self.tls.mode == ''None'''
+            - message: tls must be enabled when protocol is HTTP2, use protocol H2C
+                for HTTP/2 without tls
+              rule: '!has(self.protocol) || self.protocol != ''HTTP2'' || (has(self.tls)
+                && self.tls.mode != ''None'')'
+            - message: tls must be enabled when protocol is WSS
+              rule: '!has(self.protocol) || self.protocol != ''WSS'' || (has(self.tls)
+                && self.tls.mode != ''None'')'
           status:
             description: Status defines the current state of XBackend.
             properties:
