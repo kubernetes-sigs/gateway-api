@@ -51,6 +51,7 @@ type GatewayStatusApplyConfiguration struct {
 	// * "Accepted"
 	// * "Programmed"
 	// * "Ready"
+	// * "AddressesAssigned"
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementors:

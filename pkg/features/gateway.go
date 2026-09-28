@@ -87,6 +87,12 @@ const (
 	// SupportGatewayFrontendClientCertificateValidationInsecureFallback option indicates support
 	// for the `AllowInsecureFallback` client certificate validation mode.
 	SupportGatewayFrontendClientCertificateValidationInsecureFallback FeatureName = "GatewayFrontendClientCertificateValidationInsecureFallback"
+
+	// SupportGatewayAddressRoutability option indicates support for Gateway address routability.
+	SupportGatewayAddressRoutability FeatureName = "GatewayAddressRoutability"
+
+	// SupportGatewayAddressRoutabilityCluster option indicates support for Cluster Gateway address routability.
+	SupportGatewayAddressRoutabilityCluster FeatureName = "GatewayAddressRoutabilityCluster"
 )
 
 var (
@@ -143,6 +149,16 @@ var (
 		Name:    SupportGatewayFrontendClientCertificateValidationInsecureFallback,
 		Channel: FeatureChannelStandard,
 	}
+	// GatewayAddressRoutabilityFeature contains metadata for the GatewayAddressRoutability feature.
+	GatewayAddressRoutabilityFeature = Feature{
+		Name:    SupportGatewayAddressRoutability,
+		Channel: FeatureChannelExperimental,
+	}
+	// GatewayAddressRoutabilityClusterFeature contains metadata for the GatewayAddressRoutabilityCluster feature.
+	GatewayAddressRoutabilityClusterFeature = Feature{
+		Name:    SupportGatewayAddressRoutabilityCluster,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -157,5 +173,7 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayBackendClientCertificateFeature,
 	GatewayFrontendClientCertificateValidationFeature,
 	GatewayFrontendClientCertificateValidationInsecureFallbackFeature,
+	GatewayAddressRoutabilityFeature,
+	GatewayAddressRoutabilityClusterFeature,
 	ListenerSetFeature,
 )
