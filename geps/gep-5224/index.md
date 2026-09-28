@@ -511,18 +511,17 @@ type Listener struct {
 // Listener. It is organized by pre-routing phase so that additional
 // phases can be added additively in future revisions.
 //
-// Today only the request phase (Requests) is defined. A future
-// connection-oriented phase (Connection) is anticipated for L4
-// pre-routing (for example, source-IP allow/deny, per-connection rate
-// limits, SNI-derived decisions) but is deliberately not introduced by
-// this GEP. When Connection is added, existing configurations that only
-// populate Requests remain valid.
+// Today only the request phase (Requests) is defined. In the future
+// a connection-oriented phase (Connection) may be added.
 type ListenerFilters struct {
     // Requests is an ordered list of pre-routing filters that run on
     // every request accepted on this Listener, before route matching
     // is performed. The list order is load-bearing:
     // implementations MUST execute the filters in the exact order they
-    // appear here and MUST NOT reorder them.
+    // appear here and MUST NOT reorder them. If an implementation can
+    // not implement the filters in the order they are specified, the
+    // implementation MUST set the "Accepted" Listener condition to "false"
+    // with the "InvalidListenerFilterOrder" reason.
     //
     // Requests may mutate inputs that route matching consumes
     // (path, request headers, method, computed metadata), with the
@@ -567,8 +566,8 @@ lives on the pre-routing container and does not perturb the
 [`HTTPRouteRule.Filters`](../../reference/api-types/httproute.md#filters-optional).
 
 The shape of `ListenerFilter` follows the established
-`GRPCRouteFilter` pattern (see
-[grpcroute_types.go](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1/grpcroute_types.go#L507)):
+`HTTPRouteFilter` pattern (see
+[httproute_types.go](https://github.com/kubernetes-sigs/gateway-api/blob/0d30cd246526e20199842e00a629c312f1fa0461/apis/v1/httproute_types.go#L817)):
 a discriminated union of a `Type` enum and one payload field per variant.
 
 ```go
@@ -926,6 +925,9 @@ listed below and are additions to
   `filters.requests` is structurally invalid, for example if implementation-side
   validation rejects a combination CEL did not catch, or if a pre-routing
   filter attempts to modify `Host` or `:authority`.
+* **`Accepted=False`, `Reason=InvalidListenerFilterOrder`.** Used when a filter in
+  `filters.requests` is not in allowed order. This may be due to implementation-specific
+  ordering requirements or constraints imposed by the Gateway API specification.
 * **`ResolvedRefs=False`, `Reason=InvalidListenerFilterRef`.** Used when an
   `ExternalAuth.backendRef` or an `ExtensionRef` in `filters.requests` refers
   to a resource that does not exist, has an unsupported group/kind, or is
