@@ -260,6 +260,50 @@ func TestXBackendSessionPersistence(t *testing.T) {
 	}
 }
 
+func TestXBackendEndpointSelectorMatchLabels(t *testing.T) {
+	tests := []struct {
+		name        string
+		matchLabels map[gatewayv1.LabelKey]gatewayv1.LabelValue
+		wantErrors  []string
+	}{
+		{
+			name: "matchLabels is required",
+			wantErrors: []string{
+				"spec.endpointSelector.matchLabels: Required value",
+			},
+		},
+		{
+			name: "matchLabels is accepted",
+			matchLabels: map[gatewayv1.LabelKey]gatewayv1.LabelValue{
+				"app": "foo",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			backend := &xgatewayv1alpha1.XBackend{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: xgatewayv1alpha1.BackendSpec{
+					Type: xgatewayv1alpha1.BackendTypeEndpointSelector,
+					EndpointSelector: &xgatewayv1alpha1.EndpointSelectorBackend{
+						LabelSelector: xgatewayv1alpha1.LabelSelector{
+							MatchLabels: tc.matchLabels,
+						},
+					},
+					Port: xgatewayv1alpha1.BackendPort{
+						Number: xgatewayv1alpha1.PortNumber(80),
+					},
+				},
+			}
+			validateXBackend(t, backend, tc.wantErrors)
+		})
+	}
+}
+
 func validateXBackend(t *testing.T, backend *xgatewayv1alpha1.XBackend, wantErrors []string) {
 	t.Helper()
 

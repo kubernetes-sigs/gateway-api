@@ -86,7 +86,6 @@ spec:
                     minProperties: 1
                     type: object
                 required:
-                - ""
                 - matchLabels
                 type: object
               externalHostname:

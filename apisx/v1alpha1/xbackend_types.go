@@ -227,7 +227,7 @@ type EndpointSelectorBackend struct {
 	// does not become a relied-upon DNS entry.
 	// </gateway:util:excludeFromCRD>
 	//
-	// +required
+	// +optional
 	LabelSelector `json:",inline"`
 }
 
