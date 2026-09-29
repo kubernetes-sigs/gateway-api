@@ -513,9 +513,13 @@ type ListenerFilters struct {
 	//
 	// Requests may mutate inputs that route matching consumes
 	// (path, request headers, method, computed metadata), with the
-	// explicit exception of the `Host` and `:authority` headers, which
-	// implementations MUST reject any attempt to modify. Implementations
-	// MUST evaluate route matching exactly once after the last
+	// explicit exception of the `Host` and `:authority` headers. If a
+	// ListenerFilter attempts to modify either header, implementations
+	// MUST NOT allow that modification to take effect. Implementations
+	// SHOULD satisfy this by ignoring the mutation and continuing to
+	// process the request with the original value; they MAY instead
+	// fail the request with a 5xx response. Implementations MUST
+	// evaluate route matching exactly once after the last
 	// ListenerFilter has run.
 	//
 	// Requests MUST NOT be interpreted as changing which Listener
