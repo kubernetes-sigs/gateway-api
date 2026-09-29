@@ -376,77 +376,6 @@ func gatewayTweaks(channel string, name string, jsonProps apiext.JSONSchemaProps
 		jsonProps.Type = "string"
 	}
 
-	// AtLeastOneOf and ExactlyOneOf cannot be expressed as kubebuilder markers
-	// so they are handled inline here rather than via applyGatewayTypeValidations.
-	validationPrefix := fmt.Sprintf("<gateway:%s:validation:", channel)
-
-	atLeastOneOfRe := regexp.MustCompile(validationPrefix + "AtLeastOneOf=([A-Za-z,]*)>")
-	for _, match := range atLeastOneOfRe.FindAllStringSubmatch(jsonProps.Description, 64) {
-		if len(match) != 2 {
-			log.Fatalf("Invalid %s AtLeastOneOf tag for %s", validationPrefix, name)
-		}
-		var conditions []string
-		for field := range strings.SplitSeq(match[1], ",") {
-			if field == "" {
-				continue
-			}
-			prop, ok := jsonProps.Properties[field]
-			if !ok {
-				log.Fatalf("AtLeastOneOf field %q not found in %s", field, name)
-			}
-			switch {
-			case prop.Type == "array":
-				conditions = append(conditions, fmt.Sprintf("(has(self.%s) && size(self.%s) > 0)", field, field))
-			case prop.Type == "string":
-				conditions = append(conditions, fmt.Sprintf("(has(self.%s) && self.%s != \"\")", field, field))
-			default:
-				conditions = append(conditions, fmt.Sprintf("has(self.%s)", field))
-			}
-		}
-		if len(conditions) == 0 {
-			log.Fatalf("AtLeastOneOf tag for %s must specify at least one field", name)
-		}
-		fields := strings.Split(match[1], ",")
-		jsonProps.XValidations = append(jsonProps.XValidations, apiext.ValidationRule{
-			Message: fmt.Sprintf("must specify at least one of %s", strings.Join(fields, ", ")),
-			Rule:    strings.Join(conditions, " || "),
-		})
-	}
-
-	exactlyOneOfRe := regexp.MustCompile(validationPrefix + "ExactlyOneOf=([A-Za-z;]*)>")
-	for _, match := range exactlyOneOfRe.FindAllStringSubmatch(jsonProps.Description, 64) {
-		if len(match) != 2 {
-			log.Fatalf("Invalid %s ExactlyOneOf tag for %s", validationPrefix, name)
-		}
-		var conditions []string
-		var fields []string
-		for field := range strings.SplitSeq(match[1], ";") {
-			if field == "" {
-				continue
-			}
-			fields = append(fields, field)
-			prop, ok := jsonProps.Properties[field]
-			if !ok {
-				log.Fatalf("ExactlyOneOf field %q not found in %s", field, name)
-			}
-			switch {
-			case prop.Type == "array":
-				conditions = append(conditions, fmt.Sprintf("((has(self.%s) && size(self.%s) > 0) ? 1 : 0)", field, field))
-			case prop.Type == "string":
-				conditions = append(conditions, fmt.Sprintf("((has(self.%s) && self.%s != \"\") ? 1 : 0)", field, field))
-			default:
-				conditions = append(conditions, fmt.Sprintf("(has(self.%s) ? 1 : 0)", field))
-			}
-		}
-		if len(conditions) == 0 {
-			log.Fatalf("ExactlyOneOf tag for %s must specify at least one field", name)
-		}
-		jsonProps.XValidations = append(jsonProps.XValidations, apiext.ValidationRule{
-			Message: fmt.Sprintf("must specify exactly one of %s", strings.Join(fields, ", ")),
-			Rule:    strings.Join(conditions, " + ") + " == 1",
-		})
-	}
-
 	jsonProps.Description = formatDescription(jsonProps.Description, channel, name)
 
 	if len(jsonProps.Properties) > 0 {
@@ -468,9 +397,7 @@ func experimentalValidationMarkerValues(description, prefix string, target marke
 		rawMarker := "+kubebuilder:validation:" + marker
 		definition := experimentalValidationRegistry.Lookup(rawMarker, target)
 		if definition == nil {
-			// Skip markers not in the kubebuilder registry (e.g. ExactlyOneOf,
-			// AtLeastOneOf); those are handled inline in gatewayTweaks.
-			continue
+			return nil, fmt.Errorf("unsupported %s marker %q", prefix, marker)
 		}
 
 		value, err := definition.Parse(rawMarker)

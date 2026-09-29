@@ -456,16 +456,14 @@ spec:
                   rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
                     > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
                     != "")'
-                - message: must not contain WellKnownCACertificates together with
-                    CACertificateRefs or ClusterTrustBundleRef
-                  rule: '!(has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                    != '''' && ((has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                    > 0) || has(self.clusterTrustBundleRef)))'
-                - message: must specify exactly one of caCertificateRefs, clusterTrustBundleRef,
-                    wellKnownCACertificates
-                  rule: '((has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                    > 0) ? 1 : 0) + (has(self.clusterTrustBundleRef) ? 1 : 0) + ((has(self.wellKnownCACertificates)
-                    && self.wellKnownCACertificates != "") ? 1 : 0) == 1'
+                - message: must specify either CACertificateRefs or WellKnownCACertificates
+                  rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
+                    > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
+                    != "")
+                - message: exactly one of the fields in [caCertificateRefs clusterTrustBundleRef
+                    wellKnownCACertificates] must be set
+                  rule: (has(self.caCertificateRefs)?1:0)+(has(self.clusterTrustBundleRef)?1:0)+(has(self.wellKnownCACertificates)?1:0)
+                    == 1
             required:
             - targetRefs
             - validation
@@ -1209,16 +1207,14 @@ spec:
                   rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
                     > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
                     != "")'
-                - message: must not contain WellKnownCACertificates together with
-                    CACertificateRefs or ClusterTrustBundleRef
-                  rule: '!(has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                    != '''' && ((has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                    > 0) || has(self.clusterTrustBundleRef)))'
-                - message: must specify exactly one of caCertificateRefs, clusterTrustBundleRef,
-                    wellKnownCACertificates
-                  rule: '((has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                    > 0) ? 1 : 0) + (has(self.clusterTrustBundleRef) ? 1 : 0) + ((has(self.wellKnownCACertificates)
-                    && self.wellKnownCACertificates != "") ? 1 : 0) == 1'
+                - message: must specify either CACertificateRefs or WellKnownCACertificates
+                  rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
+                    > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
+                    != "")
+                - message: exactly one of the fields in [caCertificateRefs clusterTrustBundleRef
+                    wellKnownCACertificates] must be set
+                  rule: (has(self.caCertificateRefs)?1:0)+(has(self.clusterTrustBundleRef)?1:0)+(has(self.wellKnownCACertificates)?1:0)
+                    == 1
             required:
             - targetRefs
             - validation

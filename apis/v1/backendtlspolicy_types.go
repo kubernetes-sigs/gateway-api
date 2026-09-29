@@ -129,9 +129,6 @@ type BackendTLSPolicySpec struct {
 
 	// Validation contains backend TLS validation configuration.
 	//
-	// <gateway:experimental:validation:XValidation:message="must not contain WellKnownCACertificates together with CACertificateRefs or ClusterTrustBundleRef",rule="!(has(self.wellKnownCACertificates) && self.wellKnownCACertificates != '' && ((has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0) || has(self.clusterTrustBundleRef)))">
-	// <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>
-	//
 	// +required
 	Validation BackendTLSPolicyValidation `json:"validation"`
 
@@ -153,6 +150,8 @@ type BackendTLSPolicySpec struct {
 
 // BackendTLSPolicyValidation contains backend TLS validation configuration.
 // +kubebuilder:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
+// +kubebuilder:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
+// <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>
 type BackendTLSPolicyValidation struct {
 	// CACertificateRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to

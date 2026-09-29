@@ -26,6 +26,7 @@ import (
 // with apply.
 //
 // BackendTLSPolicyValidation contains backend TLS validation configuration.
+// <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>
 type BackendTLSPolicyValidationApplyConfiguration struct {
 	// CACertificateRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to

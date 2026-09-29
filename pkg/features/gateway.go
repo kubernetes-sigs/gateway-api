@@ -106,9 +106,9 @@ const (
 	// specifying filters on Gateway listeners.
 	SupportGatewayListenerFilters FeatureName = "GatewayListenerFilters"
 
-	// SupportClusterTrustBundle option indicates support for ClusterTrustBundle
-	// references in BackendTLSPolicyValidation and Gateway frontend TLS validation.
-	SupportClusterTrustBundle FeatureName = "ClusterTrustBundle"
+	// SupportGatewayClusterTrustBundle option indicates support for ClusterTrustBundle
+	// references in Gateway frontend TLS validation.
+	SupportGatewayClusterTrustBundle FeatureName = "GatewayClusterTrustBundle"
 )
 
 var (
@@ -188,10 +188,10 @@ var (
 		Channel: FeatureChannelExperimental,
 	}
 
-	// ClusterTrustBundleFeature contains metadata for the ClusterTrustBundle reference
-	// feature, used by both BackendTLSPolicy and Gateway frontend TLS validation.
-	ClusterTrustBundleFeature = Feature{
-		Name:    SupportClusterTrustBundle,
+	// GatewayClusterTrustBundleFeature contains metadata for the
+	// GatewayClusterTrustBundle feature.
+	GatewayClusterTrustBundleFeature = Feature{
+		Name:    SupportGatewayClusterTrustBundle,
 		Channel: FeatureChannelExperimental,
 	}
 )
@@ -211,7 +211,7 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayAddressRoutabilityFeature,
 	GatewayAddressRoutabilityClusterFeature,
 	GatewayRouteHostnameIntersectionPrecedenceFeature,
-	ClusterTrustBundleFeature,
+	GatewayClusterTrustBundleFeature,
 	ListenerSetFeature,
 	GatewayListenerFiltersFeature,
 )

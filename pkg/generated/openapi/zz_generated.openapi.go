@@ -3178,7 +3178,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref common.Refere
 					},
 					"validation": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Validation contains backend TLS validation configuration.\n\n<gateway:experimental:validation:XValidation:message=\"must not contain WellKnownCACertificates together with CACertificateRefs or ClusterTrustBundleRef\",rule=\"!(has(self.wellKnownCACertificates) && self.wellKnownCACertificates != '' && ((has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0) || has(self.clusterTrustBundleRef)))\"> <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>",
+							Description: "Validation contains backend TLS validation configuration.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation"),
 						},
@@ -3211,7 +3211,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendTLSPolicyValidation contains backend TLS validation configuration.",
+				Description: "BackendTLSPolicyValidation contains backend TLS validation configuration. <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"caCertificateRefs": {

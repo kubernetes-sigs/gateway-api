@@ -601,6 +601,14 @@ spec:
                       rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
                         > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
                         != "")'
+                    - message: must specify either CACertificateRefs or WellKnownCACertificates
+                      rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
+                        > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
+                        != "")
+                    - message: exactly one of the fields in [caCertificateRefs clusterTrustBundleRef
+                        wellKnownCACertificates] must be set
+                      rule: (has(self.caCertificateRefs)?1:0)+(has(self.clusterTrustBundleRef)?1:0)+(has(self.wellKnownCACertificates)?1:0)
+                        == 1
                 required:
                 - mode
                 type: object
