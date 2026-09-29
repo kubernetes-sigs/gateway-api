@@ -177,7 +177,7 @@ var (
 		Name:    SupportGatewayRouteHostnameIntersectionPrecedence,
 		Channel: FeatureChannelStandard,
 	}
-	
+
 	// GatewayListenerFiltersFeature contains metadata for the SupportGatewayListenerFilters feature.
 	GatewayListenerFiltersFeature = Feature{
 		Name:    SupportGatewayListenerFilters,
