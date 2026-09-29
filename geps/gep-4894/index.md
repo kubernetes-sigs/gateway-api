@@ -150,7 +150,7 @@ The Backend resource is designed with a clear separation between Core and Extend
 | `EndpointSelector` type | Core | Routes to a selected set of in-cluster endpoints; behaves equivalently to a Service `backendRef` |
 | `ExternalHostname` type | Extended | First-class external FQDN support, replacing `ExternalName` Services |
 | Inline TLS | Extended | TLS configuration inlined on the Backend resource |
-| `TCP`, `GRPC`, `MCP`, and `WSS` protocols | Extended | Extended backend communication protocols |
+| `TCP`, `GRPC`, `HTTP2`, `MCP`, and `WSS` protocols | Extended | Extended backend communication protocols |
 | [Session persistence](../gep-1619/index.md) | Extended | Session persistence across endpoints selected by an `EndpointSelector` Backend |
 
 This layering allows the Backend resource itself to move to Standard quickly (Core tests just validate "does Backend do what Service does"), while Extended features mature independently.
@@ -249,9 +249,9 @@ type BackendSpec struct {
   // These protocols are also used for validation of future protocol-specific
   // fields that may be added to the Backend resource (e.g. retries).
   //
-  // Support: Core - HTTP, HTTP2, H2C, and HTTP11
+  // Support: Core - HTTP, H2C, and HTTP11
   //
-  // Support: Extended - TCP, GRPC, MCP, and WSS
+  // Support: Extended - TCP, GRPC, HTTP2, MCP, and WSS
   // +optional
   Protocol BackendProtocol `json:"protocol"`
 

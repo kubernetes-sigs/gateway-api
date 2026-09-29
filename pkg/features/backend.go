@@ -50,6 +50,9 @@ const (
 	// This option indicates support for Backend TLS configuration.
 	SupportBackendTLS FeatureName = "BackendTLS"
 
+	// This option indicates support for the HTTP2 Backend protocol.
+	SupportBackendProtocolHTTP2 FeatureName = "BackendProtocolHTTP2"
+
 	// This option indicates support for the TCP Backend protocol.
 	SupportBackendProtocolTCP FeatureName = "BackendProtocolTCP"
 
@@ -92,6 +95,13 @@ var (
 	// BackendTLSFeature contains metadata for the BackendTLS feature.
 	BackendTLSFeature = Feature{
 		Name:    SupportBackendTLS,
+		Channel: FeatureChannelExperimental,
+	}
+
+	// BackendProtocolHTTP2Feature contains metadata for the BackendProtocolHTTP2
+	// feature.
+	BackendProtocolHTTP2Feature = Feature{
+		Name:    SupportBackendProtocolHTTP2,
 		Channel: FeatureChannelExperimental,
 	}
 
@@ -165,6 +175,7 @@ var (
 var BackendExtendedFeatures = sets.New(
 	BackendExternalHostnameFeature,
 	BackendTLSFeature,
+	BackendProtocolHTTP2Feature,
 	BackendProtocolTCPFeature,
 	BackendProtocolGRPCFeature,
 	BackendProtocolMCPFeature,
