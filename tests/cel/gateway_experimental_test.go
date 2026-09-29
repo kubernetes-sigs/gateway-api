@@ -222,3 +222,229 @@ func TestGatewayAddressRoutability(t *testing.T) {
 		})
 	}
 }
+
+func TestListenerFiltersProtocolRestriction(t *testing.T) {
+	tests := []struct {
+		name        string
+		protocol    string
+		withFilters bool
+		wantError   bool
+	}{
+		{name: "HTTP without filters", protocol: "HTTP"},
+		{name: "HTTPS without filters", protocol: "HTTPS"},
+		{name: "TCP without filters", protocol: "TCP"},
+		{name: "TLS without filters", protocol: "TLS"},
+		{name: "UDP without filters", protocol: "UDP"},
+
+		{name: "HTTP with filters", protocol: "HTTP", withFilters: true},
+		{name: "HTTPS with filters", protocol: "HTTPS", withFilters: true},
+
+		{name: "TCP with filters", protocol: "TCP", withFilters: true, wantError: true},
+		{name: "TLS with filters", protocol: "TLS", withFilters: true, wantError: true},
+		{name: "UDP with filters", protocol: "UDP", withFilters: true, wantError: true},
+		{name: "custom protocol with filters", protocol: "example.com/foo", withFilters: true, wantError: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			name := fmt.Sprintf("listener-filters-%d", time.Now().UnixNano())
+			listener := map[string]any{
+				"name":     "listener",
+				"protocol": tc.protocol,
+				"port":     int64(80),
+			}
+			// TLS listeners require a TLS block; HTTPS + Terminate is the
+			// minimum that satisfies the existing per-protocol CEL rules,
+			// which run before the new one and would otherwise mask it.
+			switch tc.protocol {
+			case "HTTPS":
+				listener["tls"] = map[string]any{
+					"mode": "Terminate",
+					"certificateRefs": []any{map[string]any{
+						"kind": "Secret",
+						"name": "example-cert",
+					}},
+				}
+			case "TLS":
+				listener["tls"] = map[string]any{
+					"mode": "Passthrough",
+				}
+			}
+			if tc.withFilters {
+				listener["filters"] = map[string]any{
+					"requests": []any{map[string]any{
+						"type": "ExtensionRef",
+						"extensionRef": map[string]any{
+							"group": "example.com",
+							"kind":  "PreRoutingExtension",
+							"name":  "example",
+						},
+					}},
+				}
+			}
+
+			obj := &unstructured.Unstructured{Object: map[string]any{
+				"apiVersion": "gateway.networking.k8s.io/v1",
+				"kind":       "Gateway",
+				"metadata": map[string]any{
+					"name":      name,
+					"namespace": metav1.NamespaceDefault,
+				},
+				"spec": map[string]any{
+					"gatewayClassName": "foo",
+					"listeners":        []any{listener},
+				},
+			}}
+
+			ctx := context.Background()
+			err := k8sClient.Create(ctx, obj)
+			if (err != nil) != tc.wantError {
+				t.Fatalf("unexpected validation result: got err=%v, want error=%v", err, tc.wantError)
+			}
+			if tc.wantError && err != nil {
+				if !strings.Contains(err.Error(), "filters may only be set when protocol is HTTP or HTTPS") {
+					t.Fatalf("expected rejection to cite the filters CEL rule; got: %v", err)
+				}
+			}
+		})
+	}
+}
+
+func TestListenerFilterUnionDiscriminator(t *testing.T) {
+	extRef := map[string]any{
+		"group": "example.com",
+		"kind":  "PreRoutingExtension",
+		"name":  "example",
+	}
+	extAuth := map[string]any{
+		"protocol": "HTTP",
+		"backendRef": map[string]any{
+			"kind": "Service",
+			"name": "auth",
+			"port": int64(9000),
+		},
+		"http": map[string]any{},
+	}
+
+	tests := []struct {
+		name         string
+		filterType   string
+		externalAuth map[string]any
+		extensionRef map[string]any
+		wantError    bool
+		errContains  string
+	}{
+		// Happy paths.
+		{
+			name:         "valid ExternalAuth filter",
+			filterType:   "ExternalAuth",
+			externalAuth: extAuth,
+		},
+		{
+			name:         "valid ExtensionRef filter",
+			filterType:   "ExtensionRef",
+			extensionRef: extRef,
+		},
+
+		// Missing value fields.
+		{
+			name:        "ExternalAuth filter with empty value field",
+			filterType:  "ExternalAuth",
+			wantError:   true,
+			errContains: "externalAuth must be specified for ExternalAuth filter.type",
+		},
+		{
+			name:        "ExtensionRef filter with empty value field",
+			filterType:  "ExtensionRef",
+			wantError:   true,
+			errContains: "extensionRef must be specified for ExtensionRef filter.type",
+		},
+
+		// Value/type mismatch.
+		{
+			name:         "ExternalAuth filter with non-matching field",
+			filterType:   "ExternalAuth",
+			extensionRef: extRef,
+			wantError:    true,
+			errContains:  "extensionRef must be nil if the filter.type is not ExtensionRef",
+		},
+		{
+			name:         "ExtensionRef filter with non-matching field",
+			filterType:   "ExtensionRef",
+			externalAuth: extAuth,
+			wantError:    true,
+			errContains:  "externalAuth must be nil if the filter.type is not ExternalAuth",
+		},
+
+		// Both value fields set.
+		{
+			name:         "ExternalAuth filter with both fields set",
+			filterType:   "ExternalAuth",
+			externalAuth: extAuth,
+			extensionRef: extRef,
+			wantError:    true,
+			errContains:  "extensionRef must be nil if the filter.type is not ExtensionRef",
+		},
+		{
+			name:         "ExtensionRef filter with both fields set",
+			filterType:   "ExtensionRef",
+			externalAuth: extAuth,
+			extensionRef: extRef,
+			wantError:    true,
+			errContains:  "externalAuth must be nil if the filter.type is not ExternalAuth",
+		},
+
+		// Enum guard: a type value outside the allowed set is rejected by the
+		// kubebuilder Enum marker, independent of the union CEL rules above.
+		{
+			name:        "invalid type value",
+			filterType:  "RequestHeaderModifier",
+			wantError:   true,
+			errContains: `supported values: "ExternalAuth", "ExtensionRef"`,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			name := fmt.Sprintf("listener-filter-union-%d", time.Now().UnixNano())
+			filter := map[string]any{
+				"type": tc.filterType,
+			}
+			if tc.externalAuth != nil {
+				filter["externalAuth"] = tc.externalAuth
+			}
+			if tc.extensionRef != nil {
+				filter["extensionRef"] = tc.extensionRef
+			}
+
+			obj := &unstructured.Unstructured{Object: map[string]any{
+				"apiVersion": "gateway.networking.k8s.io/v1",
+				"kind":       "Gateway",
+				"metadata": map[string]any{
+					"name":      name,
+					"namespace": metav1.NamespaceDefault,
+				},
+				"spec": map[string]any{
+					"gatewayClassName": "foo",
+					"listeners": []any{map[string]any{
+						"name":     "listener",
+						"protocol": "HTTP",
+						"port":     int64(80),
+						"filters": map[string]any{
+							"requests": []any{filter},
+						},
+					}},
+				},
+			}}
+
+			ctx := context.Background()
+			err := k8sClient.Create(ctx, obj)
+			if (err != nil) != tc.wantError {
+				t.Fatalf("unexpected validation result: got err=%v, want error=%v", err, tc.wantError)
+			}
+			if tc.wantError && err != nil && !strings.Contains(err.Error(), tc.errContains) {
+				t.Fatalf("expected error to contain %q, got: %v", tc.errContains, err)
+			}
+		})
+	}
+}
