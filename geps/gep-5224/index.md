@@ -5,7 +5,7 @@ title: "GEP-5224: Pre-Routing Filters"
 * Issue: [#5224](https://github.com/kubernetes-sigs/gateway-api/issues/5224)
   * Split out of [GEP-5091: PayloadProcessor Resource](https://github.com/kubernetes-sigs/gateway-api/pull/5092)
   * Resolves the pre-routing portion of [#5194: Filter ordering](https://github.com/kubernetes-sigs/gateway-api/issues/5194)
-* Status: Implementable
+* Status: Experimental
 
 ## TLDR
 

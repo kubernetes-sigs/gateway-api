@@ -13245,7 +13245,7 @@
 			}
 		},
 		"io.k8s.networking.gateway.v1.Listener": {
-			"description": "Listener embodies the concept of a logical endpoint where a Gateway accepts network connections.",
+			"description": "Listener embodies the concept of a logical endpoint where a Gateway accepts network connections.\n\n<gateway:experimental:validation:XValidation:message=\"filters may only be set when protocol is HTTP or HTTPS\",rule=\"!has(self.filters) || self.protocol in ['HTTP', 'HTTPS']\">",
 			"type": "object",
 			"required": [
 				"name",

@@ -101,6 +101,10 @@ const (
 	// Note: This feature is expected to move to Core conformance soon, so
 	// implementations are strongly encouraged to support it.
 	SupportGatewayRouteHostnameIntersectionPrecedence FeatureName = "GatewayRouteHostnameIntersectionPrecedence"
+
+	// SupportGatewayListenerFilters option indicates support for
+	// specifying filters on Gateway listeners.
+	SupportGatewayListenerFilters FeatureName = "GatewayListenerFilters"
 )
 
 var (
@@ -173,6 +177,12 @@ var (
 		Name:    SupportGatewayRouteHostnameIntersectionPrecedence,
 		Channel: FeatureChannelStandard,
 	}
+	
+	// GatewayListenerFiltersFeature contains metadata for the SupportGatewayListenerFilters feature.
+	GatewayListenerFiltersFeature = Feature{
+		Name:    SupportGatewayListenerFilters,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -191,4 +201,5 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayAddressRoutabilityClusterFeature,
 	GatewayRouteHostnameIntersectionPrecedenceFeature,
 	ListenerSetFeature,
+	GatewayListenerFiltersFeature,
 )

@@ -27,6 +27,8 @@ import (
 //
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
+//
+// <gateway:experimental:validation:XValidation:message="filters may only be set when protocol is HTTP or HTTPS",rule="!has(self.filters) || self.protocol in ['HTTP', 'HTTPS']">
 type ListenerApplyConfiguration struct {
 	// Name is the name of the Listener. This name MUST be unique within a
 	// Gateway.

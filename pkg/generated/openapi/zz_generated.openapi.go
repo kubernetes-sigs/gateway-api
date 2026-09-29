@@ -5854,7 +5854,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_Listener(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Listener embodies the concept of a logical endpoint where a Gateway accepts network connections.",
+				Description: "Listener embodies the concept of a logical endpoint where a Gateway accepts network connections.\n\n<gateway:experimental:validation:XValidation:message=\"filters may only be set when protocol is HTTP or HTTPS\",rule=\"!has(self.filters) || self.protocol in ['HTTP', 'HTTPS']\">",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
