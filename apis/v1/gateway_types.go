@@ -569,8 +569,11 @@ type ListenerFilter struct {
 	// Type. CEL validation enforces this, matching the existing
 	// HTTPRouteFilter pattern.
 
+	// +optional
 	ExternalAuth *HTTPExternalAuthFilter `json:"externalAuth,omitempty"`
-	ExtensionRef *LocalObjectReference   `json:"extensionRef,omitempty"`
+
+	// +optional
+	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 // ListenerFilterType is a distinct enum from HTTPRouteFilterType so that
