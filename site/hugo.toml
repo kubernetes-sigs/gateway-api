@@ -42,9 +42,9 @@ enableEmoji = true
 [params]
   copyright = "The Linux Foundation"
   favicon = "favicon.png"
-  # github_repo = "https://github.com/kubernetes-sigs/gateway-api"
-  # github_branch = "main"
-  # github_subdir = "site/content/en" # Set this to wherever your markdown files live
+  github_repo = "https://github.com/kubernetes-sigs/gateway-api"
+  github_branch = "main"
+  github_subdir = "site"
 
   # Search settings
   offlineSearch = true
@@ -119,3 +119,9 @@ enableEmoji = true
     source = "../examples"
     target = "content/examples"
  
+
+[[menu.main]]
+    name = "GitHub"
+    weight = 99
+    pre = "<i class='fab fa-github pr-2'></i>"
+    url = "https://github.com/kubernetes-sigs/gateway-api"
