@@ -496,20 +496,20 @@ type Listener struct {
 }
 
 // ListenerFilters is the container for pre-routing filter lists on a
-// Listener. It is organized by pre-routing phase so that additional
-// phases can be added additively in future revisions.
+// Listener.
 //
 // Today only the request phase (Requests) is defined. In the future
 // a connection-oriented phase (Connection) may be added.
 type ListenerFilters struct {
-	// Requests is an ordered list of pre-routing filters that run on
-	// every request accepted on this Listener, before route matching
-	// is performed. The list order is load-bearing:
-	// implementations MUST execute the filters in the exact order they
+	// Implementations MUST execute the filters in the exact order they
 	// appear here and MUST NOT reorder them. If an implementation can
 	// not implement the filters in the order they are specified, the
 	// implementation MUST set the "Accepted" Listener condition to "false"
 	// with the "InvalidListenerFilterOrder" reason.
+	//
+	// Requests only apply to connections with a visible HTTP stream
+	// and metadata (Protocol=HTTP, or Protocol=HTTPS with TLS
+	// terminated at the Gateway).
 	//
 	// Requests may mutate inputs that route matching consumes
 	// (path, request headers, method, computed metadata), with the
