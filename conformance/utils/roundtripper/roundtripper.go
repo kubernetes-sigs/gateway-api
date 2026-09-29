@@ -32,8 +32,6 @@ import (
 	"strings"
 	"testing"
 
-	"golang.org/x/net/http2"
-
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -153,13 +151,17 @@ func (d *DefaultRoundTripper) httpTransport(request Request) (http.RoundTripper,
 }
 
 func (d *DefaultRoundTripper) h2Transport(request Request) (http.RoundTripper, error) {
-	transport := &http2.Transport{}
+	transport := &http.Transport{}
 
 	tlsConfig, err := createTLSClientConfig(request)
 	if err != nil {
 		return nil, err
 	}
 	transport.TLSClientConfig = tlsConfig
+
+	protocols := new(http.Protocols)
+	protocols.SetHTTP2(true)
+	transport.Protocols = protocols
 
 	return transport, nil
 }
@@ -169,13 +171,16 @@ func (d *DefaultRoundTripper) h2cPriorKnowledgeTransport(request Request) (http.
 		return nil, errors.New("request has configured trusted CA certificates but h2 prior knowledge is not encrypted")
 	}
 
-	transport := &http2.Transport{
-		AllowHTTP: true,
-		DialTLSContext: func(ctx context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
+	transport := &http.Transport{
+		DialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			var d net.Dialer
 			return d.DialContext(ctx, network, addr)
 		},
 	}
+
+	protocols := new(http.Protocols)
+	protocols.SetUnencryptedHTTP2(true)
+	transport.Protocols = protocols
 
 	return transport, nil
 }
