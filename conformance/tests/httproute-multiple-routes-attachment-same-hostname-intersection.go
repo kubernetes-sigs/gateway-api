@@ -41,6 +41,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 	Description: "HTTPRoutes attached to the same listener should resolve conflicts using original hostnames over hostname intersections",
 	Features: []features.FeatureName{
 		features.SupportGateway,
+		features.SupportGatewayRouteHostnameIntersectionPrecedence,
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-multiple-routes-attachment-same-hostname-intersection.yaml"},
