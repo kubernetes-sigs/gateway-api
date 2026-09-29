@@ -159,9 +159,12 @@ type BackendSpec struct {
 	// ExternalHostname backends SHOULD have TLS configured; the lack of TLS
 	// for external hostnames should be considered insecure and a security risk.
 	//
-	// Support: Extended
+	// Support: Core - for TLS mode None
+	//
+	// Support: Extended - for TLS mode ServerOnly and ClientAndServer
 	//
 	// +optional
+	// +kubebuilder:default={mode: None}
 	TLS *BackendTLS `json:"tls,omitempty"`
 }
 
@@ -310,8 +313,13 @@ const (
 // BackendTLS defines TLS configuration for connecting to a backend.
 //
 // +kubebuilder:validation:XValidation:rule="self.mode == 'ClientAndServer' ? has(self.clientCertificateRef) : !has(self.clientCertificateRef)",message="clientCertificateRef must be set if and only if mode is ClientAndServer"
+// +kubebuilder:validation:XValidation:rule="self.mode == 'None' ? !has(self.validation) : has(self.validation)",message="validation must be set if and only if mode is either ClientAndServer or ServerOnly"
 type BackendTLS struct {
 	// Mode defines the TLS mode for the backend connection.
+	//
+	// Support: Core - None
+	//
+	// Support: Extended - ServerOnly, ClientAndServer
 	//
 	// +required
 	Mode BackendTLSMode `json:"mode"`

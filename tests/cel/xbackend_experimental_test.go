@@ -97,6 +97,15 @@ func TestXBackendSpec(t *testing.T) {
 				Protocol: new(xgatewayv1alpha1.BackendProtocolH2C),
 				TLS: &xgatewayv1alpha1.BackendTLS{
 					Mode: xgatewayv1alpha1.BackendTLSModeServerOnly,
+					Validation: &gatewayv1.BackendTLSPolicyValidation{
+						CACertificateRefs: []gatewayv1.LocalObjectReference{
+							{
+								Kind: "ConfigMap",
+								Name: "ca-cert",
+							},
+						},
+						Hostname: "example.com",
+					},
 				},
 			},
 			wantErrors: []string{"tls must be disabled when protocol is H2C, use protocol HTTP2 for HTTP/2 with tls"},
@@ -140,6 +149,15 @@ func TestXBackendSpec(t *testing.T) {
 				Protocol: new(xgatewayv1alpha1.BackendProtocolHTTP2),
 				TLS: &xgatewayv1alpha1.BackendTLS{
 					Mode: xgatewayv1alpha1.BackendTLSModeServerOnly,
+					Validation: &gatewayv1.BackendTLSPolicyValidation{
+						CACertificateRefs: []gatewayv1.LocalObjectReference{
+							{
+								Kind: "ConfigMap",
+								Name: "ca-cert",
+							},
+						},
+						Hostname: "example.com",
+					},
 				},
 			},
 			wantErrors: []string{},
@@ -183,6 +201,15 @@ func TestXBackendSpec(t *testing.T) {
 				Protocol: new(xgatewayv1alpha1.BackendProtocolWSS),
 				TLS: &xgatewayv1alpha1.BackendTLS{
 					Mode: xgatewayv1alpha1.BackendTLSModeServerOnly,
+					Validation: &gatewayv1.BackendTLSPolicyValidation{
+						CACertificateRefs: []gatewayv1.LocalObjectReference{
+							{
+								Kind: "ConfigMap",
+								Name: "ca-cert",
+							},
+						},
+						Hostname: "example.com",
+					},
 				},
 			},
 			wantErrors: []string{},
@@ -196,6 +223,116 @@ func TestXBackendSpec(t *testing.T) {
 					Namespace: metav1.NamespaceDefault,
 				},
 				Spec: tc.spec,
+			}
+			validateXBackend(t, backend, tc.wantErrors)
+		})
+	}
+}
+
+func TestXBackendTLS(t *testing.T) {
+	tests := []struct {
+		name       string
+		tls        *xgatewayv1alpha1.BackendTLS
+		wantErrors []string
+	}{
+		{
+			name: "tls mode ClientAndServer with client certificate is accepted",
+			tls: &xgatewayv1alpha1.BackendTLS{
+				Mode: xgatewayv1alpha1.BackendTLSModeClientAndServer,
+				Validation: &gatewayv1.BackendTLSPolicyValidation{
+					CACertificateRefs: []gatewayv1.LocalObjectReference{
+						{
+							Kind: "ConfigMap",
+							Name: "ca-cert",
+						},
+					},
+					Hostname: "example.com",
+				},
+				ClientCertificateRef: &gatewayv1.SecretObjectReference{
+					Name: "client-cert",
+				},
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "tls mode ClientAndServer without client certificate is rejected",
+			tls: &xgatewayv1alpha1.BackendTLS{
+				Mode: xgatewayv1alpha1.BackendTLSModeClientAndServer,
+				Validation: &gatewayv1.BackendTLSPolicyValidation{
+					CACertificateRefs: []gatewayv1.LocalObjectReference{
+						{
+							Kind: "ConfigMap",
+							Name: "ca-cert",
+						},
+					},
+					Hostname: "example.com",
+				},
+			},
+
+			wantErrors: []string{"clientCertificateRef must be set if and only if mode is ClientAndServer"},
+		},
+		{
+			name: "tls mode ServerOnly with client certificate is rejected",
+			tls: &xgatewayv1alpha1.BackendTLS{
+				Mode: xgatewayv1alpha1.BackendTLSModeServerOnly,
+				Validation: &gatewayv1.BackendTLSPolicyValidation{
+					CACertificateRefs: []gatewayv1.LocalObjectReference{
+						{
+							Kind: "ConfigMap",
+							Name: "ca-cert",
+						},
+					},
+					Hostname: "example.com",
+				},
+				ClientCertificateRef: &gatewayv1.SecretObjectReference{
+					Name: "client-cert",
+				},
+			},
+			wantErrors: []string{"clientCertificateRef must be set if and only if mode is ClientAndServer"},
+		},
+		{
+			name: "tls mode None with client certificate is rejected",
+			tls: &xgatewayv1alpha1.BackendTLS{
+				Mode: xgatewayv1alpha1.BackendTLSModeNone,
+				ClientCertificateRef: &gatewayv1.SecretObjectReference{
+					Name: "client-cert",
+				},
+			},
+			wantErrors: []string{"clientCertificateRef must be set if and only if mode is ClientAndServer"},
+		},
+		{
+			name: "tls mode None with tls validation is rejected",
+			tls: &xgatewayv1alpha1.BackendTLS{
+				Mode: xgatewayv1alpha1.BackendTLSModeNone,
+				Validation: &gatewayv1.BackendTLSPolicyValidation{
+					CACertificateRefs: []gatewayv1.LocalObjectReference{
+						{
+							Kind: "ConfigMap",
+							Name: "ca-cert",
+						},
+					},
+					Hostname: "example.com",
+				},
+			},
+			wantErrors: []string{"validation must be set if and only if mode is either ClientAndServer or ServerOnly"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			backend := &xgatewayv1alpha1.XBackend{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: xgatewayv1alpha1.BackendSpec{
+					Type: xgatewayv1alpha1.BackendTypeExternalHostname,
+					Port: xgatewayv1alpha1.BackendPort{Number: xgatewayv1alpha1.PortNumber(8080)},
+					ExternalHostname: &xgatewayv1alpha1.ExternalHostnameBackend{
+						Hostname: "example.com",
+					},
+					TLS: tc.tls,
+				},
 			}
 			validateXBackend(t, backend, tc.wantErrors)
 		})

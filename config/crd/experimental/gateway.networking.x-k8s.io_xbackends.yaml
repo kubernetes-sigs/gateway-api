@@ -276,6 +276,8 @@ spec:
                 - message: header must be specified for Header type
                   rule: self.type != 'Header' || has(self.header)
               tls:
+                default:
+                  mode: None
                 description: |-
                   TLS defines the TLS configuration that the implementation should use
                   when connecting to the backend.
@@ -283,7 +285,9 @@ spec:
                   ExternalHostname backends SHOULD have TLS configured; the lack of TLS
                   for external hostnames should be considered insecure and a security risk.
 
-                  Support: Extended
+                  Support: Core - for TLS mode None
+
+                  Support: Extended - for TLS mode ServerOnly and ClientAndServer
                 properties:
                   clientCertificateRef:
                     description: |-
@@ -330,7 +334,12 @@ spec:
                     - name
                     type: object
                   mode:
-                    description: Mode defines the TLS mode for the backend connection.
+                    description: |-
+                      Mode defines the TLS mode for the backend connection.
+
+                      Support: Core - None
+
+                      Support: Extended - ServerOnly, ClientAndServer
                     enum:
                     - None
                     - ServerOnly
@@ -551,6 +560,9 @@ spec:
                     ClientAndServer
                   rule: 'self.mode == ''ClientAndServer'' ? has(self.clientCertificateRef)
                     : !has(self.clientCertificateRef)'
+                - message: validation must be set if and only if mode is either ClientAndServer
+                    or ServerOnly
+                  rule: 'self.mode == ''None'' ? !has(self.validation) : has(self.validation)'
               type:
                 description: Type defines the backend type.
                 enum:

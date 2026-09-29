@@ -81,7 +81,9 @@ type BackendSpecApplyConfiguration struct {
 	// ExternalHostname backends SHOULD have TLS configured; the lack of TLS
 	// for external hostnames should be considered insecure and a security risk.
 	//
-	// Support: Extended
+	// Support: Core - for TLS mode None
+	//
+	// Support: Extended - for TLS mode ServerOnly and ClientAndServer
 	TLS *BackendTLSApplyConfiguration `json:"tls,omitempty"`
 }
 

@@ -10040,7 +10040,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 					},
 					"tls": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TLS defines the TLS configuration that the implementation should use when connecting to the backend.\n\nExternalHostname backends SHOULD have TLS configured; the lack of TLS for external hostnames should be considered insecure and a security risk.\n\nSupport: Extended",
+							Description: "TLS defines the TLS configuration that the implementation should use when connecting to the backend.\n\nExternalHostname backends SHOULD have TLS configured; the lack of TLS for external hostnames should be considered insecure and a security risk.\n\nSupport: Core - for TLS mode None\n\nSupport: Extended - for TLS mode ServerOnly and ClientAndServer",
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS"),
 						},
 					},
@@ -10095,7 +10095,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"mode": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Mode defines the TLS mode for the backend connection.",
+							Description: "Mode defines the TLS mode for the backend connection.\n\nSupport: Core - None\n\nSupport: Extended - ServerOnly, ClientAndServer",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",

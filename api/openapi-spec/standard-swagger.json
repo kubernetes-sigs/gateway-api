@@ -15761,7 +15761,7 @@
 					"$ref": "io.k8s.networking.gateway.v1.SessionPersistence"
 				},
 				"tls": {
-					"description": "TLS defines the TLS configuration that the implementation should use when connecting to the backend.\n\nExternalHostname backends SHOULD have TLS configured; the lack of TLS for external hostnames should be considered insecure and a security risk.\n\nSupport: Extended",
+					"description": "TLS defines the TLS configuration that the implementation should use when connecting to the backend.\n\nExternalHostname backends SHOULD have TLS configured; the lack of TLS for external hostnames should be considered insecure and a security risk.\n\nSupport: Core - for TLS mode None\n\nSupport: Extended - for TLS mode ServerOnly and ClientAndServer",
 					"$ref": "io.x-k8s.networking.gateway.v1alpha1.BackendTLS"
 				},
 				"type": {
@@ -15797,7 +15797,7 @@
 					"$ref": "io.k8s.networking.gateway.v1.SecretObjectReference"
 				},
 				"mode": {
-					"description": "Mode defines the TLS mode for the backend connection.",
+					"description": "Mode defines the TLS mode for the backend connection.\n\nSupport: Core - None\n\nSupport: Extended - ServerOnly, ClientAndServer",
 					"type": "string",
 					"default": ""
 				},
