@@ -42,6 +42,7 @@ var TLSRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Conform
 	Description: "TLSRoutes attached to the same listener should resolve conflicts using hostname specificity over creation timestamp",
 	Features: []features.FeatureName{
 		features.SupportGateway,
+		features.SupportGatewayRouteHostnameIntersectionPrecedence,
 		features.SupportTLSRoute,
 	},
 	Manifests: []string{"tests/tlsroute-multiple-routes-attachment-same-hostname-intersection.yaml"},
