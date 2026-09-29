@@ -63,9 +63,7 @@ profiles:
     - HTTPRouteBackendProtocolH2C
     - HTTPRouteBackendProtocolWebSocket
     - HTTPRouteBackendRequestHeaderModification
-    - HTTPRouteBackendRequestRedirect
     - HTTPRouteBackendTimeout
-    - HTTPRouteBackendURLRewrite
     - HTTPRouteCORS
     - HTTPRouteHostRewrite
     - HTTPRouteNamedRouteRule
