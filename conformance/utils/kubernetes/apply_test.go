@@ -253,11 +253,11 @@ func TestPrepareGatewayPreservesAddressRoutability(t *testing.T) {
 			name: "ordinary address",
 			addresses: []any{map[string]any{
 				"type":        "IPAddress",
-				"routability": "testing.gateway.networking.k8s.io/sentinel",
+				"routability": "testing.x-k8s.io/sentinel",
 			}},
 			want: []any{map[string]any{
 				"type":        "IPAddress",
-				"routability": "testing.gateway.networking.k8s.io/sentinel",
+				"routability": "testing.x-k8s.io/sentinel",
 			}},
 		},
 		{

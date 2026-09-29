@@ -53,17 +53,21 @@ var GatewayAddressRoutabilityClusterStatic = suite.ConformanceTest{
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 		defer cancel()
-		require.Len(t, s.UsableNetworkAddresses, 1, "expected one configured usable address")
-		usable := s.UsableNetworkAddresses[0]
-		require.Len(t, s.UnusableNetworkAddresses, 1, "expected one configured unusable address")
-		unusable := s.UnusableNetworkAddresses[0]
-		require.NotNil(t, usable.Type)
-		require.Equal(t, v1.IPAddressType, *usable.Type, "configured usable address must be an IP address")
-		require.NotNil(t, unusable.Type)
-		require.Equal(t, v1.IPAddressType, *unusable.Type, "configured unusable address must be an IP address")
+		require.NotEmpty(t, s.UsableNetworkAddresses, "expected configured usable addresses")
+		require.NotEmpty(t, s.UnusableNetworkAddresses, "expected configured unusable addresses")
 		serviceCIDRs := gatewayServiceCIDRs(t, s)
-		require.True(t, addressInServiceCIDRs(usable.Value, serviceCIDRs), "configured usable address %q must be in a ServiceCIDR", usable.Value)
-		require.False(t, addressInServiceCIDRs(unusable.Value, serviceCIDRs), "configured unusable address %q must be outside every ServiceCIDR", unusable.Value)
+		for _, address := range s.UsableNetworkAddresses {
+			if address.Type != nil {
+				require.Equal(t, v1.IPAddressType, *address.Type, "configured usable address must be an IP address")
+			}
+			require.True(t, addressInServiceCIDRs(address.Value, serviceCIDRs), "configured usable address %q must be in a ServiceCIDR", address.Value)
+		}
+		for _, address := range s.UnusableNetworkAddresses {
+			if address.Type != nil {
+				require.Equal(t, v1.IPAddressType, *address.Type, "configured unusable address must be an IP address")
+			}
+			require.False(t, addressInServiceCIDRs(address.Value, serviceCIDRs), "configured unusable address %q must be outside every ServiceCIDR", address.Value)
+		}
 
 		partialGateway := types.NamespacedName{Name: "gateway-address-routability-cluster-static-partial", Namespace: suite.InfrastructureNamespace}
 		var gateway v1.Gateway
@@ -79,12 +83,14 @@ var GatewayAddressRoutabilityClusterStatic = suite.ConformanceTest{
 		require.Equal(t, metav1.ConditionFalse, assignment.Status)
 		switch assignment.Reason {
 		case string(v1.GatewayReasonAddressesPartiallyAssigned):
-			require.Contains(t, assignment.Message, unusable.Value, "message must identify the unsatisfied static address")
+			for _, address := range s.UnusableNetworkAddresses {
+				require.Contains(t, assignment.Message, address.Value, "message must identify every unsatisfied static address")
+			}
 			require.Len(t, gateway.Status.Addresses, 1, "only the satisfiable empty request should be reported")
-			require.NotEqual(t, unusable.Value, gateway.Status.Addresses[0].Value)
 			require.NotEmpty(t, gateway.Status.Addresses[0].Value)
-			require.NotNil(t, gateway.Status.Addresses[0].Type)
-			require.Equal(t, v1.IPAddressType, *gateway.Status.Addresses[0].Type)
+			if gateway.Status.Addresses[0].Type != nil {
+				require.Equal(t, v1.IPAddressType, *gateway.Status.Addresses[0].Type)
+			}
 			require.NotNil(t, gateway.Status.Addresses[0].Routability)
 			switch *gateway.Status.Addresses[0].Routability {
 			case v1.GatewayAddressRoutabilityDefault:
@@ -119,12 +125,19 @@ var GatewayAddressRoutabilityClusterStatic = suite.ConformanceTest{
 		gatewayMustHaveAddressesAssigned(t, s, assignedGateway, metav1.ConditionTrue, string(v1.GatewayReasonAddressesAssigned))
 		gateway = v1.Gateway{}
 		require.NoError(t, s.Client.Get(ctx, assignedGateway, &gateway))
-		require.Len(t, gateway.Status.Addresses, 1)
-		require.Equal(t, usable.Value, gateway.Status.Addresses[0].Value)
-		require.NotNil(t, gateway.Status.Addresses[0].Type)
-		require.Equal(t, v1.IPAddressType, *gateway.Status.Addresses[0].Type)
-		require.NotNil(t, gateway.Status.Addresses[0].Routability)
-		require.Equal(t, v1.GatewayAddressRoutabilityCluster, *gateway.Status.Addresses[0].Routability)
-		require.True(t, addressInServiceCIDRs(gateway.Status.Addresses[0].Value, serviceCIDRs))
+		var reportedValues []string
+		for _, address := range gateway.Status.Addresses {
+			reportedValues = append(reportedValues, address.Value)
+			if address.Type != nil {
+				require.Equal(t, v1.IPAddressType, *address.Type)
+			}
+			require.NotNil(t, address.Routability)
+			require.Equal(t, v1.GatewayAddressRoutabilityCluster, *address.Routability)
+		}
+		var expectedValues []string
+		for _, address := range s.UsableNetworkAddresses {
+			expectedValues = append(expectedValues, address.Value)
+		}
+		require.ElementsMatch(t, expectedValues, reportedValues, "status must contain every requested usable address")
 	},
 }

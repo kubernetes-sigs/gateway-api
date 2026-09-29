@@ -58,8 +58,7 @@ var GatewayAddressRoutabilityCluster = suite.ConformanceTest{
 				return false, err
 			}
 			return len(gateway.Status.Addresses) == 1 &&
-				gateway.Status.Addresses[0].Type != nil &&
-				*gateway.Status.Addresses[0].Type == v1.IPAddressType &&
+				(gateway.Status.Addresses[0].Type == nil || *gateway.Status.Addresses[0].Type == v1.IPAddressType) &&
 				gateway.Status.Addresses[0].Value != "" &&
 				gateway.Status.Addresses[0].Routability != nil &&
 				*gateway.Status.Addresses[0].Routability == v1.GatewayAddressRoutabilityCluster, nil

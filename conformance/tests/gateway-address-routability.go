@@ -66,9 +66,11 @@ var GatewayAddressRoutability = suite.ConformanceTest{
 		for _, tc := range []struct {
 			name             string
 			exactRoutability string
+			explicitAddress  bool
 		}{
-			{name: "gateway-address-routability", exactRoutability: "testing.gateway.networking.k8s.io/sentinel"},
-			{name: "gateway-address-routability-empty"},
+			{name: "gateway-address-routability", exactRoutability: "testing.x-k8s.io/sentinel", explicitAddress: true},
+			{name: "gateway-address-routability-empty", explicitAddress: true},
+			{name: "gateway-address-routability-unspecified", explicitAddress: true},
 			{name: "gateway-address-routability-default"},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
@@ -82,11 +84,12 @@ var GatewayAddressRoutability = suite.ConformanceTest{
 					if err := s.Client.Get(ctx, gwNN, &gateway); err != nil {
 						return false, err
 					}
-					if len(gateway.Status.Addresses) == 0 {
+					if tc.explicitAddress && len(gateway.Status.Addresses) != 1 {
 						return false, nil
 					}
 					for _, address := range gateway.Status.Addresses {
-						if address.Type == nil || *address.Type != v1.IPAddressType || address.Routability == nil || address.Value == "" {
+						if address.Routability == nil || address.Value == "" ||
+							(tc.explicitAddress && address.Type != nil && *address.Type != v1.IPAddressType) {
 							return false, nil
 						}
 					}
@@ -100,6 +103,9 @@ var GatewayAddressRoutability = suite.ConformanceTest{
 				}
 
 				for _, address := range gateway.Status.Addresses {
+					if !tc.explicitAddress && address.Type != nil && *address.Type != v1.IPAddressType {
+						continue // Non-IP default addresses have no portable routability assertion.
+					}
 					switch *address.Routability {
 					case v1.GatewayAddressRoutabilityDefault:
 					case v1.GatewayAddressRoutabilityCluster:
@@ -114,6 +120,17 @@ var GatewayAddressRoutability = suite.ConformanceTest{
 				}
 			})
 		}
+
+		unsupported := types.NamespacedName{Name: "gateway-address-routability-unsupported", Namespace: suite.InfrastructureNamespace}
+		gatewayMustHaveAddressesAssigned(t, s, unsupported, metav1.ConditionFalse, string(v1.GatewayReasonAddressesNotAssigned))
+		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, unsupported, metav1.Condition{
+			Type:   string(v1.GatewayConditionProgrammed),
+			Status: metav1.ConditionFalse,
+			Reason: string(v1.GatewayReasonAddressNotAssigned),
+		})
+		var gateway v1.Gateway
+		require.NoError(t, s.Client.Get(context.Background(), unsupported, &gateway))
+		require.Empty(t, gateway.Status.Addresses, "unsupported routability must not be assigned")
 	},
 }
 

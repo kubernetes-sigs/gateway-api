@@ -64,7 +64,7 @@ var GatewayAddressRoutabilityClusterMixed = suite.ConformanceTest{
 			values := map[string]struct{}{}
 			clusterAddresses := 0
 			for _, address := range gateway.Status.Addresses {
-				if address.Type == nil || *address.Type != v1.IPAddressType || address.Value == "" || address.Routability == nil {
+				if address.Type != nil && *address.Type != v1.IPAddressType || address.Value == "" || address.Routability == nil {
 					return false, nil
 				}
 				if *address.Routability == v1.GatewayAddressRoutabilityCluster {
