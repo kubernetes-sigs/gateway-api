@@ -384,7 +384,10 @@ type SessionPersistence struct {
     // session. Once the AbsoluteTimeout duration has elapsed, the
     // session becomes invalid.
     //
-    // Support: Extended
+    // Support: Core when cookie.lifetimeType is "Permanent".
+    //
+    // Support: Extended when cookie.lifetimeType is "Session" or
+    // type is "Header".
     //
     // +optional
     AbsoluteTimeout *Duration `json:"absoluteTimeout,omitempty"`
@@ -449,14 +452,7 @@ type CookieConfig struct {
     // Users should avoid reusing cookie names to prevent unintended
     // consequences, such as rejection or unpredictable behavior.
     //
-    // <gateway:util:excludeFromCRD>
-    // This field is Extended because not all implementations can
-    // control the cookie name. Implementations SHOULD support this
-    // field if the underlying dataplane allows configuring the cookie
-    // name.
-    // </gateway:util:excludeFromCRD>
-    //
-    // Support: Extended
+    // Support: Core
     //
     // +optional
     Name *CookieName `json:"name,omitempty"`
@@ -485,9 +481,7 @@ type CookieConfig struct {
     // absolute lifetime of the cookie tracked by the gateway and
     // is optional.
     //
-    // Support: Core for "Session" type
-    //
-    // Support: Extended for "Permanent" type
+    // Support: Core
     //
     // +optional
     // +kubebuilder:default=Session
@@ -507,7 +501,7 @@ const (
     // PermanentCookieLifetimeType specifies the type for a permanent
     // cookie.
     //
-    // Support: Extended
+    // Support: Core
     PermanentCookieLifetimeType  CookieLifetimeType = "Permanent"
 )
 
@@ -687,7 +681,8 @@ or timeout for both session and permanent cookies is represented by `AbsoluteTim
 Conversely, if `LifetimeType` is `Session`, `AbsoluteTimeout` MUST regulate the cookie's lifespan through a
 different mechanism, as mentioned above. If `LifetimeType` is set to `Permanent`, then `AbsoluteTimeout` MUST
 also be set as well. This requirement is necessary because an expiration value is required to set `Expires` or `Max-Age`.
-`LifetimeType` of `Session` is core support level and the default, while `LifetimeType` of `Permanent` is extended.
+Both `LifetimeType` values have Core support. `AbsoluteTimeout` has Core support when `LifetimeType` is `Permanent`,
+and Extended support when `LifetimeType` is `Session`.
 
 See [issue #2747](https://github.com/kubernetes-sigs/gateway-api/issues/2747) for more context regarding distinguishing
 between permanent and session cookies.
@@ -887,12 +882,12 @@ supported by some implementations due to their current designs.
 
 ### Feature Names
 
-* BackendSessionPersistence - Cookie-based session persistence support.
-* BackendSessionPersistenceAbsoluteTimeout - Absolute timeout for session persistence.
-* BackendSessionPersistenceHeader - Header-based session persistence.
-* BackendSessionPersistenceCookieName - Configurable cookie name.
-* BackendSessionPersistenceCookiePath - Configurable cookie path.
-* BackendSessionPersistenceCookieLifetimeTypePermanent - Permanent lifetime for cookie-based session persistence.
+| Feature | Fields | Capability | Why Extended |
+| :---- | :---- | :---- | :---- |
+| `BackendSessionPersistenceCookie` | `type: Cookie`, `cookie.name`, `cookie.lifetimeType`, required `absoluteTimeout` for `Permanent` | Cookie-based session persistence. | Basis of the new Backend session persistence capability. |
+| `BackendSessionPersistenceHeader` | `type: Header`, `header.name`, `absoluteTimeout` | Header-based session persistence. | Not supported by some dataplanes, including NGINX. |
+| `BackendSessionPersistenceSessionCookieAbsoluteTimeout` | `absoluteTimeout` with `cookie.lifetimeType: Session` | Server-tracked timeout for Session cookies. | Not supported by some dataplanes, including Envoy and NGINX. |
+| `BackendSessionPersistenceCookiePath` | `cookie.path` | Configurable cookie Path; `/` is the default. | Not supported directly by some dataplanes, including HAProxy. |
 
 ### Backend Conformance Tests
 
@@ -902,11 +897,12 @@ tested with both route types.
 
 | Description | Outcome | Features |
 | :---- | :---- | :---- |
-| Simple Cookie Session Persistence: A Route references a Backend with sessionPersistence configured with type: Cookie (default). | The Route MUST have Accepted=True in parent status. The first request MUST receive a Set-Cookie header in the response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | BackendSessionPersistence |
-| Session Cookie Lifetime (Default): A Route references a Backend with cookie.lifetimeType: Session (default). | The Route MUST have Accepted=True in parent status. The cookie MUST NOT contain `Expires` or `Max-Age`. | BackendSessionPersistence |
-| Header-based Session Persistence: A Route references a Backend with sessionPersistence configured with type: Header. | The Route MUST have Accepted=True in parent status. The first request MUST receive a session identity header. Subsequent requests with that header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | BackendSessionPersistence, BackendSessionPersistenceHeader |
-| Multiple Weighted Backends - Session Persistence Does Not Override Traffic Splitting: A Route has multiple backendRefs with weights (e.g., 70/30) that reference Backends with session persistence configured. | The Route MUST have Accepted=True in parent status. Requests MUST respect weight distribution (~70/30 within statistical tolerance). Session persistence MUST NOT override backend selection. | BackendSessionPersistence |
-| Permanent Cookie Lifetime: A Route references a Backend with cookie.lifetimeType: Permanent and absoluteTimeout: 5min. | The Route MUST have Accepted=True in parent status. The response Set-Cookie header MUST contain an `Expires` or `Max-Age` attribute whose value corresponds to the configured absoluteTimeout duration. Session persistence MUST function correctly until the cookie expires. | BackendSessionPersistence, BackendSessionPersistenceAbsoluteTimeout, BackendSessionPersistenceCookieLifetimeTypePermanent |
+| Simple Cookie Session Persistence: A Route references a Backend with sessionPersistence configured with type: Cookie (default). | The Route MUST have Accepted=True in parent status. The first request MUST receive a Set-Cookie header in the response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | BackendSessionPersistenceCookie |
+| Session Cookie Lifetime (Default): A Route references a Backend with cookie.lifetimeType: Session (default). | The Route MUST have Accepted=True in parent status. The cookie MUST NOT contain `Expires` or `Max-Age`. | BackendSessionPersistenceCookie |
+| Session Cookie Absolute Timeout: A Route references a Backend with cookie.lifetimeType: Session and absoluteTimeout configured. | The Route MUST have Accepted=True in parent status. The cookie MUST NOT contain `Expires` or `Max-Age`. Session persistence MUST stop functioning after the configured absoluteTimeout duration. | BackendSessionPersistenceCookie, BackendSessionPersistenceSessionCookieAbsoluteTimeout |
+| Header-based Session Persistence: A Route references a Backend with sessionPersistence configured with type: Header. | The Route MUST have Accepted=True in parent status. The first request MUST receive a session identity header. Subsequent requests with that header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | BackendSessionPersistenceHeader |
+| Multiple Weighted Backends - Session Persistence Does Not Override Traffic Splitting: A Route has multiple backendRefs with weights (e.g., 70/30) that reference Backends with cookie-based session persistence configured. | The Route MUST have Accepted=True in parent status. Requests MUST respect weight distribution (~70/30 within statistical tolerance). Session persistence MUST NOT override backend selection. | BackendSessionPersistenceCookie |
+| Permanent Cookie Lifetime: A Route references a Backend with cookie.lifetimeType: Permanent and absoluteTimeout: 5min. | The Route MUST have Accepted=True in parent status. The response Set-Cookie header MUST contain an `Expires` or `Max-Age` attribute whose value corresponds to the configured absoluteTimeout duration. Session persistence MUST function correctly until the cookie expires. | BackendSessionPersistenceCookie |
 
 ## Alternatives
 

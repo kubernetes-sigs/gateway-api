@@ -3373,7 +3373,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name defines the name of the cookie used for session persistence. If not specified, a unique cookie name SHOULD be generated. Users should avoid reusing cookie names to prevent unintended consequences, such as rejection or unpredictable behavior.\n\n<gateway:util:excludeFromCRD> This field is Extended because not all implementations can control the cookie name. Implementations SHOULD support this field if the underlying dataplane allows configuring the cookie name. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+							Description: "Name defines the name of the cookie used for session persistence. If not specified, a unique cookie name SHOULD be generated. Users should avoid reusing cookie names to prevent unintended consequences, such as rejection or unpredictable behavior.\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3387,7 +3387,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 					},
 					"lifetimeType": {
 						SchemaProps: spec.SchemaProps{
-							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nDefaults to \"Session\".\n\nSupport: Core for \"Session\" type\n\nSupport: Extended for \"Permanent\" type",
+							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nDefaults to \"Session\".\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7408,7 +7408,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"absoluteTimeout": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AbsoluteTimeout defines the absolute timeout of the persistent session. Once the AbsoluteTimeout duration has elapsed, the session becomes invalid.\n\nSupport: Extended",
+							Description: "AbsoluteTimeout defines the absolute timeout of the persistent session. Once the AbsoluteTimeout duration has elapsed, the session becomes invalid.\n\nSupport: Core when cookie.lifetimeType is \"Permanent\".\n\nSupport: Extended when cookie.lifetimeType is \"Session\" or type is \"Header\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},

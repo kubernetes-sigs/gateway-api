@@ -65,23 +65,17 @@ const (
 	// This option indicates support for the WSS Backend protocol.
 	SupportBackendProtocolWSS FeatureName = "BackendProtocolWSS"
 
-	// This option indicates support for session persistence on Backend.
-	SupportBackendSessionPersistence FeatureName = "BackendSessionPersistence"
-
-	// This option indicates support for absolute timeout in Backend session persistence.
-	SupportBackendSessionPersistenceAbsoluteTimeout FeatureName = "BackendSessionPersistenceAbsoluteTimeout"
+	// This option indicates support for cookie-based Backend session persistence.
+	SupportBackendSessionPersistenceCookie FeatureName = "BackendSessionPersistenceCookie"
 
 	// This option indicates support for header-based Backend session persistence.
 	SupportBackendSessionPersistenceHeader FeatureName = "BackendSessionPersistenceHeader"
 
-	// This option indicates support for configuring the cookie name in Backend session persistence.
-	SupportBackendSessionPersistenceCookieName FeatureName = "BackendSessionPersistenceCookieName"
+	// This option indicates support for absolute timeout in Backend session persistence.
+	SupportBackendSessionPersistenceSessionCookieAbsoluteTimeout FeatureName = "BackendSessionPersistenceSessionCookieAbsoluteTimeout"
 
 	// This option indicates support for configuring the cookie path in Backend session persistence.
 	SupportBackendSessionPersistenceCookiePath FeatureName = "BackendSessionPersistenceCookiePath"
-
-	// This option indicates support for permanent cookie lifetime in Backend session persistence.
-	SupportBackendSessionPersistenceCookieLifetimeTypePermanent FeatureName = "BackendSessionPersistenceCookieLifetimeTypePermanent"
 )
 
 var (
@@ -133,39 +127,31 @@ var (
 		Channel: FeatureChannelExperimental,
 	}
 
-	// BackendSessionPersistenceFeature contains metadata for the BackendSessionPersistence feature.
-	BackendSessionPersistenceFeature = Feature{
-		Name:    SupportBackendSessionPersistence,
+	// BackendSessionPersistenceCookieFeature contains metadata for the
+	// BackendSessionPersistenceCookie feature.
+	BackendSessionPersistenceCookieFeature = Feature{
+		Name:    SupportBackendSessionPersistenceCookie,
 		Channel: FeatureChannelExperimental,
 	}
 
-	// BackendSessionPersistenceAbsoluteTimeoutFeature contains metadata for the BackendSessionPersistenceAbsoluteTimeout feature.
-	BackendSessionPersistenceAbsoluteTimeoutFeature = Feature{
-		Name:    SupportBackendSessionPersistenceAbsoluteTimeout,
-		Channel: FeatureChannelExperimental,
-	}
-
-	// BackendSessionPersistenceHeaderFeature contains metadata for the BackendSessionPersistenceHeader feature.
+	// BackendSessionPersistenceHeaderFeature contains metadata for the
+	// BackendSessionPersistenceHeader feature.
 	BackendSessionPersistenceHeaderFeature = Feature{
 		Name:    SupportBackendSessionPersistenceHeader,
 		Channel: FeatureChannelExperimental,
 	}
 
-	// BackendSessionPersistenceCookieNameFeature contains metadata for the BackendSessionPersistenceCookieName feature.
-	BackendSessionPersistenceCookieNameFeature = Feature{
-		Name:    SupportBackendSessionPersistenceCookieName,
+	// BackendSessionPersistenceSessionCookieAbsoluteTimeoutFeature contains metadata for the
+	// BackendSessionPersistenceSessionCookieAbsoluteTimeout feature.
+	BackendSessionPersistenceSessionCookieAbsoluteTimeoutFeature = Feature{
+		Name:    SupportBackendSessionPersistenceSessionCookieAbsoluteTimeout,
 		Channel: FeatureChannelExperimental,
 	}
 
-	// BackendSessionPersistenceCookiePathFeature contains metadata for the BackendSessionPersistenceCookiePath feature.
+	// BackendSessionPersistenceCookiePathFeature contains metadata for the
+	// BackendSessionPersistenceCookiePath feature.
 	BackendSessionPersistenceCookiePathFeature = Feature{
 		Name:    SupportBackendSessionPersistenceCookiePath,
-		Channel: FeatureChannelExperimental,
-	}
-
-	// BackendSessionPersistenceCookieLifetimeTypePermanentFeature contains metadata for the BackendSessionPersistenceCookieLifetimeTypePermanent feature.
-	BackendSessionPersistenceCookieLifetimeTypePermanentFeature = Feature{
-		Name:    SupportBackendSessionPersistenceCookieLifetimeTypePermanent,
 		Channel: FeatureChannelExperimental,
 	}
 )
@@ -180,10 +166,8 @@ var BackendExtendedFeatures = sets.New(
 	BackendProtocolGRPCFeature,
 	BackendProtocolMCPFeature,
 	BackendProtocolWSSFeature,
-	BackendSessionPersistenceFeature,
-	BackendSessionPersistenceAbsoluteTimeoutFeature,
+	BackendSessionPersistenceCookieFeature,
 	BackendSessionPersistenceHeaderFeature,
-	BackendSessionPersistenceCookieNameFeature,
+	BackendSessionPersistenceSessionCookieAbsoluteTimeoutFeature,
 	BackendSessionPersistenceCookiePathFeature,
-	BackendSessionPersistenceCookieLifetimeTypePermanentFeature,
 )
