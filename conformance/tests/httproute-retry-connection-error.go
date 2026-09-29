@@ -54,7 +54,9 @@ var HTTPRouteRetryConnectionError = confsuite.ConformanceTest{
 		dedicatedTimeoutConfig.RequiredConsecutiveSuccesses = 10
 
 		http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, dedicatedTimeoutConfig, gwAddr, http.ExpectedResponse{
-			Request:   http.Request{Path: "/retry-on-connection-errors"},
+			Request: http.Request{
+				Path: "/retry-on-connection-errors",
+			},
 			Response:  http.Response{StatusCode: 200},
 			Backend:   "infra-backend-connection-error-healthy",
 			Namespace: confsuite.InfrastructureNamespace,
