@@ -37,6 +37,11 @@ import (
 // HTTPRouteFilter variants are excluded because they either cannot influence
 // route selection or can already be expressed post-routing with equal
 // expressiveness. See the GEP text for details.
+//
+// <gateway:experimental:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')">
+// <gateway:experimental:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')">
+// <gateway:experimental:validation:XValidation:message="filter.extensionRef must be nil if the filter.type is not ExtensionRef",rule="!(has(self.extensionRef) && self.type != 'ExtensionRef')">
+// <gateway:experimental:validation:XValidation:message="filter.extensionRef must be specified for ExtensionRef filter.type",rule="!(!has(self.extensionRef) && self.type == 'ExtensionRef')">
 type ListenerFilterApplyConfiguration struct {
 	// Type identifies which variant of the discriminated union below is
 	// populated. Uses the same union-discriminator pattern as
