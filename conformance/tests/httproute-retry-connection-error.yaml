@@ -53,22 +53,16 @@ spec:
     spec:
       containers:
         - name: infra-backend-connection-error
-          image: registry.k8s.io/kube-proxy:v1.36.0
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           imagePullPolicy: IfNotPresent
-          command:
-            - sh
-            - -c
-            - |
-              iptables -A INPUT -p tcp --dport 3000 -j REJECT --reject-with tcp-reset
-              sleep infinity
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              add:
-                - NET_ADMIN
-                - NET_RAW
-              drop:
-                - ALL
+          env:
+            - name: TCP_ECHO_SERVER
+              value: "1"
+            - name: TCP_PORT
+              value: "3333" # does not match service port
+          ports:
+            - containerPort: 3000
+              protocol: TCP
           resources:
             requests:
               cpu: 10m
