@@ -361,6 +361,8 @@ type ListenerNamespaces struct {
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
+//
+// <gateway:experimental:validation:XValidation:message="filters may only be set when protocol is HTTP or HTTPS",rule="!has(self.filters) || self.protocol in ['HTTP', 'HTTPS']">
 type Listener struct {
 	// Name is the name of the Listener. This name MUST be unique within a
 	// Gateway.
@@ -479,7 +481,105 @@ type Listener struct {
 	// +kubebuilder:default={namespaces:{from: Same}}
 	// +optional
 	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`
+
+	// Filters groups the pre-routing filter lists that run on every
+	// request accepted on this Listener, before route matching is
+	// performed. Filters is only valid when Protocol is `HTTP` or
+	// `HTTPS`; this constraint is enforced by CEL validation on the
+	// enclosing Listener struct.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Filters *ListenerFilters `json:"filters,omitempty"`
 }
+
+// ListenerFilters is the container for pre-routing filter lists on a
+// Listener. It is organized by pre-routing phase so that additional
+// phases can be added additively in future revisions.
+//
+// Today only the request phase (Requests) is defined. In the future
+// a connection-oriented phase (Connection) may be added.
+type ListenerFilters struct {
+	// Requests is an ordered list of pre-routing filters that run on
+	// every request accepted on this Listener, before route matching
+	// is performed. The list order is load-bearing:
+	// implementations MUST execute the filters in the exact order they
+	// appear here and MUST NOT reorder them. If an implementation can
+	// not implement the filters in the order they are specified, the
+	// implementation MUST set the "Accepted" Listener condition to "false"
+	// with the "InvalidListenerFilterOrder" reason.
+	//
+	// Requests may mutate inputs that route matching consumes
+	// (path, request headers, method, computed metadata), with the
+	// explicit exception of the `Host` and `:authority` headers, which
+	// implementations MUST reject any attempt to modify. Implementations
+	// MUST evaluate route matching exactly once after the last
+	// ListenerFilter has run.
+	//
+	// Requests MUST NOT be interpreted as changing which Listener
+	// handles the request. Listener selection is decided from inputs
+	// the client committed to before any pre-routing filter runs: TLS
+	// SNI (for HTTPS) or the request's initial Host header (for HTTP).
+	// Because filters cannot modify Host or :authority, the input to
+	// cleartext-HTTP Listener selection cannot change; Listener
+	// selection therefore does not need to be re-evaluated after
+	// pre-routing filters run, and MUST NOT be.
+	//
+	// +optional
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=16
+	Requests []ListenerFilter `json:"requests,omitempty"`
+}
+
+// ListenerFilter is one element of a ListenerFilters.Requests list.
+// Unlike HTTPRouteFilter, which runs after a route is selected and whose
+// ordering is a SHOULD, ListenerFilter runs before route selection and
+// its ordering within the containing list is a MUST.
+//
+// Only a subset of HTTPRouteFilter variants are permitted:
+// ExternalAuth (to establish identity that route matching can consume) and
+// ExtensionRef (the escape hatch for custom pre-routing behavior, for
+// example body-based routing or JWT-claim projection). The other
+// HTTPRouteFilter variants are excluded because they either cannot influence
+// route selection or can already be expressed post-routing with equal
+// expressiveness. See the GEP text for details.
+//
+// +kubebuilder:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')"
+// +kubebuilder:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')"
+// +kubebuilder:validation:XValidation:message="filter.extensionRef must be nil if the filter.type is not ExtensionRef",rule="!(has(self.extensionRef) && self.type != 'ExtensionRef')"
+// +kubebuilder:validation:XValidation:message="filter.extensionRef must be specified for ExtensionRef filter.type",rule="!(!has(self.extensionRef) && self.type == 'ExtensionRef')"
+type ListenerFilter struct {
+	// Type identifies which variant of the discriminated union below is
+	// populated. Uses the same union-discriminator pattern as
+	// HTTPRouteFilter and GRPCRouteFilter.
+	//
+	// +unionDiscriminator
+	// +kubebuilder:validation:Enum=ExternalAuth;ExtensionRef
+	// +required
+	Type ListenerFilterType `json:"type"`
+
+	// The following fields reuse the corresponding HTTPRouteFilter payload
+	// types verbatim. Exactly one MUST be set, and it MUST correspond to
+	// Type. CEL validation enforces this, matching the existing
+	// HTTPRouteFilter pattern.
+
+	ExternalAuth *HTTPExternalAuthFilter `json:"externalAuth,omitempty"`
+	ExtensionRef *LocalObjectReference   `json:"extensionRef,omitempty"`
+}
+
+// ListenerFilterType is a distinct enum from HTTPRouteFilterType so that
+// the two lists can diverge. Today pre-routing admits only a subset of
+// the HTTPRouteFilter variants; future revisions may add pre-routing-only
+// variants (for example, a first-class body-projection filter once
+// GEP-5091 lands) without disturbing HTTPRouteFilter.
+type ListenerFilterType string
+
+const (
+	ListenerFilterExternalAuth ListenerFilterType = "ExternalAuth"
+	ListenerFilterExtensionRef ListenerFilterType = "ExtensionRef"
+)
 
 // ProtocolType defines the application protocol accepted by a Listener.
 // Implementations are not required to accept all the defined protocols. If an

@@ -1170,6 +1170,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allowedRoutes
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedRoutes
+    - name: filters
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ListenerFilters
     - name: hostname
       type:
         scalar: string
@@ -1232,6 +1235,28 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.RouteGroupKind
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1.ListenerFilter
+  map:
+    fields:
+    - name: extensionRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
+    - name: externalAuth
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPExternalAuthFilter
+    - name: type
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.ListenerFilters
+  map:
+    fields:
+    - name: requests
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ListenerFilter
           elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1.ListenerNamespaces
   map:

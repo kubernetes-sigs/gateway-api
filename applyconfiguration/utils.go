@@ -158,6 +158,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.ListenerEntryApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerEntryStatus"):
 		return &apisv1.ListenerEntryStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ListenerFilter"):
+		return &apisv1.ListenerFilterApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ListenerFilters"):
+		return &apisv1.ListenerFiltersApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerNamespaces"):
 		return &apisv1.ListenerNamespacesApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerSet"):

@@ -19077,6 +19077,10 @@
 					"description": "AllowedRoutes defines the types of routes that MAY be attached to a Listener and the trusted namespaces where those Route resources MAY be present.\n\nAlthough a client request may match multiple route rules, only one rule may ultimately receive the request. Matching precedence MUST be determined in order of the following criteria:\n\n* The most specific match as defined by the Route type. * The oldest Route based on creation timestamp. For example, a Route with\n  a creation timestamp of \"2020-09-08 01:02:03\" is given precedence over\n  a Route with a creation timestamp of \"2020-09-08 01:02:04\".\n* If everything else is equivalent, the Route appearing first in\n  alphabetical order (namespace/name) should be given precedence. For\n  example, foo/bar is given precedence over foo/baz.\n\nAll valid rules within a Route attached to this Listener should be implemented. Invalid Route rules can be ignored (sometimes that will mean the full Route). If a Route rule transitions from valid to invalid, support for that Route rule should be dropped to ensure consistency. For example, even if a filter specified by a Route rule is invalid, the rest of the rules within that Route should still be supported.\n\nSupport: Core",
 					"$ref": "io.k8s.networking.gateway.v1.AllowedRoutes"
 				},
+				"filters": {
+					"description": "Filters groups the pre-routing filter lists that run on every request accepted on this Listener, before route matching is performed. Filters is only valid when Protocol is `HTTP` or `HTTPS`; this constraint is enforced by CEL validation on the enclosing Listener struct.\n\nSupport: Extended\n\n<gateway:experimental>",
+					"$ref": "io.k8s.networking.gateway.v1.ListenerFilters"
+				},
 				"hostname": {
 					"description": "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, all hostnames are matched. This field is ignored for protocols that don't require hostname based matching.\n\nImplementations MUST apply Hostname matching appropriately for each of the following protocols:\n\n* TLS: The Listener Hostname MUST match the SNI. * HTTP: The Listener Hostname MUST match the Host header of the request. * HTTPS: The Listener Hostname SHOULD match both the SNI and Host header.\n  Note that this does not require the SNI and Host header to be the same.\n  The semantics of this are described in more detail below.\n\nTo ensure security, Section 11.1 of RFC-6066 emphasizes that server implementations that rely on SNI hostname matching MUST also verify hostnames within the application protocol.\n\nSection 9.1.2 of RFC-7540 provides a mechanism for servers to reject the reuse of a connection by responding with the HTTP 421 Misdirected Request status code. This indicates that the origin server has rejected the request because it appears to have been misdirected.\n\nTo detect misdirected requests, Gateways SHOULD match the authority of the requests with all the SNI hostname(s) configured across all the Gateway Listeners on the same port and protocol:\n\n* If another Listener has an exact match or more specific wildcard entry,\n  the Gateway SHOULD return a 421.\n* If the current Listener (selected by SNI matching during ClientHello)\n  does not match the Host:\n    * If another Listener does match the Host, the Gateway SHOULD return a\n      421.\n    * If no other Listener matches the Host, the Gateway MUST return a\n      404.\n\nFor HTTPRoute and TLSRoute resources, there is an interaction with the `spec.hostnames` array. When both listener and route specify hostnames, there MUST be an intersection between the values for a Route to be accepted. For more information, refer to the Route specific Hostnames documentation.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nSupport: Core",
 					"type": "string"
@@ -19173,6 +19177,40 @@
 					"type": "array",
 					"items": {
 						"$ref": "io.k8s.networking.gateway.v1.RouteGroupKind"
+					},
+					"x-kubernetes-list-type": "atomic"
+				}
+			}
+		},
+		"io.k8s.networking.gateway.v1.ListenerFilter": {
+			"description": "ListenerFilter is one element of a ListenerFilters.Requests list. Unlike HTTPRouteFilter, which runs after a route is selected and whose ordering is a SHOULD, ListenerFilter runs before route selection and its ordering within the containing list is a MUST.\n\nOnly a subset of HTTPRouteFilter variants are permitted: ExternalAuth (to establish identity that route matching can consume) and ExtensionRef (the escape hatch for custom pre-routing behavior, for example body-based routing or JWT-claim projection). The other HTTPRouteFilter variants are excluded because they either cannot influence route selection or can already be expressed post-routing with equal expressiveness. See the GEP text for details.",
+			"type": "object",
+			"required": [
+				"type"
+			],
+			"properties": {
+				"extensionRef": {
+					"$ref": "io.k8s.networking.gateway.v1.LocalObjectReference"
+				},
+				"externalAuth": {
+					"$ref": "io.k8s.networking.gateway.v1.HTTPExternalAuthFilter"
+				},
+				"type": {
+					"description": "Type identifies which variant of the discriminated union below is populated. Uses the same union-discriminator pattern as HTTPRouteFilter and GRPCRouteFilter.",
+					"type": "string",
+					"default": ""
+				}
+			}
+		},
+		"io.k8s.networking.gateway.v1.ListenerFilters": {
+			"description": "ListenerFilters is the container for pre-routing filter lists on a Listener. It is organized by pre-routing phase so that additional phases can be added additively in future revisions.\n\nToday only the request phase (Requests) is defined. In the future a connection-oriented phase (Connection) may be added.",
+			"type": "object",
+			"properties": {
+				"requests": {
+					"description": "Requests is an ordered list of pre-routing filters that run on every request accepted on this Listener, before route matching is performed. The list order is load-bearing: implementations MUST execute the filters in the exact order they appear here and MUST NOT reorder them. If an implementation can not implement the filters in the order they are specified, the implementation MUST set the \"Accepted\" Listener condition to \"false\" with the \"InvalidListenerFilterOrder\" reason.\n\nRequests may mutate inputs that route matching consumes (path, request headers, method, computed metadata), with the explicit exception of the `Host` and `:authority` headers, which implementations MUST reject any attempt to modify. Implementations MUST evaluate route matching exactly once after the last ListenerFilter has run.\n\nRequests MUST NOT be interpreted as changing which Listener handles the request. Listener selection is decided from inputs the client committed to before any pre-routing filter runs: TLS SNI (for HTTPS) or the request's initial Host header (for HTTP). Because filters cannot modify Host or :authority, the input to cleartext-HTTP Listener selection cannot change; Listener selection therefore does not need to be re-evaluated after pre-routing filters run, and MUST NOT be.",
+					"type": "array",
+					"items": {
+						"$ref": "io.k8s.networking.gateway.v1.ListenerFilter"
 					},
 					"x-kubernetes-list-type": "atomic"
 				}

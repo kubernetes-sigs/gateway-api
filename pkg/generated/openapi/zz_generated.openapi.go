@@ -149,6 +149,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.Listener":                                        schema_sigsk8sio_gateway_api_apis_v1_Listener(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntry":                                   schema_sigsk8sio_gateway_api_apis_v1_ListenerEntry(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntryStatus":                             schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerFilter":                                  schema_sigsk8sio_gateway_api_apis_v1_ListenerFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerFilters":                                 schema_sigsk8sio_gateway_api_apis_v1_ListenerFilters(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerNamespaces":                              schema_sigsk8sio_gateway_api_apis_v1_ListenerNamespaces(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerSet":                                     schema_sigsk8sio_gateway_api_apis_v1_ListenerSet(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerSetList":                                 schema_sigsk8sio_gateway_api_apis_v1_ListenerSetList(ref),
@@ -5898,12 +5900,18 @@ func schema_sigsk8sio_gateway_api_apis_v1_Listener(ref common.ReferenceCallback)
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes"),
 						},
 					},
+					"filters": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Filters groups the pre-routing filter lists that run on every request accepted on this Listener, before route matching is performed. Filters is only valid when Protocol is `HTTP` or `HTTPS`; this constraint is enforced by CEL validation on the enclosing Listener struct.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ListenerFilters"),
+						},
+					},
 				},
 				Required: []string{"name", "port", "protocol"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerFilters", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
 	}
 }
 
@@ -6029,6 +6037,73 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref common.Referen
 		},
 		Dependencies: []string{
 			v1.Condition{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ListenerFilter(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListenerFilter is one element of a ListenerFilters.Requests list. Unlike HTTPRouteFilter, which runs after a route is selected and whose ordering is a SHOULD, ListenerFilter runs before route selection and its ordering within the containing list is a MUST.\n\nOnly a subset of HTTPRouteFilter variants are permitted: ExternalAuth (to establish identity that route matching can consume) and ExtensionRef (the escape hatch for custom pre-routing behavior, for example body-based routing or JWT-claim projection). The other HTTPRouteFilter variants are excluded because they either cannot influence route selection or can already be expressed post-routing with equal expressiveness. See the GEP text for details.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type identifies which variant of the discriminated union below is populated. Uses the same union-discriminator pattern as HTTPRouteFilter and GRPCRouteFilter.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"externalAuth": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter"),
+						},
+					},
+					"extensionRef": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
+						},
+					},
+				},
+				Required: []string{"type"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ListenerFilters(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListenerFilters is the container for pre-routing filter lists on a Listener. It is organized by pre-routing phase so that additional phases can be added additively in future revisions.\n\nToday only the request phase (Requests) is defined. In the future a connection-oriented phase (Connection) may be added.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"requests": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Requests is an ordered list of pre-routing filters that run on every request accepted on this Listener, before route matching is performed. The list order is load-bearing: implementations MUST execute the filters in the exact order they appear here and MUST NOT reorder them. If an implementation can not implement the filters in the order they are specified, the implementation MUST set the \"Accepted\" Listener condition to \"false\" with the \"InvalidListenerFilterOrder\" reason.\n\nRequests may mutate inputs that route matching consumes (path, request headers, method, computed metadata), with the explicit exception of the `Host` and `:authority` headers, which implementations MUST reject any attempt to modify. Implementations MUST evaluate route matching exactly once after the last ListenerFilter has run.\n\nRequests MUST NOT be interpreted as changing which Listener handles the request. Listener selection is decided from inputs the client committed to before any pre-routing filter runs: TLS SNI (for HTTPS) or the request's initial Host header (for HTTP). Because filters cannot modify Host or :authority, the input to cleartext-HTTP Listener selection cannot change; Listener selection therefore does not need to be re-evaluated after pre-routing filters run, and MUST NOT be.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ListenerFilter"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.ListenerFilter"},
 	}
 }
 
