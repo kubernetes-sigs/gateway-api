@@ -117,6 +117,7 @@ type CapturedResponse struct {
 	ContentLength    int64
 	Protocol         string
 	Headers          map[string][]string
+	Body             string
 	RedirectRequest  *RedirectRequest
 	PeerCertificates []*x509.Certificate
 }
@@ -302,6 +303,7 @@ func (d *DefaultRoundTripper) defaultRoundTrip(request Request, transport http.R
 		ContentLength: resp.ContentLength,
 		Protocol:      resp.Proto,
 		Headers:       resp.Header,
+		Body:          string(body),
 	}
 
 	if resp.TLS != nil {

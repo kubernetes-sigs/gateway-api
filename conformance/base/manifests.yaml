@@ -915,3 +915,54 @@ spec:
               - key: tls.key
                 path: key
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-auth-grpc
+  namespace: gateway-conformance-infra
+spec:
+  selector:
+    app: external-auth
+  ports:
+    - protocol: TCP
+      port: 9001
+      targetPort: 9001
+      appProtocol: kubernetes.io/h2c
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-auth-http
+  namespace: gateway-conformance-infra
+spec:
+  selector:
+    app: external-auth
+  ports:
+    - protocol: TCP
+      port: 9002
+      targetPort: 9002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-auth
+  namespace: gateway-conformance-infra
+  labels:
+    app: external-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: external-auth
+  template:
+    metadata:
+      labels:
+        app: external-auth
+    spec:
+      containers:
+        - name: external-auth
+          image: registry.k8s.io/gateway-api/conformance/extauth-v3-impl:v20260726
+          resources:
+            requests:
+              cpu: 10m
+---

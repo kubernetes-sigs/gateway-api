@@ -146,6 +146,9 @@ type Response struct {
 	// IgnoreWhitespace will cause whitespace to be ignored when comparing the response
 	// header values.
 	IgnoreWhitespace bool
+	// Body specifies the exact response body the test case should receive.
+	// If empty, the response body is not checked.
+	Body string
 }
 
 type BackendRef struct {
@@ -363,6 +366,9 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 	}
 	if expected.Response.Protocol != "" && expected.Response.Protocol != cRes.Protocol {
 		return fmt.Errorf("expected protocol to be %s, got %s", expected.Response.Protocol, cRes.Protocol)
+	}
+	if expected.Response.Body != "" && expected.Response.Body != cRes.Body {
+		return fmt.Errorf("expected response body to be %q, got %q", expected.Response.Body, cRes.Body)
 	}
 
 	// 204 is a valid response for CORS requests.
