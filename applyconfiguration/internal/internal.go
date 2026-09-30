@@ -330,6 +330,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
           elementRelationship: atomic
+    - name: clusterTrustBundleRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ClusterTrustBundleObjectRef
     - name: hostname
       type:
         scalar: string
@@ -343,6 +346,19 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: wellKnownCACertificates
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.ClusterTrustBundleObjectRef
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.sigs.gateway-api.apis.v1.CookieConfig
   map:
     fields:
@@ -395,6 +411,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.ObjectReference
           elementRelationship: atomic
+    - name: clusterTrustBundleRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ClusterTrustBundleObjectRef
     - name: mode
       type:
         scalar: string

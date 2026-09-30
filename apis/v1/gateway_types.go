@@ -891,6 +891,39 @@ type FrontendTLSValidation struct {
 	// +kubebuilder:validation:MinItems=1
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs"`
 
+	// ClusterTrustBundleRef is an optional reference to a cluster-scoped
+	// ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
+	// PEM-encoded CA certificates in the referenced bundle are used as trust
+	// anchors for frontend client certificate validation, in addition to any
+	// certificates provided via CACertificateRefs.
+	//
+	// The referenced bundle MUST exist, be readable by the implementation, and
+	// contain at least one valid PEM-encoded CA certificate. If any of these
+	// conditions are not met, the implementation MUST set ResolvedRefs=False
+	// with reason InvalidCACertificateRef on all targeted HTTPS listeners.
+	// A ReferenceGrant is not required.
+	//
+	// If the certificates.k8s.io API is not available in the cluster, the
+	// reference is treated as an unknown kind: the implementation MUST set
+	// ResolvedRefs=False with reason InvalidKind on all targeted HTTPS
+	// listeners.
+	//
+	// Implementations that do not support ClusterTrustBundle references MUST set
+	// ResolvedRefs=False with reason InvalidKind when this field is specified.
+	//
+	// In all of the cases above, if ALL trust sources for the listener are
+	// invalid, the implementation MUST also ensure the `Accepted` condition on
+	// all targeted HTTPS listeners is set to `status: False`, with the Reason
+	// `NoValidCACertificate`. Client connections that can only be validated
+	// against an invalid ClusterTrustBundleRef MUST be rejected during the TLS
+	// handshake.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	// +optional
+	ClusterTrustBundleRef *ClusterTrustBundleObjectRef `json:"clusterTrustBundleRef,omitempty"`
+
 	// FrontendValidationMode defines the mode for validating the client certificate.
 	// There are two possible modes:
 	//
