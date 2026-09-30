@@ -44,11 +44,13 @@ type TracingProviderApplyConfiguration struct {
 	// custom resource (e.g., XBackend) that natively manages TLS.
 	//
 	// Support: Core
+	//
 	BackendRef *v1.BackendObjectReferenceApplyConfiguration `json:"backendRef,omitempty"`
 	// Headers specifies a list of custom headers to be added to the telemetry
 	// export requests (e.g., for authentication).
 	//
 	// Support: Extended
+	//
 	Headers []v1.HTTPHeaderApplyConfiguration `json:"headers,omitempty"`
 }
 

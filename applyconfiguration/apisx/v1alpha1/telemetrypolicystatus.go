@@ -56,6 +56,7 @@ type TelemetryPolicyStatusApplyConfiguration struct {
 	// Instead they MUST consider the policy unimplementable and signal that
 	// on any related resources such as the ancestor that would be referenced
 	// here.
+	//
 	Ancestors []v1.PolicyAncestorStatusApplyConfiguration `json:"ancestors,omitempty"`
 }
 

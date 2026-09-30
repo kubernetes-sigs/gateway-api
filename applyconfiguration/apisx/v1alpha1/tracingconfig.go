@@ -36,6 +36,7 @@ type TracingConfigApplyConfiguration struct {
 	// In the absence of this field, it defaults to "ImplementationDefault".
 	//
 	// Support: Core (within TelemetryPolicy feature)
+	//
 	Mode *apisxv1alpha1.TracingMode `json:"mode,omitempty"`
 	// Provider specifies the tracing collector or backend endpoint receiving OTLP spans.
 	//
@@ -43,6 +44,7 @@ type TracingConfigApplyConfiguration struct {
 	// In the absence of this field, spans are exported to an implementation-defined default sink.
 	//
 	// Support: Core (within Tracing feature)
+	//
 	Provider *TracingProviderApplyConfiguration `json:"provider,omitempty"`
 	// SamplingRate specifies the base probability of sampling new traces.
 	//
@@ -59,6 +61,7 @@ type TracingConfigApplyConfiguration struct {
 	// </gateway:util:excludeFromCRD>
 	//
 	// Support: Extended
+	//
 	SamplingRate *v1.FractionApplyConfiguration `json:"samplingRate,omitempty"`
 	// ParentBasedSampling configures whether to respect the sampling decision of the parent span.
 	//
@@ -70,16 +73,19 @@ type TracingConfigApplyConfiguration struct {
 	// Support: Extended
 	//
 	// Feature Name: TelemetryPolicyParentBasedSampling
+	//
 	ParentBasedSampling *ParentBasedSamplingApplyConfiguration `json:"parentBasedSampling,omitempty"`
 	// ServiceName is the "service.name" attribute of the OpenTelemetry resource.
 	// If absent, the implementation's default service name will be used.
 	//
 	// Support: Extended
+	//
 	ServiceName *string `json:"serviceName,omitempty"`
 	// SpanName defines a custom name for the OTel span. By default, the name
 	// is implementation-specific.
 	//
 	// Support: Extended
+	//
 	SpanName *string `json:"spanName,omitempty"`
 	// Attributes is a list of custom key-value pairs (or variables) attached to every span.
 	//
@@ -87,6 +93,7 @@ type TracingConfigApplyConfiguration struct {
 	// In the absence of attributes, only standard proxy-defined attributes are emitted.
 	//
 	// Support: Extended
+	//
 	Attributes []AttributeApplyConfiguration `json:"attributes,omitempty"`
 }
 

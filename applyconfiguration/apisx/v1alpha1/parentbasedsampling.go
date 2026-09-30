@@ -37,6 +37,7 @@ type ParentBasedSamplingApplyConfiguration struct {
 	// In the absence of this field, it defaults to "ImplementationDefault".
 	//
 	// Support: Extended
+	//
 	Mode *apisxv1alpha1.ParentBasedSamplingMode `json:"mode,omitempty"`
 	// SamplingRate is the sampling rate to apply when parent-based sampling is active.
 	//
@@ -49,6 +50,7 @@ type ParentBasedSamplingApplyConfiguration struct {
 	// In the absence of this field, it defaults to 100% ({numerator: 100}).
 	//
 	// Support: Extended
+	//
 	SamplingRate *v1.FractionApplyConfiguration `json:"samplingRate,omitempty"`
 }
 

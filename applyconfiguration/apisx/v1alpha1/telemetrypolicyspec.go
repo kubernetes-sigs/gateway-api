@@ -39,6 +39,7 @@ type TelemetryPolicySpecApplyConfiguration struct {
 	// TargetRefs must be distinct.
 	//
 	// Support: Core for Gateway
+	//
 	TargetRefs []v1.LocalObjectReferenceApplyConfiguration `json:"targetRefs,omitempty"`
 	// Tracing defines the configuration for distributed tracing.
 	//
@@ -49,6 +50,7 @@ type TelemetryPolicySpecApplyConfiguration struct {
 	// Support: Extended
 	//
 	// Feature Name: TelemetryPolicyTracing
+	//
 	Tracing *TracingConfigApplyConfiguration `json:"tracing,omitempty"`
 }
 

@@ -35,20 +35,25 @@ import (
 type AttributeApplyConfiguration struct {
 	// Name is the key of the attribute as it will appear in the output
 	// (i.e., as a span tag).
+	//
 	Name *apisxv1alpha1.AttributeName `json:"name,omitempty"`
 	// SourceType specifies where the attribute value comes from.
 	// Valid values are "Header", "Literal", or "Attribute".
+	//
 	SourceType *apisxv1alpha1.AttributeSourceType `json:"sourceType,omitempty"`
 	// HeaderName specifies the HTTP header to extract the value from.
 	// This is required if SourceType is "Header".
+	//
 	HeaderName *v1.HTTPHeaderName `json:"headerName,omitempty"`
 	// LiteralValue specifies a static string value to attach.
 	// This is required if SourceType is "Literal".
+	//
 	LiteralValue *string `json:"literalValue,omitempty"`
 	// AttributeKey refers to a standard OpenTelemetry attribute.
 	// For example: "http.response.status_code" or "http.request.method".
 	// This is required if SourceType is "Attribute".
 	// See: https://opentelemetry.io/docs/specs/semconv/
+	//
 	AttributeKey *string `json:"attributeKey,omitempty"`
 }
 
