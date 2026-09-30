@@ -431,6 +431,7 @@ spec:
                           - name
                           type: object
                         maxItems: 8
+                        minItems: 1
                         type: array
                         x-kubernetes-list-type: atomic
                       clusterTrustBundleRef:
@@ -605,14 +606,6 @@ spec:
                     - hostname
                     type: object
                     x-kubernetes-validations:
-                    - message: must not contain both CACertificateRefs and WellKnownCACertificates
-                      rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                        > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                        != "")'
-                    - message: must specify either CACertificateRefs or WellKnownCACertificates
-                      rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                        > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                        != "")
                     - message: exactly one of the fields in [caCertificateRefs clusterTrustBundleRef
                         wellKnownCACertificates] must be set
                       rule: (has(self.caCertificateRefs)?1:0)+(has(self.clusterTrustBundleRef)?1:0)+(has(self.wellKnownCACertificates)?1:0)

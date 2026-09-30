@@ -20,11 +20,13 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
@@ -36,14 +38,13 @@ func TestBackendTLSPolicyValidationClusterTrustBundle(t *testing.T) {
 		policyValidation gatewayv1.BackendTLSPolicyValidation
 	}{
 		{
-			name: "invalid BackendTLSPolicyValidation with only ClusterTrustBundleRef",
+			name: "valid BackendTLSPolicyValidation with only ClusterTrustBundleRef",
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{
 				ClusterTrustBundleRef: &gatewayv1.ClusterTrustBundleObjectRef{
 					Name: "example.com:internal-signer:v1",
 				},
 				Hostname: "foo.example.com",
 			},
-			wantErrors: []string{"must specify either CACertificateRefs or WellKnownCACertificates"},
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with ClusterTrustBundleRef and CACertificateRefs",
@@ -67,6 +68,21 @@ func TestBackendTLSPolicyValidationClusterTrustBundle(t *testing.T) {
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{
 				ClusterTrustBundleRef: &gatewayv1.ClusterTrustBundleObjectRef{
 					Name: "example.com:internal-signer:v1",
+				},
+				WellKnownCACertificates: new(gatewayv1.WellKnownCACertificatesType("System")),
+				Hostname:                "foo.example.com",
+			},
+			wantErrors: []string{"exactly one of the fields in [caCertificateRefs clusterTrustBundleRef wellKnownCACertificates] must be set"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with CACertificateRefs and WellKnownCACertificates",
+			policyValidation: gatewayv1.BackendTLSPolicyValidation{
+				CACertificateRefs: []gatewayv1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
 				},
 				WellKnownCACertificates: new(gatewayv1.WellKnownCACertificatesType("System")),
 				Hostname:                "foo.example.com",
@@ -103,5 +119,42 @@ func TestBackendTLSPolicyValidationClusterTrustBundle(t *testing.T) {
 			}
 			validateBackendTLSPolicy(t, policy, tc.wantErrors)
 		})
+	}
+}
+
+// TestBackendTLSPolicyValidationEmptyCACertificateRefs ensures an explicitly empty
+// caCertificateRefs list is not accepted as a trust source. The ExactlyOneOf rule only
+// tests for the presence of the field, so MinItems is what rejects it. An unstructured
+// object is used because the typed field is omitempty, so an empty slice never reaches
+// the API server.
+func TestBackendTLSPolicyValidationEmptyCACertificateRefs(t *testing.T) {
+	policy := &unstructured.Unstructured{Object: map[string]any{
+		"apiVersion": gatewayv1.GroupVersion.String(),
+		"kind":       "BackendTLSPolicy",
+		"metadata": map[string]any{
+			"name":      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+			"namespace": metav1.NamespaceDefault,
+		},
+		"spec": map[string]any{
+			"targetRefs": []any{map[string]any{
+				"group":       "group",
+				"kind":        "kind",
+				"name":        "name",
+				"sectionName": "section",
+			}},
+			"validation": map[string]any{
+				"hostname":          "foo.example.com",
+				"caCertificateRefs": []any{},
+			},
+		},
+	}}
+
+	err := k8sClient.Create(context.Background(), policy)
+	if err == nil {
+		t.Fatalf("expected BackendTLSPolicy with an empty caCertificateRefs list to be rejected")
+	}
+	wantError := "should have at least 1 items"
+	if !celErrorStringMatches(err.Error(), wantError) {
+		t.Errorf("Unexpected response while creating BackendTLSPolicy; got err=\n%v\n;missing string within error=%q", err, wantError)
 	}
 }

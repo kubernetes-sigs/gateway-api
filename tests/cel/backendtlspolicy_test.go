@@ -273,25 +273,11 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			wantErrors: []string{},
 		},
 		{
+			// The trust source rules differ per channel, so they are asserted in
+			// backendtlspolicy_standard_test.go and backendtlspolicy_experimental_test.go.
 			name:             "invalid BackendTLSPolicyValidation with missing fields",
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{},
-			wantErrors:       []string{"spec.validation.hostname in body should be at least 1 chars long", "must specify either CACertificateRefs or WellKnownCACertificates"},
-		},
-		{
-			name: "invalid BackendTLSPolicyValidation with both CACertificateRefs and WellKnownCACertificates",
-			policyValidation: gatewayv1.BackendTLSPolicyValidation{
-				CACertificateRefs: []gatewayv1.LocalObjectReference{
-					{
-						Group: "group",
-						Kind:  "kind",
-						Name:  "name",
-					},
-				},
-				WellKnownCACertificates: new(gatewayv1.WellKnownCACertificatesType("System")),
-				Hostname:                "foo.example.com",
-			},
-
-			wantErrors: []string{"must not contain both CACertificateRefs and WellKnownCACertificates"},
+			wantErrors:       []string{"spec.validation.hostname in body should be at least 1 chars long"},
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with invalid WellKnownCACertificates value",

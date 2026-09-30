@@ -26,6 +26,17 @@ import (
 // with apply.
 //
 // BackendTLSPolicyValidation contains backend TLS validation configuration.
+// <gateway:util:excludeFromCRD>
+// Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates
+// must be set. These rules are channel-scoped because the experimental channel adds
+// clusterTrustBundleRef as a third trust source, which they would otherwise reject.
+// </gateway:util:excludeFromCRD>
+// <gateway:standard:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")">
+// <gateway:standard:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")">
+// <gateway:util:excludeFromCRD>
+// Experimental variant of the above rules, with clusterTrustBundleRef as a third
+// mutually exclusive trust source.
+// </gateway:util:excludeFromCRD>
 // <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>
 type BackendTLSPolicyValidationApplyConfiguration struct {
 	// CACertificateRefs contains one or more references to Kubernetes objects that
@@ -72,6 +83,13 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	//
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
+	//
+	// <gateway:util:excludeFromCRD>
+	// The standard channel rules reject an empty list via `size(...) > 0`, while the
+	// experimental ExactlyOneOf rule only tests for presence. MinItems keeps an empty
+	// list invalid in the experimental channel too.
+	// </gateway:util:excludeFromCRD>
+	// <gateway:experimental:validation:MinItems=1>
 	CACertificateRefs []LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 	// ClusterTrustBundleRef is an optional reference to a cluster-scoped
 	// ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
