@@ -10066,9 +10066,9 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref common.ReferenceC
 							Format:      "",
 						},
 					},
-					"type": {
+					"sourceType": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Type specifies where the attribute value comes from. Valid values are \"Header\", \"Literal\", or \"Attribute\".",
+							Description: "SourceType specifies where the attribute value comes from. Valid values are \"Header\", \"Literal\", or \"Attribute\".",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -10076,27 +10076,27 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref common.ReferenceC
 					},
 					"headerName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "HeaderName specifies the HTTP header to extract the value from. This is required if Type is \"Header\".",
+							Description: "HeaderName specifies the HTTP header to extract the value from. This is required if SourceType is \"Header\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"literalValue": {
 						SchemaProps: spec.SchemaProps{
-							Description: "LiteralValue specifies a static string value to attach. This is required if Type is \"Literal\".",
+							Description: "LiteralValue specifies a static string value to attach. This is required if SourceType is \"Literal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"attributeKey": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AttributeKey refers to a standard OpenTelemetry attribute. For example: \"http.response.status_code\" or \"http.request.method\". This is required if Type is \"Attribute\". See: https://opentelemetry.io/docs/specs/semconv/",
+							Description: "AttributeKey refers to a standard OpenTelemetry attribute. For example: \"http.response.status_code\" or \"http.request.method\". This is required if SourceType is \"Attribute\". See: https://opentelemetry.io/docs/specs/semconv/",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 				},
-				Required: []string{"name", "type"},
+				Required: []string{"name", "sourceType"},
 			},
 		},
 	}
@@ -10645,13 +10645,18 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref common.
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"targetRefs": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "TargetRefs identifies the gateways to which this policy applies (GEP-713).\n\nWhen configured, the telemetry settings defined in this policy are applied uniformly to the referenced resources. In the absence of targetRefs, the policy is invalid and will not be accepted.\n\nTargetRefs must be distinct.\n\nSupport: Core for Gateway",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.NamespacedPolicyTargetReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
 									},
 								},
 							},
@@ -10659,7 +10664,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref common.
 					},
 					"tracing": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Tracing defines the configuration for distributed tracing.\n\nWhen configured, distributed tracing spans are generated and exported. In the absence of this configuration, tracing behavior is determined by implementation defaults.\n\nSupport: Extended",
+							Description: "Tracing defines the configuration for distributed tracing.\n\nWhen configured, distributed tracing spans are generated and exported. In the absence of this configuration, tracing behavior is determined by implementation defaults.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"),
 						},
 					},
@@ -10668,7 +10673,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref common.
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.NamespacedPolicyTargetReference", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"},
 	}
 }
 
@@ -10710,7 +10715,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "TracingConfig defines the configuration for distributed tracing.\n\nDistributed tracing tracks the lifecycle of an individual request as it propagates through the Gateway and downstream services. Each service records a segment of the request's path as a \"span\". This configuration allows platform operators to enable tracing, select the destination backend, control the portion of traffic sampled, and inject custom values as span attributes.\n\nUsers get granular visibility into request latency, system bottlenecks, and execution flows across complex distributed systems.\n\nSupport: Extended",
+				Description: "TracingConfig defines the configuration for distributed tracing.\n\nSupport: Extended",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"mode": {
@@ -10734,7 +10739,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref common.Refere
 					},
 					"parentBasedSampling": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ParentBasedSampling configures whether to respect the sampling decision of the parent span.\n\n* When Mode is \"Enabled\", the proxy will respect the upstream trace parent's sampling\n  decision.\n* When Mode is \"Disabled\" or absent, the proxy applies its own local sampling rate\n  decision.\n\nSupport: Extended",
+							Description: "ParentBasedSampling configures whether to respect the sampling decision of the parent span.\n\n* When Mode is \"Enabled\", the proxy will respect the upstream trace parent's sampling\n  decision.\n* When Mode is \"Disabled\" or absent, the proxy applies its own local sampling rate\n  decision.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyParentBasedSampling",
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling"),
 						},
 					},
@@ -11114,7 +11119,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "TelemetryPolicy defines a Direct Attached Policy to configure telemetry/observability signals for Gateways.\n\nBy applying a TelemetryPolicy, platform operators and developers can ensure consistent collection, formatting, and export of observability signals.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nTelemetryPolicy is a Direct Attached Policy. Implementing controllers MUST adhere to the Policy Attachment guidelines (GEP-713).\n\nPrecedence and Conflict Resolution:\n  - To prevent complex merging semantics, only a single TelemetryPolicy is\n    permitted to target a specific Gateway resource at any given time.\n  - If multiple TelemetryPolicy resources target the same Gateway, precedence\n    MUST be determined using the following criteria, continuing on ties:\n    1. The older policy by creation timestamp takes precedence.\n    2. The policy appearing first in alphabetical order by {namespace}/{name}.\n  - For any TelemetryPolicy that does not take precedence, the controller\n    MUST set the `Accepted` condition on the policy status to `status: False` with\n    Reason `Conflicted`.\n\nConformance: Implementations MUST support the core resource structure and `targetRefs`. Support for the tracing block is Extended, but if supported, its respective conformance profile must be met. </gateway:util:excludeFromCRD>\n\nSupport: Core (Resource shell and targetRefs), Extended (Signals)",
+				Description: "TelemetryPolicy defines a Direct Attached Policy to configure telemetry/observability signals for Gateways.\n\nBy applying a TelemetryPolicy, platform operators and developers can ensure consistent collection, formatting, and export of observability signals.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nTelemetryPolicy is a Direct Attached Policy. Implementing controllers MUST adhere to the Policy Attachment guidelines (GEP-713).\n\nPrecedence and Conflict Resolution:\n  - To prevent complex merging semantics, only a single TelemetryPolicy is\n    permitted to apply to a specific Gateway resource at any given time.\n  - If multiple TelemetryPolicy resources target the same Gateway, precedence\n    MUST be determined using the following criteria, continuing on ties:\n    1. The older policy by creation timestamp takes precedence.\n    2. The policy appearing first in alphabetical order by {namespace}/{name}.\n  - For any TelemetryPolicy that does not take precedence, the controller\n    MUST set the `Accepted` condition on the policy status to `status: False` with\n    Reason `Conflicted`.\n\nConformance: Implementations MUST support the core resource structure and `targetRefs`. Support for the tracing block is Extended, but if supported, its respective conformance profile must be met. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {

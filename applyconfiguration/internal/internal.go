@@ -1446,24 +1446,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: sectionName
       type:
         scalar: string
-- name: io.k8s.sigs.gateway-api.apis.v1.NamespacedPolicyTargetReference
-  map:
-    fields:
-    - name: group
-      type:
-        scalar: string
-      default: ""
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.ObjectReference
   map:
     fields:
@@ -2281,7 +2263,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-    - name: type
+    - name: sourceType
       type:
         scalar: string
       default: ""
@@ -2465,7 +2447,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.NamespacedPolicyTargetReference
+            namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
           elementRelationship: atomic
     - name: tracing
       type:
