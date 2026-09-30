@@ -196,9 +196,10 @@ An implementation that supports this feature MUST:
 1. Read `ClusterTrustBundle.spec.trustBundle` from the object named in `clusterTrustBundleRef` and use its PEM-encoded certificates as trust anchors for the relevant backend or frontend TLS validation.
 2. Treat a nonexistent bundle, an unreadable bundle, a bundle whose `spec.trustBundle` cannot be parsed as a CA certificate bundle, or a bundle with an empty `spec.trustBundle` as an invalid CA certificate reference.
 3. Set `ResolvedRefs=False` with reason `InvalidCACertificateRef` for an unresolved or malformed bundle, and MUST NOT use the bundle for TLS validation.
-4. If `clusterTrustBundleRef` is the sole trust source and it is invalid, additionally set `Accepted=False` with reason `NoValidCACertificate`, consistent with the existing contract for `BackendTLSPolicyValidation` and `FrontendTLSValidation`.
-5. Reconcile updates to the referenced `ClusterTrustBundle`, including changes to `spec.trustBundle`, deletion of the referenced object, and replacement or recreation of an object with the same name. During the interval between deletion and recreation, the implementation MUST treat the reference as invalid and MUST NOT use any previously cached trust anchors.
-6. Not require a `ReferenceGrant` for a valid `clusterTrustBundleRef`.
+4. Additionally set `Accepted=False` with reason `NoValidCACertificate` when no valid trust source remains, consistent with the existing contract for `BackendTLSPolicyValidation` and `FrontendTLSValidation`. On `BackendTLSPolicyValidation` the trust sources are mutually exclusive, so an invalid `clusterTrustBundleRef` always leaves no valid trust source; on `FrontendTLSValidation` the bundle supplements `caCertificateRefs`, so this applies only when every trust source is invalid.
+5. Fail the data plane for an invalid trust configuration, matching the existing `caCertificateRefs` contract: for `BackendTLSPolicy` the connection to the backend MUST fail and the client MUST receive an HTTP 5xx error response; for Gateway frontend TLS the client connection MUST be rejected during the TLS handshake.
+6. Reconcile updates to the referenced `ClusterTrustBundle`, including changes to `spec.trustBundle`, deletion of the referenced object, and replacement or recreation of an object with the same name. During the interval between deletion and recreation, the implementation MUST treat the reference as invalid and MUST NOT use any previously cached trust anchors.
+7. Not require a `ReferenceGrant` for a valid `clusterTrustBundleRef`.
 
 Implementations that do NOT support this feature MUST set `ResolvedRefs=False` with reason `InvalidKind` when `clusterTrustBundleRef` is specified.
 
@@ -226,11 +227,11 @@ This is an Extended (Experimental) conformance feature.
 | Description | Outcome | Feature |
 |---|---|---|
 | Resolve a named `ClusterTrustBundle` via `clusterTrustBundleRef` and use it for backend TLS validation. | `BackendTLSPolicy` MUST have `ResolvedRefs=True`. TLS handshake to backend MUST succeed. | `BackendTLSPolicyClusterTrustBundle` |
-| Reference a nonexistent `ClusterTrustBundle` via `clusterTrustBundleRef`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef`. TLS handshake MUST fail. | `BackendTLSPolicyClusterTrustBundle` |
+| Reference a nonexistent `ClusterTrustBundle` via `clusterTrustBundleRef`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef` and `Accepted=False` with reason `NoValidCACertificate`. TLS handshake MUST fail and the client MUST receive an HTTP 5xx error response. | `BackendTLSPolicyClusterTrustBundle` |
 | Configure `clusterTrustBundleRef` on a cluster where the `certificates.k8s.io` API is unavailable. | `ResolvedRefs=False` with reason `InvalidKind` MUST be set; other trust sources and unrelated resources MUST continue to be reconciled. | `BackendTLSPolicyClusterTrustBundle` |
-| Reference a `ClusterTrustBundle` with an empty or unparsable `spec.trustBundle`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef` and `Accepted=False` with reason `NoValidCACertificate`. TLS handshake MUST fail. | `BackendTLSPolicyClusterTrustBundle` |
+| Reference a `ClusterTrustBundle` with an empty or unparsable `spec.trustBundle`. | `BackendTLSPolicy` MUST have `ResolvedRefs=False` with reason `InvalidCACertificateRef` and `Accepted=False` with reason `NoValidCACertificate`. TLS handshake MUST fail and the client MUST receive an HTTP 5xx error response. | `BackendTLSPolicyClusterTrustBundle` |
 | Update `spec.trustBundle` of a referenced `ClusterTrustBundle`. | Implementation MUST reconcile the change. Effective trust configuration MUST reflect the updated bundle after reconciliation. | `BackendTLSPolicyClusterTrustBundle` |
-| Delete the referenced `ClusterTrustBundle`. | `BackendTLSPolicy` MUST move to `ResolvedRefs=False` with reason `InvalidCACertificateRef`. Previously established TLS sessions MAY continue but new sessions MUST fail. | `BackendTLSPolicyClusterTrustBundle` |
+| Delete the referenced `ClusterTrustBundle`. | `BackendTLSPolicy` MUST move to `ResolvedRefs=False` with reason `InvalidCACertificateRef` and `Accepted=False` with reason `NoValidCACertificate`. Previously established TLS sessions MAY continue but new sessions MUST fail with an HTTP 5xx error response. | `BackendTLSPolicyClusterTrustBundle` |
 | Resolve a named `ClusterTrustBundle` via `clusterTrustBundleRef` for Gateway frontend client certificate validation. | All targeted HTTPS listeners MUST have `ResolvedRefs=True`. Frontend mTLS MUST succeed with a certificate signed by the bundle's CA. | `GatewayClusterTrustBundle` |
 
 ## 8. Alternatives Considered

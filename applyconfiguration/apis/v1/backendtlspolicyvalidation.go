@@ -75,9 +75,10 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	CACertificateRefs []LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 	// ClusterTrustBundleRef is an optional reference to a cluster-scoped
 	// ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
-	// PEM-encoded CA certificates in the referenced bundle are used as trust
-	// anchors for backend TLS validation, in addition to any certificates
-	// provided via CACertificateRefs.
+	// PEM-encoded CA certificates in the referenced bundle are used as the
+	// trust anchors for backend TLS validation. This field is mutually
+	// exclusive with CACertificateRefs and WellKnownCACertificates, so the
+	// referenced bundle is the only trust source for this policy.
 	//
 	// The referenced bundle MUST exist, be readable by the implementation, and
 	// contain at least one valid PEM-encoded CA certificate. If any of these
@@ -90,6 +91,13 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	//
 	// Implementations that do not support ClusterTrustBundle references MUST set
 	// ResolvedRefs=False with reason InvalidKind when this field is specified.
+	//
+	// In all of the cases above, because the referenced bundle is the only
+	// trust source for this policy, the implementation MUST also ensure the
+	// `Accepted` Condition on the BackendTLSPolicy is set to `status: False`,
+	// with a Reason `NoValidCACertificate`. Connections using an invalid
+	// ClusterTrustBundleRef MUST fail, and the client MUST receive an HTTP 5xx
+	// error response.
 	//
 	// Support: Extended
 	//

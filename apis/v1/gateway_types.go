@@ -911,6 +911,13 @@ type FrontendTLSValidation struct {
 	// Implementations that do not support ClusterTrustBundle references MUST set
 	// ResolvedRefs=False with reason InvalidKind when this field is specified.
 	//
+	// In all of the cases above, if ALL trust sources for the listener are
+	// invalid, the implementation MUST also ensure the `Accepted` condition on
+	// all targeted HTTPS listeners is set to `status: False`, with the Reason
+	// `NoValidCACertificate`. Client connections that can only be validated
+	// against an invalid ClusterTrustBundleRef MUST be rejected during the TLS
+	// handshake.
+	//
 	// Support: Extended
 	//
 	// <gateway:experimental>
