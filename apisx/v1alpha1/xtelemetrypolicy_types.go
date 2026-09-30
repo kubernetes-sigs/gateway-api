@@ -26,7 +26,7 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
-// +kubebuilder:resource:categories=gateway-api,shortName=telemetrypolicy
+// +kubebuilder:resource:categories=gateway-api,shortName=xtelemetrypolicy
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 //
 // TelemetryPolicy is a Direct Attached Policy.
@@ -46,7 +46,7 @@ import (
 //
 // Precedence and Conflict Resolution:
 //   - To prevent complex merging semantics, only a single TelemetryPolicy is
-//     permitted to target a specific Gateway resource at any given time.
+//     permitted to apply to a specific Gateway resource at any given time.
 //   - If multiple TelemetryPolicy resources target the same Gateway, precedence
 //     MUST be determined using the following criteria, continuing on ties:
 //     1. The older policy by creation timestamp takes precedence.
@@ -61,18 +61,16 @@ import (
 // its respective conformance profile must be met.
 // </gateway:util:excludeFromCRD>
 //
-// Support: Core (Resource shell and targetRefs), Extended (Signals)
+// Support: Extended
 type XTelemetryPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of TelemetryPolicy.
-	//
 	// +required
 	Spec TelemetryPolicySpec `json:"spec"`
 
 	// Status defines the observed state of TelemetryPolicy.
-	//
 	// +optional
 	Status TelemetryPolicyStatus `json:"status,omitempty"`
 }
@@ -140,8 +138,6 @@ type AttributeName string
 
 // AttributeSourceType defines the source from which a telemetry attribute
 // value is retrieved.
-//
-// Support: Core
 type AttributeSourceType string
 
 const (
