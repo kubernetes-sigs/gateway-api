@@ -56,6 +56,7 @@ type ListenerFiltersApplyConfiguration struct {
 	// cleartext-HTTP Listener selection cannot change; Listener
 	// selection therefore does not need to be re-evaluated after
 	// pre-routing filters run, and MUST NOT be.
+	//
 	Requests []ListenerFilterApplyConfiguration `json:"requests,omitempty"`
 }
 

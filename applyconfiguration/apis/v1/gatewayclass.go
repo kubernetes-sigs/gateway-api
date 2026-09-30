@@ -59,6 +59,7 @@ type GatewayClassApplyConfiguration struct {
 	//
 	// Implementations MUST populate status on all GatewayClass resources which
 	// specify their controller name.
+	//
 	Status *GatewayClassStatusApplyConfiguration `json:"status,omitempty"`
 }
 

@@ -56,6 +56,7 @@ type EndpointSelectorBackendApplyConfiguration struct {
 	// predictable name, so that a name like <backend-name>-backend.svc.cluster.local
 	// does not become a relied-upon DNS entry.
 	// </gateway:util:excludeFromCRD>
+	//
 	LabelSelectorApplyConfiguration `json:""`
 }
 

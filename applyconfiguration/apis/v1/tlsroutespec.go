@@ -92,8 +92,10 @@ type TLSRouteSpecApplyConfiguration struct {
 	// support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
 	// Implementations that do not support this feature MAY evaluate precedence
 	// using the calculated Listener/Route hostname intersection.
+	//
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of actions.
+	//
 	Rules []TLSRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 

@@ -145,7 +145,7 @@ func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		jsonTag := strings.Split(field.Tag.Get("json"), ",")[0]
+		jsonTag, _, _ := strings.Cut(field.Tag.Get("json"), ",")
 		if jsonTag == "" {
 			continue
 		}

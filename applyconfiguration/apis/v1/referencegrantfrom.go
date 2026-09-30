@@ -31,6 +31,7 @@ type ReferenceGrantFromApplyConfiguration struct {
 	// When empty, the Kubernetes core API group is inferred.
 	//
 	// Support: Core
+	//
 	Group *apisv1.Group `json:"group,omitempty"`
 	// Kind is the kind of the referent. Although implementations may support
 	// additional resources, the following types are part of the "Core"
@@ -51,6 +52,7 @@ type ReferenceGrantFromApplyConfiguration struct {
 	// Namespace is the namespace of the referent.
 	//
 	// Support: Core
+	//
 	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 }
 

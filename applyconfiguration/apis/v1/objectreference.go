@@ -50,6 +50,7 @@ type ObjectReferenceApplyConfiguration struct {
 	// documentation for details.
 	//
 	// Support: Core
+	//
 	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 }
 

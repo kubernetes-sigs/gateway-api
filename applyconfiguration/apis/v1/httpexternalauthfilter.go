@@ -46,6 +46,7 @@ type HTTPExternalAuthFilterApplyConfiguration struct {
 	// Feature Names:
 	// GRPC Support - HTTPRouteExternalAuthGRPC
 	// HTTP Support - HTTPRouteExternalAuthHTTP
+	//
 	ExternalAuthProtocol *apisv1.HTTPRouteExternalAuthProtocol `json:"protocol,omitempty"`
 	// BackendRef is a reference to a backend to send authorization
 	// requests to.
@@ -56,18 +57,21 @@ type HTTPExternalAuthFilterApplyConfiguration struct {
 	// If the backend service requires TLS, use BackendTLSPolicy to tell the
 	// implementation to supply the TLS details to be used to connect to that
 	// backend.
+	//
 	BackendRef *BackendObjectReferenceApplyConfiguration `json:"backendRef,omitempty"`
 	// GRPCAuthConfig contains configuration for communication with ext_authz
 	// protocol-speaking backends.
 	//
 	// If unset, implementations must assume the default behavior for each
 	// included field is intended.
+	//
 	GRPCAuthConfig *GRPCAuthConfigApplyConfiguration `json:"grpc,omitempty"`
 	// HTTPAuthConfig contains configuration for communication with HTTP-speaking
 	// backends.
 	//
 	// If unset, implementations must assume the default behavior for each
 	// included field is intended.
+	//
 	HTTPAuthConfig *HTTPAuthConfigApplyConfiguration `json:"http,omitempty"`
 	// ForwardBody controls if requests to the authorization server should include
 	// the body of the client request; and if so, how big that body is allowed
@@ -82,6 +86,7 @@ type HTTPExternalAuthFilterApplyConfiguration struct {
 	// be forwarded.
 	//
 	// Feature Name: HTTPRouteExternalAuthForwardBody
+	//
 	ForwardBody *ForwardBodyConfigApplyConfiguration `json:"forwardBody,omitempty"`
 }
 

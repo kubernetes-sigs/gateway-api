@@ -21,7 +21,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -65,10 +64,8 @@ var HTTPRouteReferenceGrant = confsuite.ConformanceTest{
 		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout)
 		defer cancel()
 		rg := v1.ReferenceGrant{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "reference-grant",
-				Namespace: confsuite.WebBackendNamespace,
-			},
+			Name:      "reference-grant",
+			Namespace: confsuite.WebBackendNamespace,
 		}
 		require.NoError(t, suite.Client.Delete(ctx, &rg))
 

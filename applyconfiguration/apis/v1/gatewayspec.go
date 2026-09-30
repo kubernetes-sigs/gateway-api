@@ -55,12 +55,12 @@ type GatewaySpecApplyConfiguration struct {
 	// Core support and MUST be supported by implementations based on the objects
 	// they support:
 	//
-	// # HTTPRoute
+	// HTTPRoute
 	//
 	// 1. HTTPRoute, Port: 80, Protocol: HTTP
 	// 2. HTTPRoute, Port: 443, Protocol: HTTPS, TLS Mode: Terminate, TLS keypair provided
 	//
-	// # TLSRoute
+	// TLSRoute
 	//
 	// 1. TLSRoute, Port: 443, Protocol: TLS, TLS Mode: Passthrough
 	//
@@ -202,6 +202,7 @@ type GatewaySpecApplyConfiguration struct {
 	// In a future release the MinItems=1 requirement MAY be dropped.
 	//
 	// Support: Core
+	//
 	Listeners []ListenerApplyConfiguration `json:"listeners,omitempty"`
 	// Addresses requested for this Gateway. This is optional and behavior can
 	// depend on the implementation. If a value is set in the spec and the
@@ -229,13 +230,16 @@ type GatewaySpecApplyConfiguration struct {
 	// Infrastructure defines infrastructure level attributes about this Gateway instance.
 	//
 	// Support: Extended
+	//
 	Infrastructure *GatewayInfrastructureApplyConfiguration `json:"infrastructure,omitempty"`
 	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
 	// The default value is to allow no ListenerSets.
+	//
 	AllowedListeners *AllowedListenersApplyConfiguration `json:"allowedListeners,omitempty"`
 	// TLS specifies frontend and backend tls configuration for entire gateway.
 	//
 	// Support: Extended
+	//
 	TLS *GatewayTLSConfigApplyConfiguration `json:"tls,omitempty"`
 	// DefaultScope, when set, configures the Gateway as a default Gateway,
 	// meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)

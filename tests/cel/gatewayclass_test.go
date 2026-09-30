@@ -23,16 +23,12 @@ import (
 	"time"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestValidateGatewayClassUpdate(t *testing.T) {
 	ctx := context.Background()
 	baseGatewayClass := gatewayv1.GatewayClass{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "foo",
-		},
+		Name: "foo",
 		Spec: gatewayv1.GatewayClassSpec{
 			ControllerName: "example.net/gateway-controller",
 		},

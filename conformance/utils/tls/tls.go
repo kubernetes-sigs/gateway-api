@@ -192,8 +192,7 @@ func isConnectionRejected(err error) bool {
 	if strings.Contains(err.Error(), "connection reset by peer") {
 		return true
 	}
-	var sysErr syscall.Errno
-	if errors.As(err, &sysErr) {
+	if sysErr, ok := errors.AsType[syscall.Errno](err); ok {
 		return sysErr == syscall.ECONNRESET
 	}
 	return false

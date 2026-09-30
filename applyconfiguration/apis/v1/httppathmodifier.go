@@ -36,9 +36,11 @@ type HTTPPathModifierApplyConfiguration struct {
 	// Unknown values here must result in the implementation setting the
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
+	//
 	Type *apisv1.HTTPPathModifierType `json:"type,omitempty"`
 	// ReplaceFullPath specifies the value with which to replace the full path
 	// of a request during a rewrite or redirect.
+	//
 	ReplaceFullPath *string `json:"replaceFullPath,omitempty"`
 	// ReplacePrefixMatch specifies the value with which to replace the prefix
 	// match of a request during a rewrite or redirect. For example, a request
@@ -68,6 +70,7 @@ type HTTPPathModifierApplyConfiguration struct {
 	// /foo         | /foo         | <empty string> | /
 	// /foo/        | /foo         | /              | /
 	// /foo         | /foo         | /              | /
+	//
 	ReplacePrefixMatch *string `json:"replacePrefixMatch,omitempty"`
 }
 

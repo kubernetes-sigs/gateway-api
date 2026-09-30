@@ -38,6 +38,7 @@ type GatewayInfrastructureApplyConfiguration struct {
 	// change, it SHOULD clearly warn about this behavior in documentation.
 	//
 	// Support: Extended
+	//
 	Labels map[apisv1.LabelKey]apisv1.LabelValue `json:"labels,omitempty"`
 	// Annotations that SHOULD be applied to any resources created in response to this Gateway.
 	//
@@ -47,12 +48,13 @@ type GatewayInfrastructureApplyConfiguration struct {
 	// An implementation may chose to add additional implementation-specific annotations as they see fit.
 	//
 	// Support: Extended
+	//
 	Annotations map[apisv1.AnnotationKey]apisv1.AnnotationValue `json:"annotations,omitempty"`
 	// ParametersRef is a reference to a resource that contains the configuration
 	// parameters corresponding to the Gateway. This is optional if the
 	// controller does not require any additional configuration.
 	//
-	// # This follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis
+	// This follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis
 	//
 	// The Gateway's GatewayClass may provide its own `parametersRef`. When both are specified,
 	// the merging behavior is implementation specific.
@@ -64,6 +66,7 @@ type GatewayInfrastructureApplyConfiguration struct {
 	// "InvalidParameters" reason.
 	//
 	// Support: Implementation-specific
+	//
 	ParametersRef *LocalParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
 }
 

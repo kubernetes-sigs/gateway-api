@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -62,10 +61,8 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			time.Sleep(time.Second)
 
 			newerRoute := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      newerRouteNN.Name,
-					Namespace: newerRouteNN.Namespace,
-				},
+				Name:      newerRouteNN.Name,
+				Namespace: newerRouteNN.Namespace,
 				Spec: gatewayv1.HTTPRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
@@ -75,12 +72,8 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 					Hostnames: []gatewayv1.Hostname{"abc.example.com"},
 					Rules: []gatewayv1.HTTPRouteRule{{
 						BackendRefs: []gatewayv1.HTTPBackendRef{{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: gatewayv1.BackendObjectReference{
-									Name: gatewayv1.ObjectName(confsuite.InfraBackendServiceNameV2),
-									Port: ptr.To(gatewayv1.PortNumber(8080)),
-								},
-							},
+							Name: gatewayv1.ObjectName(confsuite.InfraBackendServiceNameV2),
+							Port: ptr.To(gatewayv1.PortNumber(8080)),
 						}},
 					}},
 				},
@@ -110,10 +103,8 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			time.Sleep(time.Second)
 
 			newerRoute := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      newerRouteNN.Name,
-					Namespace: newerRouteNN.Namespace,
-				},
+				Name:      newerRouteNN.Name,
+				Namespace: newerRouteNN.Namespace,
 				Spec: gatewayv1.HTTPRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
@@ -123,12 +114,8 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 					Hostnames: []gatewayv1.Hostname{"*.example.com"},
 					Rules: []gatewayv1.HTTPRouteRule{{
 						BackendRefs: []gatewayv1.HTTPBackendRef{{
-							BackendRef: gatewayv1.BackendRef{
-								BackendObjectReference: gatewayv1.BackendObjectReference{
-									Name: gatewayv1.ObjectName(confsuite.InfraBackendServiceNameV2),
-									Port: ptr.To(gatewayv1.PortNumber(8080)),
-								},
-							},
+							Name: gatewayv1.ObjectName(confsuite.InfraBackendServiceNameV2),
+							Port: ptr.To(gatewayv1.PortNumber(8080)),
 						}},
 					}},
 				},

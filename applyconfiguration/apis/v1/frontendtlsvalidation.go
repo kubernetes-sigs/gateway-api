@@ -71,6 +71,7 @@ type FrontendTLSValidationApplyConfiguration struct {
 	//
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
+	//
 	CACertificateRefs []ObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 	// ClusterTrustBundleRef is an optional reference to a cluster-scoped
 	// ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
@@ -119,6 +120,7 @@ type FrontendTLSValidationApplyConfiguration struct {
 	// Defaults to AllowValidOnly.
 	//
 	// Support: Core
+	//
 	Mode *apisv1.FrontendValidationModeType `json:"mode,omitempty"`
 }
 

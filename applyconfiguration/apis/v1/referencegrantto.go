@@ -32,6 +32,7 @@ type ReferenceGrantToApplyConfiguration struct {
 	// When empty, the Kubernetes core API group is inferred.
 	//
 	// Support: Core
+	//
 	Group *apisv1.Group `json:"group,omitempty"`
 	// Kind is the kind of the referent. Although implementations may support
 	// additional resources, the following types are part of the "Core"
@@ -39,10 +40,12 @@ type ReferenceGrantToApplyConfiguration struct {
 	//
 	// * Secret when used to permit a SecretObjectReference
 	// * Service when used to permit a BackendObjectReference
+	//
 	Kind *apisv1.Kind `json:"kind,omitempty"`
 	// Name is the name of the referent. When unspecified, this policy
 	// refers to all resources of the specified Group and Kind in the local
 	// namespace.
+	//
 	Name *apisv1.ObjectName `json:"name,omitempty"`
 }
 

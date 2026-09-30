@@ -48,6 +48,7 @@ type LocalPolicyTargetReferenceWithSectionNameApplyConfiguration struct {
 	// If a SectionName is specified, but does not exist on the targeted object,
 	// the Policy must fail to attach, and the policy implementation should record
 	// a `ResolvedRefs` or similar Condition in the Policy's status.
+	//
 	SectionName *apisv1.SectionName `json:"sectionName,omitempty"`
 }
 

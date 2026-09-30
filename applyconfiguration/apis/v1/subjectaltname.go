@@ -30,11 +30,13 @@ type SubjectAltNameApplyConfiguration struct {
 	// Type determines the format of the Subject Alternative Name. Always required.
 	//
 	// Support: Core
+	//
 	Type *apisv1.SubjectAltNameType `json:"type,omitempty"`
 	// Hostname contains Subject Alternative Name specified in DNS name format.
 	// Required when Type is set to Hostname, ignored otherwise.
 	//
 	// Support: Core
+	//
 	Hostname *apisv1.Hostname `json:"hostname,omitempty"`
 	// URI contains Subject Alternative Name specified in a full URI format.
 	// It MUST include both a scheme (e.g., "http" or "ftp") and a scheme-specific-part.
@@ -42,6 +44,7 @@ type SubjectAltNameApplyConfiguration struct {
 	// Required when Type is set to URI, ignored otherwise.
 	//
 	// Support: Core
+	//
 	URI *apisv1.AbsoluteURI `json:"uri,omitempty"`
 }
 

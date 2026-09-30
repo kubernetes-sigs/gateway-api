@@ -29,6 +29,7 @@ import (
 // to a Backend.
 type BackendPortApplyConfiguration struct {
 	// Number represents the port number of the destination.
+	//
 	Number *apisxv1alpha1.PortNumber `json:"number,omitempty"`
 }
 

@@ -56,9 +56,12 @@ type ListenerEntryApplyConfiguration struct {
 	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
 	// as a suffix match. That means that a match for `*.example.com` would match
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
+	//
 	Hostname *apisv1.Hostname `json:"hostname,omitempty"`
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
+	//
+	//
 	Port *int32 `json:"port,omitempty"`
 	// Protocol specifies the network protocol this listener expects to receive.
 	Protocol *apisv1.ProtocolType `json:"protocol,omitempty"`
@@ -71,6 +74,7 @@ type ListenerEntryApplyConfiguration struct {
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
 	// available certificates for any TLS handshake.
+	//
 	TLS *ListenerTLSConfigApplyConfiguration `json:"tls,omitempty"`
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -94,6 +98,7 @@ type ListenerEntryApplyConfiguration struct {
 	// support for that Route rule should be dropped to ensure consistency. For
 	// example, even if a filter specified by a Route rule is invalid, the rest
 	// of the rules within that Route should still be supported.
+	//
 	AllowedRoutes *AllowedRoutesApplyConfiguration `json:"allowedRoutes,omitempty"`
 }
 

@@ -44,6 +44,7 @@ type ParentReferenceApplyConfiguration struct {
 	// Group must be explicitly set to "" (empty string).
 	//
 	// Support: Core
+	//
 	Group *apisv1.Group `json:"group,omitempty"`
 	// Kind is kind of the referent.
 	//
@@ -53,6 +54,7 @@ type ParentReferenceApplyConfiguration struct {
 	// * Service (Mesh conformance profile, ClusterIP Services only)
 	//
 	// Support for other resources is Implementation-Specific.
+	//
 	Kind *apisv1.Kind `json:"kind,omitempty"`
 	// Namespace is the namespace of the referent. When unspecified, this refers
 	// to the local namespace of the Route.
@@ -76,6 +78,7 @@ type ParentReferenceApplyConfiguration struct {
 	// </gateway:experimental:description>
 	//
 	// Support: Core
+	//
 	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 	// Name is the name of the referent.
 	//
@@ -105,6 +108,7 @@ type ParentReferenceApplyConfiguration struct {
 	// Route MUST be considered detached from the Gateway.
 	//
 	// Support: Core
+	//
 	SectionName *apisv1.SectionName `json:"sectionName,omitempty"`
 	// Port is the network port this Route targets. It can be interpreted
 	// differently based on the type of parent resource.
@@ -136,6 +140,8 @@ type ParentReferenceApplyConfiguration struct {
 	// the Route MUST be considered detached from the Gateway.
 	//
 	// Support: Extended
+	//
+	//
 	Port *int32 `json:"port,omitempty"`
 }
 

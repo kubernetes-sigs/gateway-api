@@ -140,6 +140,7 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// `mycompany.com/my-custom-ca-certificates`.
 	//
 	// Support: Implementation-specific
+	//
 	WellKnownCACertificates *apisv1.WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
 	// Hostname is used for two purposes in the connection between Gateways and
 	// backends:
@@ -152,12 +153,14 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// of the Hostname field for authentication, you MUST add it to the SubjectAltNames list.
 	//
 	// Support: Core
+	//
 	Hostname *apisv1.PreciseHostname `json:"hostname,omitempty"`
 	// SubjectAltNames contains one or more Subject Alternative Names.
 	// When specified the certificate served from the backend MUST
 	// have at least one Subject Alternate Name matching one of the specified SubjectAltNames.
 	//
 	// Support: Extended
+	//
 	SubjectAltNames []SubjectAltNameApplyConfiguration `json:"subjectAltNames,omitempty"`
 }
 

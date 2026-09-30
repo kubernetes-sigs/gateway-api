@@ -70,6 +70,7 @@ type BackendRefApplyConfiguration struct {
 	// defaults to 1.
 	//
 	// Support for this field varies based on the context where used.
+	//
 	Weight *int32 `json:"weight,omitempty"`
 }
 
