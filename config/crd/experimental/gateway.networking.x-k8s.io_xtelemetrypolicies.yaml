@@ -431,6 +431,9 @@ spec:
                           type: object
                         maxItems: 16
                         type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
                     required:
                     - backendRef
                     type: object

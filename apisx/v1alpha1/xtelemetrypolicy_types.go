@@ -63,7 +63,9 @@ import (
 //
 // Support: Extended
 type XTelemetryPolicy struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of TelemetryPolicy.
@@ -233,6 +235,7 @@ type TracingConfig struct {
 	//
 	// Support: Core (within TelemetryPolicy feature)
 	//
+	// +optional
 	// +kubebuilder:validation:Enum=Enabled;Disabled;ImplementationDefault
 	// +kubebuilder:default=ImplementationDefault
 	Mode TracingMode `json:"mode,omitempty"`
@@ -343,6 +346,8 @@ type TracingProvider struct {
 	// Support: Extended
 	//
 	// +optional
+	// +listType=map
+	// +listMapKey=name
 	// +kubebuilder:validation:MaxItems=16
 	Headers []v1.HTTPHeader `json:"headers,omitempty"`
 }
@@ -374,6 +379,7 @@ type ParentBasedSampling struct {
 	//
 	// Support: Extended
 	//
+	// +optional
 	// +kubebuilder:validation:Enum=Enabled;Disabled;ImplementationDefault
 	// +kubebuilder:default=ImplementationDefault
 	Mode ParentBasedSamplingMode `json:"mode,omitempty"`
