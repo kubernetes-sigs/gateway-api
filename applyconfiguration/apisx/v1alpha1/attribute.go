@@ -36,18 +36,18 @@ type AttributeApplyConfiguration struct {
 	// Name is the key of the attribute as it will appear in the output
 	// (i.e., as a span tag).
 	Name *apisxv1alpha1.AttributeName `json:"name,omitempty"`
-	// Type specifies where the attribute value comes from.
+	// SourceType specifies where the attribute value comes from.
 	// Valid values are "Header", "Literal", or "Attribute".
-	Type *apisxv1alpha1.AttributeSourceType `json:"type,omitempty"`
+	SourceType *apisxv1alpha1.AttributeSourceType `json:"sourceType,omitempty"`
 	// HeaderName specifies the HTTP header to extract the value from.
-	// This is required if Type is "Header".
+	// This is required if SourceType is "Header".
 	HeaderName *v1.HTTPHeaderName `json:"headerName,omitempty"`
 	// LiteralValue specifies a static string value to attach.
-	// This is required if Type is "Literal".
+	// This is required if SourceType is "Literal".
 	LiteralValue *string `json:"literalValue,omitempty"`
 	// AttributeKey refers to a standard OpenTelemetry attribute.
 	// For example: "http.response.status_code" or "http.request.method".
-	// This is required if Type is "Attribute".
+	// This is required if SourceType is "Attribute".
 	// See: https://opentelemetry.io/docs/specs/semconv/
 	AttributeKey *string `json:"attributeKey,omitempty"`
 }
@@ -66,11 +66,11 @@ func (b *AttributeApplyConfiguration) WithName(value apisxv1alpha1.AttributeName
 	return b
 }
 
-// WithType sets the Type field in the declarative configuration to the given value
+// WithSourceType sets the SourceType field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Type field is set to the value of the last call.
-func (b *AttributeApplyConfiguration) WithType(value apisxv1alpha1.AttributeSourceType) *AttributeApplyConfiguration {
-	b.Type = &value
+// If called multiple times, the SourceType field is set to the value of the last call.
+func (b *AttributeApplyConfiguration) WithSourceType(value apisxv1alpha1.AttributeSourceType) *AttributeApplyConfiguration {
+	b.SourceType = &value
 	return b
 }
 

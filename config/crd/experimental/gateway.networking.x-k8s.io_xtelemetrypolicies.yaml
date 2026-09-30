@@ -17,7 +17,7 @@ spec:
     listKind: XTelemetryPolicyList
     plural: xtelemetrypolicies
     shortNames:
-    - telemetrypolicy
+    - xtelemetrypolicy
     singular: xtelemetrypolicy
   scope: Namespaced
   versions:
@@ -43,7 +43,7 @@ spec:
 
           Precedence and Conflict Resolution:
             - To prevent complex merging semantics, only a single TelemetryPolicy is
-              permitted to target a specific Gateway resource at any given time.
+              permitted to apply to a specific Gateway resource at any given time.
             - If multiple TelemetryPolicy resources target the same Gateway, precedence
               MUST be determined using the following criteria, continuing on ties:
               1. The older policy by creation timestamp takes precedence.
@@ -58,7 +58,7 @@ spec:
           its respective conformance profile must be met.
           </gateway:util:excludeFromCRD>
 
-          Support: Core (Resource shell and targetRefs), Extended (Signals)
+          Support: Extended
         properties:
           apiVersion:
             description: |-
@@ -93,46 +93,43 @@ spec:
                   Support: Core for Gateway
                 items:
                   description: |-
-                    NamespacedPolicyTargetReference identifies an API object to apply a direct or
-                    inherited policy to, potentially in a different namespace. This should only
-                    be used as part of Policy resources that need to be able to target resources
-                    in different namespaces. For more information on how this policy attachment
-                    model works, and a sample Policy resource, refer to the policy attachment
-                    documentation for Gateway API.
+                    LocalObjectReference identifies an API object within the namespace of the
+                    referrer.
+                    The API object must be valid in the cluster; the Group and Kind must
+                    be registered in the cluster for this reference to be valid.
+
+                    References to objects with invalid Group and Kind are not valid, and must
+                    be rejected by the implementation, with appropriate Conditions set
+                    on the containing object.
                   properties:
                     group:
-                      description: Group is the group of the target resource.
+                      description: |-
+                        Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                        When unspecified or empty string, core API group is inferred.
                       maxLength: 253
                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     kind:
-                      description: Kind is kind of the target resource.
+                      description: Kind is kind of the referent. For example "HTTPRoute"
+                        or "Service".
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                       type: string
                     name:
-                      description: Name is the name of the target resource.
+                      description: Name is the name of the referent.
                       maxLength: 253
                       minLength: 1
-                      type: string
-                    namespace:
-                      description: |-
-                        Namespace is the namespace of the referent. When unspecified, the local
-                        namespace is inferred. Even when policy targets a resource in a different
-                        namespace, it MUST only apply to traffic originating from the same
-                        namespace as the policy.
-                      maxLength: 63
-                      minLength: 1
-                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                       type: string
                   required:
                   - group
                   - kind
                   - name
                   type: object
+                maxItems: 16
                 minItems: 1
                 type: array
+                x-kubernetes-list-type: atomic
               tracing:
                 description: |-
                   Tracing defines the configuration for distributed tracing.
@@ -142,6 +139,8 @@ spec:
                   defaults.
 
                   Support: Extended
+
+                  Feature Name: TelemetryPolicyTracing
                 properties:
                   attributes:
                     description: |-
@@ -164,7 +163,7 @@ spec:
                           description: |-
                             AttributeKey refers to a standard OpenTelemetry attribute.
                             For example: "http.response.status_code" or "http.request.method".
-                            This is required if Type is "Attribute".
+                            This is required if SourceType is "Attribute".
                             See: https://opentelemetry.io/docs/specs/semconv/
                           maxLength: 256
                           minLength: 1
@@ -173,7 +172,7 @@ spec:
                         headerName:
                           description: |-
                             HeaderName specifies the HTTP header to extract the value from.
-                            This is required if Type is "Header".
+                            This is required if SourceType is "Header".
                           maxLength: 256
                           minLength: 1
                           pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
@@ -181,8 +180,9 @@ spec:
                         literalValue:
                           description: |-
                             LiteralValue specifies a static string value to attach.
-                            This is required if Type is "Literal".
+                            This is required if SourceType is "Literal".
                           maxLength: 1024
+                          minLength: 1
                           type: string
                         name:
                           description: |-
@@ -192,9 +192,9 @@ spec:
                           minLength: 1
                           pattern: ^[a-zA-Z0-9_.:/-]+$
                           type: string
-                        type:
+                        sourceType:
                           description: |-
-                            Type specifies where the attribute value comes from.
+                            SourceType specifies where the attribute value comes from.
                             Valid values are "Header", "Literal", or "Attribute".
                           enum:
                           - Header
@@ -203,19 +203,20 @@ spec:
                           type: string
                       required:
                       - name
-                      - type
+                      - sourceType
                       type: object
                       x-kubernetes-validations:
-                      - message: headerName is required when type is Header, and must
-                          be empty otherwise
-                        rule: 'self.type == ''Header'' ? has(self.headerName) : !has(self.headerName)'
-                      - message: literalValue is required when type is Literal, and
-                          must be empty otherwise
-                        rule: 'self.type == ''Literal'' ? has(self.literalValue) :
-                          !has(self.literalValue)'
-                      - message: attributeKey is required when type is Attribute,
+                      - message: headerName is required when sourceType is Header,
                           and must be empty otherwise
-                        rule: 'self.type == ''Attribute'' ? has(self.attributeKey)
+                        rule: 'self.sourceType == ''Header'' ? has(self.headerName)
+                          : !has(self.headerName)'
+                      - message: literalValue is required when sourceType is Literal,
+                          and must be empty otherwise
+                        rule: 'self.sourceType == ''Literal'' ? has(self.literalValue)
+                          : !has(self.literalValue)'
+                      - message: attributeKey is required when sourceType is Attribute,
+                          and must be empty otherwise
+                        rule: 'self.sourceType == ''Attribute'' ? has(self.attributeKey)
                           : !has(self.attributeKey)'
                     type: array
                     x-kubernetes-list-map-keys:
@@ -245,6 +246,8 @@ spec:
                         decision.
 
                       Support: Extended
+
+                      Feature Name: TelemetryPolicyParentBasedSampling
                     properties:
                       mode:
                         default: ImplementationDefault
@@ -262,6 +265,7 @@ spec:
                         type: string
                       samplingRate:
                         default:
+                          denominator: 100
                           numerator: 100
                         description: |-
                           SamplingRate is the sampling rate to apply when parent-based sampling is active.
@@ -466,6 +470,7 @@ spec:
                       Support: Extended
                     maxLength: 253
                     minLength: 1
+                    pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                     type: string
                   spanName:
                     description: |-
@@ -479,16 +484,15 @@ spec:
                 type: object
                 x-kubernetes-validations:
                 - message: provider must be specified when mode is Enabled
-                  rule: '!has(self.mode) || self.mode != ''Enabled'' || has(self.provider)'
-                - message: provider must be empty when mode is Disabled
-                  rule: '!has(self.mode) || self.mode != ''Disabled'' || !has(self.provider)'
-                - message: provider must be specified when mode is Enabled
                   rule: 'self.mode == ''Enabled'' ? has(self.provider) : true'
                 - message: provider must be empty when mode is Disabled
                   rule: 'self.mode == ''Disabled'' ? !has(self.provider) : true'
             required:
             - targetRefs
             type: object
+            x-kubernetes-validations:
+            - message: at least one of the fields in [tracing] must be set
+              rule: has(self.tracing)
           status:
             description: Status defines the observed state of TelemetryPolicy.
             properties:

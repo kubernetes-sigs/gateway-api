@@ -87,6 +87,8 @@ type XTelemetryPolicyList struct {
 //
 // Specifying at least one target resource in `targetRefs` is required.
 // Tracing behavior can be configured via the `tracing` field.
+//
+// +kubebuilder:validation:AtLeastOneOf=tracing
 type TelemetryPolicySpec struct {
 	// TargetRefs identifies the gateways to which this policy applies (GEP-713).
 	//
@@ -99,8 +101,10 @@ type TelemetryPolicySpec struct {
 	// Support: Core for Gateway
 	//
 	// +required
+	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
-	TargetRefs []v1.NamespacedPolicyTargetReference `json:"targetRefs"`
+	// +kubebuilder:validation:MaxItems=16
+	TargetRefs []v1.LocalObjectReference `json:"targetRefs"`
 
 	// Tracing defines the configuration for distributed tracing.
 	//
@@ -109,6 +113,8 @@ type TelemetryPolicySpec struct {
 	// defaults.
 	//
 	// Support: Extended
+	//
+	// Feature Name: TelemetryPolicyTracing
 	//
 	// +optional
 	Tracing *TracingConfig `json:"tracing,omitempty"`
@@ -158,6 +164,8 @@ const (
 	// See: https://opentelemetry.io/docs/specs/semconv/
 	//
 	// Support: Extended
+	//
+	// Feature Name: TelemetryPolicyAttribute
 	AttributeSourceAttribute AttributeSourceType = "Attribute"
 )
 
@@ -168,9 +176,9 @@ const (
 //
 // Support: Core
 //
-// +kubebuilder:validation:XValidation:rule="self.type == 'Header' ? has(self.headerName) : !has(self.headerName)",message="headerName is required when type is Header, and must be empty otherwise"
-// +kubebuilder:validation:XValidation:rule="self.type == 'Literal' ? has(self.literalValue) : !has(self.literalValue)",message="literalValue is required when type is Literal, and must be empty otherwise"
-// +kubebuilder:validation:XValidation:rule="self.type == 'Attribute' ? has(self.attributeKey) : !has(self.attributeKey)",message="attributeKey is required when type is Attribute, and must be empty otherwise"
+// +kubebuilder:validation:XValidation:rule="self.sourceType == 'Header' ? has(self.headerName) : !has(self.headerName)",message="headerName is required when sourceType is Header, and must be empty otherwise"
+// +kubebuilder:validation:XValidation:rule="self.sourceType == 'Literal' ? has(self.literalValue) : !has(self.literalValue)",message="literalValue is required when sourceType is Literal, and must be empty otherwise"
+// +kubebuilder:validation:XValidation:rule="self.sourceType == 'Attribute' ? has(self.attributeKey) : !has(self.attributeKey)",message="attributeKey is required when sourceType is Attribute, and must be empty otherwise"
 type Attribute struct {
 	// Name is the key of the attribute as it will appear in the output
 	// (i.e., as a span tag).
@@ -178,53 +186,43 @@ type Attribute struct {
 	// +required
 	Name AttributeName `json:"name"`
 
-	// Type specifies where the attribute value comes from.
+	// SourceType specifies where the attribute value comes from.
 	// Valid values are "Header", "Literal", or "Attribute".
 	//
 	// +unionDiscriminator
 	// +required
 	// +kubebuilder:validation:Enum=Header;Literal;Attribute
-	Type AttributeSourceType `json:"type"`
+	SourceType AttributeSourceType `json:"sourceType"`
 
 	// HeaderName specifies the HTTP header to extract the value from.
-	// This is required if Type is "Header".
+	// This is required if SourceType is "Header".
 	//
 	// +optional
-	HeaderName *v1.HTTPHeaderName `json:"headerName,omitempty"`
+	HeaderName v1.HTTPHeaderName `json:"headerName,omitempty"`
 
 	// LiteralValue specifies a static string value to attach.
-	// This is required if Type is "Literal".
+	// This is required if SourceType is "Literal".
 	//
 	// +optional
+	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=1024
-	LiteralValue *string `json:"literalValue,omitempty"`
+	LiteralValue string `json:"literalValue,omitempty"`
 
 	// AttributeKey refers to a standard OpenTelemetry attribute.
 	// For example: "http.response.status_code" or "http.request.method".
-	// This is required if Type is "Attribute".
+	// This is required if SourceType is "Attribute".
 	// See: https://opentelemetry.io/docs/specs/semconv/
 	//
 	// +optional
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=256
 	// +kubebuilder:validation:Pattern=`^[a-z0-9_.-]+$`
-	AttributeKey *string `json:"attributeKey,omitempty"`
+	AttributeKey string `json:"attributeKey,omitempty"`
 }
 
 // TracingConfig defines the configuration for distributed tracing.
 //
-// Distributed tracing tracks the lifecycle of an individual request as it propagates through
-// the Gateway and downstream services. Each service records a segment of the request's path
-// as a "span". This configuration allows platform operators to enable tracing, select the
-// destination backend, control the portion of traffic sampled, and inject custom values as
-// span attributes.
-//
-// Users get granular visibility into request latency, system bottlenecks, and execution flows
-// across complex distributed systems.
-//
 // Support: Extended
-// +kubebuilder:validation:XValidation:rule="!has(self.mode) || self.mode != 'Enabled' || has(self.provider)",message="provider must be specified when mode is Enabled"
-// +kubebuilder:validation:XValidation:rule="!has(self.mode) || self.mode != 'Disabled' || !has(self.provider)",message="provider must be empty when mode is Disabled"
 // +kubebuilder:validation:XValidation:rule="self.mode == 'Enabled' ? has(self.provider) : true",message="provider must be specified when mode is Enabled"
 // +kubebuilder:validation:XValidation:rule="self.mode == 'Disabled' ? !has(self.provider) : true",message="provider must be empty when mode is Disabled"
 type TracingConfig struct {
@@ -277,6 +275,8 @@ type TracingConfig struct {
 	//
 	// Support: Extended
 	//
+	// Feature Name: TelemetryPolicyParentBasedSampling
+	//
 	// +optional
 	ParentBasedSampling *ParentBasedSampling `json:"parentBasedSampling,omitempty"`
 
@@ -288,6 +288,7 @@ type TracingConfig struct {
 	// +optional
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:validation:Pattern=`^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
 	ServiceName *string `json:"serviceName,omitempty"`
 
 	// SpanName defines a custom name for the OTel span. By default, the name
@@ -390,7 +391,7 @@ type ParentBasedSampling struct {
 	// Support: Extended
 	//
 	// +optional
-	// +kubebuilder:default={numerator: 100}
+	// +kubebuilder:default={numerator: 100, denominator: 100}
 	SamplingRate *v1.Fraction `json:"samplingRate,omitempty"`
 }
 

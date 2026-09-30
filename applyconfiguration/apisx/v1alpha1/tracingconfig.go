@@ -28,15 +28,6 @@ import (
 //
 // TracingConfig defines the configuration for distributed tracing.
 //
-// Distributed tracing tracks the lifecycle of an individual request as it propagates through
-// the Gateway and downstream services. Each service records a segment of the request's path
-// as a "span". This configuration allows platform operators to enable tracing, select the
-// destination backend, control the portion of traffic sampled, and inject custom values as
-// span attributes.
-//
-// Users get granular visibility into request latency, system bottlenecks, and execution flows
-// across complex distributed systems.
-//
 // Support: Extended
 type TracingConfigApplyConfiguration struct {
 	// Mode explicitly controls if tracing is enabled. Valid values are "Enabled", "Disabled",
@@ -77,6 +68,8 @@ type TracingConfigApplyConfiguration struct {
 	// decision.
 	//
 	// Support: Extended
+	//
+	// Feature Name: TelemetryPolicyParentBasedSampling
 	ParentBasedSampling *ParentBasedSamplingApplyConfiguration `json:"parentBasedSampling,omitempty"`
 	// ServiceName is the "service.name" attribute of the OpenTelemetry resource.
 	// If absent, the implementation's default service name will be used.

@@ -45,7 +45,7 @@ import (
 //
 // Precedence and Conflict Resolution:
 // - To prevent complex merging semantics, only a single TelemetryPolicy is
-// permitted to target a specific Gateway resource at any given time.
+// permitted to apply to a specific Gateway resource at any given time.
 // - If multiple TelemetryPolicy resources target the same Gateway, precedence
 // MUST be determined using the following criteria, continuing on ties:
 // 1. The older policy by creation timestamp takes precedence.
@@ -60,7 +60,7 @@ import (
 // its respective conformance profile must be met.
 // </gateway:util:excludeFromCRD>
 //
-// Support: Core (Resource shell and targetRefs), Extended (Signals)
+// Support: Extended
 type XTelemetryPolicyApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`

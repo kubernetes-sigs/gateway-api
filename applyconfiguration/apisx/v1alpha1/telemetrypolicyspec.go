@@ -39,7 +39,7 @@ type TelemetryPolicySpecApplyConfiguration struct {
 	// TargetRefs must be distinct.
 	//
 	// Support: Core for Gateway
-	TargetRefs []v1.NamespacedPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
+	TargetRefs []v1.LocalObjectReferenceApplyConfiguration `json:"targetRefs,omitempty"`
 	// Tracing defines the configuration for distributed tracing.
 	//
 	// When configured, distributed tracing spans are generated and exported. In the
@@ -47,6 +47,8 @@ type TelemetryPolicySpecApplyConfiguration struct {
 	// defaults.
 	//
 	// Support: Extended
+	//
+	// Feature Name: TelemetryPolicyTracing
 	Tracing *TracingConfigApplyConfiguration `json:"tracing,omitempty"`
 }
 
@@ -59,7 +61,7 @@ func TelemetryPolicySpec() *TelemetryPolicySpecApplyConfiguration {
 // WithTargetRefs adds the given value to the TargetRefs field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the TargetRefs field.
-func (b *TelemetryPolicySpecApplyConfiguration) WithTargetRefs(values ...*v1.NamespacedPolicyTargetReferenceApplyConfiguration) *TelemetryPolicySpecApplyConfiguration {
+func (b *TelemetryPolicySpecApplyConfiguration) WithTargetRefs(values ...*v1.LocalObjectReferenceApplyConfiguration) *TelemetryPolicySpecApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithTargetRefs")

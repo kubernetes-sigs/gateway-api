@@ -184,8 +184,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.LocalPolicyTargetReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("LocalPolicyTargetReferenceWithSectionName"):
 		return &apisv1.LocalPolicyTargetReferenceWithSectionNameApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("NamespacedPolicyTargetReference"):
-		return &apisv1.NamespacedPolicyTargetReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ObjectReference"):
 		return &apisv1.ObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ParametersReference"):
