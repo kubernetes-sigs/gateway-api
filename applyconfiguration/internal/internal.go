@@ -2502,7 +2502,9 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPHeader
-          elementRelationship: atomic
+          elementRelationship: associative
+          keys:
+          - name
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.XBackend
   map:
     fields:

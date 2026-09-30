@@ -10801,6 +10801,14 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref common.Refe
 						},
 					},
 					"headers": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Headers specifies a list of custom headers to be added to the telemetry export requests (e.g., for authentication).\n\nSupport: Extended",
 							Type:        []string{"array"},
