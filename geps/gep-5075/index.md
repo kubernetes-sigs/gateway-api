@@ -111,7 +111,7 @@ A `ReferenceGrant` is not required because `ClusterTrustBundle` is cluster-scope
 
 ### API Changes
 
-A new optional `clusterTrustBundleRef` field is added to `BackendTLSPolicyValidation` and `FrontendTLSValidation`. The existing `caCertificateRefs` field is unchanged. When both fields are set, their trust anchors are unioned.
+A new optional `clusterTrustBundleRef` field is added to `BackendTLSPolicyValidation` and `FrontendTLSValidation`. The existing `caCertificateRefs` field is unchanged. Exactly one trust source (`caCertificateRefs`, `clusterTrustBundleRef`, or `wellKnownCACertificates`) may be configured on a given policy.
 
 #### `BackendTLSPolicyValidation` (apis/v1/backendtlspolicy_types.go)
 
@@ -200,7 +200,7 @@ An implementation that supports this feature MUST:
 5. Reconcile updates to the referenced `ClusterTrustBundle`, including changes to `spec.trustBundle`, deletion of the referenced object, and replacement or recreation of an object with the same name. During the interval between deletion and recreation, the implementation MUST treat the reference as invalid and MUST NOT use any previously cached trust anchors.
 6. Not require a `ReferenceGrant` for a valid `clusterTrustBundleRef`.
 
-Implementations that do NOT support this feature MUST set `ResolvedRefs=False` with reason `InvalidKind` (for `BackendTLSPolicy`) or `InvalidCACertificateKind` (for Gateway frontend TLS) when `clusterTrustBundleRef` is specified.
+Implementations that do NOT support this feature MUST set `ResolvedRefs=False` with reason `InvalidKind` when `clusterTrustBundleRef` is specified.
 
 ### API Availability
 
