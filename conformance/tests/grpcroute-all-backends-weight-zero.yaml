@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: all-backends-weight-zero
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - backendRefs:
+    - name: grpc-infra-backend-v1
+      port: 8080
+      weight: 0
+    - name: grpc-infra-backend-v2
+      port: 8080
+      weight: 0
