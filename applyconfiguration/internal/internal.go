@@ -2247,6 +2247,26 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantSpec
       default: {}
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.Attribute
+  map:
+    fields:
+    - name: attributeKey
+      type:
+        scalar: string
+    - name: headerName
+      type:
+        scalar: string
+    - name: literalValue
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: sourceType
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendAncestorStatus
   map:
     fields:
@@ -2393,6 +2413,15 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.ParentBasedSampling
+  map:
+    fields:
+    - name: mode
+      type:
+        scalar: string
+    - name: samplingRate
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.RequestRate
   map:
     fields:
@@ -2411,6 +2440,71 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: minRetryRate
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.RequestRate
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.TelemetryPolicySpec
+  map:
+    fields:
+    - name: targetRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
+          elementRelationship: atomic
+    - name: tracing
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.TracingConfig
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.TelemetryPolicyStatus
+  map:
+    fields:
+    - name: ancestors
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.PolicyAncestorStatus
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.TracingConfig
+  map:
+    fields:
+    - name: attributes
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.Attribute
+          elementRelationship: associative
+          keys:
+          - name
+    - name: mode
+      type:
+        scalar: string
+    - name: parentBasedSampling
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ParentBasedSampling
+    - name: provider
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.TracingProvider
+    - name: samplingRate
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction
+    - name: serviceName
+      type:
+        scalar: string
+    - name: spanName
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.TracingProvider
+  map:
+    fields:
+    - name: backendRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.BackendObjectReference
+      default: {}
+    - name: headers
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPHeader
+          elementRelationship: associative
+          keys:
+          - name
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.XBackend
   map:
     fields:
@@ -2473,6 +2567,27 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: status
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.XTelemetryPolicy
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.TelemetryPolicySpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.TelemetryPolicyStatus
       default: {}
 - name: __untyped_atomic_
   scalar: untyped

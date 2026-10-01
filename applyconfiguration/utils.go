@@ -296,6 +296,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.ReferenceGrantApplyConfiguration{}
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("Attribute"):
+		return &apisxv1alpha1.AttributeApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendAncestorStatus"):
 		return &apisxv1alpha1.BackendAncestorStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendPort"):
@@ -320,16 +322,28 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.MeshSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MeshStatus"):
 		return &apisxv1alpha1.MeshStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ParentBasedSampling"):
+		return &apisxv1alpha1.ParentBasedSamplingApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("RequestRate"):
 		return &apisxv1alpha1.RequestRateApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("RetryConstraint"):
 		return &apisxv1alpha1.RetryConstraintApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TelemetryPolicySpec"):
+		return &apisxv1alpha1.TelemetryPolicySpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TelemetryPolicyStatus"):
+		return &apisxv1alpha1.TelemetryPolicyStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TracingConfig"):
+		return &apisxv1alpha1.TracingConfigApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TracingProvider"):
+		return &apisxv1alpha1.TracingProviderApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XBackend"):
 		return &apisxv1alpha1.XBackendApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XBackendTrafficPolicy"):
 		return &apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XMesh"):
 		return &apisxv1alpha1.XMeshApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("XTelemetryPolicy"):
+		return &apisxv1alpha1.XTelemetryPolicyApplyConfiguration{}
 
 	}
 	return nil
