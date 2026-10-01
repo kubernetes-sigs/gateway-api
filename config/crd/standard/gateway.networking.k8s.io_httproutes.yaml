@@ -790,21 +790,22 @@ spec:
                                         properties:
                                           name:
                                             description: |-
-                                              Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                              Name is the name of the HTTP Header. Name matching MUST be
                                               case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                              If multiple entries specify equivalent header names, the first entry with
-                                              an equivalent name MUST be considered for a match. Subsequent entries
-                                              with an equivalent header name MUST be ignored. Due to the
-                                              case-insensitivity of header names, "foo" and "Foo" are considered
-                                              equivalent.
+                                              Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                              considered equivalent. Each header name within an HTTPHeaderFilter list
+                                              must be unique; entries with identical names are invalid. When two
+                                              entries are equivalent only because of case (for example "foo" and
+                                              "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                              ignored.
                                             maxLength: 256
                                             minLength: 1
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
                                             description: Value is the value of HTTP
-                                              Header to be matched.
+                                              Header.
                                             maxLength: 4096
                                             minLength: 1
                                             type: string
@@ -865,21 +866,22 @@ spec:
                                         properties:
                                           name:
                                             description: |-
-                                              Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                              Name is the name of the HTTP Header. Name matching MUST be
                                               case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                              If multiple entries specify equivalent header names, the first entry with
-                                              an equivalent name MUST be considered for a match. Subsequent entries
-                                              with an equivalent header name MUST be ignored. Due to the
-                                              case-insensitivity of header names, "foo" and "Foo" are considered
-                                              equivalent.
+                                              Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                              considered equivalent. Each header name within an HTTPHeaderFilter list
+                                              must be unique; entries with identical names are invalid. When two
+                                              entries are equivalent only because of case (for example "foo" and
+                                              "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                              ignored.
                                             maxLength: 256
                                             minLength: 1
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
                                             description: Value is the value of HTTP
-                                              Header to be matched.
+                                              Header.
                                             maxLength: 4096
                                             minLength: 1
                                             type: string
@@ -1233,21 +1235,22 @@ spec:
                                         properties:
                                           name:
                                             description: |-
-                                              Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                              Name is the name of the HTTP Header. Name matching MUST be
                                               case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                              If multiple entries specify equivalent header names, the first entry with
-                                              an equivalent name MUST be considered for a match. Subsequent entries
-                                              with an equivalent header name MUST be ignored. Due to the
-                                              case-insensitivity of header names, "foo" and "Foo" are considered
-                                              equivalent.
+                                              Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                              considered equivalent. Each header name within an HTTPHeaderFilter list
+                                              must be unique; entries with identical names are invalid. When two
+                                              entries are equivalent only because of case (for example "foo" and
+                                              "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                              ignored.
                                             maxLength: 256
                                             minLength: 1
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
                                             description: Value is the value of HTTP
-                                              Header to be matched.
+                                              Header.
                                             maxLength: 4096
                                             minLength: 1
                                             type: string
@@ -1308,21 +1311,22 @@ spec:
                                         properties:
                                           name:
                                             description: |-
-                                              Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                              Name is the name of the HTTP Header. Name matching MUST be
                                               case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                              If multiple entries specify equivalent header names, the first entry with
-                                              an equivalent name MUST be considered for a match. Subsequent entries
-                                              with an equivalent header name MUST be ignored. Due to the
-                                              case-insensitivity of header names, "foo" and "Foo" are considered
-                                              equivalent.
+                                              Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                              considered equivalent. Each header name within an HTTPHeaderFilter list
+                                              must be unique; entries with identical names are invalid. When two
+                                              entries are equivalent only because of case (for example "foo" and
+                                              "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                              ignored.
                                             maxLength: 256
                                             minLength: 1
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
                                             description: Value is the value of HTTP
-                                              Header to be matched.
+                                              Header.
                                             maxLength: 4096
                                             minLength: 1
                                             type: string
@@ -2045,21 +2049,21 @@ spec:
                                   properties:
                                     name:
                                       description: |-
-                                        Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                        Name is the name of the HTTP Header. Name matching MUST be
                                         case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                        If multiple entries specify equivalent header names, the first entry with
-                                        an equivalent name MUST be considered for a match. Subsequent entries
-                                        with an equivalent header name MUST be ignored. Due to the
-                                        case-insensitivity of header names, "foo" and "Foo" are considered
-                                        equivalent.
+                                        Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                        considered equivalent. Each header name within an HTTPHeaderFilter list
+                                        must be unique; entries with identical names are invalid. When two
+                                        entries are equivalent only because of case (for example "foo" and
+                                        "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                        ignored.
                                       maxLength: 256
                                       minLength: 1
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: Value is the value of HTTP Header.
                                       maxLength: 4096
                                       minLength: 1
                                       type: string
@@ -2119,21 +2123,21 @@ spec:
                                   properties:
                                     name:
                                       description: |-
-                                        Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                        Name is the name of the HTTP Header. Name matching MUST be
                                         case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                        If multiple entries specify equivalent header names, the first entry with
-                                        an equivalent name MUST be considered for a match. Subsequent entries
-                                        with an equivalent header name MUST be ignored. Due to the
-                                        case-insensitivity of header names, "foo" and "Foo" are considered
-                                        equivalent.
+                                        Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                        considered equivalent. Each header name within an HTTPHeaderFilter list
+                                        must be unique; entries with identical names are invalid. When two
+                                        entries are equivalent only because of case (for example "foo" and
+                                        "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                        ignored.
                                       maxLength: 256
                                       minLength: 1
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: Value is the value of HTTP Header.
                                       maxLength: 4096
                                       minLength: 1
                                       type: string
@@ -2486,21 +2490,21 @@ spec:
                                   properties:
                                     name:
                                       description: |-
-                                        Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                        Name is the name of the HTTP Header. Name matching MUST be
                                         case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                        If multiple entries specify equivalent header names, the first entry with
-                                        an equivalent name MUST be considered for a match. Subsequent entries
-                                        with an equivalent header name MUST be ignored. Due to the
-                                        case-insensitivity of header names, "foo" and "Foo" are considered
-                                        equivalent.
+                                        Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                        considered equivalent. Each header name within an HTTPHeaderFilter list
+                                        must be unique; entries with identical names are invalid. When two
+                                        entries are equivalent only because of case (for example "foo" and
+                                        "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                        ignored.
                                       maxLength: 256
                                       minLength: 1
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: Value is the value of HTTP Header.
                                       maxLength: 4096
                                       minLength: 1
                                       type: string
@@ -2560,21 +2564,21 @@ spec:
                                   properties:
                                     name:
                                       description: |-
-                                        Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                        Name is the name of the HTTP Header. Name matching MUST be
                                         case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                        If multiple entries specify equivalent header names, the first entry with
-                                        an equivalent name MUST be considered for a match. Subsequent entries
-                                        with an equivalent header name MUST be ignored. Due to the
-                                        case-insensitivity of header names, "foo" and "Foo" are considered
-                                        equivalent.
+                                        Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                        considered equivalent. Each header name within an HTTPHeaderFilter list
+                                        must be unique; entries with identical names are invalid. When two
+                                        entries are equivalent only because of case (for example "foo" and
+                                        "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                        ignored.
                                       maxLength: 256
                                       minLength: 1
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: Value is the value of HTTP Header.
                                       maxLength: 4096
                                       minLength: 1
                                       type: string
@@ -4251,21 +4255,22 @@ spec:
                                         properties:
                                           name:
                                             description: |-
-                                              Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                              Name is the name of the HTTP Header. Name matching MUST be
                                               case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                              If multiple entries specify equivalent header names, the first entry with
-                                              an equivalent name MUST be considered for a match. Subsequent entries
-                                              with an equivalent header name MUST be ignored. Due to the
-                                              case-insensitivity of header names, "foo" and "Foo" are considered
-                                              equivalent.
+                                              Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                              considered equivalent. Each header name within an HTTPHeaderFilter list
+                                              must be unique; entries with identical names are invalid. When two
+                                              entries are equivalent only because of case (for example "foo" and
+                                              "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                              ignored.
                                             maxLength: 256
                                             minLength: 1
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
                                             description: Value is the value of HTTP
-                                              Header to be matched.
+                                              Header.
                                             maxLength: 4096
                                             minLength: 1
                                             type: string
@@ -4326,21 +4331,22 @@ spec:
                                         properties:
                                           name:
                                             description: |-
-                                              Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                              Name is the name of the HTTP Header. Name matching MUST be
                                               case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                              If multiple entries specify equivalent header names, the first entry with
-                                              an equivalent name MUST be considered for a match. Subsequent entries
-                                              with an equivalent header name MUST be ignored. Due to the
-                                              case-insensitivity of header names, "foo" and "Foo" are considered
-                                              equivalent.
+                                              Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                              considered equivalent. Each header name within an HTTPHeaderFilter list
+                                              must be unique; entries with identical names are invalid. When two
+                                              entries are equivalent only because of case (for example "foo" and
+                                              "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                              ignored.
                                             maxLength: 256
                                             minLength: 1
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
                                             description: Value is the value of HTTP
-                                              Header to be matched.
+                                              Header.
                                             maxLength: 4096
                                             minLength: 1
                                             type: string
@@ -4694,21 +4700,22 @@ spec:
                                         properties:
                                           name:
                                             description: |-
-                                              Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                              Name is the name of the HTTP Header. Name matching MUST be
                                               case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                              If multiple entries specify equivalent header names, the first entry with
-                                              an equivalent name MUST be considered for a match. Subsequent entries
-                                              with an equivalent header name MUST be ignored. Due to the
-                                              case-insensitivity of header names, "foo" and "Foo" are considered
-                                              equivalent.
+                                              Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                              considered equivalent. Each header name within an HTTPHeaderFilter list
+                                              must be unique; entries with identical names are invalid. When two
+                                              entries are equivalent only because of case (for example "foo" and
+                                              "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                              ignored.
                                             maxLength: 256
                                             minLength: 1
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
                                             description: Value is the value of HTTP
-                                              Header to be matched.
+                                              Header.
                                             maxLength: 4096
                                             minLength: 1
                                             type: string
@@ -4769,21 +4776,22 @@ spec:
                                         properties:
                                           name:
                                             description: |-
-                                              Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                              Name is the name of the HTTP Header. Name matching MUST be
                                               case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                              If multiple entries specify equivalent header names, the first entry with
-                                              an equivalent name MUST be considered for a match. Subsequent entries
-                                              with an equivalent header name MUST be ignored. Due to the
-                                              case-insensitivity of header names, "foo" and "Foo" are considered
-                                              equivalent.
+                                              Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                              considered equivalent. Each header name within an HTTPHeaderFilter list
+                                              must be unique; entries with identical names are invalid. When two
+                                              entries are equivalent only because of case (for example "foo" and
+                                              "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                              ignored.
                                             maxLength: 256
                                             minLength: 1
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
                                             description: Value is the value of HTTP
-                                              Header to be matched.
+                                              Header.
                                             maxLength: 4096
                                             minLength: 1
                                             type: string
@@ -5506,21 +5514,21 @@ spec:
                                   properties:
                                     name:
                                       description: |-
-                                        Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                        Name is the name of the HTTP Header. Name matching MUST be
                                         case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                        If multiple entries specify equivalent header names, the first entry with
-                                        an equivalent name MUST be considered for a match. Subsequent entries
-                                        with an equivalent header name MUST be ignored. Due to the
-                                        case-insensitivity of header names, "foo" and "Foo" are considered
-                                        equivalent.
+                                        Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                        considered equivalent. Each header name within an HTTPHeaderFilter list
+                                        must be unique; entries with identical names are invalid. When two
+                                        entries are equivalent only because of case (for example "foo" and
+                                        "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                        ignored.
                                       maxLength: 256
                                       minLength: 1
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: Value is the value of HTTP Header.
                                       maxLength: 4096
                                       minLength: 1
                                       type: string
@@ -5580,21 +5588,21 @@ spec:
                                   properties:
                                     name:
                                       description: |-
-                                        Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                        Name is the name of the HTTP Header. Name matching MUST be
                                         case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                        If multiple entries specify equivalent header names, the first entry with
-                                        an equivalent name MUST be considered for a match. Subsequent entries
-                                        with an equivalent header name MUST be ignored. Due to the
-                                        case-insensitivity of header names, "foo" and "Foo" are considered
-                                        equivalent.
+                                        Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                        considered equivalent. Each header name within an HTTPHeaderFilter list
+                                        must be unique; entries with identical names are invalid. When two
+                                        entries are equivalent only because of case (for example "foo" and
+                                        "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                        ignored.
                                       maxLength: 256
                                       minLength: 1
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: Value is the value of HTTP Header.
                                       maxLength: 4096
                                       minLength: 1
                                       type: string
@@ -5947,21 +5955,21 @@ spec:
                                   properties:
                                     name:
                                       description: |-
-                                        Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                        Name is the name of the HTTP Header. Name matching MUST be
                                         case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                        If multiple entries specify equivalent header names, the first entry with
-                                        an equivalent name MUST be considered for a match. Subsequent entries
-                                        with an equivalent header name MUST be ignored. Due to the
-                                        case-insensitivity of header names, "foo" and "Foo" are considered
-                                        equivalent.
+                                        Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                        considered equivalent. Each header name within an HTTPHeaderFilter list
+                                        must be unique; entries with identical names are invalid. When two
+                                        entries are equivalent only because of case (for example "foo" and
+                                        "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                        ignored.
                                       maxLength: 256
                                       minLength: 1
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: Value is the value of HTTP Header.
                                       maxLength: 4096
                                       minLength: 1
                                       type: string
@@ -6021,21 +6029,21 @@ spec:
                                   properties:
                                     name:
                                       description: |-
-                                        Name is the name of the HTTP Header to be matched. Name matching MUST be
+                                        Name is the name of the HTTP Header. Name matching MUST be
                                         case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
-                                        If multiple entries specify equivalent header names, the first entry with
-                                        an equivalent name MUST be considered for a match. Subsequent entries
-                                        with an equivalent header name MUST be ignored. Due to the
-                                        case-insensitivity of header names, "foo" and "Foo" are considered
-                                        equivalent.
+                                        Due to the case-insensitivity of header names, "foo" and "Foo" are
+                                        considered equivalent. Each header name within an HTTPHeaderFilter list
+                                        must be unique; entries with identical names are invalid. When two
+                                        entries are equivalent only because of case (for example "foo" and
+                                        "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+                                        ignored.
                                       maxLength: 256
                                       minLength: 1
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: Value is the value of HTTP Header.
                                       maxLength: 4096
                                       minLength: 1
                                       type: string
