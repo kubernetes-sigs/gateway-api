@@ -20,7 +20,6 @@ limitations under the License.
 package main
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -401,7 +400,8 @@ func TestGRPCRouteRule(t *testing.T) {
 				}
 				return rules
 			}(),
-		}}
+		},
+	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -415,36 +415,6 @@ func TestGRPCRouteRule(t *testing.T) {
 			validateGRPCRoute(t, route, tc.wantErrors)
 		})
 	}
-}
-
-// grpcRulesWithMethodMatch returns nRules rules with one valid method match each.
-// When badIdx >= 0, the first rule instead gets badIdx+1 matches and the match at
-// badIdx uses badService/badMethod.
-func grpcRulesWithMethodMatch(nRules, badIdx int, badService, badMethod string) []gatewayv1.GRPCRouteRule {
-	valid := gatewayv1.GRPCRouteMatch{Method: &gatewayv1.GRPCMethodMatch{
-		Type:    new(gatewayv1.GRPCMethodMatchExact),
-		Service: new("foo"),
-		Method:  new("bar"),
-	}}
-	var rules []gatewayv1.GRPCRouteRule
-	for range nRules {
-		rules = append(rules, gatewayv1.GRPCRouteRule{Matches: []gatewayv1.GRPCRouteMatch{valid}})
-	}
-	if badIdx >= 0 {
-		rules[0].Matches = nil
-		for i := 0; i <= badIdx; i++ {
-			m := valid
-			if i == badIdx {
-				m = gatewayv1.GRPCRouteMatch{Method: &gatewayv1.GRPCMethodMatch{
-					Type:    new(gatewayv1.GRPCMethodMatchExact),
-					Service: new(badService),
-					Method:  new(badMethod),
-				}}
-			}
-			rules[0].Matches = append(rules[0].Matches, m)
-		}
-	}
-	return rules
 }
 
 func TestGRPCMethodMatch(t *testing.T) {
@@ -558,26 +528,5 @@ func TestGRPCMethodMatch(t *testing.T) {
 			}
 			validateGRPCRoute(t, &route, tc.wantErrors)
 		})
-	}
-}
-
-func validateGRPCRoute(t *testing.T, route *gatewayv1.GRPCRoute, wantErrors []string) {
-	t.Helper()
-
-	ctx := context.Background()
-	err := k8sClient.Create(ctx, route)
-
-	if (len(wantErrors) != 0) != (err != nil) {
-		t.Fatalf("Unexpected response while creating GRPCRoute %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", route.Namespace, route.Name), err, wantErrors)
-	}
-
-	var missingErrorStrings []string
-	for _, wantError := range wantErrors {
-		if !celErrorStringMatches(err.Error(), wantError) {
-			missingErrorStrings = append(missingErrorStrings, wantError)
-		}
-	}
-	if len(missingErrorStrings) != 0 {
-		t.Errorf("Unexpected response while creating GRPCRoute %q; got err=\n%v\n;missing strings within error=%q", fmt.Sprintf("%v/%v", route.Namespace, route.Name), err, missingErrorStrings)
 	}
 }

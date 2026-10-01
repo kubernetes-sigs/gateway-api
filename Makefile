@@ -88,7 +88,7 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./apis/... ./conformance/utils/... ./tools/openapi-generator
+	go test -race -cover ./apis/... ./conformance/utils/... ./tools/openapi-generator ./tools/generator
 
 golint:
 	hack/verify-golint.sh

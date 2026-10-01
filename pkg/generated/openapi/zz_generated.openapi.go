@@ -3677,7 +3677,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCMethodMatch(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GRPCMethodMatch describes how to select a gRPC route by matching the gRPC request service and/or method.\n\nAt least one of Service and Method MUST be a non-empty string.",
+				Description: "GRPCMethodMatch describes how to select a gRPC route by matching the gRPC request service and/or method.\n\nAt least one of Service and Method MUST be a non-empty string.\n\n<gateway:util:excludeFromCRD> The CRD generator batches the character checks at the route-rule level to keep their estimated CEL cost within the API server budget. </gateway:util:excludeFromCRD>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -3899,7 +3899,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRouteRule defines the semantics for matching a gRPC request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).\n\n<gateway:util:excludeFromCRD> The service and method character-class checks are applied from here rather than on GRPCMethodMatch. The apiserver prices a CEL rule statically as its cost times the maxItems of every enclosing list, so a regex rule on GRPCMethodMatch is charged rules x matches (64 x 64) times and exceeds the per-rule budget. Iterating over a literal list of match indexes from the rule level is charged per rule instead, and the 64 indexes are split across four rules per check to stay within budget. </gateway:util:excludeFromCRD>",
+				Description: "GRPCRouteRule defines the semantics for matching a gRPC request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
@@ -5150,7 +5150,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPPathMatch(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.",
+				Description: "HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.\n\n<gateway:util:excludeFromCRD> The CRD generator batches the character checks at the route-rule level to keep their estimated CEL cost within the API server budget. </gateway:util:excludeFromCRD>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -5621,7 +5621,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteRule defines semantics for matching an HTTP request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).\n\n<gateway:util:excludeFromCRD> The path.value character-class check is applied from here rather than on HTTPPathMatch. The apiserver prices a CEL rule statically as its cost times the maxItems of every enclosing list, so a regex rule on HTTPPathMatch is charged rules x matches (64 x 64) times and exceeds the per-rule budget. Iterating over a literal list of match indexes from the rule level is charged per rule instead, and the 64 indexes are split across four rules to stay within budget. </gateway:util:excludeFromCRD>",
+				Description: "HTTPRouteRule defines semantics for matching an HTTP request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {

@@ -2007,54 +2007,46 @@ spec:
                         rule: self.type != 'Header' || has(self.header)
                   type: object
                   x-kubernetes-validations:
-                  - message: matches[].method.service must only contain valid characters
-                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
-                    rule: '!has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i,
-                      self.matches.size() <= i || !has(self.matches[i].method) ||
-                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
-                      == ''Exact'') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""))'
-                  - message: matches[].method.service must only contain valid characters
-                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
-                    rule: '!has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i,
-                      self.matches.size() <= i || !has(self.matches[i].method) ||
-                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
-                      == ''Exact'') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""))'
-                  - message: matches[].method.service must only contain valid characters
-                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
-                    rule: '!has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i,
-                      self.matches.size() <= i || !has(self.matches[i].method) ||
-                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
-                      == ''Exact'') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""))'
-                  - message: matches[].method.service must only contain valid characters
-                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
-                    rule: '!has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i,
-                      self.matches.size() <= i || !has(self.matches[i].method) ||
-                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
-                      == ''Exact'') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""))'
-                  - message: matches[].method.method must only contain valid characters
-                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)
-                    rule: '!has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i,
-                      self.matches.size() <= i || !has(self.matches[i].method) ||
-                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
-                      == ''Exact'') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""))'
-                  - message: matches[].method.method must only contain valid characters
-                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)
-                    rule: '!has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i,
-                      self.matches.size() <= i || !has(self.matches[i].method) ||
-                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
-                      == ''Exact'') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""))'
-                  - message: matches[].method.method must only contain valid characters
-                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)
-                    rule: '!has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i,
-                      self.matches.size() <= i || !has(self.matches[i].method) ||
-                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
-                      == ''Exact'') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""))'
-                  - message: matches[].method.method must only contain valid characters
-                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)
-                    rule: '!has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i,
-                      self.matches.size() <= i || !has(self.matches[i].method) ||
-                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
-                      == ''Exact'') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""))'
+                  - message: 'matches[].method: service must only contain valid characters
+                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)'
+                    rule: |-
+                      !has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i, self.matches.size() <= i || !has(self.matches[i].method) || (((!has(self.matches[i].method.type) || self.matches[i].method.type == "Exact") &&
+                      has(self.matches[i].method.service)) ? self.matches[i].method.service.matches("^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$") : true))
+                  - message: 'matches[].method: service must only contain valid characters
+                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)'
+                    rule: |-
+                      !has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i, self.matches.size() <= i || !has(self.matches[i].method) || (((!has(self.matches[i].method.type) || self.matches[i].method.type == "Exact") &&
+                      has(self.matches[i].method.service)) ? self.matches[i].method.service.matches("^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$") : true))
+                  - message: 'matches[].method: service must only contain valid characters
+                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)'
+                    rule: |-
+                      !has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i, self.matches.size() <= i || !has(self.matches[i].method) || (((!has(self.matches[i].method.type) || self.matches[i].method.type == "Exact") &&
+                      has(self.matches[i].method.service)) ? self.matches[i].method.service.matches("^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$") : true))
+                  - message: 'matches[].method: service must only contain valid characters
+                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)'
+                    rule: |-
+                      !has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i, self.matches.size() <= i || !has(self.matches[i].method) || (((!has(self.matches[i].method.type) || self.matches[i].method.type == "Exact") &&
+                      has(self.matches[i].method.service)) ? self.matches[i].method.service.matches("^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$") : true))
+                  - message: 'matches[].method: method must only contain valid characters
+                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)'
+                    rule: |-
+                      !has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i, self.matches.size() <= i || !has(self.matches[i].method) || (((!has(self.matches[i].method.type) || self.matches[i].method.type == "Exact") &&
+                      has(self.matches[i].method.method)) ? self.matches[i].method.method.matches("^[A-Za-z_][A-Za-z_0-9]*$") : true))
+                  - message: 'matches[].method: method must only contain valid characters
+                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)'
+                    rule: |-
+                      !has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i, self.matches.size() <= i || !has(self.matches[i].method) || (((!has(self.matches[i].method.type) || self.matches[i].method.type == "Exact") &&
+                      has(self.matches[i].method.method)) ? self.matches[i].method.method.matches("^[A-Za-z_][A-Za-z_0-9]*$") : true))
+                  - message: 'matches[].method: method must only contain valid characters
+                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)'
+                    rule: |-
+                      !has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i, self.matches.size() <= i || !has(self.matches[i].method) || (((!has(self.matches[i].method.type) || self.matches[i].method.type == "Exact") &&
+                      has(self.matches[i].method.method)) ? self.matches[i].method.method.matches("^[A-Za-z_][A-Za-z_0-9]*$") : true))
+                  - message: 'matches[].method: method must only contain valid characters
+                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)'
+                    rule: |-
+                      !has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i, self.matches.size() <= i || !has(self.matches[i].method) || (((!has(self.matches[i].method.type) || self.matches[i].method.type == "Exact") &&
+                      has(self.matches[i].method.method)) ? self.matches[i].method.method.matches("^[A-Za-z_][A-Za-z_0-9]*$") : true))
                 maxItems: 64
                 type: array
                 x-kubernetes-list-type: atomic
