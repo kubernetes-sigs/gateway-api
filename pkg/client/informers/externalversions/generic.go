@@ -113,6 +113,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().XBackendTrafficPolicies().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("xmeshes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().XMeshes().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("xtelemetrypolicies"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().XTelemetryPolicies().Informer()}, nil
 
 	}
 

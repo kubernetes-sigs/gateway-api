@@ -237,6 +237,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                             schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute":                                schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref),
@@ -249,14 +250,21 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.LabelSelector":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_LabelSelector(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshSpec":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshStatus":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicyStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackend(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendList":                             schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicyList":                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh":                                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMesh(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMeshList":                                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy":                         schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicyList":                     schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicyList(ref),
 	}
 }
 
@@ -10043,6 +10051,57 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Attribute defines a single flat key-value pair to attach to traces.\n\nThis allows users to enrich spans with context like HTTP headers (e.g., \"X-User-ID\"), static tags, or built-in variables.\n\nSupport: Core",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the key of the attribute as it will appear in the output (i.e., as a span tag).",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"sourceType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SourceType specifies where the attribute value comes from. Valid values are \"Header\", \"Literal\", or \"Attribute\".",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"headerName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "HeaderName specifies the HTTP header to extract the value from. This is required if SourceType is \"Header\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"literalValue": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LiteralValue specifies a static string value to attach. This is required if SourceType is \"Literal\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"attributeKey": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AttributeKey refers to a standard OpenTelemetry attribute. For example: \"http.response.status_code\" or \"http.request.method\". This is required if SourceType is \"Attribute\". See: https://opentelemetry.io/docs/specs/semconv/",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name", "sourceType"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10496,6 +10555,34 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref common.Reference
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream trace parent.\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mode explicitly controls if parent-based sampling is enabled. Valid values are \"Enabled\", \"Disabled\", \"ImplementationDefault\".\n\nIn the absence of this field, it defaults to \"ImplementationDefault\".\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"samplingRate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SamplingRate is the sampling rate to apply when parent-based sampling is active.\n\nThis acts as a downsampling governor. It allows an operator to say: \"I want to respect the parent's decision, but only for 50% of those requests\". Even if a parent is already marked as \"Sampled\", this allows the Gateway to apply a secondary filter so that it can respect the parent's intent while still controlling the volume of spans reported.\n\nIn the absence of this field, it defaults to 100% ({numerator: 100}).\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.Fraction"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10547,6 +10634,199 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.Refe
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails", "sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicySpec defines the desired state and target of TelemetryPolicy.\n\nSpecifying at least one target resource in `targetRefs` is required. Tracing behavior can be configured via the `tracing` field.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"targetRefs": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRefs identifies the gateways to which this policy applies (GEP-713).\n\nWhen configured, the telemetry settings defined in this policy are applied uniformly to the referenced resources. In the absence of targetRefs, the policy is invalid and will not be accepted.\n\nTargetRefs must be distinct.\n\nSupport: Core for Gateway",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
+									},
+								},
+							},
+						},
+					},
+					"tracing": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Tracing defines the configuration for distributed tracing.\n\nWhen configured, distributed tracing spans are generated and exported. In the absence of this configuration, tracing behavior is determined by implementation defaults.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"),
+						},
+					},
+				},
+				Required: []string{"targetRefs"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicyStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicyStatus defines the observed state of TelemetryPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ancestors": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "For Policy Status API conventions, see: https://gateway-api.sigs.k8s.io/geps/gep-713/#the-status-stanza-of-policy-objects\n\nAncestors is a list of ancestor resources (specifically Gateway resources) that are associated with the policy, and the status of the policy with respect to each ancestor. When this policy attaches to a parent, the controller that manages the parent and the ancestors MUST add an entry to this list when the controller first sees the policy and SHOULD update the entry as appropriate when the relevant ancestor is modified.\n\nFor TelemetryPolicy, the ancestor MUST be the Gateway resource referenced in spec.targetRefs.\n\nNote also that implementations MUST ONLY populate ancestor status for the Ancestor resources they are responsible for. Implementations MUST use the ControllerName field to uniquely identify the entries in this list that they are responsible for.\n\nNote that to achieve this, the list of PolicyAncestorStatus structs MUST be treated as a map with a composite key, made up of the AncestorRef and ControllerName fields combined.\n\nA maximum of 16 ancestors will be represented in this list. An empty list means the Policy is not relevant for any ancestors.\n\nIf this slice is full, implementations MUST NOT add further entries. Instead they MUST consider the policy unimplementable and signal that on any related resources such as the ancestor that would be referenced here.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"ancestors"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TracingConfig defines the configuration for distributed tracing.\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mode explicitly controls if tracing is enabled. Valid values are \"Enabled\", \"Disabled\", \"ImplementationDefault\".\n\nIn the absence of this field, it defaults to \"ImplementationDefault\".\n\nSupport: Core (within TelemetryPolicy feature)",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"provider": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Provider specifies the tracing collector or backend endpoint receiving OTLP spans.\n\nWhen configured, spans generated by the Gateway proxy are exported to this destination. In the absence of this field, spans are exported to an implementation-defined default sink.\n\nSupport: Core (within Tracing feature)",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider"),
+						},
+					},
+					"samplingRate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SamplingRate specifies the base probability of sampling new traces.\n\nThe sampling probability is represented as a fraction.\n\nFor example, a Numerator of 5 and Denominator of 100 represents a 5% sampling rate. * If configured, only the specified percentage of new traces will be initiated. * In the absence of this field, an implementation-defined default is used.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nPermutations of numerator > denominator are invalid and MUST be rejected via validation. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
+						},
+					},
+					"parentBasedSampling": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ParentBasedSampling configures whether to respect the sampling decision of the parent span.\n\n* When Mode is \"Enabled\", the proxy will respect the upstream trace parent's sampling\n  decision.\n* When Mode is \"Disabled\" or absent, the proxy applies its own local sampling rate\n  decision.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyParentBasedSampling",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling"),
+						},
+					},
+					"serviceName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ServiceName is the \"service.name\" attribute of the OpenTelemetry resource. If absent, the implementation's default service name will be used.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"spanName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SpanName defines a custom name for the OTel span. By default, the name is implementation-specific.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"attributes": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Attributes is a list of custom key-value pairs (or variables) attached to every span.\n\nWhen configured, these attributes are injected into every generated tracing span. In the absence of attributes, only standard proxy-defined attributes are emitted.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.Fraction", "sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TracingProvider identifies the tracing backend that receives generated spans.\n\nSupport: Core for Service\n\nSupport: Implementation-specific for any other resource",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"backendRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BackendRef is a reference to a Kubernetes Service or other supported backend that receives OTLP traces.\n\nWhen configured, tracing data is exported to the referenced backend. If the reference is invalid (e.g., the Service does not exist), the implementation should update the policy's status conditions to indicate an unresolved reference.\n\nTLS configuration for the connection to the backend is managed by the referenced object. For example, if the BackendRef points to a Service, a BackendTLSPolicy can be attached to configure TLS. Alternatively, the referenced backend could be a custom resource (e.g., XBackend) that natively manages TLS.\n\nSupport: Core",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference"),
+						},
+					},
+					"headers": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Headers specifies a list of custom headers to be added to the telemetry export requests (e.g., for authentication).\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"backendRef"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference", "sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"},
 	}
 }
 
@@ -10840,5 +11120,103 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref common.ReferenceC
 		},
 		Dependencies: []string{
 			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicy defines a Direct Attached Policy to configure telemetry/observability signals for Gateways.\n\nBy applying a TelemetryPolicy, platform operators and developers can ensure consistent collection, formatting, and export of observability signals.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nTelemetryPolicy is a Direct Attached Policy. Implementing controllers MUST adhere to the Policy Attachment guidelines (GEP-713).\n\nPrecedence and Conflict Resolution:\n  - To prevent complex merging semantics, only a single TelemetryPolicy is\n    permitted to apply to a specific Gateway resource at any given time.\n  - If multiple TelemetryPolicy resources target the same Gateway, precedence\n    MUST be determined using the following criteria, continuing on ties:\n    1. The older policy by creation timestamp takes precedence.\n    2. The policy appearing first in alphabetical order by {namespace}/{name}.\n  - For any TelemetryPolicy that does not take precedence, the controller\n    MUST set the `Accepted` condition on the policy status to `status: False` with\n    Reason `Conflicted`.\n\nConformance: Implementations MUST support the core resource structure and `targetRefs`. Support for the tracing block is Extended, but if supported, its respective conformance profile must be met. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of TelemetryPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the observed state of TelemetryPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "XTelemetryPolicyList contains a list of XTelemetryPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy"},
 	}
 }
