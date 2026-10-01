@@ -30,11 +30,12 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRetryWithTimeouts)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRetryWithRequestTimeout)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRetryWithBackendTimeout)
 }
 
-var HTTPRouteRetryWithTimeouts = confsuite.ConformanceTest{
-	ShortName:   "HTTPRouteRetryWithTimeouts",
+var HTTPRouteRetryWithRequestTimeout = confsuite.ConformanceTest{
+	ShortName:   "HTTPRouteRetryWithRequestTimeout",
 	Description: "An HTTPRoute that has both Retry and Timeout policies configured should retry failed requests only while the configured timeouts permit, returning a successful response when the backend recovers within the timeout budget.",
 	Manifests:   []string{"tests/httproute-retry-with-timeouts.yaml"},
 	Features: []features.FeatureName{
@@ -62,7 +63,7 @@ var HTTPRouteRetryWithTimeouts = confsuite.ConformanceTest{
 			{
 				name: "succeeds when retries complete within the request timeout",
 				args: args{
-					path: "/retry/request-timeout-200ms",
+					path: "/retry/request-timeout-500ms",
 					retrySimulationConfig: url.Values{
 						"responseCode": []string{"500"},
 						"succeedAfter": []string{"1"},
@@ -71,13 +72,76 @@ var HTTPRouteRetryWithTimeouts = confsuite.ConformanceTest{
 				want: http.Response{StatusCode: 200},
 			},
 			{
-				name: "fails with 504 when retry delays exceed the request timeout",
+				name: "fails with 504 when the sum of retry delays exceed the request timeout",
+				args: args{
+					path: "/retry/request-timeout-500ms",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"500"},
+						"succeedAfter": []string{"2"},
+						"delayRetry":   []string{"300ms"},
+					},
+				},
+				want: http.Response{StatusCode: 504},
+			},
+		}
+		for i := range testCases {
+			tc := testCases[i]
+			t.Run(fmt.Sprintf("%d request to '%s' %s", i, tc.args.path, tc.name), func(t *testing.T) {
+				assertConsistentRetryBehaviour(t, suite, gwAddr, ns, tc.args.path, tc.args.retrySimulationConfig, tc.want)
+			})
+		}
+	},
+}
+
+var HTTPRouteRetryWithBackendTimeout = confsuite.ConformanceTest{
+	ShortName:   "HTTPRouteRetryWithBackendTimeout",
+	Description: "An HTTPRoute with both Retry and Timeout policies should succeed when retry attempts complete within the configured timeouts, and fail with a 504 when retry delays exceed them.",
+	Manifests:   []string{"tests/httproute-retry-with-timeouts.yaml"},
+	Features: []features.FeatureName{
+		features.SupportGateway,
+		features.SupportHTTPRoute,
+		features.SupportHTTPRouteRetryCodes,
+		features.SupportHTTPRouteRequestTimeout,
+		features.SupportHTTPRouteBackendTimeout,
+	},
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
+		routeNN := types.NamespacedName{Name: "retries-with-timeouts", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+
+		type args struct {
+			path                  string
+			retrySimulationConfig url.Values
+		}
+		testCases := []struct {
+			name string
+			args args
+			want http.Response
+		}{
+			{
+				name: "succeeds when retry attempt complete within the backend timeout",
+				args: args{
+					path: "/retry/backend-timeout-500ms",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"500"},
+						"succeedAfter": []string{"2"},
+						"delayRetry":   []string{"100ms"},
+						"delay":        []string{"100ms"},
+					},
+				},
+				want: http.Response{StatusCode: 200},
+			},
+			{
+				name: "fails with 504 when retry delay exceed the backend timeout",
 				args: args{
 					path: "/retry/request-timeout-200ms",
 					retrySimulationConfig: url.Values{
 						"responseCode": []string{"500"},
-						"succeedAfter": []string{"4"},
-						"delayRetry":   []string{"100ms"},
+						"succeedAfter": []string{"2"},
+						"delayRetry":   []string{"1s"},
+						"delay":        []string{"1s"},
 					},
 				},
 				want: http.Response{StatusCode: 504},
