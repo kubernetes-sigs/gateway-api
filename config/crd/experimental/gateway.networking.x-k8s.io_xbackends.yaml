@@ -138,9 +138,9 @@ spec:
                   to this backend. When not set, the implementation will use the protocol
                   determined by the route or listener configuration.
 
-                  Support: Core - HTTP, HTTP2, H2C, and HTTP11
+                  Support: Core - HTTP, H2C, and HTTP11
 
-                  Support: Extended - GRPC, MCP, TCP, WSS
+                  Support: Extended - GRPC, HTTP2, MCP, TCP, WSS
                 enum:
                 - TCP
                 - HTTP
@@ -166,7 +166,10 @@ spec:
                       session. Once the AbsoluteTimeout duration has elapsed, the
                       session becomes invalid.
 
-                      Support: Extended
+                      Support: Core when cookie.lifetimeType is "Permanent".
+
+                      Support: Extended when cookie.lifetimeType is "Session" or
+                      type is "Header".
                     pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                     type: string
                   cookie:
@@ -195,9 +198,7 @@ spec:
 
                           Defaults to "Session".
 
-                          Support: Core for "Session" type
-
-                          Support: Extended for "Permanent" type
+                          Support: Core
                         enum:
                         - Permanent
                         - Session
@@ -209,8 +210,7 @@ spec:
                           Users should avoid reusing cookie names to prevent unintended
                           consequences, such as rejection or unpredictable behavior.
 
-
-                          Support: Extended
+                          Support: Core
                         maxLength: 256
                         minLength: 1
                         pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
