@@ -107,7 +107,7 @@ Any particular traffic must only be able to be assigned to a single Listener, an
 The most important outcome here is that traffic can't fail to be routed by one Listener, then fall back to another for further processing.
 For more information on this, see the [Traffic Matching](/docs/concepts/traffic-matching/) page.
 
-However, for the Route -> Gateway relationship, the most important thing is that Routes **attach** to one or more Listeners on the the Gateway.
+However, for the Route -> Gateway relationship, the most important thing is that Routes **attach** to one or more Listeners on the Gateway.
 
 #### Distinctiveness
 
