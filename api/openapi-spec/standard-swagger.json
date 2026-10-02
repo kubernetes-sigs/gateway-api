@@ -12016,7 +12016,7 @@
 			}
 		},
 		"io.k8s.networking.gateway.v1.GRPCMethodMatch": {
-			"description": "GRPCMethodMatch describes how to select a gRPC route by matching the gRPC request service and/or method.\n\nAt least one of Service and Method MUST be a non-empty string.\n\n<gateway:util:excludeFromCRD> The CRD generator batches the character checks at the route-rule level to keep their estimated CEL cost within the API server budget. </gateway:util:excludeFromCRD>",
+			"description": "GRPCMethodMatch describes how to select a gRPC route by matching the gRPC request service and/or method.\n\nAt least one of Service and Method MUST be a non-empty string.",
 			"type": "object",
 			"properties": {
 				"method": {
@@ -12847,7 +12847,7 @@
 			}
 		},
 		"io.k8s.networking.gateway.v1.HTTPPathMatch": {
-			"description": "HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.\n\n<gateway:util:excludeFromCRD> The CRD generator batches the character checks at the route-rule level to keep their estimated CEL cost within the API server budget. </gateway:util:excludeFromCRD>",
+			"description": "HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.",
 			"type": "object",
 			"properties": {
 				"type": {

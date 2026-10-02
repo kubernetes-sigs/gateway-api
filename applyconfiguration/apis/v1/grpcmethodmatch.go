@@ -29,11 +29,6 @@ import (
 // request service and/or method.
 //
 // At least one of Service and Method MUST be a non-empty string.
-//
-// <gateway:util:excludeFromCRD>
-// The CRD generator batches the character checks at the route-rule level to
-// keep their estimated CEL cost within the API server budget.
-// </gateway:util:excludeFromCRD>
 type GRPCMethodMatchApplyConfiguration struct {
 	// Type specifies how to match against the service and/or method.
 	// Support: Core (Exact with service and method specified)

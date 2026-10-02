@@ -356,10 +356,6 @@ type GRPCRouteMatch struct {
 // At least one of Service and Method MUST be a non-empty string.
 //
 // +kubebuilder:validation:XValidation:message="One or both of 'service' or 'method' must be specified",rule="has(self.type) ? has(self.service) || has(self.method) : true"
-// <gateway:util:excludeFromCRD>
-// The CRD generator batches the character checks at the route-rule level to
-// keep their estimated CEL cost within the API server budget.
-// </gateway:util:excludeFromCRD>
 // +kubebuilder:validation:XValidation:message="service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)",rule="(!has(self.type) || self.type == 'Exact') && has(self.service) ? self.service.matches(r\"\"\"^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$\"\"\"): true"
 // +kubebuilder:validation:XValidation:message="method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)",rule="(!has(self.type) || self.type == 'Exact') && has(self.method) ? self.method.matches(r\"\"\"^[A-Za-z_][A-Za-z_0-9]*$\"\"\"): true"
 type GRPCMethodMatch struct {

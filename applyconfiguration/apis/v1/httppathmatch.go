@@ -26,11 +26,6 @@ import (
 // with apply.
 //
 // HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.
-//
-// <gateway:util:excludeFromCRD>
-// The CRD generator batches the character checks at the route-rule level to
-// keep their estimated CEL cost within the API server budget.
-// </gateway:util:excludeFromCRD>
 type HTTPPathMatchApplyConfiguration struct {
 	// Type specifies how to match against the path Value.
 	//

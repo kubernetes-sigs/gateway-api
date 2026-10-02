@@ -3677,7 +3677,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCMethodMatch(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GRPCMethodMatch describes how to select a gRPC route by matching the gRPC request service and/or method.\n\nAt least one of Service and Method MUST be a non-empty string.\n\n<gateway:util:excludeFromCRD> The CRD generator batches the character checks at the route-rule level to keep their estimated CEL cost within the API server budget. </gateway:util:excludeFromCRD>",
+				Description: "GRPCMethodMatch describes how to select a gRPC route by matching the gRPC request service and/or method.\n\nAt least one of Service and Method MUST be a non-empty string.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -5150,7 +5150,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPPathMatch(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.\n\n<gateway:util:excludeFromCRD> The CRD generator batches the character checks at the route-rule level to keep their estimated CEL cost within the API server budget. </gateway:util:excludeFromCRD>",
+				Description: "HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
