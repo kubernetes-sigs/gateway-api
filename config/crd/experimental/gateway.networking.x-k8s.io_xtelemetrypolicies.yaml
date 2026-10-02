@@ -242,8 +242,10 @@ spec:
 
                       * When Mode is "Enabled", the proxy will respect the upstream trace parent's sampling
                         decision.
-                      * When Mode is "Disabled" or absent, the proxy applies its own local sampling rate
-                        decision.
+                      * When Mode is "Disabled", the proxy ignores the upstream trace parent's sampling
+                        decision and applies its own local sampling rate decision.
+                      * When Mode is "ImplementationDefault" or absent, the implementation's default behavior
+                        is used.
 
                       Support: Extended
 
@@ -310,9 +312,16 @@ spec:
                           BackendRef is a reference to a Kubernetes Service or other supported
                           backend that receives OTLP traces.
 
-                          When configured, tracing data is exported to the referenced backend. If the reference
-                          is invalid (e.g., the Service does not exist), the implementation should update the
-                          policy's status conditions to indicate an unresolved reference.
+                          When configured, tracing data is exported to the referenced backend.
+
+                          Cross-namespace references are only valid if they are explicitly allowed
+                          by ReferenceGrant in the target namespace.
+
+                          If the reference is invalid (e.g., the Service does not exist, has an
+                          unsupported Group or Kind, or is a cross-namespace reference not permitted
+                          by a ReferenceGrant), the implementation MUST set the "ResolvedRefs"
+                          condition on the Policy status to "status: False", with Reason
+                          "BackendNotFound", "InvalidKind", or "RefNotPermitted" as appropriate.
 
                           TLS configuration for the connection to the backend is managed by the referenced
                           object. For example, if the BackendRef points to a Service, a BackendTLSPolicy
@@ -471,9 +480,11 @@ spec:
                       If absent, the implementation's default service name will be used.
 
                       Support: Extended
+
+                      Feature Name: TelemetryPolicyTracing
                     maxLength: 253
                     minLength: 1
-                    pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                    pattern: ^[a-zA-Z0-9_.:/-]+$
                     type: string
                   spanName:
                     description: |-
@@ -481,8 +492,11 @@ spec:
                       is implementation-specific.
 
                       Support: Extended
+
+                      Feature Name: TelemetryPolicyTracing
                     maxLength: 256
                     minLength: 1
+                    pattern: ^[a-zA-Z0-9_.:/-]+( [a-zA-Z0-9_.:/-]+)*$
                     type: string
                 type: object
                 x-kubernetes-validations:

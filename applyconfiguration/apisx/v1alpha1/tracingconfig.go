@@ -67,8 +67,10 @@ type TracingConfigApplyConfiguration struct {
 	//
 	// * When Mode is "Enabled", the proxy will respect the upstream trace parent's sampling
 	// decision.
-	// * When Mode is "Disabled" or absent, the proxy applies its own local sampling rate
-	// decision.
+	// * When Mode is "Disabled", the proxy ignores the upstream trace parent's sampling
+	// decision and applies its own local sampling rate decision.
+	// * When Mode is "ImplementationDefault" or absent, the implementation's default behavior
+	// is used.
 	//
 	// Support: Extended
 	//
@@ -80,11 +82,15 @@ type TracingConfigApplyConfiguration struct {
 	//
 	// Support: Extended
 	//
+	// Feature Name: TelemetryPolicyTracing
+	//
 	ServiceName *string `json:"serviceName,omitempty"`
 	// SpanName defines a custom name for the OTel span. By default, the name
 	// is implementation-specific.
 	//
 	// Support: Extended
+	//
+	// Feature Name: TelemetryPolicyTracing
 	//
 	SpanName *string `json:"spanName,omitempty"`
 	// Attributes is a list of custom key-value pairs (or variables) attached to every span.
