@@ -1241,42 +1241,6 @@ func TestHTTPRouteRule(t *testing.T) {
 			}(),
 		},
 		{
-			name:       "invalid path characters at match index 17",
-			wantErrors: []string{"must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']"},
-			rules: func() []gatewayv1.HTTPRouteRule {
-				rule := gatewayv1.HTTPRouteRule{}
-				for i := range 20 {
-					value := fmt.Sprintf("/m%d", i)
-					if i == 17 {
-						value = "/[]"
-					}
-					rule.Matches = append(rule.Matches, gatewayv1.HTTPRouteMatch{Path: &gatewayv1.HTTPPathMatch{
-						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
-						Value: new(value),
-					}})
-				}
-				return []gatewayv1.HTTPRouteRule{rule}
-			}(),
-		},
-		{
-			name:       "invalid path characters at match index 63",
-			wantErrors: []string{"must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']"},
-			rules: func() []gatewayv1.HTTPRouteRule {
-				rule := gatewayv1.HTTPRouteRule{}
-				for i := range 64 {
-					value := fmt.Sprintf("/m%d", i)
-					if i == 63 {
-						value = "/^"
-					}
-					rule.Matches = append(rule.Matches, gatewayv1.HTTPRouteMatch{Path: &gatewayv1.HTTPPathMatch{
-						Type:  new(gatewayv1.PathMatchType("Exact")),
-						Value: new(value),
-					}})
-				}
-				return []gatewayv1.HTTPRouteRule{rule}
-			}(),
-		},
-		{
 			name:       "matches are counted across all rules",
 			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
 			rules: func() []gatewayv1.HTTPRouteRule {
@@ -1314,6 +1278,21 @@ func TestHTTPRouteRule(t *testing.T) {
 						rule.Matches = append(rule.Matches, match)
 					}
 					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "exactly 129 matches across rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				rules := make([]gatewayv1.HTTPRouteRule, 3)
+				for i, count := range []int{64, 64, 1} {
+					for range count {
+						rules[i].Matches = append(rules[i].Matches, gatewayv1.HTTPRouteMatch{Path: &gatewayv1.HTTPPathMatch{
+							Type: new(gatewayv1.PathMatchExact), Value: new("/valid"),
+						}})
+					}
 				}
 				return rules
 			}(),
@@ -1394,6 +1373,25 @@ func TestHTTPRouteRule(t *testing.T) {
 				Spec:      gatewayv1.HTTPRouteSpec{Rules: tc.rules},
 			}
 			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+
+	// Check both ends of every batch in the last allowed rule. The generator
+	// unit tests cover every match position; these checks exercise the CRDs.
+	for _, index := range []int{0, 15, 16, 31, 32, 47, 48, 63} {
+		t.Run(fmt.Sprintf("invalid path in last rule at match index %d", index), func(t *testing.T) {
+			rules := make([]gatewayv1.HTTPRouteRule, 64)
+			for range 64 {
+				rules[63].Matches = append(rules[63].Matches, gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{Type: new(gatewayv1.PathMatchExact), Value: new("/valid")},
+				})
+			}
+			rules[63].Matches[index].Path.Value = new("/invalid?")
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{Name: fmt.Sprintf("batch-http-%d", time.Now().UnixNano()), Namespace: metav1.NamespaceDefault},
+				Spec:       gatewayv1.HTTPRouteSpec{Rules: rules},
+			}
+			validateHTTPRoute(t, route, []string{"spec.rules[63]", "must only contain valid characters"})
 		})
 	}
 }

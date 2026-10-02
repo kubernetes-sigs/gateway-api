@@ -69,46 +69,25 @@ func batchRouteMatchValidations(kind string, root *apiext.JSONSchemaProps) error
 	if err != nil {
 		return err
 	}
+	// At the rule level, self must refer to the path or method of match i.
+	replacement, err := parseCELExpression(env, "self.matches[i]."+object)
+	if err != nil {
+		return err
+	}
+
 	// Build the replacement before changing the schema, including all gRPC checks.
 	remaining := append(apiext.ValidationRules(nil), leaf.XValidations...)
 	var generated apiext.ValidationRules
 	for _, field := range fields {
-		index := -1
-		var expression *exprpb.Expr
-		for i, validation := range remaining {
-			ast, issues := env.Parse(validation.Rule)
-			if issues.Err() != nil {
-				return fmt.Errorf("%s: parsing validation: %w", object, issues.Err())
-			}
-			parsed, err := cel.AstToParsedExpr(ast)
-			if err != nil {
-				return err
-			}
-			if !isConditionalRegex(parsed.GetExpr(), field) {
-				continue
-			}
-			if index != -1 {
-				return fmt.Errorf("%s.%s: ambiguous conditional regex validations", object, field)
-			}
-			index, expression = i, parsed.GetExpr()
-		}
-		if index == -1 {
-			return fmt.Errorf("%s.%s: expected one validation of the form condition ? self.%s.matches(literal) : true", object, field, field)
+		index, expression, err := findConditionalRegex(env, remaining, field)
+		if err != nil {
+			return fmt.Errorf("%s.%s: %w", object, field, err)
 		}
 		validation := remaining[index]
 		if validation.MessageExpression != "" || validation.FieldPath != "" || validation.OptionalOldSelf != nil {
 			return fmt.Errorf("%s.%s: batching does not support messageExpression, fieldPath, or optionalOldSelf", object, field)
 		}
-		replacement, issues := env.Parse("self.matches[i]." + object)
-		if issues.Err() != nil {
-			return issues.Err()
-		}
-		parsedReplacement, err := cel.AstToParsedExpr(replacement)
-		if err != nil {
-			return err
-		}
-		expression, err = rebaseValidationSelf(expression, parsedReplacement.GetExpr())
-		if err != nil {
+		if err := rebaseValidationSelf(expression, replacement); err != nil {
 			return fmt.Errorf("%s.%s: %w", object, field, err)
 		}
 		predicate, err := cel.AstToString(cel.ParsedExprToAst(&exprpb.ParsedExpr{Expr: expression}))
@@ -133,70 +112,96 @@ func batchRouteMatchValidations(kind string, root *apiext.JSONSchemaProps) error
 	return nil
 }
 
+func parseCELExpression(env *cel.Env, rule string) (*exprpb.Expr, error) {
+	ast, issues := env.Parse(rule)
+	if issues.Err() != nil {
+		return nil, issues.Err()
+	}
+	parsed, err := cel.AstToParsedExpr(ast)
+	if err != nil {
+		return nil, err
+	}
+	return parsed.GetExpr(), nil
+}
+
+// Find exactly one character check for the field; missing or duplicate checks
+// indicate that the annotations changed in a way we cannot safely transform.
+func findConditionalRegex(env *cel.Env, validations apiext.ValidationRules, field string) (int, *exprpb.Expr, error) {
+	index := -1
+	var expression *exprpb.Expr
+	for i, validation := range validations {
+		parsed, err := parseCELExpression(env, validation.Rule)
+		if err != nil {
+			return -1, nil, fmt.Errorf("parsing validation: %w", err)
+		}
+		if !isConditionalRegex(parsed, field) {
+			continue
+		}
+		if index != -1 {
+			return -1, nil, fmt.Errorf("ambiguous conditional regex validations")
+		}
+		index, expression = i, parsed
+	}
+	if index == -1 {
+		return -1, nil, fmt.Errorf("expected one validation of the form condition ? self.%s.matches(literal) : true", field)
+	}
+	return index, expression, nil
+}
+
 // Match structure, not the regex text, message, or annotation position. Predicate
 // and regex edits automatically flow to the generated rules.
 func isConditionalRegex(e *exprpb.Expr, field string) bool {
 	conditional := e.GetCallExpr()
-	if conditional == nil || conditional.GetFunction() != operators.Conditional || len(conditional.GetArgs()) != 3 || !conditional.GetArgs()[2].GetConstExpr().GetBoolValue() {
+	if conditional.GetFunction() != operators.Conditional || len(conditional.GetArgs()) != 3 {
+		return false
+	}
+	if !conditional.GetArgs()[2].GetConstExpr().GetBoolValue() {
 		return false
 	}
 	call := conditional.GetArgs()[1].GetCallExpr()
-	if call == nil || call.GetFunction() != "matches" || len(call.GetArgs()) != 1 {
+	if call.GetFunction() != "matches" || len(call.GetArgs()) != 1 {
 		return false
 	}
 	if _, ok := call.GetArgs()[0].GetConstExpr().GetConstantKind().(*exprpb.Constant_StringValue); !ok {
 		return false
 	}
 	selection := call.GetTarget().GetSelectExpr()
-	return selection != nil && !selection.GetTestOnly() && selection.GetField() == field && selection.GetOperand().GetIdentExpr().GetName() == "self"
+	return !selection.GetTestOnly() && selection.GetField() == field &&
+		selection.GetOperand().GetIdentExpr().GetName() == "self"
 }
 
-// Rewrite identifiers in the syntax tree, leaving strings and selected field
+// Rewrite identifiers in place in the syntax tree, leaving strings and selected field
 // names untouched. Comprehensions and non-self variables (including oldSelf)
 // are rejected: moving them would require scope and transition-rule handling.
 // has() is a test-only select in the AST and is preserved by the unparser.
-func rebaseValidationSelf(e, replacement *exprpb.Expr) (*exprpb.Expr, error) {
+func rebaseValidationSelf(e, replacement *exprpb.Expr) error {
+	var children []*exprpb.Expr
 	switch node := e.GetExprKind().(type) {
 	case *exprpb.Expr_ConstExpr:
 	case *exprpb.Expr_IdentExpr:
 		if node.IdentExpr.GetName() != "self" {
-			return nil, fmt.Errorf("unsupported variable %q in batched validation", node.IdentExpr.GetName())
+			return fmt.Errorf("unsupported variable %q in batched validation", node.IdentExpr.GetName())
 		}
-		return proto.Clone(replacement).(*exprpb.Expr), nil
+		e.ExprKind = proto.Clone(replacement).(*exprpb.Expr).ExprKind
 	case *exprpb.Expr_SelectExpr:
-		operand, err := rebaseValidationSelf(node.SelectExpr.GetOperand(), replacement)
-		if err != nil {
-			return nil, err
-		}
-		node.SelectExpr.Operand = operand
+		children = append(children, node.SelectExpr.GetOperand())
 	case *exprpb.Expr_CallExpr:
 		if node.CallExpr.GetTarget() != nil {
-			target, err := rebaseValidationSelf(node.CallExpr.GetTarget(), replacement)
-			if err != nil {
-				return nil, err
-			}
-			node.CallExpr.Target = target
+			children = append(children, node.CallExpr.GetTarget())
 		}
-		for i, arg := range node.CallExpr.GetArgs() {
-			rebased, err := rebaseValidationSelf(arg, replacement)
-			if err != nil {
-				return nil, err
-			}
-			node.CallExpr.Args[i] = rebased
-		}
+		children = append(children, node.CallExpr.GetArgs()...)
 	case *exprpb.Expr_ListExpr:
 		if len(node.ListExpr.GetOptionalIndices()) != 0 {
-			return nil, fmt.Errorf("optional list elements are not supported in batched validation")
+			return fmt.Errorf("optional list elements are not supported in batched validation")
 		}
-		for i, element := range node.ListExpr.GetElements() {
-			rebased, err := rebaseValidationSelf(element, replacement)
-			if err != nil {
-				return nil, err
-			}
-			node.ListExpr.Elements[i] = rebased
-		}
+		children = node.ListExpr.GetElements()
 	default:
-		return nil, fmt.Errorf("unsupported expression %T in batched validation", e.GetExprKind())
+		return fmt.Errorf("unsupported expression %T in batched validation", e.GetExprKind())
 	}
-	return e, nil
+	for _, child := range children {
+		if err := rebaseValidationSelf(child, replacement); err != nil {
+			return err
+		}
+	}
+	return nil
 }
