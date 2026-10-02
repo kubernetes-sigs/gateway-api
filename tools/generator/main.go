@@ -157,6 +157,9 @@ func main() {
 					channelCrd.Spec.Versions[i].Served = false
 				}
 				version.Schema.OpenAPIV3Schema.Properties = gatewayTweaksMap(channel, version.Schema.OpenAPIV3Schema.Properties)
+				if err := batchRouteMatchValidations(groupKind.Kind, version.Schema.OpenAPIV3Schema); err != nil {
+					log.Fatalf("failed to batch CEL for %s %s %s: %v", channel, groupKind.Kind, version.Name, err)
+				}
 			}
 
 			convObj, err := crd.AsVersion(*channelCrd, apiext.SchemeGroupVersion)

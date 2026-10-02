@@ -93,11 +93,6 @@ type HTTPRouteSpecApplyConfiguration struct {
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
-	// <gateway:util:excludeFromCRD>
-	// Validates that the total number of matches across all rules does not exceed 128.
-	// CEL does not support aggregate functions like sum() over lists, so each of the
-	// (up to 16) rules is checked individually and their match counts are summed explicitly.
-	// </gateway:util:excludeFromCRD>
 	Rules []HTTPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
