@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: Portus-Gateway
+project: Portus
+fullName: Portus
+description: |
+  [Portus][portus-home] is an open source Kubernetes gateway written in Rust. One data plane
+  serves Gateway API routes, an AI gateway for LLM providers (routing on the request body,
+  API keys, token budgets) and an MCP gateway for tool servers. The controller compiles
+  Gateway API resources into a protobuf config streamed to a data plane per Gateway over
+  mTLS gRPC. Get started with the [quick start][portus-quickstart].
+
+  [portus-home]:https://portus-gateway.dev
+  [portus-quickstart]:https://github.com/Portus-Gateway/Portus#quick-start
