@@ -53,12 +53,5 @@ profiles:
     - HTTPRouteSchemeRedirect
     - MeshClusterIPMatching
     - MeshConsumerRoute
-    - MeshHTTPRouteBackendRequestHeaderModification
-    - MeshHTTPRouteQueryParamMatching
-    - MeshHTTPRouteRedirectPort
-    - MeshHTTPRouteSchemeRedirect
-    unsupportedFeatures:
-    - MeshHTTPRouteRedirectPath
-    - MeshHTTPRouteRewritePath
   name: MESH-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
