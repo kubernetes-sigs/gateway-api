@@ -156,18 +156,20 @@ type TelemetryPolicy struct {
   // Spec defines the desired state of TelemetryPolicy.
   //
   // +required
-  Spec TelemetryPolicySpec `json:"spec"`
+  Spec TelemetryPolicySpec `json:"spec,omitzero"`
 
   // Status defines the observed state of TelemetryPolicy.
   //
   // +optional
-  Status TelemetryPolicyStatus `json:"status,omitempty"`
+  Status TelemetryPolicyStatus `json:"status,omitempty,omitzero"`
 }
 
 // TelemetryPolicySpec defines the desired state and target of TelemetryPolicy.
 //
 // Specifying at least one target resource in `targetRefs` is required.
 // Tracing behavior can be configured via the `tracing` field.
+//
+// +kubebuilder:validation:AtLeastOneOf=tracing
 type TelemetryPolicySpec struct {
   // TargetRefs identifies the gateways to which this policy applies (GEP-713).
   //
@@ -180,8 +182,10 @@ type TelemetryPolicySpec struct {
   // Support: Core for Gateway
   //
   // +required
+  // +listType=atomic
   // +kubebuilder:validation:MinItems=1
-  TargetRefs []NamespacedPolicyTargetReference `json:"targetRefs"`
+  // +kubebuilder:validation:MaxItems=16
+  TargetRefs []v1.LocalObjectReference `json:"targetRefs"`
 
   // Tracing defines the configuration for distributed tracing.
   //
@@ -191,107 +195,10 @@ type TelemetryPolicySpec struct {
   //
   // Support: Extended
   //
-  // +optional
-  Tracing *TracingConfig `json:"tracing,omitempty"`
-}
-
-// TracingMode defines the enablement state of tracing.
-type TracingMode string
-
-const (
-  // TracingModeEnabled explicitly enables tracing.
-  TracingModeEnabled TracingMode = "Enabled"
-
-  // TracingModeDisabled explicitly disables tracing.
-  TracingModeDisabled TracingMode = "Disabled"
-
-  // TracingModeImplementationDefault means that the code should
-  // use the implementation's default behavior for tracing.
-  TracingModeImplementationDefault TracingMode = "ImplementationDefault"
-)
-
-// AttributeName defines the key of a span attribute or tag.
-//
-// +kubebuilder:validation:MinLength=1
-// +kubebuilder:validation:MaxLength=256
-// +kubebuilder:validation:Pattern=`^[a-zA-Z0-9_.:/-]+$`
-type AttributeName string
-
-// AttributeSourceType defines the source from which a telemetry attribute
-// value is retrieved.
-//
-// Support: Core
-type AttributeSourceType string
-const (
-  // AttributeSourceHeader indicates that the attribute value should be 
-  // extracted from a specific HTTP header in the request or response.
-  //
-  // Support: Core
-  AttributeSourceHeader AttributeSourceType = "Header"
-
-  // AttributeSourceLiteral indicates that the attribute value is a static 
-  // string provided directly in the policy configuration.
-  //
-  // Support: Core
-  AttributeSourceLiteral AttributeSourceType = "Literal"
-
-  // AttributeSourceAttribute extracts the value from a proxy-builtin reference variable
-  // mapped to OpenTelemetry Semantic Conventions (e.g., "http.request.method").
-  // See: https://opentelemetry.io/docs/specs/semconv/
-  //
-  // Support: Extended
-  AttributeSourceAttribute AttributeSourceType = "Attribute"
-)
-
-// Attribute defines a single flat key-value pair to attach to traces.
-//
-// This allows users to enrich spans with context like HTTP headers
-// (e.g., "X-User-ID"), static tags, or built-in variables.
-//
-// Support: Core
-//
-// +union
-// +kubebuilder:validation:XValidation:rule="self.type == 'Header' ? has(self.headerName) : !has(self.headerName)",message="headerName is required when type is Header, and must be empty otherwise"
-// +kubebuilder:validation:XValidation:rule="self.type == 'Literal' ? has(self.literalValue) : !has(self.literalValue)",message="literalValue is required when type is Literal, and must be empty otherwise"
-// +kubebuilder:validation:XValidation:rule="self.type == 'Attribute' ? has(self.attributeKey) : !has(self.attributeKey)",message="attributeKey is required when type is Attribute, and must be empty otherwise"
-type Attribute struct {
-  // Name is the key of the attribute as it will appear in the output
-  // (i.e., as a span tag).
-  //
-  // +required
-  Name AttributeName `json:"name"`
-
-  // Type specifies where the attribute value comes from.
-  // Valid values are "Header", "Literal", or "Attribute".
-  //
-  // +unionDiscriminator
-  // +required
-  // +kubebuilder:validation:Enum=Header;Literal;Attribute
-  Type AttributeSourceType `json:"type"`
-
-  // HeaderName specifies the HTTP header to extract the value from.
-  // This is required if Type is "Header".
+  // Feature Name: TelemetryPolicyTracing
   //
   // +optional
-  HeaderName *v1.HTTPHeaderName `json:"headerName,omitempty"`
-
-  // LiteralValue specifies a static string value to attach.
-  // This is required if Type is "Literal".
-  //
-  // +optional
-  // +kubebuilder:validation:MaxLength=1024
-  LiteralValue *string `json:"literalValue,omitempty"`
-
-  // AttributeKey refers to a standard OpenTelemetry attribute.
-  // For example: "http.response.status_code" or "http.request.method".
-  // This is required if Type is "Attribute".
-  // See: https://opentelemetry.io/docs/specs/semconv/
-  //
-  // +optional
-  // +kubebuilder:validation:MinLength=1
-  // +kubebuilder:validation:MaxLength=256
-  // +kubebuilder:validation:Pattern=`^[a-z0-9_.-]+$`
-  AttributeKey *string `json:"attributeKey,omitempty"`
+  Tracing TracingConfig `json:"tracing,omitzero"`
 }
 
 // TracingConfig defines the configuration for distributed tracing.
@@ -306,8 +213,6 @@ type Attribute struct {
 // across complex distributed systems.
 //
 // Support: Extended
-// +kubebuilder:validation:XValidation:rule="!has(self.mode) || self.mode != 'Enabled' || has(self.provider)",message="provider must be specified when mode is Enabled"
-// +kubebuilder:validation:XValidation:rule="!has(self.mode) || self.mode != 'Disabled' || !has(self.provider)",message="provider must be empty when mode is Disabled"
 // +kubebuilder:validation:XValidation:rule="self.mode == 'Enabled' ? has(self.provider) : true",message="provider must be specified when mode is Enabled"
 // +kubebuilder:validation:XValidation:rule="self.mode == 'Disabled' ? !has(self.provider) : true",message="provider must be empty when mode is Disabled"
 type TracingConfig struct {
@@ -318,6 +223,7 @@ type TracingConfig struct {
   //
   // Support: Core (within TelemetryPolicy feature)
   //
+  // +optional
   // +kubebuilder:validation:Enum=Enabled;Disabled;ImplementationDefault
   // +kubebuilder:default=ImplementationDefault
   Mode TracingMode `json:"mode,omitempty"`
@@ -330,7 +236,7 @@ type TracingConfig struct {
   // Support: Core (within Tracing feature)
   //
   // +optional
-  Provider *TracingProvider `json:"provider,omitempty"`
+  Provider TracingProvider `json:"provider,omitzero"`
 
   // SamplingRate specifies the base probability of sampling new traces.
   //
@@ -349,39 +255,49 @@ type TracingConfig struct {
   // Support: Extended
   //
   // +optional
-  SamplingRate *Fraction `json:"samplingRate,omitempty"`
+  SamplingRate v1.Fraction `json:"samplingRate,omitzero"`
 
   // ParentBasedSampling configures whether to respect the sampling decision of the parent span.
   //
   // * When Mode is "Enabled", the proxy will respect the upstream trace parent's sampling
   //   decision.
-  // * When Mode is "Disabled" or absent, the proxy applies its own local sampling rate 
-  //   decision.
+  // * When Mode is "Disabled", the proxy ignores the upstream trace parent's sampling
+  //   decision and applies its own local sampling rate decision.
+  // * When Mode is "ImplementationDefault" or absent, the implementation's default behavior
+  //   is used.
   //
   // Support: Extended
   //
+  // Feature Name: TelemetryPolicyParentBasedSampling
+  //
   // +optional
-  ParentBasedSampling *ParentBasedSampling `json:"parentBasedSampling,omitempty"`
+  ParentBasedSampling ParentBasedSampling `json:"parentBasedSampling,omitzero"`
 
   // ServiceName is the "service.name" attribute of the OpenTelemetry resource.
   // If absent, the implementation's default service name will be used.
   //
   // Support: Extended
   //
+  // Feature Name: TelemetryPolicyTracing
+  //
   // +optional
   // +kubebuilder:validation:MinLength=1
   // +kubebuilder:validation:MaxLength=253
-  ServiceName *string `json:"serviceName,omitempty"`
+  // +kubebuilder:validation:Pattern=`^[a-zA-Z0-9_.:/-]+$`
+  ServiceName string `json:"serviceName,omitempty"`
 
-  // SpanName defines a custom name for the OTel span. By default, the name 
+  // SpanName defines a custom name for the OTel span. By default, the name
   // is implementation-specific.
   //
   // Support: Extended
   //
+  // Feature Name: TelemetryPolicyTracing
+  //
   // +optional
   // +kubebuilder:validation:MinLength=1
   // +kubebuilder:validation:MaxLength=256
-  SpanName *string `json:"spanName,omitempty"`
+  // +kubebuilder:validation:Pattern=`^[a-zA-Z0-9_.:/-]+( [a-zA-Z0-9_.:/-]+)*$`
+  SpanName string `json:"spanName,omitempty"`
 
   // Attributes is a list of custom key-value pairs (or variables) attached to every span.
   //
@@ -396,18 +312,40 @@ type TracingConfig struct {
   Attributes []Attribute `json:"attributes,omitempty"`
 }
 
+// TracingMode defines the enablement state of tracing.
+type TracingMode string
+
+const (
+  // TracingModeEnabled explicitly enables tracing.
+  TracingModeEnabled TracingMode = "Enabled"
+
+  // TracingModeDisabled explicitly disables tracing.
+  TracingModeDisabled TracingMode = "Disabled"
+
+  // TracingModeImplementationDefault means that the code should
+  // use the implementation's default behavior for tracing.
+  TracingModeImplementationDefault TracingMode = "ImplementationDefault"
+)
+
 // TracingProvider identifies the tracing backend that receives generated spans.
 //
 // Support: Core for Service
 //
 // Support: Implementation-specific for any other resource
 type TracingProvider struct {
-  // BackendRef is a reference to a Kubernetes Service or other supported 
+  // BackendRef is a reference to a Kubernetes Service or other supported
   // backend that receives OTLP traces.
   //
-  // When configured, tracing data is exported to the referenced backend. If the reference
-  // is invalid (e.g., the Service does not exist), the implementation should update the
-  // policy's status conditions to indicate an unresolved reference.
+  // When configured, tracing data is exported to the referenced backend.
+  //
+  // Cross-namespace references are only valid if they are explicitly allowed
+  // by ReferenceGrant in the target namespace.
+  //
+  // If the reference is invalid (e.g., the Service does not exist, has an
+  // unsupported Group or Kind, or is a cross-namespace reference not permitted
+  // by a ReferenceGrant), the implementation MUST set the "ResolvedRefs"
+  // condition on the Policy status to "status: False", with Reason
+  // "BackendNotFound", "InvalidKind", or "RefNotPermitted" as appropriate.
   //
   // TLS configuration for the connection to the backend is managed by the referenced
   // object. For example, if the BackendRef points to a Service, a BackendTLSPolicy
@@ -417,7 +355,7 @@ type TracingProvider struct {
   // Support: Core
   //
   // +required
-  BackendRef BackendObjectReference `json:"backendRef"`
+  BackendRef v1.BackendObjectReference `json:"backendRef"`
 
   // Headers specifies a list of custom headers to be added to the telemetry
   // export requests (e.g., for authentication).
@@ -425,8 +363,44 @@ type TracingProvider struct {
   // Support: Extended
   //
   // +optional
+  // +listType=map
+  // +listMapKey=name
   // +kubebuilder:validation:MaxItems=16
   Headers []v1.HTTPHeader `json:"headers,omitempty"`
+}
+
+// ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream
+// trace parent.
+//
+// Support: Extended
+type ParentBasedSampling struct {
+  // Mode explicitly controls if parent-based sampling is enabled. Valid values are "Enabled",
+  // "Disabled", "ImplementationDefault".
+  //
+  // In the absence of this field, it defaults to "ImplementationDefault".
+  //
+  // Support: Extended
+  //
+  // +optional
+  // +kubebuilder:validation:Enum=Enabled;Disabled;ImplementationDefault
+  // +kubebuilder:default=ImplementationDefault
+  Mode ParentBasedSamplingMode `json:"mode,omitempty"`
+
+  // SamplingRate is the sampling rate to apply when parent-based sampling is active.
+  //
+  // This acts as a downsampling governor. It allows an operator to say: "I want to
+  // respect the parent's decision, but only for 50% of those requests". Even if a
+  // parent is already marked as "Sampled", this allows the Gateway to apply a secondary
+  // filter so that it can respect the parent's intent while still controlling the volume
+  // of spans reported.
+  //
+  // In the absence of this field, it defaults to 100% ({numerator: 100}).
+  //
+  // Support: Extended
+  //
+  // +optional
+  // +kubebuilder:default={numerator: 100, denominator: 100}
+  SamplingRate v1.Fraction `json:"samplingRate,omitempty,omitzero"`
 }
 
 // ParentBasedSamplingMode defines the enablement mode for parent-based sampling.
@@ -444,38 +418,90 @@ const (
   ParentBasedSamplingModeImplementationDefault ParentBasedSamplingMode = "ImplementationDefault"
 )
 
-// ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream
-// trace parent.
+// Attribute defines a single flat key-value pair to attach to traces.
 //
-// Support: Extended
-type ParentBasedSampling struct {
-  // Mode explicitly controls if parent-based sampling is enabled. Valid values are "Enabled",
-  // "Disabled", "ImplementationDefault".
+// This allows users to enrich spans with context like HTTP headers
+// (e.g., "X-User-ID"), static tags, or built-in variables.
+//
+// Support: Core
+//
+// +kubebuilder:validation:XValidation:rule="self.sourceType == 'Header' ? has(self.headerName) : !has(self.headerName)",message="headerName is required when sourceType is Header, and must be empty otherwise"
+// +kubebuilder:validation:XValidation:rule="self.sourceType == 'Literal' ? has(self.literalValue) : !has(self.literalValue)",message="literalValue is required when sourceType is Literal, and must be empty otherwise"
+// +kubebuilder:validation:XValidation:rule="self.sourceType == 'Attribute' ? has(self.attributeKey) : !has(self.attributeKey)",message="attributeKey is required when sourceType is Attribute, and must be empty otherwise"
+type Attribute struct {
+  // Name is the key of the attribute as it will appear in the output
+  // (i.e., as a span tag).
   //
-  // In the absence of this field, it defaults to "ImplementationDefault".
+  // +required
+  Name AttributeName `json:"name"`
+
+  // SourceType specifies where the attribute value comes from.
+  // Valid values are "Header", "Literal", or "Attribute".
   //
-  // Support: Extended
-  //
-  // +kubebuilder:validation:Enum=Enabled;Disabled;ImplementationDefault
-  // +kubebuilder:default=ImplementationDefault
-  Mode ParentBasedSamplingMode `json:"mode,omitempty"`
-  
-  // SamplingRate is the sampling rate to apply when parent-based sampling is active.
-  //
-  // This acts as a downsampling governor. It allows an operator to say: "I want to
-  // respect the parent's decision, but only for 50% of those requests". Even if a
-  // parent is already marked as "Sampled", this allows the Gateway to apply a secondary
-  // filter so that it can respect the parent's intent while still controlling the volume
-  // of spans reported.
-  //
-  // In the absence of this field, it defaults to 100% ({numerator: 100}).
-  //
-  // Support: Extended
+  // +unionDiscriminator
+  // +required
+  // +kubebuilder:validation:Enum=Header;Literal;Attribute
+  SourceType AttributeSourceType `json:"sourceType"`
+
+  // HeaderName specifies the HTTP header to extract the value from.
+  // This is required if SourceType is "Header".
   //
   // +optional
-  // +kubebuilder:default={numerator: 100}
-  SamplingRate *Fraction `json:"samplingRate,omitempty"`
+  HeaderName v1.HTTPHeaderName `json:"headerName,omitempty"`
+
+  // LiteralValue specifies a static string value to attach.
+  // This is required if SourceType is "Literal".
+  //
+  // +optional
+  // +kubebuilder:validation:MinLength=1
+  // +kubebuilder:validation:MaxLength=1024
+  LiteralValue string `json:"literalValue,omitempty"`
+
+  // AttributeKey refers to a standard OpenTelemetry attribute.
+  // For example: "http.response.status_code" or "http.request.method".
+  // This is required if SourceType is "Attribute".
+  // See: https://opentelemetry.io/docs/specs/semconv/
+  //
+  // +optional
+  // +kubebuilder:validation:MinLength=1
+  // +kubebuilder:validation:MaxLength=256
+  // +kubebuilder:validation:Pattern=`^[a-z0-9_.-]+$`
+  AttributeKey string `json:"attributeKey,omitempty"`
 }
+
+// AttributeName defines the key of a span attribute or tag.
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=256
+// +kubebuilder:validation:Pattern=`^[a-zA-Z0-9_.:/-]+$`
+type AttributeName string
+
+// AttributeSourceType defines the source from which a telemetry attribute
+// value is retrieved.
+type AttributeSourceType string
+
+const (
+  // AttributeSourceHeader indicates that the attribute value should be
+  // extracted from a specific HTTP header in the request or response.
+  //
+  // Support: Core
+  AttributeSourceHeader AttributeSourceType = "Header"
+
+  // AttributeSourceLiteral indicates that the attribute value is a static
+  // string provided directly in the policy configuration.
+  //
+  // Support: Core
+  AttributeSourceLiteral AttributeSourceType = "Literal"
+
+  // AttributeSourceAttribute extracts the value from a proxy-builtin reference variable
+  // mapped to OpenTelemetry Semantic Conventions (e.g., "http.request.method").
+  // See: https://opentelemetry.io/docs/specs/semconv/
+  //
+  // Support: Extended
+  //
+  // Feature Name: TelemetryPolicyAttribute
+  AttributeSourceAttribute AttributeSourceType = "Attribute"
+)
 
 // TelemetryPolicyStatus defines the observed state of TelemetryPolicy.
 type TelemetryPolicyStatus struct {
@@ -512,7 +538,7 @@ type TelemetryPolicyStatus struct {
   // +required
   // +listType=atomic
   // +kubebuilder:validation:MaxItems=16
-  Ancestors []PolicyAncestorStatus `json:"ancestors"`
+  Ancestors []v1.PolicyAncestorStatus `json:"ancestors"`
 }
 ```
 
