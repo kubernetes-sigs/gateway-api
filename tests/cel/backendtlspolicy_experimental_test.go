@@ -38,61 +38,37 @@ func TestBackendTLSPolicyValidationClusterTrustBundle(t *testing.T) {
 		policyValidation gatewayv1.BackendTLSPolicyValidation
 	}{
 		{
-			name: "valid BackendTLSPolicyValidation with only ClusterTrustBundleRef",
-			policyValidation: gatewayv1.BackendTLSPolicyValidation{
-				ClusterTrustBundleRef: &gatewayv1.ClusterTrustBundleObjectRef{
-					Name: "example.com:internal-signer:v1",
-				},
-				Hostname: "foo.example.com",
-			},
-		},
-		{
-			name: "invalid BackendTLSPolicyValidation with ClusterTrustBundleRef and CACertificateRefs",
+			name: "valid BackendTLSPolicyValidation with ClusterTrustBundle via caCertificateRefs",
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{
 				CACertificateRefs: []gatewayv1.LocalObjectReference{
 					{
-						Group: "group",
-						Kind:  "kind",
-						Name:  "name",
+						Group: "certificates.k8s.io",
+						Kind:  "ClusterTrustBundle",
+						Name:  "example.com:internal-signer:v1",
 					},
-				},
-				ClusterTrustBundleRef: &gatewayv1.ClusterTrustBundleObjectRef{
-					Name: "example.com:internal-signer:v1",
 				},
 				Hostname: "foo.example.com",
 			},
-			wantErrors: []string{"exactly one of the fields in [caCertificateRefs clusterTrustBundleRef wellKnownCACertificates] must be set"},
-		},
-		{
-			name: "invalid BackendTLSPolicyValidation with ClusterTrustBundleRef and WellKnownCACertificates",
-			policyValidation: gatewayv1.BackendTLSPolicyValidation{
-				ClusterTrustBundleRef: &gatewayv1.ClusterTrustBundleObjectRef{
-					Name: "example.com:internal-signer:v1",
-				},
-				WellKnownCACertificates: new(gatewayv1.WellKnownCACertificatesType("System")),
-				Hostname:                "foo.example.com",
-			},
-			wantErrors: []string{"exactly one of the fields in [caCertificateRefs clusterTrustBundleRef wellKnownCACertificates] must be set"},
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with CACertificateRefs and WellKnownCACertificates",
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{
 				CACertificateRefs: []gatewayv1.LocalObjectReference{
 					{
-						Group: "group",
-						Kind:  "kind",
-						Name:  "name",
+						Group: "certificates.k8s.io",
+						Kind:  "ClusterTrustBundle",
+						Name:  "example.com:internal-signer:v1",
 					},
 				},
 				WellKnownCACertificates: new(gatewayv1.WellKnownCACertificatesType("System")),
 				Hostname:                "foo.example.com",
 			},
-			wantErrors: []string{"exactly one of the fields in [caCertificateRefs clusterTrustBundleRef wellKnownCACertificates] must be set"},
+			wantErrors: []string{"exactly one of the fields in [caCertificateRefs wellKnownCACertificates] must be set"},
 		},
 		{
-			name:             "invalid BackendTLSPolicyValidation with no trust source",
+			name: "invalid BackendTLSPolicyValidation with no trust source",
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{Hostname: "foo.example.com"},
-			wantErrors:       []string{"exactly one of the fields in [caCertificateRefs clusterTrustBundleRef wellKnownCACertificates] must be set"},
+			wantErrors:       []string{"exactly one of the fields in [caCertificateRefs wellKnownCACertificates] must be set"},
 		},
 	}
 

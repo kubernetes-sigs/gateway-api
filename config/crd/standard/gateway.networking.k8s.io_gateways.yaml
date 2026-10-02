@@ -1049,6 +1049,10 @@ spec:
                                     reference, the `ResolvedRefs` on all matching HTTPS listeners condition
                                     MUST be set with the Reason `RefNotPermitted`.
 
+                                  For cluster-scoped resources (such as ClusterTrustBundle), the
+                                  `namespace` field MUST be unset. The implementation resolves the scope
+                                  based on the kind.
+
                                   Implementations MAY choose to perform further validation of the
                                   certificate content (e.g., checking expiry or enforcing specific formats).
                                   In such cases, an implementation-specific Reason and Message MUST be set.
@@ -1065,6 +1069,9 @@ spec:
 
                                   Support: Core - A single reference to a Kubernetes ConfigMap, with the
                                   CA certificate in a key named `ca.crt`.
+
+                                  Support: Extended - References to ClusterTrustBundle
+                                  (certificates.k8s.io), with `namespace` unset.
 
                                   Support: Implementation-specific - More than one reference, other kinds
                                   of resources, or a single reference that includes multiple certificates.
@@ -1122,6 +1129,11 @@ spec:
                                 minItems: 1
                                 type: array
                                 x-kubernetes-list-type: atomic
+                                x-kubernetes-validations:
+                                - message: ClusterTrustBundle references must not
+                                    specify namespace
+                                  rule: self.all(r, !(r.group == 'certificates.k8s.io'
+                                    && r.kind == 'ClusterTrustBundle' && has(r.namespace)))
                               mode:
                                 default: AllowValidOnly
                                 description: |-
@@ -1214,6 +1226,10 @@ spec:
                                           reference, the `ResolvedRefs` on all matching HTTPS listeners condition
                                           MUST be set with the Reason `RefNotPermitted`.
 
+                                        For cluster-scoped resources (such as ClusterTrustBundle), the
+                                        `namespace` field MUST be unset. The implementation resolves the scope
+                                        based on the kind.
+
                                         Implementations MAY choose to perform further validation of the
                                         certificate content (e.g., checking expiry or enforcing specific formats).
                                         In such cases, an implementation-specific Reason and Message MUST be set.
@@ -1230,6 +1246,9 @@ spec:
 
                                         Support: Core - A single reference to a Kubernetes ConfigMap, with the
                                         CA certificate in a key named `ca.crt`.
+
+                                        Support: Extended - References to ClusterTrustBundle
+                                        (certificates.k8s.io), with `namespace` unset.
 
                                         Support: Implementation-specific - More than one reference, other kinds
                                         of resources, or a single reference that includes multiple certificates.
@@ -1287,6 +1306,11 @@ spec:
                                       minItems: 1
                                       type: array
                                       x-kubernetes-list-type: atomic
+                                      x-kubernetes-validations:
+                                      - message: ClusterTrustBundle references must
+                                          not specify namespace
+                                        rule: self.all(r, !(r.group == 'certificates.k8s.io'
+                                          && r.kind == 'ClusterTrustBundle' && has(r.namespace)))
                                     mode:
                                       default: AllowValidOnly
                                       description: |-
@@ -2684,6 +2708,10 @@ spec:
                                     reference, the `ResolvedRefs` on all matching HTTPS listeners condition
                                     MUST be set with the Reason `RefNotPermitted`.
 
+                                  For cluster-scoped resources (such as ClusterTrustBundle), the
+                                  `namespace` field MUST be unset. The implementation resolves the scope
+                                  based on the kind.
+
                                   Implementations MAY choose to perform further validation of the
                                   certificate content (e.g., checking expiry or enforcing specific formats).
                                   In such cases, an implementation-specific Reason and Message MUST be set.
@@ -2700,6 +2728,9 @@ spec:
 
                                   Support: Core - A single reference to a Kubernetes ConfigMap, with the
                                   CA certificate in a key named `ca.crt`.
+
+                                  Support: Extended - References to ClusterTrustBundle
+                                  (certificates.k8s.io), with `namespace` unset.
 
                                   Support: Implementation-specific - More than one reference, other kinds
                                   of resources, or a single reference that includes multiple certificates.
@@ -2757,6 +2788,11 @@ spec:
                                 minItems: 1
                                 type: array
                                 x-kubernetes-list-type: atomic
+                                x-kubernetes-validations:
+                                - message: ClusterTrustBundle references must not
+                                    specify namespace
+                                  rule: self.all(r, !(r.group == 'certificates.k8s.io'
+                                    && r.kind == 'ClusterTrustBundle' && has(r.namespace)))
                               mode:
                                 default: AllowValidOnly
                                 description: |-
@@ -2849,6 +2885,10 @@ spec:
                                           reference, the `ResolvedRefs` on all matching HTTPS listeners condition
                                           MUST be set with the Reason `RefNotPermitted`.
 
+                                        For cluster-scoped resources (such as ClusterTrustBundle), the
+                                        `namespace` field MUST be unset. The implementation resolves the scope
+                                        based on the kind.
+
                                         Implementations MAY choose to perform further validation of the
                                         certificate content (e.g., checking expiry or enforcing specific formats).
                                         In such cases, an implementation-specific Reason and Message MUST be set.
@@ -2865,6 +2905,9 @@ spec:
 
                                         Support: Core - A single reference to a Kubernetes ConfigMap, with the
                                         CA certificate in a key named `ca.crt`.
+
+                                        Support: Extended - References to ClusterTrustBundle
+                                        (certificates.k8s.io), with `namespace` unset.
 
                                         Support: Implementation-specific - More than one reference, other kinds
                                         of resources, or a single reference that includes multiple certificates.
@@ -2922,6 +2965,11 @@ spec:
                                       minItems: 1
                                       type: array
                                       x-kubernetes-list-type: atomic
+                                      x-kubernetes-validations:
+                                      - message: ClusterTrustBundle references must
+                                          not specify namespace
+                                        rule: self.all(r, !(r.group == 'certificates.k8s.io'
+                                          && r.kind == 'ClusterTrustBundle' && has(r.namespace)))
                                     mode:
                                       default: AllowValidOnly
                                       description: |-
