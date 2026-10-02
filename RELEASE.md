@@ -166,6 +166,11 @@ of the PR is the community consensus for a new release.
 - Verify `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
   - Has the updated `gateway.networking.k8s.io/bundle-version`.
   - Has the updated `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, where `3` is the latest minor version number -1).
+- Record the features available in this release, so that the conformance reports for it can be verified
+  even after `main` has moved on. With the `release-major.minor` branch checked out, run
+  `go run ./tools/reportfeatures -generate vmajor.minor` and open a pull request against `main` adding the
+  resulting `conformance/release-features/vmajor.minor.yaml`. It must be generated from the release branch
+  as `main` may already contain features of the next release.
 - Verify the CI tests pass before continuing.
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
   GitHub's [release][release] page.
