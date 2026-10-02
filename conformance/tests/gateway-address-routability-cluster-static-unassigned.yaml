@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-address-routability-cluster-static-unassigned
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  addresses:
+  - type: IPAddress
+    value: "PLACEHOLDER_UNUSABLE_ADDRS"
+    routability: Cluster
+  listeners:
+  - name: http
+    port: 8080
+    protocol: HTTP
