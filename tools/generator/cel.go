@@ -37,9 +37,13 @@ const matchValidationBatchSize = 16
 
 // batchRouteMatchValidations lowers only the three conditional regex checks
 // whose cost exceeds the per-expression budget at 64 route rules. The original
-// kubebuilder annotations remain the source of the predicate and regex. This
-// deliberately is not a general CEL optimizer: unexpected shapes fail generation
-// so a source edit cannot silently drop validation or change its scope.
+// kubebuilder annotations remain the source of the predicate and regex.
+// The supported form is: condition ? self.<field>.matches("regex") : true.
+// Changes within this form are picked up automatically, provided they use only
+// self and no comprehensions (such as all() or map()). For example, replacing
+// the conditional with condition && self.<field>.matches("regex"), referring to
+// oldSelf, or adding an all() check requires updating this transformation.
+// Otherwise, generation fails rather than silently changing validation.
 func batchRouteMatchValidations(kind string, root *apiext.JSONSchemaProps) error {
 	var object string
 	var fields []string
