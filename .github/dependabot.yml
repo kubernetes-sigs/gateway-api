@@ -1,4 +1,13 @@
 version: 2
+multi-ecosystem-groups:
+  gateway-api-conformance-images:
+    schedule:
+      interval: "daily"
+    labels:
+      - dependencies
+      - ok-to-test
+      - release-note-none
+      - ail/0
 updates:
   # Dependencies listed in go.mod
   - package-ecosystem: "gomod"
@@ -15,14 +24,24 @@ updates:
           - "k8s.io/*"
           - "sigs.k8s.io/*"
       k8s.io: # Group k8s.io golang dependencies updates
-          patterns:
-            - "k8s.io/*"
-            - "sigs.k8s.io/*"
+        patterns:
+          - "k8s.io/*"
+          - "sigs.k8s.io/*"
+        exclude-patterns:
+          - "sigs.k8s.io/gateway-api-conformance-images"
+    ignore:
+      - dependency-name: "sigs.k8s.io/gateway-api-conformance-images"
     labels:
       - go
       - dependencies
       - ok-to-test
       - release-note-none
+      - ail/0
+  - package-ecosystem: "gomod"
+    directory: "/"
+    patterns:
+      - "sigs.k8s.io/gateway-api-conformance-images"
+    multi-ecosystem-group: "gateway-api-conformance-images"
 
   # Images listed in Dockerfile or Kubernetes manifests
   - package-ecosystem: "docker"
@@ -33,15 +52,23 @@ updates:
       - "/conformance/tests/mesh"
     schedule:
       interval: "daily"
-    groups:
-      gateway-api-conformance:
-        patterns:
-          - "registry.k8s.io/gateway-api/conformance/*"
+    ignore:
+      - dependency-name: "registry.k8s.io/gateway-api/conformance/*"
     labels:
       - docker
       - dependencies
       - ok-to-test
       - release-note-none
+      - ail/0
+  - package-ecosystem: "docker"
+    directories:
+      - "/conformance/base"
+      - "/conformance/mesh"
+      - "/conformance/tests"
+      - "/conformance/tests/mesh"
+    patterns:
+      - "registry.k8s.io/gateway-api/conformance/*"
+    multi-ecosystem-group: "gateway-api-conformance-images"
 
   #  Github actions updates
   - package-ecosystem: "github-actions"
@@ -63,5 +90,6 @@ updates:
       - dependencies
       - ok-to-test
       - release-note-none
+      - ail/0
 
 
