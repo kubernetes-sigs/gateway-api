@@ -28,16 +28,11 @@ import (
 // BackendTLSPolicyValidation contains backend TLS validation configuration.
 // <gateway:util:excludeFromCRD>
 // Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates
-// must be set. These rules are channel-scoped because the experimental channel adds
-// clusterTrustBundleRef as a third trust source, which they would otherwise reject.
+// must be set.
 // </gateway:util:excludeFromCRD>
 // <gateway:standard:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")">
 // <gateway:standard:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")">
-// <gateway:util:excludeFromCRD>
-// Experimental variant of the above rules, with clusterTrustBundleRef as a third
-// mutually exclusive trust source.
-// </gateway:util:excludeFromCRD>
-// <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>
+// <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;wellKnownCACertificates>
 type BackendTLSPolicyValidationApplyConfiguration struct {
 	// CACertificateRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to
@@ -74,12 +69,20 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// ensure the `Accepted` Condition on the BackendTLSPolicy is set to
 	// `status: False`, with a Reason `NoValidCACertificate`.
 	//
+	// References to cluster-scoped resources (such as ClusterTrustBundle)
+	// are supported: the implementation resolves the scope based on the kind.
+	// A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped
+	// resource by name. A reference to a namespaced resource (such as ConfigMap
+	// or Secret) uses the local namespace.
+	//
 	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
 	// Implementations MAY choose to support attaching multiple certificates to
 	// a backend, but this behavior is implementation-specific.
 	//
 	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
 	// with the CA certificate in a key named `ca.crt`.
+	//
+	// Support: Extended - References to ClusterTrustBundle (certificates.k8s.io).
 	//
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
@@ -91,36 +94,6 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// </gateway:util:excludeFromCRD>
 	// <gateway:experimental:validation:MinItems=1>
 	CACertificateRefs []LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
-	// ClusterTrustBundleRef is an optional reference to a cluster-scoped
-	// ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
-	// PEM-encoded CA certificates in the referenced bundle are used as the
-	// trust anchors for backend TLS validation. This field is mutually
-	// exclusive with CACertificateRefs and WellKnownCACertificates, so the
-	// referenced bundle is the only trust source for this policy.
-	//
-	// The referenced bundle MUST exist, be readable by the implementation, and
-	// contain at least one valid PEM-encoded CA certificate. If any of these
-	// conditions are not met, the implementation MUST set ResolvedRefs=False
-	// with reason InvalidCACertificateRef. A ReferenceGrant is not required.
-	//
-	// If the certificates.k8s.io API is not available in the cluster, the
-	// reference is treated as an unknown kind: the implementation MUST set
-	// ResolvedRefs=False with reason InvalidKind.
-	//
-	// Implementations that do not support ClusterTrustBundle references MUST set
-	// ResolvedRefs=False with reason InvalidKind when this field is specified.
-	//
-	// In all of the cases above, because the referenced bundle is the only
-	// trust source for this policy, the implementation MUST also ensure the
-	// `Accepted` Condition on the BackendTLSPolicy is set to `status: False`,
-	// with a Reason `NoValidCACertificate`. Connections using an invalid
-	// ClusterTrustBundleRef MUST fail, and the client MUST receive an HTTP 5xx
-	// error response.
-	//
-	// Support: Extended
-	//
-	// <gateway:experimental>
-	ClusterTrustBundleRef *ClusterTrustBundleObjectRefApplyConfiguration `json:"clusterTrustBundleRef,omitempty"`
 	// WellKnownCACertificates specifies whether a well-known set of CA certificates
 	// may be used in the TLS handshake between the gateway and backend pod.
 	//
@@ -180,14 +153,6 @@ func (b *BackendTLSPolicyValidationApplyConfiguration) WithCACertificateRefs(val
 		}
 		b.CACertificateRefs = append(b.CACertificateRefs, *values[i])
 	}
-	return b
-}
-
-// WithClusterTrustBundleRef sets the ClusterTrustBundleRef field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the ClusterTrustBundleRef field is set to the value of the last call.
-func (b *BackendTLSPolicyValidationApplyConfiguration) WithClusterTrustBundleRef(value *ClusterTrustBundleObjectRefApplyConfiguration) *BackendTLSPolicyValidationApplyConfiguration {
-	b.ClusterTrustBundleRef = value
 	return b
 }
 
