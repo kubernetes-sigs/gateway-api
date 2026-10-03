@@ -119,11 +119,7 @@ update.
 
 Each entry is an object with a `name` field, set to a feature name from the
 [`pkg/features`][features] package. The list MUST be sorted in ascending
-alphabetical order by `name`, and it can contain at most 64 entries.
-
-Do not list core features one by one. A resource name such as `HTTPRoute`
-means that the implementation supports all the core features of that resource.
-List Extended and implementation-specific features by their own names. For
+alphabetical order by `name`, and it can contain at most 64 entries. For
 example:
 
 ```yaml
