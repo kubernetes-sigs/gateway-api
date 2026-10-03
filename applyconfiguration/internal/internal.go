@@ -2422,6 +2422,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: samplingRate
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction
+      default: {}
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.RequestRate
   map:
     fields:
@@ -2452,6 +2453,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: tracing
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.TracingConfig
+      default: {}
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.TelemetryPolicyStatus
   map:
     fields:
@@ -2478,12 +2480,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: parentBasedSampling
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ParentBasedSampling
+      default: {}
     - name: provider
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.TracingProvider
+      default: {}
     - name: samplingRate
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction
+      default: {}
     - name: serviceName
       type:
         scalar: string

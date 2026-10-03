@@ -34,9 +34,16 @@ type TracingProviderApplyConfiguration struct {
 	// BackendRef is a reference to a Kubernetes Service or other supported
 	// backend that receives OTLP traces.
 	//
-	// When configured, tracing data is exported to the referenced backend. If the reference
-	// is invalid (e.g., the Service does not exist), the implementation should update the
-	// policy's status conditions to indicate an unresolved reference.
+	// When configured, tracing data is exported to the referenced backend.
+	//
+	// Cross-namespace references are only valid if they are explicitly allowed
+	// by ReferenceGrant in the target namespace.
+	//
+	// If the reference is invalid (e.g., the Service does not exist, has an
+	// unsupported Group or Kind, or is a cross-namespace reference not permitted
+	// by a ReferenceGrant), the implementation MUST set the "ResolvedRefs"
+	// condition on the Policy status to "status: False", with Reason
+	// "BackendNotFound", "InvalidKind", or "RefNotPermitted" as appropriate.
 	//
 	// TLS configuration for the connection to the backend is managed by the referenced
 	// object. For example, if the BackendRef points to a Service, a BackendTLSPolicy
