@@ -108,6 +108,50 @@ to the Gateway API GitHub repo containing details of their testing.
 
 The conformance suite output includes the Gateway API version supported.
 
+### Reporting supported features
+
+Implementations are expected to publish the features they support in the
+`status.supportedFeatures` field of each GatewayClass they accept. Users read
+this field to learn what a GatewayClass can do, and the conformance suite reads
+it to choose which tests to run. Implementations MUST publish this list before
+they set the `Accepted` condition on the GatewayClass, or in the same status
+update.
+
+Each entry is an object with a `name` field, set to a feature name from the
+[`pkg/features`][features] package. The list MUST be sorted in ascending
+alphabetical order by `name`, and it can contain at most 64 entries.
+
+Do not list core features one by one. A resource name such as `HTTPRoute`
+means that the implementation supports all the core features of that resource.
+List Extended and implementation-specific features by their own names. For
+example:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+...
+status:
+  conditions:
+  ...
+  supportedFeatures:
+  - name: Gateway
+  - name: HTTPRoute
+  - name: HTTPRoutePortRedirect
+  - name: HTTPRouteQueryParamMatching
+  - name: ReferenceGrant
+```
+
+Only publish Gateway features on a GatewayClass. Mesh features go in the status
+of the experimental XMesh resource instead. The conformance suite ignores Mesh
+features that it finds on a GatewayClass and prints a warning.
+
+Gateway conformance reports MUST use the features that the conformance suite
+infers from the GatewayClass status. Use the `--supported-features` flag only
+during development, or to select Mesh features. For more details, see
+[Conformance](/docs/concepts/conformance/) and [GEP-2162](/geps/gep-2162/).
+
+[features]: https://github.com/kubernetes-sigs/gateway-api/tree/main/pkg/features
+
 ### Union feature conformance
 
 Some features are only useful when implemented in combination with other
