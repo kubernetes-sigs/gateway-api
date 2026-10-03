@@ -47,7 +47,8 @@ type ParentBasedSamplingApplyConfiguration struct {
 	// filter so that it can respect the parent's intent while still controlling the volume
 	// of spans reported.
 	//
-	// In the absence of this field, it defaults to 100% ({numerator: 100}).
+	// When Mode is "Enabled" and this field is absent, a 100% sampling rate
+	// ({numerator: 100, denominator: 100}) is used.
 	//
 	// Support: Extended
 	//
