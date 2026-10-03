@@ -141,6 +141,7 @@ Only publish Gateway features on a GatewayClass. Mesh features go in the status
 of the experimental XMesh resource instead. The conformance suite ignores Mesh
 features that it finds on a GatewayClass and prints a warning.
 
+Only publish a feature when your implementation passes its conformance tests.
 Gateway conformance reports MUST use the features that the conformance suite
 infers from the GatewayClass status. Use the `--supported-features` flag only
 during development, or to select Mesh features. For more details, see
