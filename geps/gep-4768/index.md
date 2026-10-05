@@ -259,7 +259,7 @@ type TracingConfig struct {
   // Support: Extended
   //
   // +optional
-  SamplingRate v1.Fraction `json:"samplingRate,omitzero"`
+  SamplingRate *v1.Fraction `json:"samplingRate,omitempty"`
 
   // ParentBasedSampling configures whether to respect the sampling decision of the parent span.
   //
@@ -405,7 +405,7 @@ type ParentBasedSampling struct {
   // Support: Extended
   //
   // +optional
-  SamplingRate v1.Fraction `json:"samplingRate,omitzero"`
+  SamplingRate *v1.Fraction `json:"samplingRate,omitempty"`
 }
 
 // ParentBasedSamplingMode defines the enablement mode for parent-based sampling.

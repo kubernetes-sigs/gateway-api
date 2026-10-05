@@ -2422,7 +2422,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: samplingRate
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction
-      default: {}
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.RequestRate
   map:
     fields:
@@ -2488,7 +2487,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: samplingRate
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction
-      default: {}
     - name: serviceName
       type:
         scalar: string
