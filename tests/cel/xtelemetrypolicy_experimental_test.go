@@ -26,6 +26,7 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	xgatewayv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
@@ -50,12 +51,12 @@ func TestXTelemetryPolicyTracingMode(t *testing.T) {
 			tracing: xgatewayv1alpha1.TracingConfig{
 				Mode:     xgatewayv1alpha1.TracingModeEnabled,
 				Provider: validTracingProvider(),
-				SamplingRate: gatewayv1.Fraction{
+				SamplingRate: &gatewayv1.Fraction{
 					Numerator: 50,
 				},
 				ParentBasedSampling: xgatewayv1alpha1.ParentBasedSampling{
 					Mode: xgatewayv1alpha1.ParentBasedSamplingModeEnabled,
-					SamplingRate: gatewayv1.Fraction{
+					SamplingRate: &gatewayv1.Fraction{
 						Numerator: 50,
 					},
 				},
@@ -67,6 +68,17 @@ func TestXTelemetryPolicyTracingMode(t *testing.T) {
 						SourceType:   xgatewayv1alpha1.AttributeSourceLiteral,
 						LiteralValue: "prod",
 					},
+				},
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "mode Enabled with 0% samplingRate is accepted",
+			tracing: xgatewayv1alpha1.TracingConfig{
+				Mode:     xgatewayv1alpha1.TracingModeEnabled,
+				Provider: validTracingProvider(),
+				SamplingRate: &gatewayv1.Fraction{
+					Numerator: 0,
 				},
 			},
 			wantErrors: []string{},
@@ -97,7 +109,7 @@ func TestXTelemetryPolicyTracingMode(t *testing.T) {
 			name: "mode Disabled with samplingRate is rejected",
 			tracing: xgatewayv1alpha1.TracingConfig{
 				Mode: xgatewayv1alpha1.TracingModeDisabled,
-				SamplingRate: gatewayv1.Fraction{
+				SamplingRate: &gatewayv1.Fraction{
 					Numerator: 10,
 				},
 			},
@@ -162,7 +174,7 @@ func TestXTelemetryPolicyTracingMode(t *testing.T) {
 			name: "mode ImplementationDefault with samplingRate is rejected",
 			tracing: xgatewayv1alpha1.TracingConfig{
 				Mode: xgatewayv1alpha1.TracingModeImplementationDefault,
-				SamplingRate: gatewayv1.Fraction{
+				SamplingRate: &gatewayv1.Fraction{
 					Numerator: 10,
 				},
 			},
@@ -210,7 +222,7 @@ func TestXTelemetryPolicyParentBasedSampling(t *testing.T) {
 			name: "parentBasedSampling mode Enabled with samplingRate is accepted",
 			parentBasedSampling: xgatewayv1alpha1.ParentBasedSampling{
 				Mode: xgatewayv1alpha1.ParentBasedSamplingModeEnabled,
-				SamplingRate: gatewayv1.Fraction{
+				SamplingRate: &gatewayv1.Fraction{
 					Numerator: 50,
 				},
 			},
@@ -227,7 +239,7 @@ func TestXTelemetryPolicyParentBasedSampling(t *testing.T) {
 			name: "parentBasedSampling mode Disabled with samplingRate is rejected",
 			parentBasedSampling: xgatewayv1alpha1.ParentBasedSampling{
 				Mode: xgatewayv1alpha1.ParentBasedSamplingModeDisabled,
-				SamplingRate: gatewayv1.Fraction{
+				SamplingRate: &gatewayv1.Fraction{
 					Numerator: 50,
 				},
 			},
@@ -244,7 +256,7 @@ func TestXTelemetryPolicyParentBasedSampling(t *testing.T) {
 			name: "parentBasedSampling mode ImplementationDefault with samplingRate is rejected",
 			parentBasedSampling: xgatewayv1alpha1.ParentBasedSampling{
 				Mode: xgatewayv1alpha1.ParentBasedSamplingModeImplementationDefault,
-				SamplingRate: gatewayv1.Fraction{
+				SamplingRate: &gatewayv1.Fraction{
 					Numerator: 50,
 				},
 			},

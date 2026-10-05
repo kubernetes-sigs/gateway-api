@@ -10572,7 +10572,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref common.
 					"samplingRate": {
 						SchemaProps: spec.SchemaProps{
 							Description: "SamplingRate is the sampling rate to apply when parent-based sampling is active.\n\nThis acts as a downsampling governor. It allows an operator to say: \"I want to respect the parent's decision, but only for 50% of those requests\". Even if a parent is already marked as \"Sampled\", this allows the Gateway to apply a secondary filter so that it can respect the parent's intent while still controlling the volume of spans reported.\n\nWhen Mode is \"Enabled\" and this field is absent, a 100% sampling rate ({numerator: 100, denominator: 100}) is used.\n\nSupport: Extended",
-							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
 						},
 					},
@@ -10737,7 +10736,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref common.Refere
 					"samplingRate": {
 						SchemaProps: spec.SchemaProps{
 							Description: "SamplingRate specifies the base probability of sampling new traces.\n\nThe sampling probability is represented as a fraction.\n\nFor example, a Numerator of 5 and Denominator of 100 represents a 5% sampling rate. * If configured, only the specified percentage of new traces will be initiated. * In the absence of this field, an implementation-defined default is used.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nPermutations of numerator > denominator are invalid and MUST be rejected via validation. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
-							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
 						},
 					},
