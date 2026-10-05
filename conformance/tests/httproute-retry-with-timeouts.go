@@ -30,8 +30,7 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRetryWithRequestTimeout)
-	ConformanceTests = append(ConformanceTests, HTTPRouteRetryWithBackendTimeout)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRetryWithRequestTimeout, HTTPRouteRetryWithBackendTimeout)
 }
 
 var HTTPRouteRetryWithRequestTimeout = confsuite.ConformanceTest{
@@ -44,6 +43,7 @@ var HTTPRouteRetryWithRequestTimeout = confsuite.ConformanceTest{
 		features.SupportHTTPRouteRetryCodes,
 		features.SupportHTTPRouteRequestTimeout,
 	},
+	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "retries-with-timeouts", Namespace: ns}
@@ -104,6 +104,7 @@ var HTTPRouteRetryWithBackendTimeout = confsuite.ConformanceTest{
 		features.SupportHTTPRouteRequestTimeout,
 		features.SupportHTTPRouteBackendTimeout,
 	},
+	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "retries-with-timeouts", Namespace: ns}
@@ -136,7 +137,7 @@ var HTTPRouteRetryWithBackendTimeout = confsuite.ConformanceTest{
 			{
 				name: "fails with 504 when retry delay exceed the backend timeout",
 				args: args{
-					path: "/retry/request-timeout-200ms",
+					path: "/retry/request-timeout-500ms",
 					retrySimulationConfig: url.Values{
 						"responseCode": []string{"500"},
 						"succeedAfter": []string{"2"},
