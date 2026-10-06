@@ -167,6 +167,419 @@ processing is a gap in that substrate, and it is being filled today by duplicate
   * I want the boundary between what the routing layer decides and what the workload decides to be explicit, so that I can implement the routing side
     without encoding any workload's semantics.
 
+
+## Prior Art
+
+Multi-stage request processing is not hypothetical. Four projects implement it today, three of them are distributed inference stacks and one general-purpose proxy,
+each with a different architecture and no shared configuration surface between them.
+Disaggregated serving is the most visible case, but the same structural problem appears in representation transformation and  guardrail pipelines,
+and the difference between those cases is what exposes the gap most clearly.
+
+### llm-d (CNCF Sandbox project)
+
+llm-d has implemented this twice, in this section we walkthrough both implementations.
+
+#### First Try - The sidecar model
+
+Orchestration lived in a sidecar running only on the vLLM decode worker; no coordination logic ran on prefill or encode nodes.
+The EPP's `disagg-profile-handler` selected pods for every phase the request needed in a single workers selection cycle: decode always, then encode if multimodal content was detected, then prefill if the P/D decider judged it beneficial — and passed them to the sidecar as request headers.
+The gateway forwarded the request to the decode pod and took no further part.
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant GW as Inference Gateway
+    participant EPP as EPP
+    participant SC as Decode Worker Sidecar
+    participant P as Prefill Worker
+    participant D as Decode Worker(vLLM)
+
+    C->>GW: POST /v1/chat/completions
+    GW->>EPP: Select all endpoint for all phases in a single cycle
+    EPP-->>GW: Decode pod plus x-prefiller-host-port
+    GW->>SC: Request with phase headers
+    Note right of SC: Composition lives here.<br>The gateway sees one request<br>and one response and is not <br> aware of this sub-request.
+    SC->>P: Remote prefill with max_tokens=1
+    P-->>SC: KV transfer parameters
+    SC->>D: Decode with KV transfer parameters
+    D-->>SC: Stream
+    SC-->>GW: Stream
+    GW-->>C: Response
+```
+
+#### Second Try - The coordinator model
+
+The sidecar is removed and orchestration is pulled out to a standalone coordinator in front of the Inference Gateway.
+Client traffic enters through the Gateway: an HTTPRoute sends the client-facing inference paths to the coordinator, which then
+makes one EPP-mediated call per phase back through the same Gateway, tagging each with an EPP-Profile header.
+Each call is single-phase worker selection, so a pod is selected only when that phase's call is made.
+Cross-phase state (which is essentially payload processing) lives on the coordinator's code and is very tailored to inference phases.
+
+Two kinds of stage behave differently, and the difference matters. The inference phases are routed through the Gateway, because they need
+EPP endpoint selection against an InferencePool. The render (tokenization service) step is called directly by the coordinator — llm-d's own
+diagram labels the tokenizer a "side service".
+
+The pipeline also begins with a conditional probe: the coordinator first tries decode alone, and only falls back to the full encode,
+prefill and decode sequence when decode answers 412 Precondition Failed. That is the same control flow this proposal expresses
+declaratively with onResponse, implemented here as application logic in a project-specific service.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Coordinator
+    participant EPP
+    participant Render as Render (side service)
+    participant Encode as Encode pool
+    participant Prefill as Prefill pool
+    participant Decode as Decode pool
+
+    Client->>Gateway: Request
+    Gateway->>Coordinator: Forward request
+
+    opt render step configured
+        Coordinator->>Render: Normalize multimodal input (tokenize)
+        Render-->>Coordinator: TokenIDs
+    end
+
+    Note over Coordinator,Decode: conditional-decode, try decode alone first
+    Coordinator->>Gateway: Call (EPP-Profile: decode)
+    Gateway->>EPP: ext_proc, pick pod (profile=decode)
+    EPP-->>Gateway: Chosen decode pod
+    Gateway->>Decode: Forward request
+
+    alt Decode can serve the request
+        Decode-->>Gateway: 200 OK (tokens)
+        Gateway-->>Coordinator: Response
+        Coordinator-->>Client: Final response
+    else Decode cannot serve it (e.g. no KV cache for this prompt)
+        Decode-->>Gateway: 412 Precondition Failed
+        Gateway-->>Coordinator: 412
+        Note over Coordinator: Fall back to the full pipeline
+
+        opt request has multimodal entries
+            par one call per media entry
+                Coordinator->>Gateway: Call (EPP-Profile: encode)
+                Gateway->>EPP: ext_proc, pick pod (profile=encode)
+                EPP-->>Gateway: Chosen encode pod
+                Gateway->>Encode: Forward request
+                Encode-->>Gateway: Embeddings
+                Gateway-->>Coordinator: Embeddings
+            end
+        end
+
+        Coordinator->>Gateway: Call (EPP-Profile: prefill)
+        Gateway->>EPP: ext_proc, pick pod (profile=prefill)
+        EPP-->>Gateway: Chosen prefill pod
+        Gateway->>Prefill: Forward request
+        Prefill-->>Gateway: KV transfer descriptor
+        Gateway-->>Coordinator: Response
+
+        Coordinator->>Gateway: Call (EPP-Profile: decode)
+        Gateway->>EPP: ext_proc, pick pod (profile=decode)
+        EPP-->>Gateway: Chosen decode pod
+        Gateway->>Decode: Forward request (pulls KV via NIXL)
+        Decode-->>Gateway: 200 OK (tokens)
+        Gateway-->>Coordinator: Response
+        Coordinator-->>Client: Final response
+    end
+```
+
+Every inference phase is a real routed request through the Gateway, with an EPP worker selection decision of its own.
+The loop that drives them is not, the conditional-decode fallback is not, and the render stage is not.
+Eight Gateway round-trips in the worst case, while the order decisions and payload processing lives outside the Gateway entirely.
+
+llm-d is the only one of the three distributed inference projects that attempts to describe its stages in routing configuration,
+and it takes two cooperating HTTPRoutes to do it. Abbreviated from the coordinator disaggregation guide:
+
+#### The client-facing paths go to the coordinator.
+
+```yaml
+kind: HTTPRoute
+metadata: {name: coordinator}
+spec:
+  parentRefs: [{kind: Gateway, name: llm-d-inference-gateway}]
+  rules:
+  - matches:
+    - {path: {type: Exact, value: /v1/completions}}
+    - {path: {type: Exact, value: /v1/chat/completions}}
+    - {path: {type: Exact, value: /inference/v1/generate}}
+    backendRefs: [{kind: Service, name: llm-d-coordinator, port: 8080}]
+    timeouts: {request: 300s}
+```
+
+#### The coordinator's own per-phase calls come back in, distinguished only by a header.
+```yaml
+kind: HTTPRoute
+spec:
+  rules:
+  - backendRefs: [{group: inference.networking.k8s.io, kind: InferencePool, name: <pool>}]
+    matches:
+    - path: {type: Exact, value: /v1/completions}
+      headers: [{type: Exact, name: EPP-Profile, value: encode}]
+    - path: {type: Exact, value: /v1/completions}
+      headers: [{type: Exact, name: EPP-Profile, value: prefill}]
+    - path: {type: Exact, value: /v1/completions}
+      headers: [{type: Exact, name: EPP-Profile, value: decode}]
+    # ... the same three profiles repeated for each of the other two paths
+    - path: {type: PathPrefix, value: /}
+    timeouts: {request: 300s}
+```
+
+Several limits are visible in this example:
+
+- The stage selector is client-forgeable. A stage can only be expressed as a header match, and a header is whatever the client sends,
+  so the composition can be bypassed from outside. This is also an independent witness for the premise of [GEP-5224]: the reason it cannot
+  be defended is that filters run after route selection.
+- Stage dispatch rides on match-precedence arithmetic. The two routes must tie on path specificity so that the header match breaks the
+  tie; as the guide notes, a prefix match "would lose to the Coordinator's exact match even when EPP-Profile is present." The composition
+  works because of precedence rules, not because anything declares it.
+- Combinatorial match explosion. Three paths times three profiles, plus a catch-all, to say that a request has three stages.
+- One timeout for every stage. Each rule carries request: 300s, because there is nowhere to say that a prefill interaction and a
+  decode interaction have different budgets.
+
+### AIBrix
+
+AIBrix puts orchestration inside the gateway, as a routing algorithm in its Envoy ext_proc plugin (pd_disaggregation.go, RouterPD = "pd").
+Per request it groups pods by roleset, scores both groups and produces a (prefillPod, decodePod) pair, then issues the prefill request itself,
+synchronously for vLLM, extracting kv_transfer_params, and for TRT-LLM, extracting disaggregated_params;
+asynchronously for SGLang, which performs a bootstrap handshake instead before setting the target to the decode pod.
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant EG as Envoy Gateway
+    participant PL as ext_proc plugin (pd router)
+    participant P as Prefill pod
+    participant D as Decode pod
+
+    C->>EG: POST /v1/chat/completions
+    EG->>PL: ext_proc
+    Note over PL: scores pods, selects<br/>(prefillPod, decodePod)
+    Note right of PL: Composition lives here.<br>The gateway sees one request<br>and one response and is not <br> aware of this sub-request.
+    PL->>P: prefill sub-request — direct HTTP, not using route
+    P-->>PL: kv_transfer_params
+    PL-->>EG: target = decodePod
+    EG->>D: decode + kv_transfer_params
+    D-->>EG: stream
+    EG-->>C: response
+```
+
+AIBrix HttpRoute as it looks today:
+```yaml
+kind: HTTPRoute
+metadata: {name: qwen3-8b-router, namespace: aibrix-system}
+spec:
+  parentRefs: [{kind: Gateway, name: aibrix-eg, namespace: aibrix-system}]
+  rules:
+  - backendRefs: [{kind: Service, name: qwen3-8b, namespace: brixbench-adhoc, port: 8000}]
+    matches:
+    - headers: [{name: model, type: Exact, value: qwen3-8b}]
+      path: {type: PathPrefix, value: /v1/chat/completions}
+    timeouts: {request: 120s}
+```
+
+The prefill call is a plain HTTP request made from an extension process. It has no route, no retry policy, no timeout configuration, no
+traffic policy and no status, because nothing in the routing layer knows it happened.
+The 120s timeout covers the pair as though it were one exchange, and there is no way to give the prefill call a different budget, a different
+retry policy, or a status of its own. An operator reading this cluster's routing configuration has no way to learn that disaggregation is happening at all.
+
+### Dynamo
+
+Dynamo uses a bespoke Frontend with an integrated Router. The frontend activates an internal prefill router when it discovers a decode
+worker registered as WorkerType.Decode alongside a prefill service in the same namespace with a matching model name and
+WorkerType.Prefill. The router selects a prefill worker by KV-aware routing on cache-overlap scores and load, receives NIXL transfer
+metadata in disaggregated_params, injects it into the decode request and routes to the decode worker. Failure handling is deliberately
+narrow: once dispatched to prefill, a prefill or handoff failure is returned to the client rather than retried through a decode-only path.
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant FE as Frontend + Router
+    participant P as Prefill worker
+    participant D as Decode worker
+
+    C->>FE: POST /v1/chat/completions
+    Note over FE: KV-aware selection<br/>(cache overlap + load)
+    Note right of FE: Composition lives here.<br>The gateway sees one request<br>and one response and is not <br> aware of this sub-request.
+    FE->>P: prefill
+    P-->>FE: disaggregated_params (NIXL metadata)
+    FE->>D: decode + disaggregated_params
+    D-->>FE: stream
+    FE-->>C: response
+    P-->>FE: KV events (async)
+```
+
+An earlier documented design placed the decision in the decode worker instead: based on prefill length and queue depth it chose local
+versus remote prefill, pushing a RemotePrefillRequest onto a global PrefillQueue that prefill workers consumed.
+
+Dynamo HttpRoute as it looks today:
+```yaml
+kind: HTTPRoute
+metadata: {name: qwen3-0-6b-agg}
+spec:
+  parentRefs: [{kind: Gateway, name: inference-gateway}]
+  rules:
+  - matches:
+    - headers: [{name: X-Gateway-Model-Name, type: Exact, value: Qwen/Qwen3-0.6B}]
+      path: {type: PathPrefix, value: /}
+    backendRefs: [{group: inference.networking.k8s.io, kind: InferencePool, name: qwen3-0-6b-agg-pool, port: 8000}]
+    timeouts: {request: 300s}
+```
+
+Dyanmo is sharing the same shape and same gaps with AIBrix - one visible request while the networking configuration is completely invisible for the sub-request.
+
+### Beyond disaggregation
+
+Prefill and decode is the loudest example, but not the only one.
+The other shapes expose the problem more sharply because they are exposing the broader repeating patterns.
+
+#### Representation transformation
+A request arrives as HTTP and JSON and must be tokenized before any inference stage runs, after which later stages operate on a
+tokens-in and tokens-out representation, potentially over gRPC.
+The tokenizer is an ordinary service: no InferencePool, no KV cache, no load-aware endpoint selection. It is simply a stage that happens first.
+This is not an invented use case - it is a common pattern happening today in inference projects (e.g., dynamo is also doing sub-request for tokenization).
+
+#### Guardrails
+An input guard inspects the prompt and may end the exchange with a canned response, so that a detected jailbreak attempt never reaches a model,
+while an output guard inspects the response before it reaches the client. Both guards are themselves inference calls, to different models,
+with latency and failure characteristics quite unlike the main model's. This is a stage before, a stage after, and early termination in between.
+
+Neither is exotic, and neither is AI-specific in structure: one logical request, several ordered backend interactions, with the input of
+one derived from the output of the last. The question is whether the existing implementations can express them.
+
+AIBrix cannot. pd is one routing algorithm among many, selected by name, and its stages are "a prefill pod" and "a decode pod",
+identified by roleset labels. There is no notion of an arbitrary stage to configure.
+
+Dynamo cannot. Composition activates when the frontend discovers a WorkerType.Prefill service alongside a WorkerType.Decode worker,
+so the set of expressible stages is the worker-type enumeration. There is no WorkerType.Guardrail, and adding one is a change to the
+frontend rather than to configuration.
+
+llm-d partly can, and the way it manages is the evidence. Its coordinator is a configurable pipeline of reorderable plugin steps, and
+it already tokenizes through the render step described above — but that step is a side service called directly, outside the Gateway, and so
+it receives no route, no retry policy, no timeout configuration and no status. The stages that the Gateway can see are exactly the ones backed
+by an InferencePool. Adding a guardrail stage means writing a Go plugin for llm-d's coordinator, which does nothing for a platform team
+running AIBrix or Dynamo.
+
+The specificity is the problem. Each project solved the composition it needed, in the vocabulary of that composition: roleset labels, a
+worker-type enumeration, a profile header. None produced a way to say "an input guard, then a tokenizer, then prefill, then decode, then an
+output guard", and a platform team that wants exactly that has nowhere to ask for it.
+
+### Praxis
+
+The three projects above are distributed inference systems, and each built request composition because its workload demanded it.
+Praxis is a different kind of witness: It is a [CNCF Sandbox project][cncf-sandbox-praxis], general-purpose proxy and gateway, the same category of
+software as a Gateway API implementation, the same category of Gateways as the implementations that would have to support this GEP.
+Praxis arrived at this Multi-Stage-Routing abstraction independently.
+
+Praxis builds it in three layers.
+
+#### A sub-request primitive
+provides request and response types, a client with a bounded execution API, a pooled connector, pull-based streaming bodies, and
+typed transport errors: admission timeout, connect, I/O, deadline exceeded, stream idle timeout, circuit open, response too large. 
+
+#### An executor
+runs a named filter pipeline against a sub-request, reconstructs a nested filter context, runs the request, request-body, response and
+response-body phases, and applies the same forwarding boundary as the normal upstream path — a stage is not a side call, it is a request through the proxy's own machinery.
+
+#### A composition filter
+iterative_request_router, holds named steps, each backed by a pre-built sub-pipeline; per request it executes a step's filters, makes the call, executes the step's
+response filters, evaluates transition rules, and either continues to another step or returns the response.
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant PX as Praxis iterative_request_router
+    participant S1 as Step primary
+    participant S2 as Step fallback
+
+    C->>PX: Request
+    Note right of PX: Named ordered steps, each a routed<br>sub-pipeline. Composition is<br>configuration, inside the proxy.
+    PX->>S1: Step request via router and load_balancer
+    S1-->>PX: 503
+    Note right of PX: on_result matches 502/503/504,<br>next is fallback
+    PX->>S2: Step request
+    S2-->>PX: 200
+    Note right of PX: on_result default, done
+    PX-->>C: Response
+```
+
+Two things distinguish this from the three implementations above.
+
+It is general. A step is an arbitrary filter sub-pipeline, not a role. Nothing in the mechanism knows what prefill is, and nothing
+would need to change to express a guardrail, a tokenizer, or a plain service composition — precisely the cases the inference stacks cannot
+reach without new code. This is what it looks like when composition is a primitive rather than a special case.
+
+It converged on the same vocabulary this GEP proposes: named ordered steps, per-step routing and networking configuration,
+response-driven transitions, and both a whole-exchange deadline and a per-step one. Steps may reference reusable named chains or define
+them inline, mixed freely, which is the reference-and-reuse model this proposal argues for, already shipping.
+
+It also answers two questions this proposal lists as open. On streaming, header-safe failover rules run before any bytes are exposed
+downstream, while remaining transition rules run after clean EOF and may resume another step inside the same already-committed response;
+the end-to-end deadline explicitly covers a streamed final response, not only the step exchanges. On accumulated state, cross-stage
+state is bounded by an explicit ceiling. Two differences are instructive: Praxis permits backward re-entrance between steps and therefore
+needs both an iteration cap and a reserved depth header to prevent loops, mechanisms this proposal does not need because stages are
+forward-only and run at most once; and its transitions match response origin (upstream, local, transport) and transport error kind, a finer
+distinction than status alone can express.
+
+And none of it is expressible in Gateway API. Praxis implements Gateway API and configures this in its own YAML, because Gateway API
+has no vocabulary for it. That is the gap in one sentence: an implementation has already built the capability, shipped documentation for
+it, and still cannot let an operator ask for it portably. The feature is experimental and gated behind an off-by-default build flag, so the
+right weight to give it is not a production deployment, but a considered design by maintainers of a Gateway API implementation who had to
+answer the same questions this GEP raises.
+
+Takeaway
+
+The same thing is being built four times, in four places. A pod sidecar, an ext_proc plugin, a bespoke frontend process, and a proxy
+filter. The handle carried between stages differs per engine — kv_transfer_params for vLLM, disaggregated_params for TRT-LLM, a
+bootstrap room for SGLang — which is why this proposal keeps payload shaping in payload processing and stays agnostic to what is carried.
+
+They are converging on the front door, and on the same vocabulary. Dynamo moved the decision out of the decode worker into its
+frontend router; llm-d moved it out of the decode pod's sidecar into a coordinator that dispatches every phase through the Inference
+Gateway. Praxis independently defined named ordered steps with response-driven transitions. The shape is not in dispute. Only its expression is.
+
+The one general implementation is the one that is not an inference project. The three inference stacks each encoded their use case into
+the mechanism, so none extends to a tokenizer, a guardrail, or any composition outside inference without new code. Praxis, a Gateway API
+implementation with no inference workload, built the general form. Standardizing this is therefore not a matter of inventing an abstraction
+and hoping implementations adopt it: one has already built it, and three more have built use-case-specific approximations because they had
+no portable alternative.
+
+This can already be done — and that is precisely the problem. Nothing here required a new primitive. What none of these projects could
+do is express the composition in routing configuration, so each reimplemented retries, backoff, timeouts, fail-open/closed behavior and
+connection management alongside its own orchestrator, in its own language, with no portability between them and no uniform way for an
+operator to observe a logical request as one exchange. A platform team that adopts one cannot carry its configuration to another. The
+pattern is common; only the expression of it is bespoke.
+
+What this proposal is aiming at
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant GW as Gateway with MultiStageRoute
+    participant R0 as HTTPRoute input guard
+    participant R1 as HTTPRoute tokenizer
+    participant R2 as HTTPRoute prefill
+    participant R3 as HTTPRoute decode
+
+    C->>GW: POST /v1/chat/completions
+    Note right of GW: Composition is configuration:<br>which stages, in what order,<br>under what conditions
+    GW->>R0: Stage input guard
+    R0-->>GW: Allowed
+    Note right of GW: A blocked verdict would end<br>the exchange here
+    GW->>R1: Stage tokenize
+    R1-->>GW: Token IDs
+    GW->>R2: Stage prefill, with the route's<br>own timeouts and retries
+    R2-->>GW: kv_transfer_params
+    Note right of GW: Payload processing derives<br>the next stage's request body
+    GW->>R3: Stage decode
+    R3-->>GW: Stream
+    GW-->>C: Response
+```
+
+No component beside the Gateway, no sub-request nor payload processing outside its reach, and every stage an ordinary route that could be used on its own.
+
+
+
 ## API
 
 **TODO**: Concrete definitions will be added once there is consensus on the previous sections. 
@@ -408,3 +821,4 @@ open, and it should be resolved with them rather than separately here.
 [GEP-3793]:https://gateway-api.sigs.k8s.io/geps/gep-3793/
 [gateway-api#5194]:https://github.com/kubernetes-sigs/gateway-api/issues/5194
 [JSON Pointer]:https://www.rfc-editor.org/rfc/rfc6901
+[cncf-sandbox-praxis]: https://github.com/cncf/sandbox/issues/506
