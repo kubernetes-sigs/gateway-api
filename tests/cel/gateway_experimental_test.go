@@ -128,10 +128,58 @@ func TestGatewayInfrastructureLabels(t *testing.T) {
 					missingErrorStrings = append(missingErrorStrings, wantError)
 				}
 			}
+
 			if len(missingErrorStrings) != 0 {
 				t.Errorf("Unexpected response while creating Gateway; got err=\n%v\n;missing strings within error=%q", err, missingErrorStrings)
 			}
 		})
+	}
+}
+
+func TestGatewayClusterTrustBundleReferenceNamespace(t *testing.T) {
+	gateway := &gatewayv1.Gateway{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+			Namespace: metav1.NamespaceDefault,
+		},
+		Spec: gatewayv1.GatewaySpec{
+			GatewayClassName: "foo",
+			Listeners: []gatewayv1.Listener{
+				{
+					Name:     gatewayv1.SectionName("https"),
+					Protocol: gatewayv1.HTTPSProtocolType,
+					Port:     gatewayv1.PortNumber(443),
+					TLS: &gatewayv1.ListenerTLSConfig{
+						Mode: new(gatewayv1.TLSModeType("Terminate")),
+					},
+				},
+			},
+			TLS: &gatewayv1.GatewayTLSConfig{
+				Frontend: &gatewayv1.FrontendTLSConfig{
+					Default: gatewayv1.TLSConfig{
+						Validation: &gatewayv1.FrontendTLSValidation{
+							CACertificateRefs: []gatewayv1.ObjectReference{
+								{
+									Group:     "certificates.k8s.io",
+									Kind:      "ClusterTrustBundle",
+									Name:      "example.com:internal-signer:v1",
+									Namespace: new(gatewayv1.Namespace("unexpected")),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	err := k8sClient.Create(context.Background(), gateway)
+	if err == nil {
+		t.Fatalf("expected Gateway with a namespaced ClusterTrustBundle reference to be rejected")
+	}
+	wantError := "ClusterTrustBundle references must not specify namespace"
+	if !celErrorStringMatches(err.Error(), wantError) {
+		t.Errorf("Unexpected response while creating Gateway; got err=\n%v\n;missing string within error=%q", err, wantError)
 	}
 }
 
