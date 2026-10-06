@@ -150,7 +150,7 @@ The Backend resource is designed with a clear separation between Core and Extend
 | `EndpointSelector` type | Core | Routes to a selected set of in-cluster endpoints; behaves equivalently to a Service `backendRef` |
 | `ExternalHostname` type | Extended | First-class external FQDN support, replacing `ExternalName` Services |
 | Inline TLS | Extended | TLS configuration inlined on the Backend resource |
-| `MCP` protocol | Extended | Higher-level protocol metadata for AI/agentic use cases |
+| `TCP`, `GRPC`, `HTTP2`, `MCP`, and `WSS` protocols | Extended | Extended backend communication protocols |
 | [Session persistence](../gep-1619/index.md) | Extended | Session persistence across endpoints selected by an `EndpointSelector` Backend |
 
 This layering allows the Backend resource itself to move to Standard quickly (Core tests just validate "does Backend do what Service does"), while Extended features mature independently.
@@ -249,8 +249,9 @@ type BackendSpec struct {
   // These protocols are also used for validation of future protocol-specific
   // fields that may be added to the Backend resource (e.g. retries).
   //
-  // Support: Extended for MCP, Core for TCP, HTTP, HTTP2, and H2C
-  // TODO: Not sure if the above is allowed or viable.
+  // Support: Core - HTTP, H2C, and HTTP11
+  //
+  // Support: Extended - TCP, GRPC, HTTP2, MCP, and WSS
   // +optional
   Protocol BackendProtocol `json:"protocol"`
 
@@ -454,16 +455,18 @@ type ExternalHostnameBackend struct {
 ### Protocol and Extension Support
 
 ```go
-// +kubebuilder:validation:Enum=TCP,HTTP,HTTP2,HTTP11,H2C,MCP
+// +kubebuilder:validation:Enum=TCP;HTTP;HTTP2;HTTP11;H2C;MCP;GRPC;WSS
 type BackendProtocol string
 
 const (
-  BackendProtocolMCP   BackendProtocol = "MCP"
-  BackendProtocolTCP   BackendProtocol = "TCP"
-  BackendProtocolHTTP  BackendProtocol = "HTTP"
-  BackendProtocolHTTP2 BackendProtocol = "HTTP2"
-  BackendProtocolH2C   BackendProtocol = "H2C"
+  BackendProtocolMCP    BackendProtocol = "MCP"
+  BackendProtocolTCP    BackendProtocol = "TCP"
+  BackendProtocolHTTP   BackendProtocol = "HTTP"
+  BackendProtocolHTTP2  BackendProtocol = "HTTP2"
   BackendProtocolHTTP11 BackendProtocol = "HTTP11"
+  BackendProtocolH2C    BackendProtocol = "H2C"
+  BackendProtocolGRPC   BackendProtocol = "GRPC"
+  BackendProtocolWSS    BackendProtocol = "WSS"
 )
 ```
 

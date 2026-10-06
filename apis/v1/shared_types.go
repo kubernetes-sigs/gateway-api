@@ -931,7 +931,10 @@ type SessionPersistence struct {
 	// session. Once the AbsoluteTimeout duration has elapsed, the
 	// session becomes invalid.
 	//
-	// Support: Extended
+	// Support: Core when cookie.lifetimeType is "Permanent".
+	//
+	// Support: Extended when cookie.lifetimeType is "Session" or
+	// type is "Header".
 	//
 	// +optional
 	AbsoluteTimeout *Duration `json:"absoluteTimeout,omitempty"`
@@ -990,14 +993,7 @@ type CookieConfig struct {
 	// Users should avoid reusing cookie names to prevent unintended
 	// consequences, such as rejection or unpredictable behavior.
 	//
-	// <gateway:util:excludeFromCRD>
-	// This field is Extended because not all implementations can
-	// control the cookie name. Implementations SHOULD support this
-	// field if the underlying dataplane allows configuring the cookie
-	// name.
-	// </gateway:util:excludeFromCRD>
-	//
-	// Support: Extended
+	// Support: Core
 	//
 	// +optional
 	Name *CookieName `json:"name,omitempty"`
@@ -1035,9 +1031,7 @@ type CookieConfig struct {
 	//
 	// Defaults to "Session".
 	//
-	// Support: Core for "Session" type
-	//
-	// Support: Extended for "Permanent" type
+	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:default=Session
@@ -1057,7 +1051,7 @@ const (
 	// PermanentCookieLifetimeType specifies the type for a permanent
 	// cookie.
 	//
-	// Support: Extended
+	// Support: Core
 	PermanentCookieLifetimeType CookieLifetimeType = "Permanent"
 )
 
