@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -73,10 +72,8 @@ var TLSRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Conform
 			time.Sleep(time.Second)
 
 			newerRoute := &gatewayv1.TLSRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      newerRouteNN.Name,
-					Namespace: newerRouteNN.Namespace,
-				},
+				Name:      newerRouteNN.Name,
+				Namespace: newerRouteNN.Namespace,
 				Spec: gatewayv1.TLSRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
@@ -86,10 +83,8 @@ var TLSRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Conform
 					Hostnames: []gatewayv1.Hostname{"abc.example.com"},
 					Rules: []gatewayv1.TLSRouteRule{{
 						BackendRefs: []gatewayv1.BackendRef{{
-							BackendObjectReference: gatewayv1.BackendObjectReference{
-								Name: gatewayv1.ObjectName("tls-backend-2"),
-								Port: ptr.To(gatewayv1.PortNumber(443)),
-							},
+							Name: gatewayv1.ObjectName("tls-backend-2"),
+							Port: ptr.To(gatewayv1.PortNumber(443)),
 						}},
 					}},
 				},
@@ -118,10 +113,8 @@ var TLSRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Conform
 			time.Sleep(time.Second)
 
 			newerRoute := &gatewayv1.TLSRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      newerRouteNN.Name,
-					Namespace: newerRouteNN.Namespace,
-				},
+				Name:      newerRouteNN.Name,
+				Namespace: newerRouteNN.Namespace,
 				Spec: gatewayv1.TLSRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
@@ -131,10 +124,8 @@ var TLSRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Conform
 					Hostnames: []gatewayv1.Hostname{"*.example.com"},
 					Rules: []gatewayv1.TLSRouteRule{{
 						BackendRefs: []gatewayv1.BackendRef{{
-							BackendObjectReference: gatewayv1.BackendObjectReference{
-								Name: gatewayv1.ObjectName("tls-backend-2"),
-								Port: ptr.To(gatewayv1.PortNumber(443)),
-							},
+							Name: gatewayv1.ObjectName("tls-backend-2"),
+							Port: ptr.To(gatewayv1.PortNumber(443)),
 						}},
 					}},
 				},
