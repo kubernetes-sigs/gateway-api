@@ -53,8 +53,8 @@ var BackendTLSPolicyCoreFeatures = sets.New(
 // BackendTLSPolicy API at a Extended level of support.
 //
 // ClusterTrustBundleFeature is defined in gateway.go and is shared with
-// GatewayExtendedFeatures, since the same feature name covers clusterTrustBundleRef
-// support in both BackendTLSPolicyValidation and Gateway frontend TLS validation.
+// GatewayExtendedFeatures, since the same feature name covers ClusterTrustBundle
+// reference support in both BackendTLSPolicyValidation and Gateway frontend TLS validation.
 var BackendTLSPolicyExtendedFeatures = sets.New(
 	BackendTLSPolicySanValidationFeature,
 	ClusterTrustBundleFeature,
