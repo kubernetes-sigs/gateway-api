@@ -53,7 +53,7 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-      - dependency-name: "registry.k8s.io/gateway-api/conformance/*"
+      - dependency-name: "gateway-api/conformance/*"
     labels:
       - docker
       - dependencies
@@ -67,7 +67,7 @@ updates:
       - "/conformance/tests"
       - "/conformance/tests/mesh"
     patterns:
-      - "registry.k8s.io/gateway-api/conformance/*"
+      - "gateway-api/conformance/*"
     multi-ecosystem-group: "gateway-api-conformance-images"
 
   #  Github actions updates
