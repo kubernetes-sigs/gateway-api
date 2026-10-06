@@ -15,9 +15,9 @@ spec:
       resources:   ["*"]
   validations:
     - expression: "object.spec.group != 'gateway.networking.k8s.io' || oldObject == null || (
-        has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') && 
+        has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') &&
         object.metadata.annotations['gateway.networking.k8s.io/channel'] == 'standard' ) || (
-        oldObject != null && has(oldObject.metadata.annotations) && oldObject.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') && 
+        oldObject != null && has(oldObject.metadata.annotations) && oldObject.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') &&
         oldObject.metadata.annotations['gateway.networking.k8s.io/channel'] == 'experimental' )"
       message: "Installing experimental CRDs on top of standard channel CRDs is prohibited by default. Uninstall ValidatingAdmissionPolicy safe-upgrades.gateway.networking.k8s.io to install experimental CRDs on top of standard channel CRDs."
       reason: Invalid
