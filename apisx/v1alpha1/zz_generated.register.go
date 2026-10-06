@@ -68,6 +68,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&XBackendTrafficPolicyList{},
 		&XMesh{},
 		&XMeshList{},
+		&XTelemetryPolicy{},
+		&XTelemetryPolicyList{},
 	)
 	// AddToGroupVersion allows the serialization of client types like ListOptions.
 	v1.AddToGroupVersion(scheme, SchemeGroupVersion)

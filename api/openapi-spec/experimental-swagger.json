@@ -14811,6 +14811,669 @@
 				}
 			]
 		},
+		"/apis/gateway.networking.x-k8s.io/v1alpha1/namespaces/{namespace}/xtelemetrypolicies": {
+			"get": {
+				"description": "list objects of kind XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "listGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/shardSelector-Kgyki_3_"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					},
+					{
+						"$ref": "#/parameters/watch-XNNPZGbK"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicyList"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"post": {
+				"description": "create a XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "createGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicy",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "post",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"delete": {
+				"description": "delete collection of XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "deleteGatewayNetworkingXK8sIoV1alpha1CollectionNamespacedXTelemetryPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/shardSelector-Kgyki_3_"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					},
+					{
+						"$ref": "#/parameters/watch-XNNPZGbK"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "deletecollection",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/gateway.networking.x-k8s.io/v1alpha1/namespaces/{namespace}/xtelemetrypolicies/{name}": {
+			"get": {
+				"description": "read the specified XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "readGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"put": {
+				"description": "replace the specified XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "replaceGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicy",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"delete": {
+				"description": "delete a XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "deleteGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/ignoreStoreReadErrorWithClusterBreakingPotential-QbNkfIqj"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "delete",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"patch": {
+				"description": "partially update the specified XTelemetryPolicy",
+				"consumes": [
+					"application/json-patch+json",
+					"application/merge-patch+json",
+					"application/apply-patch+yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "patchGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-78PwaGsr"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-7c6nTn1T"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/force-tOGGb0Yi"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"parameters": [
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the XTelemetryPolicy",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/gateway.networking.x-k8s.io/v1alpha1/namespaces/{namespace}/xtelemetrypolicies/{name}/status": {
+			"get": {
+				"description": "read status of the specified XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "readGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicyStatus",
+				"parameters": [
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"put": {
+				"description": "replace status of the specified XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "replaceGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicyStatus",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"patch": {
+				"description": "partially update status of the specified XTelemetryPolicy",
+				"consumes": [
+					"application/json-patch+json",
+					"application/merge-patch+json",
+					"application/apply-patch+yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "patchGatewayNetworkingXK8sIoV1alpha1NamespacedXTelemetryPolicyStatus",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-78PwaGsr"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-7c6nTn1T"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/force-tOGGb0Yi"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"parameters": [
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the XTelemetryPolicy",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
 		"/apis/gateway.networking.x-k8s.io/v1alpha1/xbackends": {
 			"get": {
 				"description": "list objects of kind XBackend",
@@ -15612,6 +16275,81 @@
 				},
 				{
 					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/gateway.networking.x-k8s.io/v1alpha1/xtelemetrypolicies": {
+			"get": {
+				"description": "list objects of kind XTelemetryPolicy",
+				"consumes": [
+					"application/json",
+					"application/yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"gatewayNetworkingXK8sIo_v1alpha1"
+				],
+				"operationId": "listGatewayNetworkingXK8sIoV1alpha1XTelemetryPolicyForAllNamespaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicyList"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "gateway.networking.x-k8s.io",
+					"version": "v1alpha1",
+					"kind": "XTelemetryPolicy"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/shardSelector-Kgyki_3_"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
 				}
 			]
 		}
@@ -21647,6 +22385,38 @@
 				}
 			]
 		},
+		"io.x-k8s.networking.gateway.v1alpha1.Attribute": {
+			"description": "Attribute defines a single flat key-value pair to attach to traces.\n\nThis allows users to enrich spans with context like HTTP headers (e.g., \"X-User-ID\"), static tags, or built-in variables.\n\nSupport: Core",
+			"type": "object",
+			"required": [
+				"name",
+				"sourceType"
+			],
+			"properties": {
+				"attributeKey": {
+					"description": "AttributeKey refers to a standard OpenTelemetry attribute. For example: \"http.response.status_code\" or \"http.request.method\". This is required if SourceType is \"Attribute\". See: https://opentelemetry.io/docs/specs/semconv/",
+					"type": "string"
+				},
+				"headerName": {
+					"description": "HeaderName specifies the HTTP header to extract the value from. This is required if SourceType is \"Header\".",
+					"type": "string"
+				},
+				"literalValue": {
+					"description": "LiteralValue specifies a static string value to attach. This is required if SourceType is \"Literal\".",
+					"type": "string"
+				},
+				"name": {
+					"description": "Name is the key of the attribute as it will appear in the output (i.e., as a span tag).",
+					"type": "string",
+					"default": ""
+				},
+				"sourceType": {
+					"description": "SourceType specifies where the attribute value comes from. Valid values are \"Header\", \"Literal\", or \"Attribute\".",
+					"type": "string",
+					"default": ""
+				}
+			}
+		},
 		"io.x-k8s.networking.gateway.v1alpha1.BackendAncestorStatus": {
 			"description": "BackendAncestorStatus describes the status of a Backend with respect to a specific ancestor resource (typically a Gateway).",
 			"type": "object",
@@ -21904,6 +22674,20 @@
 				}
 			}
 		},
+		"io.x-k8s.networking.gateway.v1alpha1.ParentBasedSampling": {
+			"description": "ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream trace parent.\n\nSupport: Extended",
+			"type": "object",
+			"properties": {
+				"mode": {
+					"description": "Mode explicitly controls if parent-based sampling is enabled. Valid values are \"Enabled\", \"Disabled\", \"ImplementationDefault\".\n\nIn the absence of this field, it defaults to \"ImplementationDefault\".\n\nSupport: Extended",
+					"type": "string"
+				},
+				"samplingRate": {
+					"description": "SamplingRate is the sampling rate to apply when parent-based sampling is active.\n\nThis acts as a downsampling governor. It allows an operator to say: \"I want to respect the parent's decision, but only for 50% of those requests\". Even if a parent is already marked as \"Sampled\", this allows the Gateway to apply a secondary filter so that it can respect the parent's intent while still controlling the volume of spans reported.\n\nIn the absence of this field, it defaults to 100% ({numerator: 100}).\n\nSupport: Extended",
+					"$ref": "io.k8s.networking.gateway.v1.Fraction"
+				}
+			}
+		},
 		"io.x-k8s.networking.gateway.v1alpha1.RequestRate": {
 			"description": "RequestRate expresses a rate of requests over a given period of time.",
 			"type": "object",
@@ -21930,6 +22714,110 @@
 				"minRetryRate": {
 					"description": "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nThe effective overall minimum rate of retries targeting the backend service may be much higher, as there can be any number of clients which are applying this setting locally.\n\nThis ensures that requests can still be retried during periods of low traffic, where the budget for retries may be calculated as a very low value.\n\nSupport: Extended",
 					"$ref": "io.x-k8s.networking.gateway.v1alpha1.RequestRate"
+				}
+			}
+		},
+		"io.x-k8s.networking.gateway.v1alpha1.TelemetryPolicySpec": {
+			"description": "TelemetryPolicySpec defines the desired state and target of TelemetryPolicy.\n\nSpecifying at least one target resource in `targetRefs` is required. Tracing behavior can be configured via the `tracing` field.",
+			"type": "object",
+			"required": [
+				"targetRefs"
+			],
+			"properties": {
+				"targetRefs": {
+					"description": "TargetRefs identifies the gateways to which this policy applies (GEP-713).\n\nWhen configured, the telemetry settings defined in this policy are applied uniformly to the referenced resources. In the absence of targetRefs, the policy is invalid and will not be accepted.\n\nTargetRefs must be distinct.\n\nSupport: Core for Gateway",
+					"type": "array",
+					"items": {
+						"$ref": "io.k8s.networking.gateway.v1.LocalObjectReference"
+					},
+					"x-kubernetes-list-type": "atomic"
+				},
+				"tracing": {
+					"description": "Tracing defines the configuration for distributed tracing.\n\nWhen configured, distributed tracing spans are generated and exported. In the absence of this configuration, tracing behavior is determined by implementation defaults.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
+					"$ref": "io.x-k8s.networking.gateway.v1alpha1.TracingConfig"
+				}
+			}
+		},
+		"io.x-k8s.networking.gateway.v1alpha1.TelemetryPolicyStatus": {
+			"description": "TelemetryPolicyStatus defines the observed state of TelemetryPolicy.",
+			"type": "object",
+			"required": [
+				"ancestors"
+			],
+			"properties": {
+				"ancestors": {
+					"description": "For Policy Status API conventions, see: https://gateway-api.sigs.k8s.io/geps/gep-713/#the-status-stanza-of-policy-objects\n\nAncestors is a list of ancestor resources (specifically Gateway resources) that are associated with the policy, and the status of the policy with respect to each ancestor. When this policy attaches to a parent, the controller that manages the parent and the ancestors MUST add an entry to this list when the controller first sees the policy and SHOULD update the entry as appropriate when the relevant ancestor is modified.\n\nFor TelemetryPolicy, the ancestor MUST be the Gateway resource referenced in spec.targetRefs.\n\nNote also that implementations MUST ONLY populate ancestor status for the Ancestor resources they are responsible for. Implementations MUST use the ControllerName field to uniquely identify the entries in this list that they are responsible for.\n\nNote that to achieve this, the list of PolicyAncestorStatus structs MUST be treated as a map with a composite key, made up of the AncestorRef and ControllerName fields combined.\n\nA maximum of 16 ancestors will be represented in this list. An empty list means the Policy is not relevant for any ancestors.\n\nIf this slice is full, implementations MUST NOT add further entries. Instead they MUST consider the policy unimplementable and signal that on any related resources such as the ancestor that would be referenced here.",
+					"type": "array",
+					"items": {
+						"$ref": "io.k8s.networking.gateway.v1.PolicyAncestorStatus"
+					},
+					"x-kubernetes-list-type": "atomic"
+				}
+			}
+		},
+		"io.x-k8s.networking.gateway.v1alpha1.TracingConfig": {
+			"description": "TracingConfig defines the configuration for distributed tracing.\n\nSupport: Extended",
+			"type": "object",
+			"properties": {
+				"attributes": {
+					"description": "Attributes is a list of custom key-value pairs (or variables) attached to every span.\n\nWhen configured, these attributes are injected into every generated tracing span. In the absence of attributes, only standard proxy-defined attributes are emitted.\n\nSupport: Extended",
+					"type": "array",
+					"items": {
+						"$ref": "io.x-k8s.networking.gateway.v1alpha1.Attribute"
+					},
+					"x-kubernetes-list-map-keys": [
+						"name"
+					],
+					"x-kubernetes-list-type": "map"
+				},
+				"mode": {
+					"description": "Mode explicitly controls if tracing is enabled. Valid values are \"Enabled\", \"Disabled\", \"ImplementationDefault\".\n\nIn the absence of this field, it defaults to \"ImplementationDefault\".\n\nSupport: Core (within TelemetryPolicy feature)",
+					"type": "string"
+				},
+				"parentBasedSampling": {
+					"description": "ParentBasedSampling configures whether to respect the sampling decision of the parent span.\n\n* When Mode is \"Enabled\", the proxy will respect the upstream trace parent's sampling\n  decision.\n* When Mode is \"Disabled\" or absent, the proxy applies its own local sampling rate\n  decision.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyParentBasedSampling",
+					"$ref": "io.x-k8s.networking.gateway.v1alpha1.ParentBasedSampling"
+				},
+				"provider": {
+					"description": "Provider specifies the tracing collector or backend endpoint receiving OTLP spans.\n\nWhen configured, spans generated by the Gateway proxy are exported to this destination. In the absence of this field, spans are exported to an implementation-defined default sink.\n\nSupport: Core (within Tracing feature)",
+					"$ref": "io.x-k8s.networking.gateway.v1alpha1.TracingProvider"
+				},
+				"samplingRate": {
+					"description": "SamplingRate specifies the base probability of sampling new traces.\n\nThe sampling probability is represented as a fraction.\n\nFor example, a Numerator of 5 and Denominator of 100 represents a 5% sampling rate. * If configured, only the specified percentage of new traces will be initiated. * In the absence of this field, an implementation-defined default is used.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nPermutations of numerator > denominator are invalid and MUST be rejected via validation. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+					"$ref": "io.k8s.networking.gateway.v1.Fraction"
+				},
+				"serviceName": {
+					"description": "ServiceName is the \"service.name\" attribute of the OpenTelemetry resource. If absent, the implementation's default service name will be used.\n\nSupport: Extended",
+					"type": "string"
+				},
+				"spanName": {
+					"description": "SpanName defines a custom name for the OTel span. By default, the name is implementation-specific.\n\nSupport: Extended",
+					"type": "string"
+				}
+			}
+		},
+		"io.x-k8s.networking.gateway.v1alpha1.TracingProvider": {
+			"description": "TracingProvider identifies the tracing backend that receives generated spans.\n\nSupport: Core for Service\n\nSupport: Implementation-specific for any other resource",
+			"type": "object",
+			"required": [
+				"backendRef"
+			],
+			"properties": {
+				"backendRef": {
+					"description": "BackendRef is a reference to a Kubernetes Service or other supported backend that receives OTLP traces.\n\nWhen configured, tracing data is exported to the referenced backend. If the reference is invalid (e.g., the Service does not exist), the implementation should update the policy's status conditions to indicate an unresolved reference.\n\nTLS configuration for the connection to the backend is managed by the referenced object. For example, if the BackendRef points to a Service, a BackendTLSPolicy can be attached to configure TLS. Alternatively, the referenced backend could be a custom resource (e.g., XBackend) that natively manages TLS.\n\nSupport: Core",
+					"default": {},
+					"$ref": "io.k8s.networking.gateway.v1.BackendObjectReference"
+				},
+				"headers": {
+					"description": "Headers specifies a list of custom headers to be added to the telemetry export requests (e.g., for authentication).\n\nSupport: Extended",
+					"type": "array",
+					"items": {
+						"$ref": "io.k8s.networking.gateway.v1.HTTPHeader"
+					},
+					"x-kubernetes-list-map-keys": [
+						"name"
+					],
+					"x-kubernetes-list-type": "map"
 				}
 			}
 		},
@@ -22144,6 +23032,78 @@
 				{
 					"group": "gateway.networking.x-k8s.io",
 					"kind": "XMeshList",
+					"version": "v1alpha1"
+				}
+			]
+		},
+		"io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy": {
+			"description": "TelemetryPolicy defines a Direct Attached Policy to configure telemetry/observability signals for Gateways.\n\nBy applying a TelemetryPolicy, platform operators and developers can ensure consistent collection, formatting, and export of observability signals.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nTelemetryPolicy is a Direct Attached Policy. Implementing controllers MUST adhere to the Policy Attachment guidelines (GEP-713).\n\nPrecedence and Conflict Resolution:\n  - To prevent complex merging semantics, only a single TelemetryPolicy is\n    permitted to apply to a specific Gateway resource at any given time.\n  - If multiple TelemetryPolicy resources target the same Gateway, precedence\n    MUST be determined using the following criteria, continuing on ties:\n    1. The older policy by creation timestamp takes precedence.\n    2. The policy appearing first in alphabetical order by {namespace}/{name}.\n  - For any TelemetryPolicy that does not take precedence, the controller\n    MUST set the `Accepted` condition on the policy status to `status: False` with\n    Reason `Conflicted`.\n\nConformance: Implementations MUST support the core resource structure and `targetRefs`. Support for the tracing block is Extended, but if supported, its respective conformance profile must be met. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+			"type": "object",
+			"required": [
+				"spec"
+			],
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"default": {},
+					"$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+				},
+				"spec": {
+					"description": "Spec defines the desired state of TelemetryPolicy.",
+					"default": {},
+					"$ref": "io.x-k8s.networking.gateway.v1alpha1.TelemetryPolicySpec"
+				},
+				"status": {
+					"description": "Status defines the observed state of TelemetryPolicy.",
+					"default": {},
+					"$ref": "io.x-k8s.networking.gateway.v1alpha1.TelemetryPolicyStatus"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "gateway.networking.x-k8s.io",
+					"kind": "XTelemetryPolicy",
+					"version": "v1alpha1"
+				}
+			]
+		},
+		"io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicyList": {
+			"description": "XTelemetryPolicyList contains a list of XTelemetryPolicy.",
+			"type": "object",
+			"required": [
+				"items"
+			],
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"items": {
+					"type": "array",
+					"items": {
+						"$ref": "io.x-k8s.networking.gateway.v1alpha1.XTelemetryPolicy"
+					}
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"default": {},
+					"$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "gateway.networking.x-k8s.io",
+					"kind": "XTelemetryPolicyList",
 					"version": "v1alpha1"
 				}
 			]
