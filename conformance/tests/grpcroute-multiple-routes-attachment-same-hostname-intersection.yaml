@@ -1,0 +1,67 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-grpcroute-exact-hostname-x
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: listener-exact-hostname
+    protocol: HTTP
+    port: 80
+    hostname: abc.example.com
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: GRPCRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-grpcroute-wc-hostname-x
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: listener-wc-hostname
+    protocol: HTTP
+    port: 80
+    hostname: "*.example.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: GRPCRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpcroute-wc-hostname-x-older
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-grpcroute-exact-hostname-x
+    namespace: gateway-conformance-infra
+  hostnames:
+  - "*.example.com"
+  rules:
+  - backendRefs:
+    - name: grpc-infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpcroute-less-specific-wc-hostname-x-older
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-grpcroute-wc-hostname-x
+    namespace: gateway-conformance-infra
+  hostnames:
+  - "*.com"
+  rules:
+  - backendRefs:
+    - name: grpc-infra-backend-v1
+      port: 8080
