@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: tcp-backend
-          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.2.0
           imagePullPolicy: IfNotPresent
           env:
             - name: TCP_ECHO_SERVER
@@ -90,7 +90,7 @@ spec:
     spec:
       containers:
         - name: tcp-backend
-          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.2.0
           imagePullPolicy: IfNotPresent
           env:
             - name: TCP_ECHO_SERVER
