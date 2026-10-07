@@ -183,6 +183,49 @@ func TestGatewayClusterTrustBundleReferenceNamespace(t *testing.T) {
 	}
 }
 
+func TestGatewayClusterTrustBundleReferenceEmptyNamespace(t *testing.T) {
+	gateway := &gatewayv1.Gateway{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+			Namespace: metav1.NamespaceDefault,
+		},
+		Spec: gatewayv1.GatewaySpec{
+			GatewayClassName: "foo",
+			Listeners: []gatewayv1.Listener{
+				{
+					Name:     gatewayv1.SectionName("https"),
+					Protocol: gatewayv1.HTTPSProtocolType,
+					Port:     gatewayv1.PortNumber(443),
+					TLS: &gatewayv1.ListenerTLSConfig{
+						Mode: new(gatewayv1.TLSModeType("Terminate")),
+					},
+				},
+			},
+			TLS: &gatewayv1.GatewayTLSConfig{
+				Frontend: &gatewayv1.FrontendTLSConfig{
+					Default: gatewayv1.TLSConfig{
+						Validation: &gatewayv1.FrontendTLSValidation{
+							CACertificateRefs: []gatewayv1.ObjectReference{
+								{
+									Group:     "certificates.k8s.io",
+									Kind:      "ClusterTrustBundle",
+									Name:      "example.com:internal-signer:v1",
+									Namespace: new(gatewayv1.Namespace("")),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	err := k8sClient.Create(context.Background(), gateway)
+	if err == nil {
+		t.Fatal("expected Gateway with an empty ClusterTrustBundle reference namespace to be rejected")
+	}
+}
+
 func TestGatewayAddressRoutability(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -367,9 +410,10 @@ func TestListenerFilterUnionDiscriminator(t *testing.T) {
 	extAuth := map[string]any{
 		"protocol": "HTTP",
 		"backendRef": map[string]any{
-			"kind": "Service",
-			"name": "auth",
-			"port": int64(9000),
+			"group": "",
+			"kind":  "Service",
+			"name":  "auth",
+			"port":  int64(9000),
 		},
 		"http": map[string]any{},
 	}
