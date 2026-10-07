@@ -311,7 +311,7 @@ type HTTPRouteRetry struct {
     // `backoff * N` between each retry attempts, where N is the number of the
     // retry attempt, starting at 1 (so a longer wait between each attempt). An
     // exponential backoff strategy would typically be waiting
-    // `backoff * 2^(N - 1)` between each retry attempt, where N is the number
+    // `backoff * 2^N - 1` between each retry attempt, where N is the number
     // of the retry attempt, starting at 1.
 
     // Implementations MAY add jitter, resulting in an actual delay longer or
