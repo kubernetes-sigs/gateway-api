@@ -306,12 +306,12 @@ type HTTPRouteRetry struct {
     // Implemenetations MAY use any of the backoff strategies described below,
     // or a custom strategy.
     //
-// The duration a Gateway waits before a retry attempt is determined
-// by the base interval and the implementation's retry strategy.
-// The precise backoff curve and jitter calculation are implementation-specific
-// and not exposed in the Gateway API specification. Implementations typically
-// apply exponential backoff with jitter to mitigate thundering-herd issues.
-
+    // The duration a Gateway waits before a retry attempt is determined
+    // by the base interval and the implementation's retry strategy.
+    // The precise backoff curve and jitter calculation are implementation-specific
+    // and not exposed in the Gateway API specification. Implementations typically
+    // apply exponential backoff with jitter to mitigate thundering-herd issues.
+    //
     // Implementations MAY add jitter, resulting in an actual delay longer or
     // shorter than this duration, and MAY cap the delay at an
     // implementation-defined maximum, which SHOULD NOT be less than the base
