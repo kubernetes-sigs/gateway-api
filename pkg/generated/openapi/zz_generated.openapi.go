@@ -93,7 +93,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyList":                            schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicySpec":                            schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation":                      schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef":                     schema_sigsk8sio_gateway_api_apis_v1_ClusterTrustBundleObjectRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                                 schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CookieConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ForwardBodyConfig":                               schema_sigsk8sio_gateway_api_apis_v1_ForwardBodyConfig(ref),
@@ -3219,7 +3218,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendTLSPolicyValidation contains backend TLS validation configuration. <gateway:util:excludeFromCRD> Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates must be set. These rules are channel-scoped because the experimental channel adds clusterTrustBundleRef as a third trust source, which they would otherwise reject. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"must not contain both CACertificateRefs and WellKnownCACertificates\",rule=\"!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:standard:validation:XValidation:message=\"must specify either CACertificateRefs or WellKnownCACertificates\",rule=\"(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:util:excludeFromCRD> Experimental variant of the above rules, with clusterTrustBundleRef as a third mutually exclusive trust source. </gateway:util:excludeFromCRD> <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>",
+				Description: "BackendTLSPolicyValidation contains backend TLS validation configuration. <gateway:util:excludeFromCRD> Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates must be set. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"must not contain both CACertificateRefs and WellKnownCACertificates\",rule=\"!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:standard:validation:XValidation:message=\"must specify either CACertificateRefs or WellKnownCACertificates\",rule=\"(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;wellKnownCACertificates>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"caCertificateRefs": {
@@ -3229,7 +3228,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used to validate a TLS handshake between the Gateway and backend Pod.\n\nIf CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If CACertificateRefs is empty or unspecified, the configuration for WellKnownCACertificates MUST be honored instead if supported by the implementation.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key\n  named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this case, the Reason\n  must be set to `InvalidKind` and the Message of the Condition must explain which\n  kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace. This may change in future\n  spec updates.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message must be set for the invalid reference.\n\nIn all cases, the implementation MUST ensure the `ResolvedRefs` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason and Message that indicate the cause of the error. Connections using an invalid CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `NoValidCACertificate`.\n\nA single CACertificateRef to a Kubernetes ConfigMap kind has \"Core\" support. Implementations MAY choose to support attaching multiple certificates to a backend, but this behavior is implementation-specific.\n\nSupport: Core - An optional single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.\n\n<gateway:util:excludeFromCRD> The standard channel rules reject an empty list via `size(...) > 0`, while the experimental ExactlyOneOf rule only tests for presence. MinItems keeps an empty list invalid in the experimental channel too. </gateway:util:excludeFromCRD> <gateway:experimental:validation:MinItems=1>",
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used to validate a TLS handshake between the Gateway and backend Pod.\n\nIf CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If CACertificateRefs is empty or unspecified, the configuration for WellKnownCACertificates MUST be honored instead if supported by the implementation.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key\n  named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this case, the Reason\n  must be set to `InvalidKind` and the Message of the Condition must explain which\n  kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace. This may change in future\n  spec updates.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message must be set for the invalid reference.\n\nIn all cases, the implementation MUST ensure the `ResolvedRefs` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason and Message that indicate the cause of the error. Connections using an invalid CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `NoValidCACertificate`.\n\n<gateway:experimental:description> References to cluster-scoped resources (such as ClusterTrustBundle) are supported: the implementation resolves the scope based on the kind. A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped resource by name. A reference to a namespaced resource (such as ConfigMap or Secret) uses the local namespace. </gateway:experimental:description>\n\nA single CACertificateRef to a Kubernetes ConfigMap kind has \"Core\" support. Implementations MAY choose to support attaching multiple certificates to a backend, but this behavior is implementation-specific.\n\nSupport: Core - An optional single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\n<gateway:experimental:description> Support: Extended - A single reference to a ClusterTrustBundle (certificates.k8s.io). </gateway:experimental:description>\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.\n\n<gateway:util:excludeFromCRD> The standard channel rules reject an empty list via `size(...) > 0`, while the experimental ExactlyOneOf rule only tests for presence. MinItems keeps an empty list invalid in the experimental channel too. </gateway:util:excludeFromCRD> <gateway:experimental:validation:MinItems=1>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3238,12 +3237,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 									},
 								},
 							},
-						},
-					},
-					"clusterTrustBundleRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ClusterTrustBundleRef is an optional reference to a cluster-scoped ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the PEM-encoded CA certificates in the referenced bundle are used as the trust anchors for backend TLS validation. This field is mutually exclusive with CACertificateRefs and WellKnownCACertificates, so the referenced bundle is the only trust source for this policy.\n\nThe referenced bundle MUST exist, be readable by the implementation, and contain at least one valid PEM-encoded CA certificate. If any of these conditions are not met, the implementation MUST set ResolvedRefs=False with reason InvalidCACertificateRef. A ReferenceGrant is not required.\n\nIf the certificates.k8s.io API is not available in the cluster, the reference is treated as an unknown kind: the implementation MUST set ResolvedRefs=False with reason InvalidKind.\n\nImplementations that do not support ClusterTrustBundle references MUST set ResolvedRefs=False with reason InvalidKind when this field is specified.\n\nIn all of the cases above, because the referenced bundle is the only trust source for this policy, the implementation MUST also ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `NoValidCACertificate`. Connections using an invalid ClusterTrustBundleRef MUST fail, and the client MUST receive an HTTP 5xx error response.\n\nSupport: Extended\n\n<gateway:experimental>",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef"),
 						},
 					},
 					"wellKnownCACertificates": {
@@ -3284,43 +3277,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apis/v1.SubjectAltName"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1_ClusterTrustBundleObjectRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ClusterTrustBundleObjectRef identifies a ClusterTrustBundle.\n\nThe Group defaults to \"certificates.k8s.io\" and the Kind defaults to \"ClusterTrustBundle\", so users only need to specify the name.\n\nThis type is intended exclusively for cluster-scoped ClusterTrustBundle resources. The absence of a Namespace field is intentional and correct - it MUST NOT be used with namespace-scoped resources.\n\nA ReferenceGrant is not required because ClusterTrustBundle is cluster-scoped and has no target namespace.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the referent.\n\nDefaults to \"certificates.k8s.io\".",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is the kind of the referent.\n\nDefaults to \"ClusterTrustBundle\".",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the referent.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"name"},
-			},
-		},
+			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apis/v1.SubjectAltName"},
 	}
 }
 
@@ -3502,7 +3459,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used as a trust anchor to validate the certificates presented by the client.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the\n  referenced resource does not exist) or is misconfigured (e.g., a\n  ConfigMap does not contain a key named `ca.crt`). In this case, the\n  Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this\n  case, the Reason on all matching HTTPS listeners must be set to\n  `InvalidCACertificateKind` and the Message of the Condition must explain\n  which kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace UNLESS there is a\n  ReferenceGrant in the target namespace that allows the CA\n  certificate to be attached. If a ReferenceGrant does not allow this\n  reference, the `ResolvedRefs` on all matching HTTPS listeners condition\n  MUST be set with the Reason `RefNotPermitted`.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nIn all cases, the implementation MUST ensure that the `ResolvedRefs` condition is set to `status: False` on all targeted listeners (i.e., listeners serving HTTPS on a matching port). The condition MUST include a Reason and Message that indicate the cause of the error. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` condition on the listener is set to `status: False`, with the Reason `NoValidCACertificate`. Implementations MAY choose to support attaching multiple CA certificates to a listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.",
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used as a trust anchor to validate the certificates presented by the client.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the\n  referenced resource does not exist) or is misconfigured (e.g., a\n  ConfigMap does not contain a key named `ca.crt`). In this case, the\n  Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this\n  case, the Reason on all matching HTTPS listeners must be set to\n  `InvalidCACertificateKind` and the Message of the Condition must explain\n  which kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace UNLESS there is a\n  ReferenceGrant in the target namespace that allows the CA\n  certificate to be attached. If a ReferenceGrant does not allow this\n  reference, the `ResolvedRefs` on all matching HTTPS listeners condition\n  MUST be set with the Reason `RefNotPermitted`.\n\n<gateway:experimental:description> For cluster-scoped resources (such as ClusterTrustBundle), the `namespace` field MUST be unset. The implementation resolves the scope based on the kind. </gateway:experimental:description>\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nIn all cases, the implementation MUST ensure that the `ResolvedRefs` condition is set to `status: False` on all targeted listeners (i.e., listeners serving HTTPS on a matching port). The condition MUST include a Reason and Message that indicate the cause of the error. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` condition on the listener is set to `status: False`, with the Reason `NoValidCACertificate`. Implementations MAY choose to support attaching multiple CA certificates to a listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\n<gateway:experimental:description> Support: Extended - References to ClusterTrustBundle (certificates.k8s.io), with `namespace` unset. </gateway:experimental:description>\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.\n\n<gateway:experimental:validation:XValidation:message=\"ClusterTrustBundle references must not specify namespace\",rule=\"self.all(r, !(r.group == 'certificates.k8s.io' && r.kind == 'ClusterTrustBundle' && has(r.namespace)))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3511,12 +3468,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 									},
 								},
 							},
-						},
-					},
-					"clusterTrustBundleRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ClusterTrustBundleRef is an optional reference to a cluster-scoped ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the PEM-encoded CA certificates in the referenced bundle are used as trust anchors for frontend client certificate validation, in addition to any certificates provided via CACertificateRefs.\n\nThe referenced bundle MUST exist, be readable by the implementation, and contain at least one valid PEM-encoded CA certificate. If any of these conditions are not met, the implementation MUST set ResolvedRefs=False with reason InvalidCACertificateRef on all targeted HTTPS listeners. A ReferenceGrant is not required.\n\nIf the certificates.k8s.io API is not available in the cluster, the reference is treated as an unknown kind: the implementation MUST set ResolvedRefs=False with reason InvalidKind on all targeted HTTPS listeners.\n\nImplementations that do not support ClusterTrustBundle references MUST set ResolvedRefs=False with reason InvalidKind when this field is specified.\n\nIn all of the cases above, if ALL trust sources for the listener are invalid, the implementation MUST also ensure the `Accepted` condition on all targeted HTTPS listeners is set to `status: False`, with the Reason `NoValidCACertificate`. Client connections that can only be validated against an invalid ClusterTrustBundleRef MUST be rejected during the TLS handshake.\n\nSupport: Extended\n\n<gateway:experimental>",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef"),
 						},
 					},
 					"mode": {
@@ -3531,7 +3482,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef", "sigs.k8s.io/gateway-api/apis/v1.ObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.ObjectReference"},
 	}
 }
 
