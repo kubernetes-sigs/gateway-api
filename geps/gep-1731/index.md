@@ -319,12 +319,6 @@ type HTTPRouteRetry struct {
     // implementation-defined maximum, which SHOULD NOT be less than the base
     // interval.
     //
-    // For example, with any of the strategies described above, setting the
-    // `rules[].retry.backoff` field to the value `100ms` will cause a backend
-    // request to first be retried approximately 100 milliseconds after a
-    // connection error or receiving a response code configured to be
-    // retriable.
-    //
     // If a Request timeout (`rules[].timeouts.request`) is configured on the
     // route, the entire duration of the initial request and any retry attempts
     // MUST not exceed the Request timeout duration. If any retry attempts are
