@@ -241,12 +241,12 @@ var (
 	// HTTPRouteRetryCodesFeature contains metadata for the HTTPRouteRetryCodes feature.
 	HTTPRouteRetryCodesFeature = Feature{
 		Name:    SupportHTTPRouteRetryCodes,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 	// HTTPRouteRetryConnectionErrorFeature contains metadata for the HTTPRouteRetryConnectionError feature.
 	HTTPRouteRetryConnectionErrorFeature = Feature{
 		Name:    SupportHTTPRouteRetryConnectionError,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 	// HTTPRouteBackendURLRewriteFeature contains metadata for the HTTPRouteBackendURLRewrite feature.
 	HTTPRouteBackendURLRewriteFeature = Feature{

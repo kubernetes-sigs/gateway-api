@@ -323,7 +323,6 @@ type HTTPRouteRule struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	Retry *HTTPRouteRetry `json:"retry,omitempty"`
 
 	// Deprecated: use the Backend resource for session persistence (GEP-4894).
@@ -472,6 +471,7 @@ type HTTPRouteRetry struct {
 	// Support: Implementation-specific
 	//
 	// +optional
+	// <gateway:experimental>
 	Backoff *Duration `json:"backoff,omitempty"`
 }
 
@@ -493,7 +493,6 @@ type HTTPRouteRetry struct {
 //
 // +kubebuilder:validation:Minimum:=400
 // +kubebuilder:validation:Maximum:=599
-// <gateway:experimental>
 type HTTPRouteRetryStatusCode int
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
