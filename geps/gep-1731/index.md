@@ -346,7 +346,7 @@ type HTTPRouteRetry struct {
     // When this field is unspecified, the backoff strategy and base interval
     // are implementation-specific.
 
-    // Implemenations which retry immediately with no backoff MUST NOT advertise
+    // Implementations which retry immediately with no backoff MUST NOT advertise
     // support for this field and MUST set the Accepted Condition for the Route
     // to `status: False` with a Reason of `UnsupportedValue` when this field is
     // set.
