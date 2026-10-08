@@ -300,22 +300,14 @@ type HTTPRouteRetry struct {
     // Backoff specifies the base interval for a backoff strategy between
     // retry attempts and is represented in Gateway API Duration formatting.
     //
-    // The duration a Gateway should wait before a retry attempt is determined
-    // by the base interval and strategy. The strategy is a internal detail of
-    // implementations and is not exposed in the Gateway API specification.
-    // Implemenetations MAY use any of the backoff strategies described below,
-    // or a custom strategy.
-    //
     // The duration a Gateway waits before a retry attempt is determined
     // by the base interval and the implementation's retry strategy.
-    // The precise backoff curve and jitter calculation are implementation-specific
-    // and not exposed in the Gateway API specification. Implementations typically
-    // apply exponential backoff with jitter to mitigate thundering-herd issues.
-    //
-    // Implementations MAY add jitter, resulting in an actual delay longer or
-    // shorter than this duration, and MAY cap the delay at an
+    // Implementations MAY add random jitter and MAY cap the delay at an
     // implementation-defined maximum, which SHOULD NOT be less than the base
-    // interval.
+    // interval. The precise backoff curve and jitter calculation are
+    // implementation-specific and not exposed in the Gateway API specification.
+    // Implementations typically apply exponential backoff with jitter to
+    // mitigate thundering-herd issues.
     //
     // If a Request timeout (`rules[].timeouts.request`) is configured on the
     // route, the entire duration of the initial request and any retry attempts
