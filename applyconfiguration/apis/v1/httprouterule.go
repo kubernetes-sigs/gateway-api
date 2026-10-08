@@ -175,7 +175,6 @@ type HTTPRouteRuleApplyConfiguration struct {
 	//
 	// Support: Extended
 	//
-	// <gateway:experimental>
 	Retry *HTTPRouteRetryApplyConfiguration `json:"retry,omitempty"`
 	// Deprecated: use the Backend resource for session persistence (GEP-4894).
 	//
