@@ -3090,6 +3090,54 @@ spec:
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
+                    retry:
+                      description: |-
+                        Retry defines the configuration for when to retry an HTTP request.
+
+                        Support: Extended
+                      properties:
+                        attempts:
+                          default: 1
+                          description: |-
+                            Attempts specifies the maximum number of times an individual request
+                            from the Gateway to a backend should be retried in addition to the
+                            initial request.
+
+                            If the maximum number of retries has been attempted without a successful
+                            response from the backend, the Gateway MUST return an error.
+
+                            Support: Extended
+                          minimum: 1
+                          type: integer
+                        codes:
+                          description: |-
+                            Codes defines the HTTP response status codes for which a backend request
+                            should be retried.
+
+                            Support: Extended
+                          items:
+                            description: |-
+                              HTTPRouteRetryStatusCode defines an HTTP response status code for
+                              which a backend request should be retried.
+
+                              Implementations MUST support the following status codes as retriable:
+
+                              * 500
+                              * 502
+                              * 503
+                              * 504
+
+                              Implementations MAY support specifying additional discrete values in the
+                              500-599 range.
+
+                              Implementations MAY support specifying discrete values in the 400-499 range,
+                              which are often inadvisable to retry.
+                            maximum: 599
+                            minimum: 400
+                            type: integer
+                          type: array
+                          x-kubernetes-list-type: set
+                      type: object
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -6551,6 +6599,54 @@ spec:
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
+                    retry:
+                      description: |-
+                        Retry defines the configuration for when to retry an HTTP request.
+
+                        Support: Extended
+                      properties:
+                        attempts:
+                          default: 1
+                          description: |-
+                            Attempts specifies the maximum number of times an individual request
+                            from the Gateway to a backend should be retried in addition to the
+                            initial request.
+
+                            If the maximum number of retries has been attempted without a successful
+                            response from the backend, the Gateway MUST return an error.
+
+                            Support: Extended
+                          minimum: 1
+                          type: integer
+                        codes:
+                          description: |-
+                            Codes defines the HTTP response status codes for which a backend request
+                            should be retried.
+
+                            Support: Extended
+                          items:
+                            description: |-
+                              HTTPRouteRetryStatusCode defines an HTTP response status code for
+                              which a backend request should be retried.
+
+                              Implementations MUST support the following status codes as retriable:
+
+                              * 500
+                              * 502
+                              * 503
+                              * 504
+
+                              Implementations MAY support specifying additional discrete values in the
+                              500-599 range.
+
+                              Implementations MAY support specifying discrete values in the 400-499 range,
+                              which are often inadvisable to retry.
+                            maximum: 599
+                            minimum: 400
+                            type: integer
+                          type: array
+                          x-kubernetes-list-type: set
+                      type: object
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.

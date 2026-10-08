@@ -96,6 +96,7 @@ type HTTPRouteRetryApplyConfiguration struct {
 	//
 	// Support: Implementation-specific
 	//
+	// <gateway:experimental>
 	Backoff *apisv1.Duration `json:"backoff,omitempty"`
 }
 
