@@ -50,8 +50,7 @@ type HTTPRouteRetryApplyConfiguration struct {
 	// If the maximum number of retries has been attempted without a successful
 	// response from the backend, the Gateway MUST return an error.
 	//
-	// If unspecified, the number of attempts MAY be an implementation-specific
-	// default, including none. An explicit zero value MUST disable retries.
+	// An explicit zero value MUST disable retries.
 	//
 	// Support: Extended
 	//

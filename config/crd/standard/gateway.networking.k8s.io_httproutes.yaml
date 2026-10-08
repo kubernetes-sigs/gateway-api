@@ -3105,10 +3105,10 @@ spec:
                             If the maximum number of retries has been attempted without a successful
                             response from the backend, the Gateway MUST return an error.
 
-                            If unspecified, the number of attempts MAY be an implementation-specific
-                            default, including none. An explicit zero value MUST disable retries.
+                            An explicit zero value MUST disable retries.
 
                             Support: Extended
+                          minimum: 0
                           type: integer
                         backoff:
                           description: |-
@@ -3181,6 +3181,8 @@ spec:
                             type: integer
                           type: array
                           x-kubernetes-list-type: set
+                      required:
+                      - attempts
                       type: object
                     timeouts:
                       description: |-
@@ -6658,10 +6660,10 @@ spec:
                             If the maximum number of retries has been attempted without a successful
                             response from the backend, the Gateway MUST return an error.
 
-                            If unspecified, the number of attempts MAY be an implementation-specific
-                            default, including none. An explicit zero value MUST disable retries.
+                            An explicit zero value MUST disable retries.
 
                             Support: Extended
+                          minimum: 0
                           type: integer
                         backoff:
                           description: |-
@@ -6734,6 +6736,8 @@ spec:
                             type: integer
                           type: array
                           x-kubernetes-list-type: set
+                      required:
+                      - attempts
                       type: object
                     timeouts:
                       description: |-
