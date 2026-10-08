@@ -299,9 +299,9 @@ type HTTPRouteRetry struct {
     
     // Backoff specifies the base interval for a backoff strategy between
     // retry attempts and is represented in Gateway API Duration formatting.
-    //
     // The duration a Gateway waits before a retry attempt is determined
     // by the base interval and the implementation's retry strategy.
+    //
     // Implementations MAY add random jitter and MAY cap the delay at an
     // implementation-defined maximum, which SHOULD NOT be less than the base
     // interval. The precise backoff curve and jitter calculation are
@@ -329,7 +329,7 @@ type HTTPRouteRetry struct {
     //
     // When this field is unspecified, the backoff strategy and base interval
     // are implementation-specific.
-
+    //
     // Implementations which retry immediately with no backoff MUST NOT advertise
     // support for this field and MUST set the Accepted Condition for the Route
     // to `status: False` with a Reason of `UnsupportedValue` when this field is
