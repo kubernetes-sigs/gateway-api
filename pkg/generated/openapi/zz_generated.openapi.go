@@ -5558,7 +5558,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 					},
 					"attempts": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Attempts specifies the maximum number of times an individual request from the Gateway to a backend should be retried in addition to the initial request.\n\nIf the maximum number of retries has been attempted without a successful response from the backend, the Gateway MUST return an error.\n\nSupport: Extended",
+							Description: "Attempts specifies the maximum number of times an individual request from the Gateway to a backend should be retried in addition to the initial request.\n\nIf the maximum number of retries has been attempted without a successful response from the backend, the Gateway MUST return an error.\n\nIf unspecified, the number of attempts MAY be an implementation-specific default, including none. An explicit zero value MUST disable retries.\n\nSupport: Extended",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
