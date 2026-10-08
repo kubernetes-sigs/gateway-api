@@ -79,7 +79,7 @@ var (
 // pruneFeatures removes the features in invalid from the supportedFeatures
 // and unsupportedFeatures lists of a conformance report.
 //
-// The report is edited as text rather than being unmarshalled and marshalled
+// The report is edited as text rather than being unmarshaled and marshaled
 // again, so the rest of the file is left byte-for-byte as it was and the
 // resulting diff only contains the removed lines. A list that ends up empty is
 // removed together with its key, which matches how reports are generated.

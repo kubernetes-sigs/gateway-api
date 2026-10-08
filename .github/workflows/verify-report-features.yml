@@ -1,0 +1,22 @@
+name: Verify conformance report features
+
+on:
+  pull_request:
+    paths:
+      - 'conformance/reports/**'
+      - 'conformance/release-features/**'
+      - 'tools/reportfeatures/**'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-report-features:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify report features
+        run: go run ./tools/reportfeatures
