@@ -32,3 +32,17 @@ spec:
       backendRefs:
         - name: infra-backend-v3
           port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /retry/code-all-attempts-0
+      retry:
+        codes:
+          - 500
+          - 502
+          - 503
+          - 504
+        attempts: 0
+      backendRefs:
+        - name: infra-backend-v3
+          port: 8080

@@ -183,6 +183,51 @@ var HTTPRouteRetry = confsuite.ConformanceTest{
 				},
 				want: http.Response{StatusCode: 504},
 			},
+
+			{
+				name: "does not retry on 500 when attempts are set to 0",
+				args: args{
+					path: "/retry/code-all-attempts-0",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"500"},
+						"succeedAfter": []string{"1"},
+					},
+				},
+				want: http.Response{StatusCode: 500},
+			},
+			{
+				name: "does not retry on 502 when attempts are set to 0",
+				args: args{
+					path: "/retry/code-all-attempts-0",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"502"},
+						"succeedAfter": []string{"1"},
+					},
+				},
+				want: http.Response{StatusCode: 502},
+			},
+			{
+				name: "does not retry on 503 when attempts are set to 0",
+				args: args{
+					path: "/retry/code-all-attempts-0",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"503"},
+						"succeedAfter": []string{"1"},
+					},
+				},
+				want: http.Response{StatusCode: 503},
+			},
+			{
+				name: "does not retry on 504 when attempts are set to 0",
+				args: args{
+					path: "/retry/code-all-attempts-0",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"504"},
+						"succeedAfter": []string{"1"},
+					},
+				},
+				want: http.Response{StatusCode: 504},
+			},
 		}
 		for i := range testCases {
 			// Declare tc here to avoid loop variable reuse issues across parallel tests.
