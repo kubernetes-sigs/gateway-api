@@ -3097,7 +3097,6 @@ spec:
                         Support: Extended
                       properties:
                         attempts:
-                          default: 1
                           description: |-
                             Attempts specifies the maximum number of times an individual request
                             from the Gateway to a backend should be retried in addition to the
@@ -3106,8 +3105,10 @@ spec:
                             If the maximum number of retries has been attempted without a successful
                             response from the backend, the Gateway MUST return an error.
 
+                            If unspecified, the number of attempts MAY be an implementation-specific
+                            default, including none. An explicit zero value MUST disable retries.
+
                             Support: Extended
-                          minimum: 1
                           type: integer
                         backoff:
                           description: |-
@@ -6649,7 +6650,6 @@ spec:
                         Support: Extended
                       properties:
                         attempts:
-                          default: 1
                           description: |-
                             Attempts specifies the maximum number of times an individual request
                             from the Gateway to a backend should be retried in addition to the
@@ -6658,8 +6658,10 @@ spec:
                             If the maximum number of retries has been attempted without a successful
                             response from the backend, the Gateway MUST return an error.
 
+                            If unspecified, the number of attempts MAY be an implementation-specific
+                            default, including none. An explicit zero value MUST disable retries.
+
                             Support: Extended
-                          minimum: 1
                           type: integer
                         backoff:
                           description: |-
