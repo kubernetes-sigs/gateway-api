@@ -15,7 +15,7 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 
 * To allow specification of [HTTP status codes](https://www.rfc-editor.org/rfc/rfc9110#name-overview-of-status-codes) for which a request should be retried.
 * To allow specification of the maximum number of times to retry a request.
-* To allow specification of the base interval for exponential backoff strategy used to calculate the duration between retry attempts.
+* To allow specification of the base interval for a backoff strategy used to calculate the duration between retry attempts.
 * To define any interaction with configured HTTPRoute [timeouts](../gep-1742/index.md).
 * Retry configuration must be applicable to most known Gateway API implementations.
 
@@ -297,21 +297,17 @@ type HTTPRouteRetry struct {
     // +kubebuilder:validation:Minimum:=1
     Attempts int `json:"attempts,omitempty"`
     
-    // Backoff specifies the base interval for an exponential backoff strategy
-    // between retry attempts and is represented in Gateway API Duration
-    // formatting.
+    // Backoff specifies the base interval for a backoff strategy between
+    // retry attempts and is represented in Gateway API Duration formatting.
+    // The duration a Gateway waits before a retry attempt is determined
+    // by the base interval and the implementation's retry strategy.
     //
-    // The maximum duration a Gateway should wait before a retry attempt is
-    // `backoff * (2^N - 1)`, where N is the number of the retry attempt,
-    // starting at 1. Implementations MAY add jitter, resulting in an actual
-    // delay anywhere between zero and this bound, and MAY cap the delay at an
-    // implementation-defined maximum, which SHOULD be no less than the base
-    // interval.
-    //
-    // For example, setting the `rules[].retry.backoff` field to the value
-    // `100ms` will cause a backend request to first be retried up to
-    // approximately 100 milliseconds after a connection error  or receiving
-    // a response code configured to be retriable.
+    // Implementations MAY add random jitter and MAY cap the delay at an
+    // implementation-defined maximum, which SHOULD NOT be less than the base
+    // interval. The precise backoff curve and jitter calculation are
+    // implementation-specific and not exposed in the Gateway API specification.
+    // Implementations typically apply exponential backoff with jitter to
+    // mitigate thundering-herd issues.
     //
     // If a Request timeout (`rules[].timeouts.request`) is configured on the
     // route, the entire duration of the initial request and any retry attempts
@@ -331,12 +327,13 @@ type HTTPRouteRetry struct {
     // remain pending until a configured Request timeout or implementation
     // default duration for total request time is reached.
     //
-    // When this field is unspecified, the backoff strategy or base interval are
-    // implementation-specific.
+    // When this field is unspecified, the backoff strategy and base interval
+    // are implementation-specific.
     //
-    // Implementations that do not support an exponential backoff strategy
-    // MUST set the Accepted Condition for the Route to `status: False` with
-    // a Reason of `UnsupportedValue` when this field is set.
+    // Implementations which retry immediately with no backoff MUST NOT advertise
+    // support for this field and MUST set the Accepted Condition for the Route
+    // to `status: False` with a Reason of `UnsupportedValue` when this field is
+    // set.
     //
     // Support: Implementation-specific
     //
