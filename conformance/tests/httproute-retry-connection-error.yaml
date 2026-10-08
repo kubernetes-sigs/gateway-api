@@ -17,6 +17,15 @@ spec:
       backendRefs:
         - name: infra-backend-connection-error
           port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /disable-retry
+      retry:
+        attempts: 0
+      backendRefs:
+        - name: infra-backend-connection-error
+          port: 8080
 ---
 apiVersion: v1
 kind: Service

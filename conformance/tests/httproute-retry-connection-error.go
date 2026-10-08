@@ -61,5 +61,14 @@ var HTTPRouteRetryConnectionError = confsuite.ConformanceTest{
 			Backend:   "infra-backend-connection-error-healthy",
 			Namespace: confsuite.InfrastructureNamespace,
 		})
+
+		http.MakeRequestAndExpectFailure(t, suite.RoundTripper, dedicatedTimeoutConfig, gwAddr, http.ExpectedResponse{
+			Request: http.Request{
+				Path: "/disable-retry",
+			},
+			Response:  http.Response{StatusCode: 200},
+			Backend:   "infra-backend-connection-error-healthy",
+			Namespace: confsuite.InfrastructureNamespace,
+		})
 	},
 }
