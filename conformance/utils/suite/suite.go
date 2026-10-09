@@ -83,6 +83,7 @@ type ConformanceTestSuite struct {
 	ManifestFS               []fs.FS
 	UsableNetworkAddresses   []gatewayv1.GatewaySpecAddress
 	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
+	ServiceCIDRs             []string
 
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
@@ -178,6 +179,10 @@ type ConfigurableOptions struct {
 	// Gateways for tests which need to test failures with manual Gateway
 	// address assignment.
 	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"unusableNetworkAddresses"`
+	// ServiceCIDRs are the cluster's ServiceCIDR ranges, used by tests that
+	// verify Cluster Gateway addresses. If unset, tests discover them from the
+	// ServiceCIDR API.
+	ServiceCIDRs []string `json:"serviceCIDRs"`
 }
 
 // ConformanceOptions can be used to initialize a ConformanceTestSuite.
@@ -328,6 +333,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		ManifestFS:                  options.ManifestFS,
 		UsableNetworkAddresses:      options.UsableNetworkAddresses,
 		UnusableNetworkAddresses:    options.UnusableNetworkAddresses,
+		ServiceCIDRs:                options.ServiceCIDRs,
 		results:                     make(map[string]testResult),
 		extendedUnsupportedFeatures: extendedUnsupportedFeatures,
 		extendedSupportedFeatures:   extendedSupportedFeatures,
