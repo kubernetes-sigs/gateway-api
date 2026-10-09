@@ -1197,6 +1197,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allowedRoutes
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedRoutes
+    - name: filters
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ListenerFilters
     - name: hostname
       type:
         scalar: string
