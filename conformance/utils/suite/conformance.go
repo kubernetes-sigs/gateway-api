@@ -68,6 +68,12 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 		t.Skipf("Skipping %s: test explicitly skipped", test.ShortName)
 	}
 
+	// skip provisional tests before manifests/body: suite.Run only labels them,
+	// it does not stop execution.
+	if suite.SkipProvisionalTests && test.Provisional {
+		t.Skipf("Skipping %s: provisional tests skipped", test.ShortName)
+	}
+
 	for _, manifestLocation := range test.Manifests {
 		tlog.Logf(t, "Applying %s", manifestLocation)
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, manifestLocation, suite.CleanupTestResources)
