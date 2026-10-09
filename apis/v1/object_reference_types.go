@@ -101,6 +101,7 @@ type SecretObjectReference struct {
 // backend.
 //
 // +kubebuilder:validation:XValidation:message="Must have port for Service reference",rule="(size(self.group) == 0 && self.kind == 'Service') ? has(self.port) : true"
+// <gateway:experimental:validation:XValidation:message="Must not have port for Backend reference",rule="(self.group == 'gateway.networking.x-k8s.io' && self.kind == 'XBackend') ? !has(self.port) : true">
 type BackendObjectReference struct {
 	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
 	// When unspecified or empty string, core API group is inferred.
