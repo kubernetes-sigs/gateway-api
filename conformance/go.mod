@@ -1,6 +1,6 @@
 module sigs.k8s.io/gateway-api/conformance
 
-go 1.27.1
+go 1.27.0
 
 replace sigs.k8s.io/gateway-api => ../
 
