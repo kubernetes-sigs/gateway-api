@@ -5969,12 +5969,18 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntry(ref common.ReferenceCall
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes"),
 						},
 					},
+					"filters": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Filters groups the pre-routing filter lists that run on every request accepted on this Listener, before route matching is performed. Filters is only valid when Protocol is `HTTP` or `HTTPS`; this constraint is enforced by CEL validation on the enclosing Listener struct.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ListenerFilters"),
+						},
+					},
 				},
 				Required: []string{"name", "port", "protocol"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerFilters", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
 	}
 }
 
