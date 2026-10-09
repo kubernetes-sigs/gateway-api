@@ -1,0 +1,53 @@
+# Aggregates gateway.networking.x-k8s.io resources into the builtin view, edit and admin
+# ClusterRoles. Hand-maintained; keep in sync with the CRDs in this directory
+# (enforced by tests/crd/rbac_test.go).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    gateway.networking.k8s.io/channel: experimental
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+  name: gateway.networking.x-k8s.io:aggregate-to-view
+rules:
+- apiGroups:
+  - gateway.networking.x-k8s.io
+  resources:
+  - xbackends
+  - xbackendtrafficpolicies
+  - xmeshes
+  - xtelemetrypolicies
+  - xbackends/status
+  - xbackendtrafficpolicies/status
+  - xmeshes/status
+  - xtelemetrypolicies/status
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    gateway.networking.k8s.io/channel: experimental
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+  name: gateway.networking.x-k8s.io:aggregate-to-edit
+rules:
+- apiGroups:
+  - gateway.networking.x-k8s.io
+  resources:
+  - xbackends
+  - xbackendtrafficpolicies
+  - xmeshes
+  - xtelemetrypolicies
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - patch
+  - update
