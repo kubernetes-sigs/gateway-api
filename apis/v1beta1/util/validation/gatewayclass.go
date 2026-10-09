@@ -22,13 +22,24 @@ import (
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
+// MaxControllerNameLength defines the maximum allowed length for a controller name.
+// This aligns with Kubernetes DNS subdomain name limits (253 characters) and helps
+// prevent potential regex denial-of-service attacks from extremely long inputs.
+const MaxControllerNameLength = 253
+
 var controllerNameRegex = regexp.MustCompile(`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`)
 
 // IsControllerNameValid checks that the provided controllerName complies with the expected
-// format. It must be a non-empty domain prefixed path.
+// format. It must be a non-empty domain prefixed path with a maximum length of 253 characters.
 func IsControllerNameValid(controllerName gatewayv1b1.GatewayController) bool {
 	if controllerName == "" {
 		return false
 	}
+
+	// Check length before regex to prevent potential DoS
+	if len(controllerName) > MaxControllerNameLength {
+		return false
+	}
+
 	return controllerNameRegex.Match([]byte(controllerName))
 }
