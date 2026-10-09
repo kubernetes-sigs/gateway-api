@@ -100,6 +100,16 @@ type ListenerEntryApplyConfiguration struct {
 	// of the rules within that Route should still be supported.
 	//
 	AllowedRoutes *AllowedRoutesApplyConfiguration `json:"allowedRoutes,omitempty"`
+	// Filters groups the pre-routing filter lists that run on every
+	// request accepted on this Listener, before route matching is
+	// performed. Filters is only valid when Protocol is `HTTP` or
+	// `HTTPS`; this constraint is enforced by CEL validation on the
+	// enclosing Listener struct.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	Filters *ListenerFiltersApplyConfiguration `json:"filters,omitempty"`
 }
 
 // ListenerEntryApplyConfiguration constructs a declarative configuration of the ListenerEntry type for use with
@@ -153,5 +163,13 @@ func (b *ListenerEntryApplyConfiguration) WithTLS(value *ListenerTLSConfigApplyC
 // If called multiple times, the AllowedRoutes field is set to the value of the last call.
 func (b *ListenerEntryApplyConfiguration) WithAllowedRoutes(value *AllowedRoutesApplyConfiguration) *ListenerEntryApplyConfiguration {
 	b.AllowedRoutes = value
+	return b
+}
+
+// WithFilters sets the Filters field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Filters field is set to the value of the last call.
+func (b *ListenerEntryApplyConfiguration) WithFilters(value *ListenerFiltersApplyConfiguration) *ListenerEntryApplyConfiguration {
+	b.Filters = value
 	return b
 }
