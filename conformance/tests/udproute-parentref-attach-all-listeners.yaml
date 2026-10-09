@@ -84,7 +84,7 @@ spec:
 ---
 # A UDPRoute with no `port` and no `sectionName` set on its parentRef should
 # attach to every UDP listener on the Gateway.
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: UDPRoute
 metadata:
   name: udp-route-attach-all

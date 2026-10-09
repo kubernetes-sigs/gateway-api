@@ -24,8 +24,6 @@ import (
 	"testing"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 
@@ -45,8 +43,6 @@ func TestMain(m *testing.M) {
 	var testEnv *envtest.Environment
 	var err error
 
-	v1alpha3.Install(scheme)
-	v1alpha2.Install(scheme)
 	v1beta1.Install(scheme)
 	v1.Install(scheme)
 	apisxv1alpha1.Install(scheme)

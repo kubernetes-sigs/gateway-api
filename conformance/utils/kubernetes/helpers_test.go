@@ -34,7 +34,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
@@ -338,7 +337,7 @@ func Test_listenersMatch(t *testing.T) {
 				{
 					SupportedKinds: []gatewayv1.RouteGroupKind{
 						{
-							Group: (*gatewayv1.Group)(&v1alpha2.GroupVersion.Group),
+							Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
 							Kind:  gatewayv1.Kind("GRPCRoute"),
 						},
 					},
@@ -362,7 +361,7 @@ func Test_listenersMatch(t *testing.T) {
 				{
 					SupportedKinds: []gatewayv1.RouteGroupKind{
 						{
-							Group: (*gatewayv1.Group)(&v1alpha2.GroupVersion.Group),
+							Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
 							Kind:  gatewayv1.Kind("GRPCRoute"),
 						},
 						{
