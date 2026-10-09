@@ -71,7 +71,7 @@ spec:
           - kind: TCPRoute
 ---
 # No ReferenceGrant: the cross-namespace backendRef must NOT be permitted.
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: TCPRoute
 metadata:
   name: tcp-invalid-cross-namespace-backend-ref
