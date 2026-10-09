@@ -34,8 +34,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
@@ -51,8 +49,6 @@ func TestVAPValidation(t *testing.T) {
 
 	crdChannel := "standard"
 
-	v1alpha3.Install(scheme)
-	v1alpha2.Install(scheme)
 	v1beta1.Install(scheme)
 	v1.Install(scheme)
 	apisxv1alpha1.Install(scheme)

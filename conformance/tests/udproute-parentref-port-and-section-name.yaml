@@ -197,7 +197,7 @@ spec:
           - kind: UDPRoute
 ---
 # Scenario 1: parentRef with `port` only -> attaches to the listener on port 5300.
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: UDPRoute
 metadata:
   name: udp-route-by-port
@@ -212,7 +212,7 @@ spec:
           port: 8080
 ---
 # Scenario 2: parentRef with `sectionName` only -> attaches to the by-section listener.
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: UDPRoute
 metadata:
   name: udp-route-by-section
@@ -227,7 +227,7 @@ spec:
           port: 8080
 ---
 # Scenario 3: parentRef with both `sectionName` and `port` -> attaches to the by-section-and-port listener.
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: UDPRoute
 metadata:
   name: udp-route-by-section-and-port
