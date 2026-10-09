@@ -123,11 +123,30 @@ type GRPCRouteSpec struct {
 	// the implementation. The implementation MUST raise an 'Accepted' Condition
 	// with a status of `False` in the corresponding RouteParentStatus.
 	//
+	// In the event that multiple GRPCRoutes specify intersecting hostnames (e.g.
+	// overlapping wildcard matching and exact matching hostnames), precedence must
+	// be given to rules from the GRPCRoute with the largest number of:
+	//
+	// * Characters in a matching non-wildcard hostname.
+	// * Characters in a matching hostname.
+	//
+	// When multiple GRPCRoutes attach to the same Listener and yield identical
+	// Listener/Route intersected hostnames, implementations SHOULD evaluate
+	// precedence using the original hostnames configured on the Route, not the
+	// calculated Listener/Route hostname intersection.
+	//
+	// Resolving Route precedence using original Route hostname specificity is an
+	// Extended feature. Implementations that support this behavior SHOULD claim
+	// support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+	// Implementations that do not support this feature MAY evaluate precedence
+	// using the calculated Listener/Route hostname intersection.
+	//
 	// If a Route (A) of type HTTPRoute or GRPCRoute is attached to a
 	// Listener and that listener already has another Route (B) of the other
 	// type attached and the intersection of the hostnames of A and B is
-	// non-empty, then the implementation MUST accept exactly one of these two
-	// routes, determined by the following criteria, in order:
+	// non-empty, then the implementation MAY reject one of the two routes.
+	// An implementation that does so MUST accept exactly one of them,
+	// determined by the following criteria, in order:
 	//
 	// * The oldest Route based on creation timestamp.
 	// * The Route appearing first in alphabetical order by
@@ -149,7 +168,7 @@ type GRPCRouteSpec struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="While 16 rules and 64 matches per rule are allowed, the total number of matches across all rules in a route must be less than 128",rule="(self.size() > 0 ? (has(self[0].matches) ? self[0].matches.size() : 0) : 0) + (self.size() > 1 ? (has(self[1].matches) ? self[1].matches.size() : 0) : 0) + (self.size() > 2 ? (has(self[2].matches) ? self[2].matches.size() : 0) : 0) + (self.size() > 3 ? (has(self[3].matches) ? self[3].matches.size() : 0) : 0) + (self.size() > 4 ? (has(self[4].matches) ? self[4].matches.size() : 0) : 0) + (self.size() > 5 ? (has(self[5].matches) ? self[5].matches.size() : 0) : 0) + (self.size() > 6 ? (has(self[6].matches) ? self[6].matches.size() : 0) : 0) + (self.size() > 7 ? (has(self[7].matches) ? self[7].matches.size() : 0) : 0) + (self.size() > 8 ? (has(self[8].matches) ? self[8].matches.size() : 0) : 0) + (self.size() > 9 ? (has(self[9].matches) ? self[9].matches.size() : 0) : 0) + (self.size() > 10 ? (has(self[10].matches) ? self[10].matches.size() : 0) : 0) + (self.size() > 11 ? (has(self[11].matches) ? self[11].matches.size() : 0) : 0) + (self.size() > 12 ? (has(self[12].matches) ? self[12].matches.size() : 0) : 0) + (self.size() > 13 ? (has(self[13].matches) ? self[13].matches.size() : 0) : 0) + (self.size() > 14 ? (has(self[14].matches) ? self[14].matches.size() : 0) : 0) + (self.size() > 15 ? (has(self[15].matches) ? self[15].matches.size() : 0) : 0) <= 128"
-	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
+	// +kubebuilder:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))"
 	Rules []GRPCRouteRule `json:"rules,omitempty"`
 }
 
@@ -284,6 +303,8 @@ type GRPCRouteRule struct {
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []GRPCBackendRef `json:"backendRefs,omitempty"`
 
+	// Deprecated: use the Backend resource for session persistence (GEP-4894).
+	//
 	// SessionPersistence defines and configures session persistence
 	// for the route rule.
 	//

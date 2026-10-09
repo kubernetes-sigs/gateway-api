@@ -361,6 +361,8 @@ type ListenerNamespaces struct {
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
+//
+// <gateway:experimental:validation:XValidation:message="filters may only be set when protocol is HTTP or HTTPS",rule="!has(self.filters) || self.protocol in ['HTTP', 'HTTPS']">
 type Listener struct {
 	// Name is the name of the Listener. This name MUST be unique within a
 	// Gateway.
@@ -479,7 +481,112 @@ type Listener struct {
 	// +kubebuilder:default={namespaces:{from: Same}}
 	// +optional
 	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`
+
+	// Filters groups the pre-routing filter lists that run on every
+	// request accepted on this Listener, before route matching is
+	// performed. Filters is only valid when Protocol is `HTTP` or
+	// `HTTPS`; this constraint is enforced by CEL validation on the
+	// enclosing Listener struct.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Filters *ListenerFilters `json:"filters,omitempty"`
 }
+
+// ListenerFilters is the container for pre-routing filter lists on a
+// Listener.
+//
+// Today only the request phase (Requests) is defined. In the future
+// a connection-oriented phase (Connection) may be added.
+type ListenerFilters struct {
+	// Implementations MUST execute the filters in the exact order they
+	// appear here and MUST NOT reorder them. If an implementation can
+	// not implement the filters in the order they are specified, the
+	// implementation MUST set the "Accepted" Listener condition to "false"
+	// with the "InvalidListenerFilterOrder" reason.
+	//
+	// Requests only apply to connections with a visible HTTP stream
+	// and metadata (Protocol=HTTP, or Protocol=HTTPS with TLS
+	// terminated at the Gateway).
+	//
+	// Requests may mutate inputs that route matching consumes
+	// (path, request headers, method, computed metadata), with the
+	// explicit exception of the `Host` and `:authority` headers. If a
+	// ListenerFilter attempts to modify either header, implementations
+	// MUST NOT allow that modification to take effect. Implementations
+	// SHOULD satisfy this by ignoring the mutation and continuing to
+	// process the request with the original value; they MAY instead
+	// fail the request with a 5xx response. Implementations MUST
+	// evaluate route matching exactly once after the last
+	// ListenerFilter has run.
+	//
+	// Requests MUST NOT be interpreted as changing which Listener
+	// handles the request. Listener selection is decided from inputs
+	// the client committed to before any pre-routing filter runs: TLS
+	// SNI (for HTTPS) or the request's initial Host header (for HTTP).
+	// Because filters cannot modify Host or :authority, the input to
+	// cleartext-HTTP Listener selection cannot change; Listener
+	// selection therefore does not need to be re-evaluated after
+	// pre-routing filters run, and MUST NOT be.
+	//
+	// +optional
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=16
+	Requests []ListenerFilter `json:"requests,omitempty"`
+}
+
+// ListenerFilter is one element of a ListenerFilters.Requests list.
+// Unlike HTTPRouteFilter, which runs after a route is selected and whose
+// ordering is a SHOULD, ListenerFilter runs before route selection and
+// its ordering within the containing list is a MUST.
+//
+// Only a subset of HTTPRouteFilter variants are permitted:
+// ExternalAuth (to establish identity that route matching can consume) and
+// ExtensionRef (the escape hatch for custom pre-routing behavior, for
+// example body-based routing or JWT-claim projection). The other
+// HTTPRouteFilter variants are excluded because they either cannot influence
+// route selection or can already be expressed post-routing with equal
+// expressiveness. See the GEP text for details.
+//
+// +kubebuilder:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')"
+// +kubebuilder:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')"
+// +kubebuilder:validation:XValidation:message="filter.extensionRef must be nil if the filter.type is not ExtensionRef",rule="!(has(self.extensionRef) && self.type != 'ExtensionRef')"
+// +kubebuilder:validation:XValidation:message="filter.extensionRef must be specified for ExtensionRef filter.type",rule="!(!has(self.extensionRef) && self.type == 'ExtensionRef')"
+type ListenerFilter struct {
+	// Type identifies which variant of the discriminated union below is
+	// populated. Uses the same union-discriminator pattern as
+	// HTTPRouteFilter and GRPCRouteFilter.
+	//
+	// +unionDiscriminator
+	// +kubebuilder:validation:Enum=ExternalAuth;ExtensionRef
+	// +required
+	Type ListenerFilterType `json:"type"`
+
+	// The following fields reuse the corresponding HTTPRouteFilter payload
+	// types verbatim. Exactly one MUST be set, and it MUST correspond to
+	// Type. CEL validation enforces this, matching the existing
+	// HTTPRouteFilter pattern.
+
+	// +optional
+	ExternalAuth *HTTPExternalAuthFilter `json:"externalAuth,omitempty"`
+
+	// +optional
+	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
+}
+
+// ListenerFilterType is a distinct enum from HTTPRouteFilterType so that
+// the two lists can diverge. Today pre-routing admits only a subset of
+// the HTTPRouteFilter variants; future revisions may add pre-routing-only
+// variants (for example, a first-class body-projection filter once
+// GEP-5091 lands) without disturbing HTTPRouteFilter.
+type ListenerFilterType string
+
+const (
+	ListenerFilterExternalAuth ListenerFilterType = "ExternalAuth"
+	ListenerFilterExtensionRef ListenerFilterType = "ExtensionRef"
+)
 
 // ProtocolType defines the application protocol accepted by a Listener.
 // Implementations are not required to accept all the defined protocols. If an
@@ -758,6 +865,12 @@ type FrontendTLSValidation struct {
 	//   reference, the `ResolvedRefs` on all matching HTTPS listeners condition
 	//   MUST be set with the Reason `RefNotPermitted`.
 	//
+	// <gateway:experimental:description>
+	// For cluster-scoped resources (such as ClusterTrustBundle), the
+	// `namespace` field MUST be unset. The implementation resolves the scope
+	// based on the kind.
+	// </gateway:experimental:description>
+	//
 	// Implementations MAY choose to perform further validation of the
 	// certificate content (e.g., checking expiry or enforcing specific formats).
 	// In such cases, an implementation-specific Reason and Message MUST be set.
@@ -775,6 +888,11 @@ type FrontendTLSValidation struct {
 	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
 	// CA certificate in a key named `ca.crt`.
 	//
+	// <gateway:experimental:description>
+	// Support: Extended - References to ClusterTrustBundle
+	// (certificates.k8s.io), with `namespace` unset.
+	// </gateway:experimental:description>
+	//
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
 	//
@@ -782,6 +900,7 @@ type FrontendTLSValidation struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:MinItems=1
+	// <gateway:experimental:validation:XValidation:message="ClusterTrustBundle references must not specify namespace",rule="self.all(r, !(r.group == 'certificates.k8s.io' && r.kind == 'ClusterTrustBundle' && has(r.namespace)))">
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs"`
 
 	// FrontendValidationMode defines the mode for validating the client certificate.
@@ -911,6 +1030,27 @@ type RouteGroupKind struct {
 	Kind Kind `json:"kind"`
 }
 
+// GatewayAddressRoutabilityType describes where a Gateway address is expected to
+// be reachable from.
+//
+// Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
+// The `k8s.io` domain and all its subdomains are reserved and cannot be used
+// until Gateway API defines a value for them.
+//
+// <gateway:experimental:validation:MaxLength=253>
+// <gateway:experimental:validation:XValidation:message="Routability must be empty, Cluster, or an implementation-specific prefixed path; k8s.io and its subdomains are reserved",rule="size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$') && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue() && self.split('/')[0] != 'k8s.io' && !self.split('/')[0].endsWith('.k8s.io'))">
+type GatewayAddressRoutabilityType string
+
+const (
+	// GatewayAddressRoutabilityDefault uses the implementation's default
+	// address provisioning behavior.
+	GatewayAddressRoutabilityDefault GatewayAddressRoutabilityType = ""
+
+	// GatewayAddressRoutabilityCluster indicates that an IPAddress is a
+	// Kubernetes Service ClusterIP.
+	GatewayAddressRoutabilityCluster GatewayAddressRoutabilityType = "Cluster"
+)
+
 // GatewaySpecAddress describes an address that can be bound to a Gateway.
 //
 // +kubebuilder:validation:XValidation:message="Hostname value must be empty or contain only valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? (!has(self.value) || self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\")): true"
@@ -932,6 +1072,18 @@ type GatewaySpecAddress struct {
 	// +optional
 	// +kubebuilder:validation:MaxLength=253
 	Value string `json:"value,omitempty"`
+
+	// Routability specifies the requested reachability scope of this address.
+	// Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
+	// The `k8s.io` domain and all its subdomains are reserved.
+	// When unset or empty, this field uses the implementation's default
+	// routability behavior.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Routability GatewayAddressRoutabilityType `json:"routability,omitempty,omitzero"`
 }
 
 // GatewayStatusAddress describes a network address that is bound to a Gateway.
@@ -953,6 +1105,14 @@ type GatewayStatusAddress struct {
 	// +kubebuilder:validation:MaxLength=253
 	// +required
 	Value string `json:"value"`
+
+	// Routability reports the reachability scope of this address. When empty or
+	// unset, this field uses the implementation's default routability behavior.
+	// The `k8s.io` domain and all its subdomains are reserved for well-known values.
+	//
+	// +optional
+	// <gateway:experimental>
+	Routability *GatewayAddressRoutabilityType `json:"routability,omitempty"`
 }
 
 // GatewayStatus defines the observed state of Gateway.
@@ -985,6 +1145,7 @@ type GatewayStatus struct {
 	// * "Accepted"
 	// * "Programmed"
 	// * "Ready"
+	// * "AddressesAssigned"
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementors:
@@ -1128,6 +1289,21 @@ type GatewayConditionType string
 type GatewayConditionReason string
 
 const (
+	// This condition indicates whether all requested Gateway addresses were
+	// successfully assigned.
+	GatewayConditionAddressesAssigned GatewayConditionType = "AddressesAssigned"
+
+	// This reason is used when all requested Gateway addresses were assigned.
+	GatewayReasonAddressesAssigned GatewayConditionReason = "AddressesAssigned"
+
+	// This reason is used when some, but not all, requested Gateway addresses
+	// were assigned.
+	GatewayReasonAddressesPartiallyAssigned GatewayConditionReason = "PartiallyAssigned"
+
+	// This reason is used when none of the requested Gateway addresses were
+	// assigned.
+	GatewayReasonAddressesNotAssigned GatewayConditionReason = "NotAssigned"
+
 	// This condition indicates whether a Gateway has generated some
 	// configuration that is assumed to be ready soon in the underlying data
 	// plane.

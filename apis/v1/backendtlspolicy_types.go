@@ -128,6 +128,7 @@ type BackendTLSPolicySpec struct {
 	TargetRefs []LocalPolicyTargetReferenceWithSectionName `json:"targetRefs,omitempty"`
 
 	// Validation contains backend TLS validation configuration.
+	//
 	// +required
 	Validation BackendTLSPolicyValidation `json:"validation"`
 
@@ -148,8 +149,13 @@ type BackendTLSPolicySpec struct {
 }
 
 // BackendTLSPolicyValidation contains backend TLS validation configuration.
-// +kubebuilder:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
-// +kubebuilder:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
+// <gateway:util:excludeFromCRD>
+// Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates
+// must be set.
+// </gateway:util:excludeFromCRD>
+// <gateway:standard:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")">
+// <gateway:standard:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")">
+// <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;wellKnownCACertificates>
 type BackendTLSPolicyValidation struct {
 	// CACertificateRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to
@@ -186,6 +192,13 @@ type BackendTLSPolicyValidation struct {
 	// ensure the `Accepted` Condition on the BackendTLSPolicy is set to
 	// `status: False`, with a Reason `NoValidCACertificate`.
 	//
+	// <gateway:experimental:description>
+	// References to cluster-scoped resources (such as ClusterTrustBundle)
+	// are supported: the implementation resolves the scope based on the kind.
+	// A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped
+	// resource by name. A reference to a namespaced resource (such as ConfigMap
+	// or Secret) uses the local namespace.
+	// </gateway:experimental:description>
 	//
 	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
 	// Implementations MAY choose to support attaching multiple certificates to
@@ -194,12 +207,22 @@ type BackendTLSPolicyValidation struct {
 	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
 	// with the CA certificate in a key named `ca.crt`.
 	//
+	// <gateway:experimental:description>
+	// Support: Extended - A single reference to a ClusterTrustBundle (certificates.k8s.io).
+	// </gateway:experimental:description>
+	//
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
 	//
 	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
+	// <gateway:util:excludeFromCRD>
+	// The standard channel rules reject an empty list via `size(...) > 0`, while the
+	// experimental ExactlyOneOf rule only tests for presence. MinItems keeps an empty
+	// list invalid in the experimental channel too.
+	// </gateway:util:excludeFromCRD>
+	// <gateway:experimental:validation:MinItems=1>
 	CACertificateRefs []LocalObjectReference `json:"caCertificateRefs,omitempty"`
 
 	// WellKnownCACertificates specifies whether a well-known set of CA certificates

@@ -65,7 +65,7 @@ type MeshSpec struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:XValidation:message="Value is immutable",rule="self == oldSelf"
+	// +k8s:immutable
 	// +required
 	ControllerName gatewayapiv1.GatewayController `json:"controllerName,omitempty"`
 
