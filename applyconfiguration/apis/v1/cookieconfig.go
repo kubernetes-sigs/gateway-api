@@ -32,14 +32,7 @@ type CookieConfigApplyConfiguration struct {
 	// Users should avoid reusing cookie names to prevent unintended
 	// consequences, such as rejection or unpredictable behavior.
 	//
-	// <gateway:util:excludeFromCRD>
-	// This field is Extended because not all implementations can
-	// control the cookie name. Implementations SHOULD support this
-	// field if the underlying dataplane allows configuring the cookie
-	// name.
-	// </gateway:util:excludeFromCRD>
-	//
-	// Support: Extended
+	// Support: Core
 	//
 	Name *apisv1.CookieName `json:"name,omitempty"`
 	// Path defines the cookie Path attribute. When not specified,
@@ -71,9 +64,7 @@ type CookieConfigApplyConfiguration struct {
 	//
 	// Defaults to "Session".
 	//
-	// Support: Core for "Session" type
-	//
-	// Support: Extended for "Permanent" type
+	// Support: Core
 	//
 	LifetimeType *apisv1.CookieLifetimeType `json:"lifetimeType,omitempty"`
 }

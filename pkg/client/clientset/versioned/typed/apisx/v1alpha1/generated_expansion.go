@@ -23,3 +23,5 @@ type XBackendExpansion interface{}
 type XBackendTrafficPolicyExpansion interface{}
 
 type XMeshExpansion interface{}
+
+type XTelemetryPolicyExpansion interface{}

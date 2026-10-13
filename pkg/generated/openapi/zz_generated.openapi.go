@@ -93,7 +93,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyList":                            schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicySpec":                            schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation":                      schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef":                     schema_sigsk8sio_gateway_api_apis_v1_ClusterTrustBundleObjectRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                                 schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CookieConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ForwardBodyConfig":                               schema_sigsk8sio_gateway_api_apis_v1_ForwardBodyConfig(ref),
@@ -237,6 +236,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                             schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute":                                schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref),
@@ -249,14 +249,21 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.LabelSelector":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_LabelSelector(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshSpec":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshStatus":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicyStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackend(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendList":                             schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicyList":                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh":                                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMesh(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMeshList":                                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy":                         schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicyList":                     schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicyList(ref),
 	}
 }
 
@@ -3211,7 +3218,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendTLSPolicyValidation contains backend TLS validation configuration. <gateway:util:excludeFromCRD> Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates must be set. These rules are channel-scoped because the experimental channel adds clusterTrustBundleRef as a third trust source, which they would otherwise reject. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"must not contain both CACertificateRefs and WellKnownCACertificates\",rule=\"!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:standard:validation:XValidation:message=\"must specify either CACertificateRefs or WellKnownCACertificates\",rule=\"(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:util:excludeFromCRD> Experimental variant of the above rules, with clusterTrustBundleRef as a third mutually exclusive trust source. </gateway:util:excludeFromCRD> <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;clusterTrustBundleRef;wellKnownCACertificates>",
+				Description: "BackendTLSPolicyValidation contains backend TLS validation configuration. <gateway:util:excludeFromCRD> Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates must be set. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"must not contain both CACertificateRefs and WellKnownCACertificates\",rule=\"!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:standard:validation:XValidation:message=\"must specify either CACertificateRefs or WellKnownCACertificates\",rule=\"(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;wellKnownCACertificates>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"caCertificateRefs": {
@@ -3221,7 +3228,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used to validate a TLS handshake between the Gateway and backend Pod.\n\nIf CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If CACertificateRefs is empty or unspecified, the configuration for WellKnownCACertificates MUST be honored instead if supported by the implementation.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key\n  named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this case, the Reason\n  must be set to `InvalidKind` and the Message of the Condition must explain which\n  kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace. This may change in future\n  spec updates.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message must be set for the invalid reference.\n\nIn all cases, the implementation MUST ensure the `ResolvedRefs` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason and Message that indicate the cause of the error. Connections using an invalid CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `NoValidCACertificate`.\n\nA single CACertificateRef to a Kubernetes ConfigMap kind has \"Core\" support. Implementations MAY choose to support attaching multiple certificates to a backend, but this behavior is implementation-specific.\n\nSupport: Core - An optional single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.\n\n<gateway:util:excludeFromCRD> The standard channel rules reject an empty list via `size(...) > 0`, while the experimental ExactlyOneOf rule only tests for presence. MinItems keeps an empty list invalid in the experimental channel too. </gateway:util:excludeFromCRD> <gateway:experimental:validation:MinItems=1>",
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used to validate a TLS handshake between the Gateway and backend Pod.\n\nIf CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If CACertificateRefs is empty or unspecified, the configuration for WellKnownCACertificates MUST be honored instead if supported by the implementation.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key\n  named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this case, the Reason\n  must be set to `InvalidKind` and the Message of the Condition must explain which\n  kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace. This may change in future\n  spec updates.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message must be set for the invalid reference.\n\nIn all cases, the implementation MUST ensure the `ResolvedRefs` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason and Message that indicate the cause of the error. Connections using an invalid CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `NoValidCACertificate`.\n\n<gateway:experimental:description> References to cluster-scoped resources (such as ClusterTrustBundle) are supported: the implementation resolves the scope based on the kind. A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped resource by name. A reference to a namespaced resource (such as ConfigMap or Secret) uses the local namespace. </gateway:experimental:description>\n\nA single CACertificateRef to a Kubernetes ConfigMap kind has \"Core\" support. Implementations MAY choose to support attaching multiple certificates to a backend, but this behavior is implementation-specific.\n\nSupport: Core - An optional single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\n<gateway:experimental:description> Support: Extended - A single reference to a ClusterTrustBundle (certificates.k8s.io). </gateway:experimental:description>\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.\n\n<gateway:util:excludeFromCRD> The standard channel rules reject an empty list via `size(...) > 0`, while the experimental ExactlyOneOf rule only tests for presence. MinItems keeps an empty list invalid in the experimental channel too. </gateway:util:excludeFromCRD> <gateway:experimental:validation:MinItems=1>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3230,12 +3237,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 									},
 								},
 							},
-						},
-					},
-					"clusterTrustBundleRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ClusterTrustBundleRef is an optional reference to a cluster-scoped ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the PEM-encoded CA certificates in the referenced bundle are used as the trust anchors for backend TLS validation. This field is mutually exclusive with CACertificateRefs and WellKnownCACertificates, so the referenced bundle is the only trust source for this policy.\n\nThe referenced bundle MUST exist, be readable by the implementation, and contain at least one valid PEM-encoded CA certificate. If any of these conditions are not met, the implementation MUST set ResolvedRefs=False with reason InvalidCACertificateRef. A ReferenceGrant is not required.\n\nIf the certificates.k8s.io API is not available in the cluster, the reference is treated as an unknown kind: the implementation MUST set ResolvedRefs=False with reason InvalidKind.\n\nImplementations that do not support ClusterTrustBundle references MUST set ResolvedRefs=False with reason InvalidKind when this field is specified.\n\nIn all of the cases above, because the referenced bundle is the only trust source for this policy, the implementation MUST also ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `NoValidCACertificate`. Connections using an invalid ClusterTrustBundleRef MUST fail, and the client MUST receive an HTTP 5xx error response.\n\nSupport: Extended\n\n<gateway:experimental>",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef"),
 						},
 					},
 					"wellKnownCACertificates": {
@@ -3276,43 +3277,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apis/v1.SubjectAltName"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1_ClusterTrustBundleObjectRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ClusterTrustBundleObjectRef identifies a ClusterTrustBundle.\n\nThe Group defaults to \"certificates.k8s.io\" and the Kind defaults to \"ClusterTrustBundle\", so users only need to specify the name.\n\nThis type is intended exclusively for cluster-scoped ClusterTrustBundle resources. The absence of a Namespace field is intentional and correct - it MUST NOT be used with namespace-scoped resources.\n\nA ReferenceGrant is not required because ClusterTrustBundle is cluster-scoped and has no target namespace.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the referent.\n\nDefaults to \"certificates.k8s.io\".",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is the kind of the referent.\n\nDefaults to \"ClusterTrustBundle\".",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the referent.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"name"},
-			},
-		},
+			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apis/v1.SubjectAltName"},
 	}
 }
 
@@ -3365,7 +3330,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name defines the name of the cookie used for session persistence. If not specified, a unique cookie name SHOULD be generated. Users should avoid reusing cookie names to prevent unintended consequences, such as rejection or unpredictable behavior.\n\n<gateway:util:excludeFromCRD> This field is Extended because not all implementations can control the cookie name. Implementations SHOULD support this field if the underlying dataplane allows configuring the cookie name. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+							Description: "Name defines the name of the cookie used for session persistence. If not specified, a unique cookie name SHOULD be generated. Users should avoid reusing cookie names to prevent unintended consequences, such as rejection or unpredictable behavior.\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3379,7 +3344,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 					},
 					"lifetimeType": {
 						SchemaProps: spec.SchemaProps{
-							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nDefaults to \"Session\".\n\nSupport: Core for \"Session\" type\n\nSupport: Extended for \"Permanent\" type",
+							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nDefaults to \"Session\".\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3494,7 +3459,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used as a trust anchor to validate the certificates presented by the client.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the\n  referenced resource does not exist) or is misconfigured (e.g., a\n  ConfigMap does not contain a key named `ca.crt`). In this case, the\n  Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this\n  case, the Reason on all matching HTTPS listeners must be set to\n  `InvalidCACertificateKind` and the Message of the Condition must explain\n  which kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace UNLESS there is a\n  ReferenceGrant in the target namespace that allows the CA\n  certificate to be attached. If a ReferenceGrant does not allow this\n  reference, the `ResolvedRefs` on all matching HTTPS listeners condition\n  MUST be set with the Reason `RefNotPermitted`.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nIn all cases, the implementation MUST ensure that the `ResolvedRefs` condition is set to `status: False` on all targeted listeners (i.e., listeners serving HTTPS on a matching port). The condition MUST include a Reason and Message that indicate the cause of the error. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` condition on the listener is set to `status: False`, with the Reason `NoValidCACertificate`. Implementations MAY choose to support attaching multiple CA certificates to a listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.",
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used as a trust anchor to validate the certificates presented by the client.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the\n  referenced resource does not exist) or is misconfigured (e.g., a\n  ConfigMap does not contain a key named `ca.crt`). In this case, the\n  Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this\n  case, the Reason on all matching HTTPS listeners must be set to\n  `InvalidCACertificateKind` and the Message of the Condition must explain\n  which kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace UNLESS there is a\n  ReferenceGrant in the target namespace that allows the CA\n  certificate to be attached. If a ReferenceGrant does not allow this\n  reference, the `ResolvedRefs` on all matching HTTPS listeners condition\n  MUST be set with the Reason `RefNotPermitted`.\n\n<gateway:experimental:description> For cluster-scoped resources (such as ClusterTrustBundle), the `namespace` field MUST be unset. The implementation resolves the scope based on the kind. </gateway:experimental:description>\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nIn all cases, the implementation MUST ensure that the `ResolvedRefs` condition is set to `status: False` on all targeted listeners (i.e., listeners serving HTTPS on a matching port). The condition MUST include a Reason and Message that indicate the cause of the error. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` condition on the listener is set to `status: False`, with the Reason `NoValidCACertificate`. Implementations MAY choose to support attaching multiple CA certificates to a listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\n<gateway:experimental:description> Support: Extended - References to ClusterTrustBundle (certificates.k8s.io), with `namespace` unset. </gateway:experimental:description>\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.\n\n<gateway:experimental:validation:XValidation:message=\"ClusterTrustBundle references must not specify namespace\",rule=\"self.all(r, !(r.group == 'certificates.k8s.io' && r.kind == 'ClusterTrustBundle' && has(r.namespace)))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3503,12 +3468,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 									},
 								},
 							},
-						},
-					},
-					"clusterTrustBundleRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ClusterTrustBundleRef is an optional reference to a cluster-scoped ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the PEM-encoded CA certificates in the referenced bundle are used as trust anchors for frontend client certificate validation, in addition to any certificates provided via CACertificateRefs.\n\nThe referenced bundle MUST exist, be readable by the implementation, and contain at least one valid PEM-encoded CA certificate. If any of these conditions are not met, the implementation MUST set ResolvedRefs=False with reason InvalidCACertificateRef on all targeted HTTPS listeners. A ReferenceGrant is not required.\n\nIf the certificates.k8s.io API is not available in the cluster, the reference is treated as an unknown kind: the implementation MUST set ResolvedRefs=False with reason InvalidKind on all targeted HTTPS listeners.\n\nImplementations that do not support ClusterTrustBundle references MUST set ResolvedRefs=False with reason InvalidKind when this field is specified.\n\nIn all of the cases above, if ALL trust sources for the listener are invalid, the implementation MUST also ensure the `Accepted` condition on all targeted HTTPS listeners is set to `status: False`, with the Reason `NoValidCACertificate`. Client connections that can only be validated against an invalid ClusterTrustBundleRef MUST be rejected during the TLS handshake.\n\nSupport: Extended\n\n<gateway:experimental>",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef"),
 						},
 					},
 					"mode": {
@@ -3523,7 +3482,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ClusterTrustBundleObjectRef", "sigs.k8s.io/gateway-api/apis/v1.ObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.ObjectReference"},
 	}
 }
 
@@ -5606,7 +5565,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 					},
 					"backoff": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Backoff specifies the base interval for an exponential backoff strategy between retry attempts and is represented in Gateway API Duration formatting.\n\nThe maximum duration a Gateway should wait before a retry attempt is `backoff * (2^N - 1)`, where N is the number of the retry attempt, starting at 1. Implementations MAY add jitter, resulting in an actual delay anywhere between zero and this bound, and MAY cap the delay at an implementation-defined maximum, which SHOULD be no less than the base interval.\n\nFor example, setting the `rules[].retry.backoff` field to the value `100ms` will cause a backend request to first be retried up to approximately 100 milliseconds after a connection error  or receiving a response code configured to be retriable.\n\nIf a Request timeout (`rules[].timeouts.request`) is configured on the route, the entire duration of the initial request and any retry attempts MUST not exceed the Request timeout duration. If any retry attempts are still in progress when the Request timeout duration has been reached, these SHOULD be canceled if possible and the Gateway MUST immediately return a timeout error.\n\nIf a BackendRequest timeout (`rules[].timeouts.backendRequest`) is configured on the route, any retry attempts which reach the configured BackendRequest timeout duration without a response SHOULD be canceled if possible and the Gateway SHOULD schedule the next retry attempt according to the configured backoff.\n\nIf a BackendRequest timeout is _not_ configured on the route, retry attempts MAY time out after an implementation default duration, or MAY remain pending until a configured Request timeout or implementation default duration for total request time is reached.\n\nWhen this field is unspecified, the backoff strategy or base interval are implementation-specific.\n\nImplementations that do not support an exponential backoff strategy MUST set the Accepted Condition for the Route to `status: False` with a Reason of `UnsupportedValue` when this field is set.\n\nSupport: Implementation-specific",
+							Description: "Backoff specifies the base interval for a backoff strategy between retry attempts and is represented in Gateway API Duration formatting. The duration a Gateway waits before a retry attempt is determined by the base interval and the implementation's retry strategy.\n\nImplementations MAY add random jitter and MAY cap the delay at an implementation-defined maximum, which SHOULD NOT be less than the base interval. The precise backoff curve and jitter calculation are implementation-specific and not exposed in the Gateway API specification. Implementations typically apply exponential backoff with jitter to mitigate thundering-herd issues.\n\nIf a Request timeout (`rules[].timeouts.request`) is configured on the route, the entire duration of the initial request and any retry attempts MUST not exceed the Request timeout duration. If any retry attempts are still in progress when the Request timeout duration has been reached, these SHOULD be canceled if possible and the Gateway MUST immediately return a timeout error.\n\nIf a BackendRequest timeout (`rules[].timeouts.backendRequest`) is configured on the route, any retry attempts which reach the configured BackendRequest timeout duration without a response SHOULD be canceled if possible and the Gateway SHOULD schedule the next retry attempt according to the configured backoff.\n\nIf a BackendRequest timeout is _not_ configured on the route, retry attempts MAY time out after an implementation default duration, or MAY remain pending until a configured Request timeout or implementation default duration for total request time is reached.\n\nWhen this field is unspecified, the backoff strategy and base interval are implementation-specific.\n\nImplementations which retry immediately with no backoff MUST NOT advertise support for this field and MUST set the Accepted Condition for the Route to `status: False` with a Reason of `UnsupportedValue` when this field is set.\n\nSupport: Implementation-specific",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5693,7 +5652,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"retry": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry"),
 						},
 					},
@@ -6010,12 +5969,18 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntry(ref common.ReferenceCall
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes"),
 						},
 					},
+					"filters": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Filters groups the pre-routing filter lists that run on every request accepted on this Listener, before route matching is performed. Filters is only valid when Protocol is `HTTP` or `HTTPS`; this constraint is enforced by CEL validation on the enclosing Listener struct.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ListenerFilters"),
+						},
+					},
 				},
 				Required: []string{"name", "port", "protocol"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerFilters", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
 	}
 }
 
@@ -7400,7 +7365,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"absoluteTimeout": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AbsoluteTimeout defines the absolute timeout of the persistent session. Once the AbsoluteTimeout duration has elapsed, the session becomes invalid.\n\nSupport: Extended",
+							Description: "AbsoluteTimeout defines the absolute timeout of the persistent session. Once the AbsoluteTimeout duration has elapsed, the session becomes invalid.\n\nSupport: Core when cookie.lifetimeType is \"Permanent\".\n\nSupport: Extended when cookie.lifetimeType is \"Session\" or type is \"Header\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -10043,6 +10008,57 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Attribute defines a single flat key-value pair to attach to traces.\n\nThis allows users to enrich spans with context like HTTP headers (e.g., \"X-User-ID\"), static tags, or built-in variables.\n\nSupport: Core",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the key of the attribute as it will appear in the output (i.e., as a span tag).",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"sourceType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SourceType specifies where the attribute value comes from. Valid values are \"Header\", \"Literal\", or \"Attribute\".",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"headerName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "HeaderName specifies the HTTP header to extract the value from. This is required if SourceType is \"Header\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"literalValue": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LiteralValue specifies a static string value to attach. This is required if SourceType is \"Literal\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"attributeKey": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AttributeKey refers to a standard OpenTelemetry attribute. For example: \"http.response.status_code\" or \"http.request.method\". This is required if SourceType is \"Attribute\". See: https://opentelemetry.io/docs/specs/semconv/",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name", "sourceType"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10157,7 +10173,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 					},
 					"protocol": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - HTTP, HTTP2, H2C, and HTTP11\n\nSupport: Extended - GRPC, MCP, TCP, WSS\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend. </gateway:util:excludeFromCRD>",
+							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - HTTP, H2C, and HTTP11\n\nSupport: Extended - GRPC, HTTP2, MCP, TCP, WSS\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend. </gateway:util:excludeFromCRD>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -10496,6 +10512,34 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref common.Reference
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream trace parent.\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mode explicitly controls if parent-based sampling is enabled. Valid values are \"Enabled\", \"Disabled\", \"ImplementationDefault\".\n\nIn the absence of this field, it defaults to \"ImplementationDefault\".\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"samplingRate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SamplingRate is the sampling rate to apply when parent-based sampling is active.\n\nThis acts as a downsampling governor. It allows an operator to say: \"I want to respect the parent's decision, but only for 50% of those requests\". Even if a parent is already marked as \"Sampled\", this allows the Gateway to apply a secondary filter so that it can respect the parent's intent while still controlling the volume of spans reported.\n\nWhen Mode is \"Enabled\" and this field is absent, a 100% sampling rate ({numerator: 100, denominator: 100}) is used.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.Fraction"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10547,6 +10591,202 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.Refe
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails", "sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicySpec defines the desired state and target of TelemetryPolicy.\n\nSpecifying at least one target resource in `targetRefs` is required. Tracing behavior can be configured via the `tracing` field.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"targetRefs": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRefs identifies the gateways to which this policy applies (GEP-713).\n\nWhen configured, the telemetry settings defined in this policy are applied uniformly to the referenced resources. In the absence of targetRefs, the policy is invalid and will not be accepted.\n\nTargetRefs must be distinct.\n\nSupport: Core for Gateway",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
+									},
+								},
+							},
+						},
+					},
+					"tracing": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Tracing defines the configuration for distributed tracing.\n\nWhen configured, distributed tracing spans are generated and exported. In the absence of this configuration, tracing behavior is determined by implementation defaults.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"),
+						},
+					},
+				},
+				Required: []string{"targetRefs"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicyStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicyStatus defines the observed state of TelemetryPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ancestors": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "For Policy Status API conventions, see: https://gateway-api.sigs.k8s.io/geps/gep-713/#the-status-stanza-of-policy-objects\n\nAncestors is a list of ancestor resources (specifically Gateway resources) that are associated with the policy, and the status of the policy with respect to each ancestor. When this policy attaches to a parent, the controller that manages the parent and the ancestors MUST add an entry to this list when the controller first sees the policy and SHOULD update the entry as appropriate when the relevant ancestor is modified.\n\nFor TelemetryPolicy, the ancestor MUST be the Gateway resource referenced in spec.targetRefs.\n\nNote also that implementations MUST ONLY populate ancestor status for the Ancestor resources they are responsible for. Implementations MUST use the ControllerName field to uniquely identify the entries in this list that they are responsible for.\n\nNote that to achieve this, the list of PolicyAncestorStatus structs MUST be treated as a map with a composite key, made up of the AncestorRef and ControllerName fields combined.\n\nA maximum of 16 ancestors will be represented in this list. An empty list means the Policy is not relevant for any ancestors.\n\nIf this slice is full, implementations MUST NOT add further entries. Instead they MUST consider the policy unimplementable and signal that on any related resources such as the ancestor that would be referenced here.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"ancestors"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TracingConfig defines the configuration for distributed tracing.\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mode explicitly controls if tracing is enabled. Valid values are \"Enabled\", \"Disabled\", \"ImplementationDefault\".\n\nIn the absence of this field, it defaults to \"ImplementationDefault\".\n\nSupport: Core (within TelemetryPolicy feature)",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"provider": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Provider specifies the tracing collector or backend endpoint receiving OTLP spans.\n\nWhen configured, spans generated by the Gateway proxy are exported to this destination. This field is required when Mode is \"Enabled\", and must not be set otherwise.\n\nSupport: Core (within Tracing feature)",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider"),
+						},
+					},
+					"samplingRate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SamplingRate specifies the base probability of sampling new traces.\n\nThe sampling probability is represented as a fraction.\n\nFor example, a Numerator of 5 and Denominator of 100 represents a 5% sampling rate. * If configured, only the specified percentage of new traces will be initiated. * In the absence of this field, an implementation-defined default is used.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nPermutations of numerator > denominator are invalid and MUST be rejected via validation. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
+						},
+					},
+					"parentBasedSampling": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ParentBasedSampling configures whether to respect the sampling decision of the parent span.\n\n* When Mode is \"Enabled\", the proxy will respect the upstream trace parent's sampling\n  decision.\n* When Mode is \"Disabled\", the proxy ignores the upstream trace parent's sampling\n  decision and applies its own local sampling rate decision.\n* When Mode is \"ImplementationDefault\" or absent, the implementation's default behavior\n  is used.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyParentBasedSampling",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling"),
+						},
+					},
+					"serviceName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ServiceName is the \"service.name\" attribute of the OpenTelemetry resource. If absent, the implementation's default service name will be used.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"spanName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SpanName defines a custom name for the OTel span. By default, the name is implementation-specific.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"attributes": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Attributes is a list of custom key-value pairs (or variables) attached to every span.\n\nWhen configured, these attributes are injected into every generated tracing span. In the absence of attributes, only standard proxy-defined attributes are emitted.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.Fraction", "sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TracingProvider identifies the tracing backend that receives generated spans.\n\nSupport: Core for Service\n\nSupport: Implementation-specific for any other resource",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"backendRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BackendRef is a reference to a Kubernetes Service or other supported backend that receives OTLP traces.\n\nWhen configured, tracing data is exported to the referenced backend.\n\nCross-namespace references are only valid if they are explicitly allowed by ReferenceGrant in the target namespace.\n\nIf the reference is invalid (e.g., the Service does not exist, has an unsupported Group or Kind, or is a cross-namespace reference not permitted by a ReferenceGrant), the implementation MUST set the \"ResolvedRefs\" condition on the Policy status to \"status: False\", with Reason \"BackendNotFound\", \"InvalidKind\", or \"RefNotPermitted\" as appropriate.\n\nTLS configuration for the connection to the backend is managed by the referenced object. For example, if the BackendRef points to a Service, a BackendTLSPolicy can be attached to configure TLS. Alternatively, the referenced backend could be a custom resource (e.g., XBackend) that natively manages TLS.\n\nSupport: Core",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference"),
+						},
+					},
+					"headers": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Headers specifies a list of custom headers to be added to the telemetry export requests (e.g., for authentication).\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"backendRef"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference", "sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"},
 	}
 }
 
@@ -10840,5 +11080,103 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref common.ReferenceC
 		},
 		Dependencies: []string{
 			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicy defines a Direct Attached Policy to configure telemetry/observability signals for Gateways.\n\nBy applying a TelemetryPolicy, platform operators and developers can ensure consistent collection, formatting, and export of observability signals.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nTelemetryPolicy is a Direct Attached Policy. Implementing controllers MUST adhere to the Policy Attachment guidelines (GEP-713).\n\nPrecedence and Conflict Resolution:\n  - To prevent complex merging semantics, only a single TelemetryPolicy is\n    permitted to apply to a specific Gateway resource at any given time.\n  - If multiple TelemetryPolicy resources target the same Gateway, precedence\n    MUST be determined using the following criteria, continuing on ties:\n    1. The older policy by creation timestamp takes precedence.\n    2. The policy appearing first in alphabetical order by {namespace}/{name}.\n  - For any TelemetryPolicy that does not take precedence, the controller\n    MUST set the `Accepted` condition on the policy status to `status: False` with\n    Reason `Conflicted`.\n\nConformance: Implementations MUST support the core resource structure and `targetRefs`. Support for the tracing block is Extended, but if supported, its respective conformance profile must be met. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of TelemetryPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the observed state of TelemetryPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "XTelemetryPolicyList contains a list of XTelemetryPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy"},
 	}
 }

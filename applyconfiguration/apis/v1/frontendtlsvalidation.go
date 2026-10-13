@@ -52,6 +52,12 @@ type FrontendTLSValidationApplyConfiguration struct {
 	// reference, the `ResolvedRefs` on all matching HTTPS listeners condition
 	// MUST be set with the Reason `RefNotPermitted`.
 	//
+	// <gateway:experimental:description>
+	// For cluster-scoped resources (such as ClusterTrustBundle), the
+	// `namespace` field MUST be unset. The implementation resolves the scope
+	// based on the kind.
+	// </gateway:experimental:description>
+	//
 	// Implementations MAY choose to perform further validation of the
 	// certificate content (e.g., checking expiry or enforcing specific formats).
 	// In such cases, an implementation-specific Reason and Message MUST be set.
@@ -69,41 +75,16 @@ type FrontendTLSValidationApplyConfiguration struct {
 	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
 	// CA certificate in a key named `ca.crt`.
 	//
+	// <gateway:experimental:description>
+	// Support: Extended - References to ClusterTrustBundle
+	// (certificates.k8s.io), with `namespace` unset.
+	// </gateway:experimental:description>
+	//
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
 	//
+	// <gateway:experimental:validation:XValidation:message="ClusterTrustBundle references must not specify namespace",rule="self.all(r, !(r.group == 'certificates.k8s.io' && r.kind == 'ClusterTrustBundle' && has(r.namespace)))">
 	CACertificateRefs []ObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
-	// ClusterTrustBundleRef is an optional reference to a cluster-scoped
-	// ClusterTrustBundle (certificates.k8s.io/v1) resource. When set, the
-	// PEM-encoded CA certificates in the referenced bundle are used as trust
-	// anchors for frontend client certificate validation, in addition to any
-	// certificates provided via CACertificateRefs.
-	//
-	// The referenced bundle MUST exist, be readable by the implementation, and
-	// contain at least one valid PEM-encoded CA certificate. If any of these
-	// conditions are not met, the implementation MUST set ResolvedRefs=False
-	// with reason InvalidCACertificateRef on all targeted HTTPS listeners.
-	// A ReferenceGrant is not required.
-	//
-	// If the certificates.k8s.io API is not available in the cluster, the
-	// reference is treated as an unknown kind: the implementation MUST set
-	// ResolvedRefs=False with reason InvalidKind on all targeted HTTPS
-	// listeners.
-	//
-	// Implementations that do not support ClusterTrustBundle references MUST set
-	// ResolvedRefs=False with reason InvalidKind when this field is specified.
-	//
-	// In all of the cases above, if ALL trust sources for the listener are
-	// invalid, the implementation MUST also ensure the `Accepted` condition on
-	// all targeted HTTPS listeners is set to `status: False`, with the Reason
-	// `NoValidCACertificate`. Client connections that can only be validated
-	// against an invalid ClusterTrustBundleRef MUST be rejected during the TLS
-	// handshake.
-	//
-	// Support: Extended
-	//
-	// <gateway:experimental>
-	ClusterTrustBundleRef *ClusterTrustBundleObjectRefApplyConfiguration `json:"clusterTrustBundleRef,omitempty"`
 	// FrontendValidationMode defines the mode for validating the client certificate.
 	// There are two possible modes:
 	//
@@ -140,14 +121,6 @@ func (b *FrontendTLSValidationApplyConfiguration) WithCACertificateRefs(values .
 		}
 		b.CACertificateRefs = append(b.CACertificateRefs, *values[i])
 	}
-	return b
-}
-
-// WithClusterTrustBundleRef sets the ClusterTrustBundleRef field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the ClusterTrustBundleRef field is set to the value of the last call.
-func (b *FrontendTLSValidationApplyConfiguration) WithClusterTrustBundleRef(value *ClusterTrustBundleObjectRefApplyConfiguration) *FrontendTLSValidationApplyConfiguration {
-	b.ClusterTrustBundleRef = value
 	return b
 }
 

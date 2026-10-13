@@ -192,9 +192,9 @@ var (
 	// reference feature. It is a union feature: it belongs to both
 	// GatewayExtendedFeatures and BackendTLSPolicyExtendedFeatures, so an
 	// implementation claiming it alongside GatewayFrontendClientCertificateValidation
-	// must support clusterTrustBundleRef in Gateway frontend TLS validation, and
-	// an implementation claiming it alongside BackendTLSPolicy must support
-	// clusterTrustBundleRef in BackendTLSPolicyValidation.
+	// must support ClusterTrustBundle references in Gateway frontend TLS validation,
+	// and an implementation claiming it alongside BackendTLSPolicy must support
+	// ClusterTrustBundle references in BackendTLSPolicyValidation.
 	ClusterTrustBundleFeature = Feature{
 		Name:    SupportClusterTrustBundle,
 		Channel: FeatureChannelExperimental,

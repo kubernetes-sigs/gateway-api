@@ -28,7 +28,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tcp"
@@ -64,17 +63,17 @@ var TCPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 		// is strictly newer than the first.
 		time.Sleep(time.Second)
 
-		newerRoute := &v1alpha2.TCPRoute{
+		newerRoute := &gatewayv1.TCPRoute{
 			Name:      newerRouteNN.Name,
 			Namespace: newerRouteNN.Namespace,
-			Spec: v1alpha2.TCPRouteSpec{
+			Spec: gatewayv1.TCPRouteSpec{
 				CommonRouteSpec: gatewayv1.CommonRouteSpec{
 					ParentRefs: []gatewayv1.ParentReference{{
 						Name:        gatewayv1.ObjectName(gwNN.Name),
 						SectionName: ptr.To(gatewayv1.SectionName("tcp")),
 					}},
 				},
-				Rules: []v1alpha2.TCPRouteRule{{
+				Rules: []gatewayv1.TCPRouteRule{{
 					BackendRefs: []gatewayv1.BackendRef{{
 						Name: gatewayv1.ObjectName("tcp-attach-backend-2"),
 						Port: ptr.To(gatewayv1.PortNumber(3000)),

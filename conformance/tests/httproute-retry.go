@@ -43,7 +43,7 @@ var HTTPRouteRetry = confsuite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteRetry,
+		features.SupportHTTPRouteRetryCodes,
 	},
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace

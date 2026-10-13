@@ -31,7 +31,10 @@ type SessionPersistenceApplyConfiguration struct {
 	// session. Once the AbsoluteTimeout duration has elapsed, the
 	// session becomes invalid.
 	//
-	// Support: Extended
+	// Support: Core when cookie.lifetimeType is "Permanent".
+	//
+	// Support: Extended when cookie.lifetimeType is "Session" or
+	// type is "Header".
 	//
 	AbsoluteTimeout *apisv1.Duration `json:"absoluteTimeout,omitempty"`
 	// Type defines the type of session persistence such as through

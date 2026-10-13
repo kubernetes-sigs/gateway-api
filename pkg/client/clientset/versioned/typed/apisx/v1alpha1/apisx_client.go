@@ -31,6 +31,7 @@ type ExperimentalV1alpha1Interface interface {
 	XBackendsGetter
 	XBackendTrafficPoliciesGetter
 	XMeshesGetter
+	XTelemetryPoliciesGetter
 }
 
 // ExperimentalV1alpha1Client is used to interact with features provided by the gateway.networking.x-k8s.io group.
@@ -48,6 +49,10 @@ func (c *ExperimentalV1alpha1Client) XBackendTrafficPolicies(namespace string) X
 
 func (c *ExperimentalV1alpha1Client) XMeshes() XMeshInterface {
 	return newXMeshes(c)
+}
+
+func (c *ExperimentalV1alpha1Client) XTelemetryPolicies(namespace string) XTelemetryPolicyInterface {
+	return newXTelemetryPolicies(c, namespace)
 }
 
 // NewForConfig creates a new ExperimentalV1alpha1Client for the given config.

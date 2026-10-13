@@ -41,7 +41,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -533,7 +532,7 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
 func GatewayAndUDPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &v1alpha2.UDPRoute{}, true, routeNNs...)
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.UDPRoute{}, true, routeNNs...)
 }
 
 // WaitForGatewayAddress waits until at least one IP Address has been set in the
@@ -868,14 +867,14 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 // in status that match the expected parents. This will cause the test to halt
 // if the specified timeout is exceeded.
 func UDPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
-	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1alpha2.UDPRoute{})
+	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &gatewayv1.UDPRoute{})
 }
 
 // TCPRouteMustHaveParents waits for the specified TCPRoute to have parents
 // in status that match the expected parents. This will cause the test to halt
 // if the specified timeout is exceeded.
 func TCPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
-	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1alpha2.TCPRoute{})
+	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &gatewayv1.TCPRoute{})
 }
 
 // TCPRouteMustHaveCondition checks that the supplied TCPRoute has the supplied Condition,
@@ -884,7 +883,7 @@ func TCPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.TCPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.TCPRoute{}
+		route := &gatewayv1.TCPRoute{}
 		err := client.Get(ctx, routeNN, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TCPRoute: %w", err)
@@ -919,7 +918,7 @@ func UDPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.UDPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.UDPRoute{}
+		route := &gatewayv1.UDPRoute{}
 		err := client.Get(ctx, routeNN, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching UDPRoute: %w", err)
@@ -957,7 +956,7 @@ func TCPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 	emptyChecked := false
 	// We explicitly do not use timeoutConfig.DefaultPollInterval here since we are doing negative testing
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.TCPRoute{}
+		route := &gatewayv1.TCPRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TCPRoute: %w", err)
@@ -999,7 +998,7 @@ func TCPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
 func GatewayAndTCPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &v1alpha2.TCPRoute{}, true, routeNNs...)
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.TCPRoute{}, true, routeNNs...)
 }
 
 // TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
@@ -1162,7 +1161,7 @@ func UDPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 	emptyChecked := false
 	// We explicitly do not use timeoutConfig.DefaultPollInterval here since we are doing negative testing
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.UDPRoute{}
+		route := &gatewayv1.UDPRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching UDPRoute: %w", err)

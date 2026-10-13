@@ -31,8 +31,8 @@ import (
 
 // TestBackendTLSPolicyValidationTrustSource covers the standard channel rules that
 // require exactly one of CACertificateRefs or WellKnownCACertificates. The
-// experimental channel replaces them with a rule that also accepts
-// ClusterTrustBundleRef, see backendtlspolicy_experimental_test.go.
+// experimental channel applies the same trust-source rule while adding
+// ClusterTrustBundle support through CACertificateRefs.
 func TestBackendTLSPolicyValidationTrustSource(t *testing.T) {
 	tests := []struct {
 		name             string

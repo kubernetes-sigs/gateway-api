@@ -210,6 +210,18 @@ type ListenerEntry struct {
 	// +kubebuilder:default={namespaces:{from: Same}}
 	// +optional
 	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`
+
+	// Filters groups the pre-routing filter lists that run on every
+	// request accepted on this Listener, before route matching is
+	// performed. Filters is only valid when Protocol is `HTTP` or
+	// `HTTPS`; this constraint is enforced by CEL validation on the
+	// enclosing Listener struct.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Filters *ListenerFilters `json:"filters,omitempty"`
 }
 
 type ListenerSetStatus struct {

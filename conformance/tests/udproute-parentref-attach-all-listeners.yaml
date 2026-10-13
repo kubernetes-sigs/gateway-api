@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: udp-echo
-          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.2.0
           imagePullPolicy: IfNotPresent
           env:
             - name: UDP_ECHO_SERVER
@@ -84,7 +84,7 @@ spec:
 ---
 # A UDPRoute with no `port` and no `sectionName` set on its parentRef should
 # attach to every UDP listener on the Gateway.
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: UDPRoute
 metadata:
   name: udp-route-attach-all
