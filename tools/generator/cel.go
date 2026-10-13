@@ -177,11 +177,11 @@ func levelUpValidation(parent *apiext.JSONSchemaProps, list string, leaf []strin
 		// rather than at the whole list.
 		span := strconv.FormatInt(start, 10)
 		if end > start {
-			span = fmt.Sprintf("%d..%d", start, end)
+			span = fmt.Sprintf("%d-%d", start, end)
 		}
 		batch := validation
 		batch.Rule = fmt.Sprintf("!has(self.%s) || [%s].all(i, self.%s.size() <= i || !has(self.%s[i].%s) || (%s))", list, strings.Join(indexes, ","), list, list, object, predicate)
-		batch.Message = fmt.Sprintf("%s[%s].%s: %s", list, span, object, validation.Message)
+		batch.Message = fmt.Sprintf("%s in %s %s: %s", object, list, span, validation.Message)
 		generated = append(generated, batch)
 	}
 	target.XValidations = append(remaining[:index], remaining[index+1:]...)
