@@ -18,6 +18,8 @@ package main
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -28,91 +30,163 @@ import (
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 )
 
-// A leaf validation is charged for rules.maxItems * matches.maxItems executions.
-// Moving it to the rule and checking literal batches of match indexes divides
-// that cost among separate expressions. It does not reduce the total CRD cost.
-// Keep the batch size stable across generator dependency upgrades; CRD install
-// tests on supported Kubernetes versions verify both cost budgets.
+// How many list indexes each leveled-up expression covers. Keep it stable across
+// generator dependency upgrades; CRD install tests on supported Kubernetes versions
+// verify both cost budgets.
 const matchValidationBatchSize = 16
 
-// batchRouteMatchValidations lowers only the three conditional regex checks
-// whose cost exceeds the per-expression budget at 64 route rules. The original
-// kubebuilder annotations remain the source of the predicate and regex.
+// levelUpTagPrefix introduces <gateway:validation:levelUpValidation="<object>.<field>">
+// on a list field. The tagged validation is hoisted off the list items and onto the
+// object that owns the list, which is how a check whose cost exceeds the
+// per-expression budget stays installable. Tags are collected before the channel
+// tweaks strip them from descriptions, and applied afterwards.
+const levelUpTagPrefix = `<gateway:validation:levelUpValidation=`
+
+// levelUpTarget is one tagged list and the leaf validation to hoist out of it.
+type levelUpTarget struct {
+	path []string // property names from the CRD root to the tagged list
+	leaf []string // object and field names relative to the list item schema
+}
+
+// collectLevelUpTargets reads every levelUpValidation tag in the schema. Properties
+// are visited in name order so generation does not depend on map iteration order;
+// tags on one property keep the order they were written in.
+func collectLevelUpTargets(root *apiext.JSONSchemaProps) ([]levelUpTarget, error) {
+	var targets []levelUpTarget
+	var walk func(node *apiext.JSONSchemaProps, path []string) error
+	walk = func(node *apiext.JSONSchemaProps, path []string) error {
+		if strings.Contains(node.Description, levelUpTagPrefix) {
+			tags, err := experimentalValidationMarkers(node.Description, levelUpTagPrefix)
+			if err != nil {
+				return err
+			}
+			for _, tag := range tags {
+				value, err := strconv.Unquote(tag)
+				if err != nil {
+					return fmt.Errorf("%s: invalid levelUpValidation tag %s: %w", strings.Join(path, "."), tag, err)
+				}
+				leaf := strings.Split(value, ".")
+				if len(leaf) != 2 {
+					return fmt.Errorf("%s: expected a levelUpValidation path of the form <object>.<field>, got %q", strings.Join(path, "."), value)
+				}
+				targets = append(targets, levelUpTarget{path: slices.Clone(path), leaf: leaf})
+			}
+		}
+		for _, name := range slices.Sorted(maps.Keys(node.Properties)) {
+			child := node.Properties[name]
+			if err := walk(&child, append(slices.Clone(path), name)); err != nil {
+				return err
+			}
+		}
+		if node.Items != nil && node.Items.Schema != nil {
+			return walk(node.Items.Schema, path)
+		}
+		return nil
+	}
+	if err := walk(root, nil); err != nil {
+		return nil, err
+	}
+	return targets, nil
+}
+
+// applyLevelUpTargets hoists every collected validation. A tagged property that the
+// channel pruned is an error rather than a silent skip.
+func applyLevelUpTargets(root *apiext.JSONSchemaProps, targets []levelUpTarget) error {
+	for _, target := range targets {
+		if err := applyLevelUpTarget(root, target.path, target.leaf); err != nil {
+			return fmt.Errorf("%s: %w", strings.Join(target.path, "."), err)
+		}
+	}
+	return nil
+}
+
+// applyLevelUpTarget walks to the tagged list. Properties holds values rather than
+// pointers, so every step writes the child back after recursing into it.
+func applyLevelUpTarget(node *apiext.JSONSchemaProps, path, leaf []string) error {
+	if node.Items != nil && node.Items.Schema != nil {
+		return applyLevelUpTarget(node.Items.Schema, path, leaf)
+	}
+	if _, ok := node.Properties[path[0]]; !ok {
+		return fmt.Errorf("property %q not found", path[0])
+	}
+	if len(path) == 1 {
+		return levelUpValidation(node, path[0], leaf)
+	}
+	child := node.Properties[path[0]]
+	err := applyLevelUpTarget(&child, path[1:], leaf)
+	node.Properties[path[0]] = child
+	return err
+}
+
+// levelUpValidation moves one conditional regex off the items of parent.<list> and
+// onto parent, checking literal batches of list indexes. A leaf validation is charged
+// for list.maxItems executions per owning element, so splitting it across expressions
+// keeps each one inside the per-expression budget. It does not reduce the total CRD
+// cost. The kubebuilder annotation remains the source of the predicate and regex.
 // The supported form is: condition ? self.<field>.matches("regex") : true.
 // Changes within this form are picked up automatically, provided they use only
 // self and no comprehensions (such as all() or map()). For example, replacing
 // the conditional with condition && self.<field>.matches("regex"), referring to
 // oldSelf, or adding an all() check requires updating this transformation.
 // Otherwise, generation fails rather than silently changing validation.
-func batchRouteMatchValidations(kind string, root *apiext.JSONSchemaProps) error {
-	var object string
-	var fields []string
-	switch kind {
-	case "HTTPRoute":
-		object, fields = "path", []string{"value"}
-	case "GRPCRoute":
-		object, fields = "method", []string{"service", "method"}
-	default:
-		return nil
+func levelUpValidation(parent *apiext.JSONSchemaProps, list string, leaf []string) error {
+	object, field := leaf[0], leaf[1]
+	items := parent.Properties[list]
+	if items.Items == nil || items.Items.Schema == nil || items.MaxItems == nil || *items.MaxItems <= 0 {
+		return fmt.Errorf("%s: expected an array with positive maxItems", list)
 	}
-	spec := root.Properties["spec"]
-	rules := spec.Properties["rules"]
-	if rules.Items == nil || rules.Items.Schema == nil {
-		return fmt.Errorf("spec.rules: expected an array of route rules")
-	}
-	rule := rules.Items.Schema
-	matches := rule.Properties["matches"]
-	if matches.Items == nil || matches.Items.Schema == nil || matches.MaxItems == nil || *matches.MaxItems <= 0 {
-		return fmt.Errorf("spec.rules[].matches: expected an array with positive maxItems")
-	}
-	leaf, ok := matches.Items.Schema.Properties[object]
-	if !ok || leaf.Type != "object" || leaf.Nullable {
-		return fmt.Errorf("spec.rules[].matches[].%s: expected a non-nullable object", object)
+	target, ok := items.Items.Schema.Properties[object]
+	if !ok || target.Type != "object" || target.Nullable {
+		return fmt.Errorf("%s[].%s: expected a non-nullable object", list, object)
 	}
 	env, err := cel.NewEnv()
 	if err != nil {
 		return err
 	}
-	// At the rule level, self must refer to the path or method of match i.
-	replacement, err := parseCELExpression(env, "self.matches[i]."+object)
+	// At the parent level, self must refer to the tagged object of element i.
+	replacement, err := parseCELExpression(env, fmt.Sprintf("self.%s[i].%s", list, object))
 	if err != nil {
 		return err
 	}
 
-	// Build the replacement before changing the schema, including all gRPC checks.
-	remaining := append(apiext.ValidationRules(nil), leaf.XValidations...)
-	var generated apiext.ValidationRules
-	for _, field := range fields {
-		index, expression, err := findConditionalRegex(env, remaining, field)
-		if err != nil {
-			return fmt.Errorf("%s.%s: %w", object, field, err)
-		}
-		validation := remaining[index]
-		if validation.MessageExpression != "" || validation.FieldPath != "" || validation.OptionalOldSelf != nil {
-			return fmt.Errorf("%s.%s: batching does not support messageExpression, fieldPath, or optionalOldSelf", object, field)
-		}
-		if err := rebaseValidationSelf(expression, replacement); err != nil {
-			return fmt.Errorf("%s.%s: %w", object, field, err)
-		}
-		predicate, err := cel.AstToString(cel.ParsedExprToAst(&exprpb.ParsedExpr{Expr: expression}))
-		if err != nil {
-			return fmt.Errorf("%s.%s: rendering validation: %w", object, field, err)
-		}
-		for start := int64(0); start < *matches.MaxItems; start += matchValidationBatchSize {
-			var indexes []string
-			for i := start; i < min(start+matchValidationBatchSize, *matches.MaxItems); i++ {
-				indexes = append(indexes, strconv.FormatInt(i, 10))
-			}
-			batch := validation
-			batch.Rule = fmt.Sprintf("!has(self.matches) || [%s].all(i, self.matches.size() <= i || !has(self.matches[i].%s) || (%s))", strings.Join(indexes, ","), object, predicate)
-			batch.Message = "matches[]." + object + ": " + validation.Message
-			generated = append(generated, batch)
-		}
-		remaining = append(remaining[:index], remaining[index+1:]...)
+	// Build the replacement before changing the schema.
+	remaining := append(apiext.ValidationRules(nil), target.XValidations...)
+	index, expression, err := findConditionalRegex(env, remaining, field)
+	if err != nil {
+		return fmt.Errorf("%s.%s: %w", object, field, err)
 	}
-	leaf.XValidations = remaining
-	matches.Items.Schema.Properties[object] = leaf
-	rule.XValidations = append(rule.XValidations, generated...)
+	validation := remaining[index]
+	if validation.MessageExpression != "" || validation.FieldPath != "" || validation.OptionalOldSelf != nil {
+		return fmt.Errorf("%s.%s: batching does not support messageExpression, fieldPath, or optionalOldSelf", object, field)
+	}
+	if err := rebaseValidationSelf(expression, replacement); err != nil {
+		return fmt.Errorf("%s.%s: %w", object, field, err)
+	}
+	predicate, err := cel.AstToString(cel.ParsedExprToAst(&exprpb.ParsedExpr{Expr: expression}))
+	if err != nil {
+		return fmt.Errorf("%s.%s: rendering validation: %w", object, field, err)
+	}
+	var generated apiext.ValidationRules
+	for start := int64(0); start < *items.MaxItems; start += matchValidationBatchSize {
+		var indexes []string
+		end := min(start+matchValidationBatchSize, *items.MaxItems) - 1
+		for i := start; i <= end; i++ {
+			indexes = append(indexes, strconv.FormatInt(i, 10))
+		}
+		// Name the indexes the batch covers, so a failure points at 16 elements
+		// rather than at the whole list.
+		span := strconv.FormatInt(start, 10)
+		if end > start {
+			span = fmt.Sprintf("%d..%d", start, end)
+		}
+		batch := validation
+		batch.Rule = fmt.Sprintf("!has(self.%s) || [%s].all(i, self.%s.size() <= i || !has(self.%s[i].%s) || (%s))", list, strings.Join(indexes, ","), list, list, object, predicate)
+		batch.Message = fmt.Sprintf("%s[%s].%s: %s", list, span, object, validation.Message)
+		generated = append(generated, batch)
+	}
+	target.XValidations = append(remaining[:index], remaining[index+1:]...)
+	items.Items.Schema.Properties[object] = target
+	parent.XValidations = append(parent.XValidations, generated...)
 	return nil
 }
 

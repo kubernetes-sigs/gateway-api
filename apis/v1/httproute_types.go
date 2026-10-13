@@ -215,6 +215,12 @@ type HTTPRouteRule struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=64
 	// +kubebuilder:default={{path:{ type: "PathPrefix", value: "/"}}}
+	// <gateway:util:excludeFromCRD>
+	// The CEL cost estimator charges a check on path.value for rules x matches
+	// executions, which exceeds the per-expression budget at 64 rules. The generator
+	// hoists it onto the rule, in batches of literal match indexes.
+	// <gateway:validation:levelUpValidation="path.value">
+	// </gateway:util:excludeFromCRD>
 	Matches []HTTPRouteMatch `json:"matches,omitempty"`
 
 	// Filters define the filters that are applied to requests that match

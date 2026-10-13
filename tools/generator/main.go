@@ -156,9 +156,15 @@ func main() {
 				if channel == "standard" && strings.Contains(version.Name, "alpha") {
 					channelCrd.Spec.Versions[i].Served = false
 				}
+				// Tags must be read before the channel tweaks strip them from the
+				// descriptions, and applied after the tweaks prune properties.
+				targets, err := collectLevelUpTargets(version.Schema.OpenAPIV3Schema)
+				if err != nil {
+					log.Fatalf("failed to collect levelUpValidation tags for %s %s %s: %v", channel, groupKind.Kind, version.Name, err)
+				}
 				version.Schema.OpenAPIV3Schema.Properties = gatewayTweaksMap(channel, version.Schema.OpenAPIV3Schema.Properties)
-				if err := batchRouteMatchValidations(groupKind.Kind, version.Schema.OpenAPIV3Schema); err != nil {
-					log.Fatalf("failed to batch CEL for %s %s %s: %v", channel, groupKind.Kind, version.Name, err)
+				if err := applyLevelUpTargets(version.Schema.OpenAPIV3Schema, targets); err != nil {
+					log.Fatalf("failed to level up validations for %s %s %s: %v", channel, groupKind.Kind, version.Name, err)
 				}
 			}
 

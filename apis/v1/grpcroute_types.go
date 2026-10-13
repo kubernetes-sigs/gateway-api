@@ -235,6 +235,13 @@ type GRPCRouteRule struct {
 	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=64
+	// <gateway:util:excludeFromCRD>
+	// The CEL cost estimator charges a check on method.service or method.method for
+	// rules x matches executions, which exceeds the per-expression budget at 64 rules.
+	// The generator hoists them onto the rule, in batches of literal match indexes.
+	// <gateway:validation:levelUpValidation="method.service">
+	// <gateway:validation:levelUpValidation="method.method">
+	// </gateway:util:excludeFromCRD>
 	Matches []GRPCRouteMatch `json:"matches,omitempty"`
 
 	// Filters define the filters that are applied to requests that match

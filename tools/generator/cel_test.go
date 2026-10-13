@@ -27,11 +27,14 @@ import (
 
 func matchValidationSchema(kind string, maxItems int64) (*apiext.JSONSchemaProps, *apiext.JSONSchemaProps, *apiext.JSONSchemaProps) {
 	object := "path"
+	description := `<gateway:validation:levelUpValidation="path.value">`
 	validations := apiext.ValidationRules{{
 		Rule: `self.type in ['Exact', 'PathPrefix'] ? self.value.matches('^/[a-z]+$') : true`, Message: "invalid path",
 	}}
 	if kind == "GRPCRoute" {
 		object = "method"
+		description = `<gateway:validation:levelUpValidation="method.service">` + "\n" +
+			`<gateway:validation:levelUpValidation="method.method">`
 		validations = apiext.ValidationRules{
 			{Rule: `(!has(self.type) || self.type == 'Exact') && has(self.service) ? self.service.matches('^[a-z]+$') : true`, Message: "invalid service"},
 			{Rule: `(!has(self.type) || self.type == 'Exact') && has(self.method) ? self.method.matches('^[a-z]+$') : true`, Message: "invalid method"},
@@ -40,7 +43,7 @@ func matchValidationSchema(kind string, maxItems int64) (*apiext.JSONSchemaProps
 	leaf := apiext.JSONSchemaProps{Type: "object", XValidations: validations}
 	match := &apiext.JSONSchemaProps{Type: "object", Properties: map[string]apiext.JSONSchemaProps{object: leaf}}
 	rule := &apiext.JSONSchemaProps{Type: "object", Properties: map[string]apiext.JSONSchemaProps{
-		"matches": {Type: "array", MaxItems: &maxItems, Items: &apiext.JSONSchemaPropsOrArray{Schema: match}},
+		"matches": {Type: "array", MaxItems: &maxItems, Description: description, Items: &apiext.JSONSchemaPropsOrArray{Schema: match}},
 	}}
 	root := &apiext.JSONSchemaProps{Properties: map[string]apiext.JSONSchemaProps{
 		"spec": {Properties: map[string]apiext.JSONSchemaProps{
@@ -50,7 +53,23 @@ func matchValidationSchema(kind string, maxItems int64) (*apiext.JSONSchemaProps
 	return root, rule, match
 }
 
-func TestBatchRouteMatchValidations(t *testing.T) {
+// levelUpSchema runs the two generator steps the way main does, collecting the tags
+// before anything strips them and applying them afterwards.
+func levelUpSchema(root *apiext.JSONSchemaProps) error {
+	targets, err := collectLevelUpTargets(root)
+	if err != nil {
+		return err
+	}
+	return applyLevelUpTargets(root, targets)
+}
+
+func setMatchesDescription(rule *apiext.JSONSchemaProps, description string) {
+	matches := rule.Properties["matches"]
+	matches.Description = description
+	rule.Properties["matches"] = matches
+}
+
+func TestLevelUpValidation(t *testing.T) {
 	for _, kind := range []string{"HTTPRoute", "GRPCRoute"} {
 		t.Run(kind, func(t *testing.T) {
 			root, rule, match := matchValidationSchema(kind, 17)
@@ -64,21 +83,29 @@ func TestBatchRouteMatchValidations(t *testing.T) {
 			leaf.XValidations = append(leaf.XValidations, other)
 			match.Properties[object] = leaf
 			rule.XValidations = apiext.ValidationRules{other}
-			require.NoError(t, batchRouteMatchValidations(kind, root))
+			require.NoError(t, levelUpSchema(root))
 			require.Equal(t, apiext.ValidationRules{other}, match.Properties[object].XValidations)
 			require.Len(t, rule.XValidations, count+1)
 			require.Equal(t, other, rule.XValidations[0])
 			require.Contains(t, rule.XValidations[1].Rule, "[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all")
 			require.Contains(t, rule.XValidations[2].Rule, "[16].all")
-			require.Contains(t, rule.XValidations[1].Message, "matches[]."+object)
-			require.NoError(t, batchRouteMatchValidations(kind, original))
+			require.Contains(t, rule.XValidations[1].Message, "matches[0..15]."+object)
+			require.Contains(t, rule.XValidations[2].Message, "matches[16]."+object)
+			require.NoError(t, levelUpSchema(original))
 			require.Equal(t, rule.XValidations[1:], original.Properties["spec"].Properties["rules"].Items.Schema.XValidations)
 		})
 	}
-	require.NoError(t, batchRouteMatchValidations("Gateway", &apiext.JSONSchemaProps{}))
+
+	t.Run("untagged schema is a no-op", func(t *testing.T) {
+		root, rule, _ := matchValidationSchema("HTTPRoute", 17)
+		setMatchesDescription(rule, "")
+		original := root.DeepCopy()
+		require.NoError(t, levelUpSchema(root))
+		require.Equal(t, original, root)
+	})
 }
 
-func TestBatchRouteMatchValidationErrors(t *testing.T) {
+func TestLevelUpValidationErrors(t *testing.T) {
 	tests := []struct {
 		name, expression string
 		modify           func(*apiext.JSONSchemaProps, *apiext.JSONSchemaProps)
@@ -118,6 +145,29 @@ func TestBatchRouteMatchValidationErrors(t *testing.T) {
 			leaf.Nullable = true
 			match.Properties["path"] = leaf
 		}},
+		{name: "unterminated tag", modify: func(rule, _ *apiext.JSONSchemaProps) {
+			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="path.value"`)
+		}},
+		{name: "unquoted tag value", modify: func(rule, _ *apiext.JSONSchemaProps) {
+			setMatchesDescription(rule, `<gateway:validation:levelUpValidation=path.value>`)
+		}},
+		{name: "leaf path too short", modify: func(rule, _ *apiext.JSONSchemaProps) {
+			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="value">`)
+		}},
+		{name: "leaf path too long", modify: func(rule, _ *apiext.JSONSchemaProps) {
+			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="path.value.extra">`)
+		}},
+		{name: "unknown object", modify: func(rule, _ *apiext.JSONSchemaProps) {
+			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="missing.value">`)
+		}},
+		{name: "unknown field", modify: func(rule, _ *apiext.JSONSchemaProps) {
+			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="path.missing">`)
+		}},
+		{name: "tagged list without items", modify: func(rule, _ *apiext.JSONSchemaProps) {
+			matches := rule.Properties["matches"]
+			matches.Items = nil
+			rule.Properties["matches"] = matches
+		}},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -131,10 +181,45 @@ func TestBatchRouteMatchValidationErrors(t *testing.T) {
 				tc.modify(rule, match)
 			}
 			original := root.DeepCopy()
-			require.Error(t, batchRouteMatchValidations("HTTPRoute", root))
+			require.Error(t, levelUpSchema(root))
 			require.Equal(t, original, root, "failed translation must not modify the schema")
 		})
 	}
+}
+
+func TestCollectLevelUpTargetsIsDeterministic(t *testing.T) {
+	root, rule, _ := matchValidationSchema("GRPCRoute", 64)
+	rule.Properties["backendRefs"] = apiext.JSONSchemaProps{
+		Type:        "array",
+		Description: `<gateway:validation:levelUpValidation="filters.type">`,
+	}
+	first, err := collectLevelUpTargets(root)
+	require.NoError(t, err)
+	require.Len(t, first, 3)
+	for range 20 {
+		next, err := collectLevelUpTargets(root)
+		require.NoError(t, err)
+		require.Equal(t, first, next, "collection must not depend on map iteration order")
+	}
+}
+
+// Properties holds values rather than pointers, so a missed write-back is invisible to
+// assertions on an inner schema. Read everything back through the root instead.
+func TestLevelUpValidationWritesBackThroughRoot(t *testing.T) {
+	root, _, _ := matchValidationSchema("HTTPRoute", 17)
+	require.NoError(t, levelUpSchema(root))
+	rule := root.Properties["spec"].Properties["rules"].Items.Schema
+	require.Len(t, rule.XValidations, 2)
+	require.Empty(t, rule.Properties["matches"].Items.Schema.Properties["path"].XValidations)
+}
+
+// A tagged property removed by the channel tweaks must fail loudly, not silently skip.
+func TestLevelUpValidationRejectsPrunedProperty(t *testing.T) {
+	root, rule, _ := matchValidationSchema("HTTPRoute", 17)
+	targets, err := collectLevelUpTargets(root)
+	require.NoError(t, err)
+	delete(rule.Properties, "matches")
+	require.ErrorContains(t, applyLevelUpTargets(root, targets), `property "matches" not found`)
 }
 
 func compileValidation(t *testing.T, expression string) cel.Program {
@@ -183,7 +268,7 @@ func TestBatchedValidationEquivalence(t *testing.T) {
 			for _, v := range match.Properties[object].XValidations {
 				original = append(original, compileValidation(t, v.Rule))
 			}
-			require.NoError(t, batchRouteMatchValidations(kind, root))
+			require.NoError(t, levelUpSchema(root))
 			for _, v := range rule.XValidations {
 				generated = append(generated, compileValidation(t, v.Rule))
 			}
@@ -221,7 +306,7 @@ func TestBatchingPreservesLiteralSelfAndHas(t *testing.T) {
 	leaf := match.Properties["path"]
 	leaf.XValidations[0].Rule = `has(self.value) ? self.value.matches('^self[.]value$') : true`
 	match.Properties["path"] = leaf
-	require.NoError(t, batchRouteMatchValidations("HTTPRoute", root))
+	require.NoError(t, levelUpSchema(root))
 	program := compileValidation(t, rule.XValidations[0].Rule)
 	for _, value := range []map[string]any{{}, {"value": "self.value"}} {
 		require.True(t, evalValidation(t, program, map[string]any{"matches": []any{map[string]any{"path": value}}}))
