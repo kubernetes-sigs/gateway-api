@@ -320,6 +320,11 @@ type HTTPRouteRule struct {
 
 	// Retry defines the configuration for when to retry an HTTP request.
 	//
+	// A request is retried when attempts is greater than 0 and the backend did
+	// not process it. This is the case when the connection could not be
+	// established, or when the backend explicitly rejected the request, either
+	// before processing it or with one of the configured status codes.
+	//
 	// Support: Extended
 	//
 	// +optional
