@@ -5571,7 +5571,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 						},
 					},
 				},
-				Required: []string{"attempts"},
 			},
 		},
 	}
@@ -5653,7 +5652,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"retry": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nSupport: Extended",
+							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nA request is retried when attempts is greater than 0 and the backend did not process it. This is the case when the connection could not be established, or when the backend explicitly rejected the request, either before processing it or with one of the configured status codes.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry"),
 						},
 					},
