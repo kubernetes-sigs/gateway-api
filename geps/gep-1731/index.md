@@ -294,7 +294,8 @@ type HTTPRouteRetry struct {
     //
     // Support: Extended
     //
-    // +required
+    // +optional
+    // +kubebuilder:default=1
     // +kubebuilder:validation:Minimum:=0
     Attempts int `json:"attempts,omitempty"`
     
