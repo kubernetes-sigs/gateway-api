@@ -135,6 +135,7 @@ func TestConformanceOptions_PartialYAML(t *testing.T) {
 	defaults := conformanceconfig.DefaultTimeoutConfig()
 
 	assert.Equal(t, "partial-only", opts.MeshName)
+	assert.Equal(t, []string{"10.96.0.0/12", "fd00:1234::/108"}, opts.ServiceCIDRs)
 	assert.Equal(t, 5*time.Second, opts.TimeoutConfig.DeleteTimeout)
 	assert.Equal(t, 5, opts.TimeoutConfig.RequiredConsecutiveSuccesses)
 	assert.Equal(t, 75*time.Second, opts.TimeoutConfig.TCPRouteMustHaveCondition)
