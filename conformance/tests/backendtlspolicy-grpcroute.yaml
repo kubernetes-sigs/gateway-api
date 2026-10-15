@@ -64,6 +64,7 @@ spec:
     protocol: TCP
     port: 443
     targetPort: 8443
+    appProtocol: kubernetes.io/h2c
 ---
 apiVersion: v1
 kind: Service
@@ -78,6 +79,7 @@ spec:
     protocol: TCP
     port: 443
     targetPort: 8443
+    appProtocol: kubernetes.io/h2c
 ---
 apiVersion: v1
 kind: Service
@@ -92,6 +94,7 @@ spec:
     protocol: TCP
     port: 443
     targetPort: 8443
+    appProtocol: kubernetes.io/h2c
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
