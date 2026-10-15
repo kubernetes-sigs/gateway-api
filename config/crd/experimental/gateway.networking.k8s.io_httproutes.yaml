@@ -3712,6 +3712,11 @@ spec:
                       description: |-
                         Retry defines the configuration for when to retry an HTTP request.
 
+                        A request is retried when attempts is greater than 0 and the backend did
+                        not process it. This is the case when the connection could not be
+                        established, or when the backend explicitly rejected the request, either
+                        before processing it or with one of the configured status codes.
+
                         Support: Extended
                       properties:
                         attempts:
@@ -3724,8 +3729,10 @@ spec:
                             If the maximum number of retries has been attempted without a successful
                             response from the backend, the Gateway MUST return an error.
 
+                            An explicit zero value MUST disable retries.
+
                             Support: Extended
-                          minimum: 1
+                          minimum: 0
                           type: integer
                         backoff:
                           description: |-
@@ -8042,6 +8049,11 @@ spec:
                       description: |-
                         Retry defines the configuration for when to retry an HTTP request.
 
+                        A request is retried when attempts is greater than 0 and the backend did
+                        not process it. This is the case when the connection could not be
+                        established, or when the backend explicitly rejected the request, either
+                        before processing it or with one of the configured status codes.
+
                         Support: Extended
                       properties:
                         attempts:
@@ -8054,8 +8066,10 @@ spec:
                             If the maximum number of retries has been attempted without a successful
                             response from the backend, the Gateway MUST return an error.
 
+                            An explicit zero value MUST disable retries.
+
                             Support: Extended
-                          minimum: 1
+                          minimum: 0
                           type: integer
                         backoff:
                           description: |-
