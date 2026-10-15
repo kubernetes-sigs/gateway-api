@@ -1,6 +1,6 @@
 module sigs.k8s.io/gateway-api
 
-go 1.27.1
+go 1.27.0
 
 require (
 	github.com/stretchr/testify v1.12.1
