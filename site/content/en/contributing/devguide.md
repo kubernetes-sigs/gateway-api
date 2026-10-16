@@ -105,6 +105,27 @@ Example:
 // DeprecatedField string `json:"deprecatedField,omitempty" protobuf:"bytes,16,opt,name=deprecatedField"`
 ```
 
+#### Level Up a Validation
+
+The API server estimates the cost of every CEL validation before it installs a CRD,
+using the largest list sizes the schema allows rather than the actual ones. A check on
+a field nested inside two lists is charged for the product of their limits, which can
+exceed the per-expression budget even though the check itself is cheap.
+
+Marking the outer list with `<gateway:validation:levelUpValidation="<object>.<field>">`
+moves such a check off the list items and onto the object that owns the list, where CRD
+generation splits it into expressions that each cover a fixed batch of list indexes. The
+kubebuilder annotation on the field stays the source of the predicate, and it must keep
+the form `condition ? self.<field>.matches("regex") : true` — anything else fails
+generation rather than silently changing what is validated.
+
+Example, from `HTTPRouteRule`:
+
+```golang
+// <gateway:validation:levelUpValidation="path.value">
+Matches []HTTPRouteMatch `json:"matches,omitempty"`
+```
+
 ### Deploy the Code
 
 Use the following command to deploy CRDs to the preexisting `Kind` cluster.

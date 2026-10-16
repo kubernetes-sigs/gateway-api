@@ -202,6 +202,62 @@ metadata:
   name: safe-upgrades.gateway.networking.k8s.io
 `
 
+// The tweaks strip every <gateway:...> tag from the descriptions and replace the
+// schemas they walk, so tags must be collected before gatewayTweaksMap and applied to
+// the schema it returns.
+func TestLevelUpTagsSurviveDescriptionStripping(t *testing.T) {
+	t.Parallel()
+
+	maxItems := int64(2)
+	root := &apiext.JSONSchemaProps{Properties: map[string]apiext.JSONSchemaProps{
+		"spec": {Properties: map[string]apiext.JSONSchemaProps{
+			"rules": {Type: "array", Items: &apiext.JSONSchemaPropsOrArray{Schema: &apiext.JSONSchemaProps{
+				Type: "object",
+				Properties: map[string]apiext.JSONSchemaProps{
+					"matches": {
+						Type:        "array",
+						MaxItems:    &maxItems,
+						Description: "Matches are evaluated in order.\n\n\n<gateway:validation:levelUpValidation=\"path.value\">",
+						Items: &apiext.JSONSchemaPropsOrArray{Schema: &apiext.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiext.JSONSchemaProps{
+								"path": {Type: "object", XValidations: apiext.ValidationRules{{
+									Rule:    "self.type == 'Exact' ? self.value.matches('^/[a-z]+$') : true",
+									Message: "invalid path",
+								}}},
+							},
+						}},
+					},
+				},
+			}}},
+		}},
+	}}
+
+	targets, err := collectLevelUpTargets(root)
+	if err != nil {
+		t.Fatalf("collecting tags: %v", err)
+	}
+	if len(targets) != 1 {
+		t.Fatalf("expected 1 target, got %d", len(targets))
+	}
+
+	root.Properties = gatewayTweaksMap("standard", root.Properties)
+	if err := applyLevelUpTargets(root, targets); err != nil {
+		t.Fatalf("applying tags: %v", err)
+	}
+
+	rule := root.Properties["spec"].Properties["rules"].Items.Schema
+	if description := rule.Properties["matches"].Description; strings.Contains(description, "<gateway:") {
+		t.Fatalf("tweaks left a tag in the description: %q", description)
+	}
+	if len(rule.XValidations) != 1 {
+		t.Fatalf("expected 1 generated validation, got %d", len(rule.XValidations))
+	}
+	if path := rule.Properties["matches"].Items.Schema.Properties["path"]; len(path.XValidations) != 0 {
+		t.Fatalf("expected the leaf validation to move, got %d", len(path.XValidations))
+	}
+}
+
 func TestUpdateVAPManifestStandardChannel(t *testing.T) {
 	t.Parallel()
 

@@ -1199,7 +1199,7 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name:       "too many matches and rules",
-			wantErrors: []string{"total number of matches across all rules in a route must be less than 128"},
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
 			rules: func() []gatewayv1.HTTPRouteRule {
 				match := gatewayv1.HTTPRouteMatch{
 					Path: &gatewayv1.HTTPPathMatch{
@@ -1214,6 +1214,85 @@ func TestHTTPRouteRule(t *testing.T) {
 						rule.Matches = append(rule.Matches, match)
 					}
 					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "64 rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.HTTPRouteRule {
+				var rules []gatewayv1.HTTPRouteRule
+				for range 64 {
+					rules = append(rules, gatewayv1.HTTPRouteRule{})
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "65 rules",
+			wantErrors: []string{"must have at most 64 items"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				var rules []gatewayv1.HTTPRouteRule
+				for range 65 {
+					rules = append(rules, gatewayv1.HTTPRouteRule{})
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "matches are counted across all rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				match := gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new("/"),
+					},
+				}
+				var rules []gatewayv1.HTTPRouteRule
+				for range 20 { // rules
+					rule := gatewayv1.HTTPRouteRule{}
+					for range 7 { // matches: 140 in total, 112 within the first 16 rules
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "exactly 128 matches across rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.HTTPRouteRule {
+				match := gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new("/"),
+					},
+				}
+				var rules []gatewayv1.HTTPRouteRule
+				for range 2 { // rules
+					rule := gatewayv1.HTTPRouteRule{}
+					for range 64 { // matches
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "exactly 129 matches across rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				rules := make([]gatewayv1.HTTPRouteRule, 3)
+				for i, count := range []int{64, 64, 1} {
+					for range count {
+						rules[i].Matches = append(rules[i].Matches, gatewayv1.HTTPRouteMatch{Path: &gatewayv1.HTTPPathMatch{
+							Type: new(gatewayv1.PathMatchExact), Value: new("/valid"),
+						}})
+					}
 				}
 				return rules
 			}(),
@@ -1294,6 +1373,25 @@ func TestHTTPRouteRule(t *testing.T) {
 				Spec:      gatewayv1.HTTPRouteSpec{Rules: tc.rules},
 			}
 			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+
+	// Check both ends of every batch in the last allowed rule. The generator
+	// unit tests cover every match position; these checks exercise the CRDs.
+	for _, index := range []int{0, 15, 16, 31, 32, 47, 48, 63} {
+		t.Run(fmt.Sprintf("invalid path in last rule at match index %d", index), func(t *testing.T) {
+			rules := make([]gatewayv1.HTTPRouteRule, 64)
+			for range 64 {
+				rules[63].Matches = append(rules[63].Matches, gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{Type: new(gatewayv1.PathMatchExact), Value: new("/valid")},
+				})
+			}
+			rules[63].Matches[index].Path.Value = new("/invalid?")
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{Name: fmt.Sprintf("batch-http-%d", time.Now().UnixNano()), Namespace: metav1.NamespaceDefault},
+				Spec:       gatewayv1.HTTPRouteSpec{Rules: rules},
+			}
+			validateHTTPRoute(t, route, []string{"spec.rules[63]", "must only contain valid characters"})
 		})
 	}
 }
