@@ -78,6 +78,10 @@ type BackendSpecApplyConfiguration struct {
 	// In cases where the protocol is negotiated on the wire (e.g. HTTP/1.1
 	// Upgrade or ALPN), implementations MUST include the protocol set here
 	// in the negotiation options presented to the backend.
+	//
+	// In cases the implementation does not support the configured protocol, it
+	// MUST set the "Accepted" condition to "False" with the reason
+	// "UnsupportedProtocol".
 	// </gateway:util:excludeFromCRD>
 	//
 	Protocol *apisxv1alpha1.BackendProtocol `json:"protocol,omitempty"`

@@ -59,6 +59,7 @@ type BackendAncestorStatusApplyConfiguration struct {
 	//
 	// Defined condition types include:
 	// - "Accepted": the resource has been acknowledged and accepted by the controller
+	// - "ResolvedRefs": all references of the resource have been resolved
 	//
 	// The status of each condition is one of True, False, or Unknown.
 	//
