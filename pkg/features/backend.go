@@ -47,8 +47,15 @@ const (
 	// This option indicates support for ExternalHostname Backend destinations.
 	SupportBackendExternalHostname FeatureName = "BackendExternalHostname"
 
-	// This option indicates support for Backend TLS configuration.
-	SupportBackendTLS FeatureName = "BackendTLS"
+	// This option indicates support for Backend TLS mode ServerOnly.
+	SupportBackendTLSModeServerOnly FeatureName = "BackendTLSModeServerOnly"
+
+	// This option indicates support for Backend TLS mode ClientAndServer.
+	SupportBackendTLSModeClientAndServer FeatureName = "BackendTLSModeServerOnly"
+
+	// This option indicates support for SubjectAltNames validation in Backend
+	// TLS configuration.
+	SupportBackendTLSSANValidation FeatureName = "BackendTLSSANValidation"
 
 	// This option indicates support for the HTTP2 Backend protocol.
 	SupportBackendProtocolHTTP2 FeatureName = "BackendProtocolHTTP2"
@@ -86,9 +93,24 @@ var (
 		Channel: FeatureChannelExperimental,
 	}
 
-	// BackendTLSFeature contains metadata for the BackendTLS feature.
-	BackendTLSFeature = Feature{
-		Name:    SupportBackendTLS,
+	// BackendTLSModeServerOnlyFeature contains metadata for the
+	// BackendTLSModeServerOnly feature.
+	BackendTLSModeServerOnlyFeature = Feature{
+		Name:    SupportBackendTLSModeServerOnly,
+		Channel: FeatureChannelExperimental,
+	}
+
+	// BackendTLSModeClientAndServerFeature contains metadata for the
+	// BackendTLSModeClientAndServer feature.
+	BackendTLSModeClientAndServerFeature = Feature{
+		Name:    SupportBackendTLSModeClientAndServer,
+		Channel: FeatureChannelExperimental,
+	}
+
+	// BackendTLSSANValidationFeature contains metadata for the
+	// BackendTLSSANValidation feature.
+	BackendTLSSANValidationFeature = Feature{
+		Name:    SupportBackendTLSSANValidation,
 		Channel: FeatureChannelExperimental,
 	}
 
@@ -160,7 +182,9 @@ var (
 // Backend API at an Extended level of support.
 var BackendExtendedFeatures = sets.New(
 	BackendExternalHostnameFeature,
-	BackendTLSFeature,
+	BackendTLSModeServerOnlyFeature,
+	BackendTLSModeClientAndServerFeature,
+	BackendTLSSANValidationFeature,
 	BackendProtocolHTTP2Feature,
 	BackendProtocolTCPFeature,
 	BackendProtocolGRPCFeature,
