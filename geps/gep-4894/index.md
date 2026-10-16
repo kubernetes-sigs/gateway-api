@@ -317,30 +317,42 @@ type LabelSelector struct {
 }
 
 type EndpointSelectorBackend struct {
-  // Selector defines the label selector used to identify the set of pods whose IP addresses
-  // will make up the endpoints that this Backend should route traffic to.
+  // Selector defines the label selector used to identify the set of pods whose
+  // IP addresses will make up the endpoints that this Backend should route
+  // traffic to.
   //
-  // If this field is set, the endpoints are resolved automatically and stay up to date as pods matching the
-  // selector are added or removed; the user does not create or manage any separate endpoint resource.
+  // If this field is set, the endpoints are resolved automatically and stay up
+  // to date as pods matching the selector are added or removed; the user does
+  // not create or manage any separate endpoint resource.
   //
   // <gateway:util:excludeFromCRD>
-  // Notes for implementors:
+  // Notes for implementers:
   //
-  // Implementations MAY create a Service from the label selector for endpoint resolution until the
-  // upstream EndpointSelector resource (KEP-6116) is available. Implementations SHOULD set ownerReferences
-  // so the created resource's lifecycle is tied to this Backend. This Service only exists to produce EndpointSlices;
-  // Service-level behaviors (including but not limited to internalTrafficPolicy, externalTrafficPolicy,
-  // sessionAffinity, and trafficDistribution) play no role. The Service port (ClusterIP frontend) is unused;
-  // the targetPort SHOULD be set to Backend.spec.port.number. Implementations SHOULD create the
-  // Service as headless (clusterIP: None), since no ClusterIP or kube-proxy load balancing is needed.
-  // Implementations MUST name the Service with generateName rather than a predictable name, so that a
-  // name like <backend-name>-backend.svc.cluster.local does not become a relied-upon DNS entry.
+  // This is an embedded struct to avoid stuttering in the API
+  // (i.e. `endpointSelector.selector`).
   //
-  // This is an embedded struct to avoid stuttering in the API (i.e. `endpointSelector.selector`).
+  // Implementations MAY create a Service from the label selector for endpoint
+  // resolution until the upstream EndpointSelector resource (KEP-6116) is
+  // available. Implementations SHOULD set ownerReferences so the created
+  // resource's lifecycle is tied to this Backend. Implementations MUST set
+  // the annotation "gateway.networking.k8s.io/controller-name" on the created
+  // Service to the controller name, to prevent conflicts with other
+  // controllers.
+  //
+  // This Service only exists to produce EndpointSlices; Service-level
+  // behaviors (including but not limited to internalTrafficPolicy,
+  // externalTrafficPolicy, sessionAffinity, and trafficDistribution) play no
+  // role. The Service port (ClusterIP frontend) is unused; the targetPort
+  // SHOULD be set to Backend.spec.port.number.
+  // Implementations SHOULD create the Service as headless (clusterIP: None),
+  // since no ClusterIP or kube-proxy load balancing is needed.
+  // Implementations MUST name the Service with generateName rather than a
+  // predictable name, so that a name like <backend-name>-backend.svc.cluster.local
+  // does not become a relied-upon DNS entry.
   // </gateway:util:excludeFromCRD>
   //
-  // +required
-  LabelSelector
+  // +optional
+  LabelSelector `json:",inline"`
 }
 
 // +kubebuilder:validation:XValidation:rule="self.mode == 'ClientAndServer' ? has(self.clientCertificateRef) : !has(self.clientCertificateRef)",message="clientCertificateRef must be set if and only if mode is ClientAndServer"
