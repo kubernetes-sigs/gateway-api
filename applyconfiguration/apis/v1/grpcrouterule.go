@@ -83,6 +83,13 @@ type GRPCRouteRuleApplyConfiguration struct {
 	// matching precedence MUST be granted to the first matching rule meeting
 	// the above criteria.
 	//
+	// <gateway:util:excludeFromCRD>
+	// The CEL cost estimator charges a check on method.service or method.method for
+	// rules x matches executions, which exceeds the per-expression budget at 64 rules.
+	// The generator hoists them onto the rule, in batches of literal match indexes.
+	// <gateway:validation:levelUpValidation="method.service">
+	// <gateway:validation:levelUpValidation="method.method">
+	// </gateway:util:excludeFromCRD>
 	Matches []GRPCRouteMatchApplyConfiguration `json:"matches,omitempty"`
 	// Filters define the filters that are applied to requests that match
 	// this rule.
