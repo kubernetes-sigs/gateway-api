@@ -432,7 +432,7 @@ type HTTPRouteRetry struct {
 	// +optional
 	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum:=0
-	Attempts int `json:"attempts,omitempty"`
+	Attempts *int `json:"attempts,omitempty"`
 
 	// Backoff specifies the base interval for a backoff strategy between
 	// retry attempts and is represented in Gateway API Duration formatting.
