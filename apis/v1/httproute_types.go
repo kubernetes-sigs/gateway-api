@@ -320,6 +320,11 @@ type HTTPRouteRule struct {
 
 	// Retry defines the configuration for when to retry an HTTP request.
 	//
+	// A request is retried when attempts is greater than 0 and the backend did
+	// not process it. This is the case when the connection could not be
+	// established, or when the backend explicitly rejected the request, either
+	// before processing it or with one of the configured status codes.
+	//
 	// Support: Extended
 	//
 	// +optional
@@ -420,12 +425,14 @@ type HTTPRouteRetry struct {
 	// If the maximum number of retries has been attempted without a successful
 	// response from the backend, the Gateway MUST return an error.
 	//
+	// An explicit zero value MUST disable retries.
+	//
 	// Support: Extended
 	//
 	// +optional
 	// +kubebuilder:default=1
-	// +kubebuilder:validation:Minimum:=1
-	Attempts int `json:"attempts,omitempty"`
+	// +kubebuilder:validation:Minimum:=0
+	Attempts *int `json:"attempts,omitempty"`
 
 	// Backoff specifies the base interval for a backoff strategy between
 	// retry attempts and is represented in Gateway API Duration formatting.
