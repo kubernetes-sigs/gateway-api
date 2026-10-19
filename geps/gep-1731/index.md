@@ -290,12 +290,14 @@ type HTTPRouteRetry struct {
     // If the maximum number of retries has been attempted without a successful
     // response from the backend, the Gateway MUST return an error.
     //
+    // An explicit zero value MUST disable retries.
+    //
     // Support: Extended
     //
     // +optional
     // +kubebuilder:default=1
-    // +kubebuilder:validation:Minimum:=1
-    Attempts int `json:"attempts,omitempty"`
+    // +kubebuilder:validation:Minimum:=0
+    Attempts *int `json:"attempts,omitempty"`
     
     // Backoff specifies the base interval for a backoff strategy between
     // retry attempts and is represented in Gateway API Duration formatting.
