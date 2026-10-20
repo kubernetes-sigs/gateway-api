@@ -92,7 +92,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				})
 		})
 
-		t.Run("HTTPRoute with exact hostname and less specific PathPrefix match takes precedence over HTTPRoute wildcard hostname and more specific PathPrefix match despite having newer creation timestamp", func(t *testing.T) {
+		t.Run("HTTPRoute exact hostname match takes precedence over HTTPRoute wildcard hostname match despite having newer creation timestamp and less specific PathPrefix match", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gw-httproute-exact-hostname-x", Namespace: ns}
 			olderRouteNN := types.NamespacedName{Name: "httproute-wc-hostname-x-path-older", Namespace: ns}
 			newerRouteNN := types.NamespacedName{Name: "httproute-exact-hostname-x-path-newer", Namespace: ns}
@@ -184,7 +184,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				})
 		})
 
-		t.Run("HTTPRoute more specific wildcard hostname and less specific PathPrefix match takes precedence over less specific wildcard hostname and more specific PathPrefix match despite having newer creation timestamp", func(t *testing.T) {
+		t.Run("HTTPRoute more specific wildcard hostname match takes precedence over less specific wildcard hostname match despite having newer creation timestamp and less specific PathPrefix match", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gw-httproute-wc-hostname-x", Namespace: ns}
 			olderRouteNN := types.NamespacedName{Name: "httproute-less-specific-wc-hostname-x-path-older", Namespace: ns}
 			newerRouteNN := types.NamespacedName{Name: "httproute-more-specific-wc-hostname-x-path-newer", Namespace: ns}
