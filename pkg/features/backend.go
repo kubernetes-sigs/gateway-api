@@ -51,7 +51,7 @@ const (
 	SupportBackendTLSModeServerOnly FeatureName = "BackendTLSModeServerOnly"
 
 	// This option indicates support for Backend TLS mode ClientAndServer.
-	SupportBackendTLSModeClientAndServer FeatureName = "BackendTLSModeServerOnly"
+	SupportBackendTLSModeClientAndServer FeatureName = "BackendTLSModeClientAndServer"
 
 	// This option indicates support for SubjectAltNames validation in Backend
 	// TLS configuration.
