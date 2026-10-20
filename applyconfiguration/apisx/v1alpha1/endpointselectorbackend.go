@@ -45,11 +45,18 @@ type EndpointSelectorBackendApplyConfiguration struct {
 	// Implementations MAY create a Service from the label selector for endpoint
 	// resolution until the upstream EndpointSelector resource (KEP-6116) is
 	// available. Implementations SHOULD set ownerReferences so the created
-	// resource's lifecycle is tied to this Backend. This Service only exists to
-	// produce EndpointSlices; Service-level behaviors (including but not limited
-	// to internalTrafficPolicy, externalTrafficPolicy, sessionAffinity, and
-	// trafficDistribution) play no role. The Service port (ClusterIP frontend)
-	// is unused; the targetPort SHOULD be set to Backend.spec.port.number.
+	// resource's lifecycle is tied to this Backend. Implementations MUST set
+	// the annotation "gateway.networking.x-k8s.io/controller-name" on the
+	// created Service to the controller name, to prevent conflicts with other
+	// controllers. Implementations MUST only reconcile generated Services
+	// whose annotation matches their controller name and MUST ignore Services
+	// annotated for another controller.
+	//
+	// This Service only exists to produce EndpointSlices; Service-level
+	// behaviors (including but not limited to internalTrafficPolicy,
+	// externalTrafficPolicy, sessionAffinity, and trafficDistribution) play no
+	// role. The Service port (ClusterIP frontend) is unused; the targetPort
+	// SHOULD be set to Backend.spec.port.number.
 	// Implementations SHOULD create the Service as headless (clusterIP: None),
 	// since no ClusterIP or kube-proxy load balancing is needed.
 	// Implementations MUST name the Service with generateName rather than a

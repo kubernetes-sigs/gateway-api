@@ -5,6 +5,8 @@ name: Backend Resource
 status: Experimental
 authors:
   - keithmattix
+  - gcs278
+  - snorwin
 # featureNames is a list of the feature names introduced by the GEP, if there
 # are any. This will allow us to track which feature was introduced by which GEP.
 featureNames:
