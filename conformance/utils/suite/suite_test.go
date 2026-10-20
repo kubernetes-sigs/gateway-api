@@ -21,11 +21,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	xnetws "golang.org/x/net/websocket"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -744,4 +746,89 @@ func namesToFeatureSet(names []string) FeaturesSet {
 		featureSet.Insert(features.FeatureName(name))
 	}
 	return featureSet
+}
+
+func TestSuiteRunSkipsProvisionalTests(t *testing.T) {
+	testCases := []struct {
+		name                 string
+		provisional          bool
+		skipProvisionalTests bool
+		skipTests            sets.Set[string]
+		runTest              string
+		bodyFails            bool
+		wantExecuted         bool
+		wantResult           resultType
+	}{
+		{
+			name:                 "provisional test is skipped when the flag is set",
+			provisional:          true,
+			skipProvisionalTests: true,
+			wantExecuted:         false,
+			wantResult:           testProvisionalSkipped,
+		},
+		{
+			name:                 "failing provisional body still records skipped, not failed",
+			provisional:          true,
+			skipProvisionalTests: true,
+			bodyFails:            true,
+			wantExecuted:         false,
+			wantResult:           testProvisionalSkipped,
+		},
+		{
+			name:         "provisional test runs when the flag is not set",
+			provisional:  true,
+			wantExecuted: true,
+			wantResult:   testSucceeded,
+		},
+		{
+			name:                 "stable test runs when the flag is set",
+			skipProvisionalTests: true,
+			wantExecuted:         true,
+			wantResult:           testSucceeded,
+		},
+		{
+			name:                 "explicitly skipped test stays skipped",
+			skipProvisionalTests: true,
+			skipTests:            sets.New("ProvisionalSkip"),
+			wantExecuted:         false,
+			wantResult:           testSkipped,
+		},
+		{
+			name:                 "provisional skip applies even when RunTest focuses the test",
+			provisional:          true,
+			skipProvisionalTests: true,
+			runTest:              "ProvisionalSkip",
+			wantExecuted:         false,
+			wantResult:           testProvisionalSkipped,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			executed := false
+			test := ConformanceTest{
+				ShortName:   "ProvisionalSkip",
+				Provisional: tc.provisional,
+				Test: func(t *testing.T, _ *ConformanceTestSuite) {
+					executed = true
+					if tc.bodyFails {
+						t.Errorf("provisional body executed despite the skip flag")
+					}
+				},
+			}
+			// The RestConfig stub is never dialed: setClientsetForTest only
+			// constructs clients, so no cluster is needed.
+			suite := ConformanceTestSuite{
+				RestConfig:           &rest.Config{Host: "https://127.0.0.1:1"},
+				SupportedFeatures:    sets.New[features.FeatureName](),
+				SkipTests:            tc.skipTests,
+				SkipProvisionalTests: tc.skipProvisionalTests,
+				RunTest:              tc.runTest,
+			}
+			require.NoError(t, suite.Run(t, []ConformanceTest{test}))
+			assert.Equal(t, tc.wantExecuted, executed, "unexpected test-body execution")
+			require.Contains(t, suite.results, test.ShortName)
+			assert.Equal(t, tc.wantResult, suite.results[test.ShortName].result)
+		})
+	}
 }
