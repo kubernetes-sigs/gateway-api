@@ -55,7 +55,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			newerRouteNN := types.NamespacedName{Name: "httproute-exact-hostname-x-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), olderRouteNN)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-exact-hostname-80"), olderRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
@@ -97,7 +97,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			newerRouteNN := types.NamespacedName{Name: "httproute-more-specific-wc-hostname-x-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), olderRouteNN)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-wc-hostname-80"), olderRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)

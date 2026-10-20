@@ -6,9 +6,27 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: listener-exact-hostname
+  - name: listener-exact-hostname-80
     protocol: HTTP
     port: 80
+    hostname: abc.example.com
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: HTTPRoute
+  - name: listener-exact-hostname-8000
+    protocol: HTTP
+    port: 8000
+    hostname: abc.example.com
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: HTTPRoute
+  - name: listener-exact-hostname-8080
+    protocol: HTTP
+    port: 8080
     hostname: abc.example.com
     allowedRoutes:
       namespaces:
@@ -24,9 +42,27 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: listener-wc-hostname
+  - name: listener-wc-hostname-80
     protocol: HTTP
     port: 80
+    hostname: "*.example.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: HTTPRoute
+  - name: listener-wc-hostname-8000
+    protocol: HTTP
+    port: 8000
+    hostname: "*.example.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: HTTPRoute
+  - name: listener-wc-hostname-8080
+    protocol: HTTP
+    port: 8080
     hostname: "*.example.com"
     allowedRoutes:
       namespaces:
