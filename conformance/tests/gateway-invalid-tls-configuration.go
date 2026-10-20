@@ -48,37 +48,34 @@ var GatewayInvalidTLSConfiguration = suite.ConformanceTest{
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		testCases := []struct {
 			name         string
-			gatewayName  string
-			controlRoute string
-			controlHost  string
+			listenerName string
+			port         string
 		}{
 			{
 				name:         "Nonexistent secret referenced as CertificateRef in a Gateway listener",
-				gatewayName:  "gateway-certificate-nonexistent-secret",
-				controlRoute: "gateway-certificate-nonexistent-secret-control",
-				controlHost:  "nonexistent-certificate.example.com",
+				listenerName: "https-nonexistent-secret",
+				port:         "443",
 			},
 			{
 				name:         "Unsupported group resource referenced as CertificateRef in a Gateway listener",
-				gatewayName:  "gateway-certificate-unsupported-group",
-				controlRoute: "gateway-certificate-unsupported-group-control",
-				controlHost:  "unsupported-group-certificate.example.com",
+				listenerName: "https-unsupported-group",
+				port:         "8443",
 			},
 			{
 				name:         "Unsupported kind resource referenced as CertificateRef in a Gateway listener",
-				gatewayName:  "gateway-certificate-unsupported-kind",
-				controlRoute: "gateway-certificate-unsupported-kind-control",
-				controlHost:  "unsupported-kind-certificate.example.com",
+				listenerName: "https-unsupported-kind",
+				port:         "8444",
 			},
 			{
 				name:         "Malformed secret referenced as CertificateRef in a Gateway listener",
-				gatewayName:  "gateway-certificate-malformed-secret",
-				controlRoute: "gateway-certificate-malformed-secret-control",
-				controlHost:  "malformed-certificate.example.com",
+				listenerName: "https-malformed-secret",
+				port:         "8445",
 			},
 		}
 
 		ns := suite.InfrastructureNamespace
+		gwNN := types.NamespacedName{Name: "gateway-invalid-tls-configuration", Namespace: ns}
+		controlRouteNN := types.NamespacedName{Name: "gateway-invalid-tls-configuration-control", Namespace: ns}
 		certNN := types.NamespacedName{Name: "tls-validity-checks-certificate", Namespace: ns}
 		serverCertificate, _, err := kubernetes.GetTLSSecret(s.Client, certNN)
 		require.NoError(t, err, "failed to get TLS certificate")
@@ -89,35 +86,32 @@ var GatewayInvalidTLSConfiguration = suite.ConformanceTest{
 			Reason: string(v1.ListenerReasonInvalidCertificateRef),
 		}}
 
+		gwAddr, err := kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, kubernetes.NewGatewayRef(gwNN, "http"))
+		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+
+		t.Run("Control route is recognized as accepted", func(t *testing.T) {
+			kubernetes.HTTPRouteMustHaveRouteAcceptedConditionsTrue(t, s.Client, s.TimeoutConfig, controlRouteNN, gwNN)
+		})
+
+		t.Run("Control listener serves traffic", func(t *testing.T) {
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
+				Request:   http.Request{Host: "invalid-tls-configuration.example.com", Path: "/"},
+				Response:  http.Response{StatusCode: 200},
+				Backend:   suite.InfraBackendServiceNameV1,
+				Namespace: ns,
+			})
+		})
+
 		for _, tc := range testCases {
 			t.Run(tc.name, func(t *testing.T) {
-				gwNN := types.NamespacedName{Name: tc.gatewayName, Namespace: ns}
-				controlRouteNN := types.NamespacedName{Name: tc.controlRoute, Namespace: ns}
-
 				t.Run("Certificate is recognized as invalid", func(t *testing.T) {
-					kubernetes.GatewayListenerMustHaveConditions(t, s.Client, s.TimeoutConfig, gwNN, "https", conditions)
-				})
-
-				gwAddr, err := kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, kubernetes.NewGatewayRef(gwNN, "http"))
-				require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
-
-				t.Run("Control route is recognized as accepted", func(t *testing.T) {
-					kubernetes.HTTPRouteMustHaveRouteAcceptedConditionsTrue(t, s.Client, s.TimeoutConfig, controlRouteNN, gwNN)
-				})
-
-				t.Run("Control listener serves traffic", func(t *testing.T) {
-					http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
-						Request:   http.Request{Host: tc.controlHost, Path: "/"},
-						Response:  http.Response{StatusCode: 200},
-						Backend:   suite.InfraBackendServiceNameV1,
-						Namespace: ns,
-					})
+					kubernetes.GatewayListenerMustHaveConditions(t, s.Client, s.TimeoutConfig, gwNN, tc.listenerName, conditions)
 				})
 
 				t.Run("Invalid listener does not accept connections", func(t *testing.T) {
 					gwIP, _, err := net.SplitHostPort(gwAddr)
 					require.NoErrorf(t, err, "failed to split Gateway address %q", gwAddr)
-					httpsAddr := net.JoinHostPort(gwIP, "443")
+					httpsAddr := net.JoinHostPort(gwIP, tc.port)
 					tls.MakeTLSConnectionAndExpectEventuallyConsistentFailure(t, s.TimeoutConfig, httpsAddr, serverCertificate, "example.org")
 				})
 			})

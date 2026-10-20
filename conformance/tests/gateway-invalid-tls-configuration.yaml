@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-certificate-nonexistent-secret
+  name: gateway-invalid-tls-configuration
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -12,7 +12,7 @@ spec:
       allowedRoutes:
         namespaces:
           from: Same
-    - name: https
+    - name: https-nonexistent-secret
       port: 443
       protocol: HTTPS
       allowedRoutes:
@@ -23,39 +23,8 @@ spec:
           - group: ""
             kind: Secret
             name: nonexistent-certificate
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: gateway-certificate-nonexistent-secret-control
-  namespace: gateway-conformance-infra
-spec:
-  parentRefs:
-    - name: gateway-certificate-nonexistent-secret
-      sectionName: http
-  hostnames:
-    - nonexistent-certificate.example.com
-  rules:
-    - backendRefs:
-        - name: infra-backend-v1
-          port: 8080
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway-certificate-unsupported-group
-  namespace: gateway-conformance-infra
-spec:
-  gatewayClassName: "{GATEWAY_CLASS_NAME}"
-  listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: https
-      port: 443
+    - name: https-unsupported-group
+      port: 8443
       protocol: HTTPS
       allowedRoutes:
         namespaces:
@@ -65,39 +34,8 @@ spec:
           - group: wrong.group.company.io
             kind: Secret
             name: tls-validity-checks-certificate
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: gateway-certificate-unsupported-group-control
-  namespace: gateway-conformance-infra
-spec:
-  parentRefs:
-    - name: gateway-certificate-unsupported-group
-      sectionName: http
-  hostnames:
-    - unsupported-group-certificate.example.com
-  rules:
-    - backendRefs:
-        - name: infra-backend-v1
-          port: 8080
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway-certificate-unsupported-kind
-  namespace: gateway-conformance-infra
-spec:
-  gatewayClassName: "{GATEWAY_CLASS_NAME}"
-  listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: https
-      port: 443
+    - name: https-unsupported-kind
+      port: 8444
       protocol: HTTPS
       allowedRoutes:
         namespaces:
@@ -107,39 +45,8 @@ spec:
           - group: ""
             kind: WrongKind
             name: tls-validity-checks-certificate
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: gateway-certificate-unsupported-kind-control
-  namespace: gateway-conformance-infra
-spec:
-  parentRefs:
-    - name: gateway-certificate-unsupported-kind
-      sectionName: http
-  hostnames:
-    - unsupported-kind-certificate.example.com
-  rules:
-    - backendRefs:
-        - name: infra-backend-v1
-          port: 8080
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway-certificate-malformed-secret
-  namespace: gateway-conformance-infra
-spec:
-  gatewayClassName: "{GATEWAY_CLASS_NAME}"
-  listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: https
-      port: 443
+    - name: https-malformed-secret
+      port: 8445
       protocol: HTTPS
       allowedRoutes:
         namespaces:
@@ -153,14 +60,14 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: gateway-certificate-malformed-secret-control
+  name: gateway-invalid-tls-configuration-control
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: gateway-certificate-malformed-secret
+    - name: gateway-invalid-tls-configuration
       sectionName: http
   hostnames:
-    - malformed-certificate.example.com
+    - invalid-tls-configuration.example.com
   rules:
     - backendRefs:
         - name: infra-backend-v1
