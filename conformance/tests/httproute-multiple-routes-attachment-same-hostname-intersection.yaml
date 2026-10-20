@@ -79,10 +79,57 @@ spec:
   parentRefs:
   - name: gw-httproute-exact-hostname-x
     namespace: gateway-conformance-infra
+    sectionName: listener-exact-hostname-80
   hostnames:
   - "*.example.com"
   rules:
   - backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-wc-hostname-x-path-older
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-httproute-exact-hostname-x
+    namespace: gateway-conformance-infra
+    sectionName: listener-exact-hostname-8000
+  hostnames:
+  - "*.example.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /prefix/longer
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-wc-hostname-x-path-header-older
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-httproute-exact-hostname-x
+    namespace: gateway-conformance-infra
+    sectionName: listener-exact-hostname-8080
+  hostnames:
+  - "*.example.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /prefix/longer
+      headers:
+      - type: Exact
+        name: Header-B
+        value: B
+    backendRefs:
     - name: infra-backend-v1
       port: 8080
 ---
@@ -95,9 +142,56 @@ spec:
   parentRefs:
   - name: gw-httproute-wc-hostname-x
     namespace: gateway-conformance-infra
+    sectionName: listener-wc-hostname-80
   hostnames:
   - "*.com"
   rules:
   - backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-less-specific-wc-hostname-x-path-older
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-httproute-wc-hostname-x
+    namespace: gateway-conformance-infra
+    sectionName: listener-wc-hostname-8000
+  hostnames:
+  - "*.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /prefix/longer
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-less-specific-wc-hostname-x-path-header-older
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-httproute-wc-hostname-x
+    namespace: gateway-conformance-infra
+    sectionName: listener-wc-hostname-8080
+  hostnames:
+  - "*.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /prefix/longer
+      headers:
+      - type: Exact
+        name: Header-B
+        value: B
+    backendRefs:
     - name: infra-backend-v1
       port: 8080
