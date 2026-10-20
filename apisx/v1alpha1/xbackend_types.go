@@ -219,9 +219,11 @@ type EndpointSelectorBackend struct {
 	// resolution until the upstream EndpointSelector resource (KEP-6116) is
 	// available. Implementations SHOULD set ownerReferences so the created
 	// resource's lifecycle is tied to this Backend. Implementations MUST set
-	// the annotation "gateway.networking.k8s.io/controller-name" on the created
-	// Service to the controller name, to prevent conflicts with other
-	// controllers.
+	// the annotation "gateway.networking.x-k8s.io/controller-name" on the
+	// created Service to the controller name, to prevent conflicts with other
+	// controllers. Implementations MUST only reconcile generated Services
+	// whose annotation matches their controller name and MUST ignore Services
+	// annotated for another controller.
 	//
 	// This Service only exists to produce EndpointSlices; Service-level
 	// behaviors (including but not limited to internalTrafficPolicy,
