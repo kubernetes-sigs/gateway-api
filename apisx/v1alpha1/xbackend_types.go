@@ -449,7 +449,7 @@ const (
 	BackendReasonNoValidCACertificate BackendConditionReason = "NoValidCACertificate"
 
 	// BackendReasonNoValidClientCertificate is used with the "Accepted" condition
-	// when it is set to false because the ClientCertificateRefs of the Backend
+	// when it is set to false because the ClientCertificateRef of the Backend
 	// is invalid.
 	BackendReasonNoValidClientCertificate BackendConditionReason = "NoValidClientCertificate"
 
@@ -504,8 +504,9 @@ const (
 	BackendReasonInvalidClientCertificateRef BackendConditionReason = "InvalidClientCertificateRef"
 
 	// BackendReasonInvalidKind is used with the "ResolvedRefs" condition when
-	// the condition is set false because one of the Backend's CACertificateRefs
-	// references an unknown or unsupported Group and/or Kind.
+	// the condition is set to false because one of the Backend's
+	// CACertificateRefs or its ClientCertificateRef references an unknown or
+	// unsupported Group and/or Kind.
 	BackendReasonInvalidKind BackendConditionReason = "InvalidKind"
 
 	// BackendReasonRefNotPermitted is used with the "ResolvedRefs" condition
