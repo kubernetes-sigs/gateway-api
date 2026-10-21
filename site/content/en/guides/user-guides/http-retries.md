@@ -62,7 +62,7 @@ failures should be masked:
 
 ## Combining with timeouts
 
-{{< details title="Extended Support Feature: HTTPRouteRequestTimeout, HTTPRouteRetryBackendTimeout" open="true" >}}
+{{< details title="Extended Support Feature: HTTPRouteRetryCodes, HTTPRouteRequestTimeout, HTTPRouteBackendTimeout" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
 {{< /details >}}
 
