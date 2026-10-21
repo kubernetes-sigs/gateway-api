@@ -1489,11 +1489,11 @@ func gatewayListenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerSt
 		for _, eKind := range eListener.SupportedKinds {
 			found := false
 
-			for _, aKind := range aListener.SupportedKinds {
-				if eKind.Group == nil {
-					eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
-				}
+			if eKind.Group == nil {
+				eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
+			}
 
+			for _, aKind := range aListener.SupportedKinds {
 				if aKind.Group == nil {
 					aKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
 				}
@@ -1598,11 +1598,11 @@ func listenerSetListenersMatch(t *testing.T, expected, actual []gatewayv1.Listen
 		for _, eKind := range eListener.SupportedKinds {
 			found := false
 
-			for _, aKind := range aListener.SupportedKinds {
-				if eKind.Group == nil {
-					eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
-				}
+			if eKind.Group == nil {
+				eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
+			}
 
+			for _, aKind := range aListener.SupportedKinds {
 				if aKind.Group == nil {
 					aKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
 				}
