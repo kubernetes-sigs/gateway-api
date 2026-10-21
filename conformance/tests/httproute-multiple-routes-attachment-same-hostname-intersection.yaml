@@ -6,7 +6,7 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: listener-exact-hostname-80
+  - name: listener-exact-hostname
     protocol: HTTP
     port: 80
     hostname: abc.example.com
@@ -15,18 +15,36 @@ spec:
         from: Same
       kinds:
       - kind: HTTPRoute
-  - name: listener-exact-hostname-8000
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-httproute-exact-hostname-x-path
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: listener-exact-hostname
     protocol: HTTP
-    port: 8000
+    port: 80
     hostname: abc.example.com
     allowedRoutes:
       namespaces:
         from: Same
       kinds:
       - kind: HTTPRoute
-  - name: listener-exact-hostname-8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-httproute-exact-hostname-x-path-header
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: listener-exact-hostname
     protocol: HTTP
-    port: 8080
+    port: 80
     hostname: abc.example.com
     allowedRoutes:
       namespaces:
@@ -42,7 +60,7 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: listener-wc-hostname-80
+  - name: listener-wc-hostname
     protocol: HTTP
     port: 80
     hostname: "*.example.com"
@@ -51,18 +69,36 @@ spec:
         from: Same
       kinds:
       - kind: HTTPRoute
-  - name: listener-wc-hostname-8000
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-httproute-wc-hostname-x-path
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: listener-wc-hostname
     protocol: HTTP
-    port: 8000
+    port: 80
     hostname: "*.example.com"
     allowedRoutes:
       namespaces:
         from: Same
       kinds:
       - kind: HTTPRoute
-  - name: listener-wc-hostname-8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-httproute-wc-hostname-x-path-header
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: listener-wc-hostname
     protocol: HTTP
-    port: 8080
+    port: 80
     hostname: "*.example.com"
     allowedRoutes:
       namespaces:
@@ -79,7 +115,6 @@ spec:
   parentRefs:
   - name: gw-httproute-exact-hostname-x
     namespace: gateway-conformance-infra
-    sectionName: listener-exact-hostname-80
   hostnames:
   - "*.example.com"
   rules:
@@ -94,9 +129,8 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gw-httproute-exact-hostname-x
+  - name: gw-httproute-exact-hostname-x-path
     namespace: gateway-conformance-infra
-    sectionName: listener-exact-hostname-8000
   hostnames:
   - "*.example.com"
   rules:
@@ -115,9 +149,8 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gw-httproute-exact-hostname-x
+  - name: gw-httproute-exact-hostname-x-path-header
     namespace: gateway-conformance-infra
-    sectionName: listener-exact-hostname-8080
   hostnames:
   - "*.example.com"
   rules:
@@ -142,7 +175,6 @@ spec:
   parentRefs:
   - name: gw-httproute-wc-hostname-x
     namespace: gateway-conformance-infra
-    sectionName: listener-wc-hostname-80
   hostnames:
   - "*.com"
   rules:
@@ -157,9 +189,8 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gw-httproute-wc-hostname-x
+  - name: gw-httproute-wc-hostname-x-path
     namespace: gateway-conformance-infra
-    sectionName: listener-wc-hostname-8000
   hostnames:
   - "*.com"
   rules:
@@ -178,9 +209,8 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gw-httproute-wc-hostname-x
+  - name: gw-httproute-wc-hostname-x-path-header
     namespace: gateway-conformance-infra
-    sectionName: listener-wc-hostname-8080
   hostnames:
   - "*.com"
   rules:
