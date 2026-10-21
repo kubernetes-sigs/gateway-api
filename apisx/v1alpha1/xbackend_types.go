@@ -243,6 +243,8 @@ type LabelSelector struct {
 	// +required
 	// +kubebuilder:validation:MinProperties=1
 	// +kubebuilder:validation:MaxProperties=64
+	// +kubebuilder:validation:XValidation:message="Label keys must be in the form of an optional DNS subdomain prefix followed by a required name segment of up to 63 characters.",rule="self.all(key, key.matches(r\"\"\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$\"\"\"))"
+	// +kubebuilder:validation:XValidation:message="If specified, the label key's prefix must be a DNS subdomain not longer than 253 characters in total.",rule="self.all(key, key.split(\"/\")[0].size() < 253)"
 	MatchLabels map[v1.LabelKey]v1.LabelValue `json:"matchLabels"` //nolint:kubeapilinter
 }
 
