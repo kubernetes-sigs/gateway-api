@@ -55,7 +55,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			newerRouteNN := types.NamespacedName{Name: "httproute-exact-hostname-x-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-exact-hostname-80"), olderRouteNN)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), olderRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
@@ -66,8 +66,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				Spec: gatewayv1.HTTPRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
-							Name:        gatewayv1.ObjectName(gwNN.Name),
-							SectionName: ptr.To(gatewayv1.SectionName("listener-exact-hostname-80")),
+							Name: gatewayv1.ObjectName(gwNN.Name),
 						}},
 					},
 					Hostnames: []gatewayv1.Hostname{"abc.example.com"},
@@ -93,12 +92,12 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 		})
 
 		t.Run("HTTPRoute exact hostname match takes precedence over HTTPRoute wildcard hostname match despite having newer creation timestamp and less specific PathPrefix match", func(t *testing.T) {
-			gwNN := types.NamespacedName{Name: "gw-httproute-exact-hostname-x", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "gw-httproute-exact-hostname-x-path", Namespace: ns}
 			olderRouteNN := types.NamespacedName{Name: "httproute-wc-hostname-x-path-older", Namespace: ns}
 			newerRouteNN := types.NamespacedName{Name: "httproute-exact-hostname-x-path-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-exact-hostname-8000"), olderRouteNN)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), olderRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
@@ -109,8 +108,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				Spec: gatewayv1.HTTPRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
-							Name:        gatewayv1.ObjectName(gwNN.Name),
-							SectionName: ptr.To(gatewayv1.SectionName("listener-exact-hostname-8000")),
+							Name: gatewayv1.ObjectName(gwNN.Name),
 						}},
 					},
 					Hostnames: []gatewayv1.Hostname{"abc.example.com"},
@@ -142,12 +140,12 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 		})
 
 		t.Run("HTTPRoute exact hostname match passes unmatched traffic to HTTPRoute wildcard hostname match", func(t *testing.T) {
-			gwNN := types.NamespacedName{Name: "gw-httproute-exact-hostname-x", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "gw-httproute-exact-hostname-x-path-header", Namespace: ns}
 			olderRouteNN := types.NamespacedName{Name: "httproute-wc-hostname-x-path-header-older", Namespace: ns}
 			newerRouteNN := types.NamespacedName{Name: "httproute-exact-hostname-x-path-header-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-exact-hostname-8080"), olderRouteNN)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), olderRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
@@ -158,8 +156,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				Spec: gatewayv1.HTTPRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
-							Name:        gatewayv1.ObjectName(gwNN.Name),
-							SectionName: ptr.To(gatewayv1.SectionName("listener-exact-hostname-8080")),
+							Name: gatewayv1.ObjectName(gwNN.Name),
 						}},
 					},
 					Hostnames: []gatewayv1.Hostname{"abc.example.com"},
@@ -207,7 +204,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			newerRouteNN := types.NamespacedName{Name: "httproute-more-specific-wc-hostname-x-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-wc-hostname-80"), olderRouteNN)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), olderRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
@@ -218,8 +215,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				Spec: gatewayv1.HTTPRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
-							Name:        gatewayv1.ObjectName(gwNN.Name),
-							SectionName: ptr.To(gatewayv1.SectionName("listener-wc-hostname-80")),
+							Name: gatewayv1.ObjectName(gwNN.Name),
 						}},
 					},
 					Hostnames: []gatewayv1.Hostname{"*.example.com"},
@@ -245,12 +241,12 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 		})
 
 		t.Run("HTTPRoute more specific wildcard hostname match takes precedence over HTTPRoute less specific wildcard hostname match despite having newer creation timestamp and less specific PathPrefix match", func(t *testing.T) {
-			gwNN := types.NamespacedName{Name: "gw-httproute-wc-hostname-x", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "gw-httproute-wc-hostname-x-path", Namespace: ns}
 			olderRouteNN := types.NamespacedName{Name: "httproute-less-specific-wc-hostname-x-path-older", Namespace: ns}
 			newerRouteNN := types.NamespacedName{Name: "httproute-more-specific-wc-hostname-x-path-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-wc-hostname-8000"), olderRouteNN)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), olderRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
@@ -261,8 +257,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				Spec: gatewayv1.HTTPRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
-							Name:        gatewayv1.ObjectName(gwNN.Name),
-							SectionName: ptr.To(gatewayv1.SectionName("listener-wc-hostname-8000")),
+							Name: gatewayv1.ObjectName(gwNN.Name),
 						}},
 					},
 					Hostnames: []gatewayv1.Hostname{"*.example.com"},
@@ -294,12 +289,12 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 		})
 
 		t.Run("HTTPRoute more specific wildcard hostname match passes unmatched traffic to HTTPRoute less specific wildcard hostname match", func(t *testing.T) {
-			gwNN := types.NamespacedName{Name: "gw-httproute-wc-hostname-x", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "gw-httproute-wc-hostname-x-path-header", Namespace: ns}
 			olderRouteNN := types.NamespacedName{Name: "httproute-less-specific-wc-hostname-x-path-header-older", Namespace: ns}
 			newerRouteNN := types.NamespacedName{Name: "httproute-more-specific-wc-hostname-x-path-header-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-wc-hostname-8080"), olderRouteNN)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), olderRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
@@ -310,8 +305,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				Spec: gatewayv1.HTTPRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
-							Name:        gatewayv1.ObjectName(gwNN.Name),
-							SectionName: ptr.To(gatewayv1.SectionName("listener-wc-hostname-8080")),
+							Name: gatewayv1.ObjectName(gwNN.Name),
 						}},
 					},
 					Hostnames: []gatewayv1.Hostname{"*.example.com"},
