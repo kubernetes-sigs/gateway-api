@@ -396,8 +396,6 @@ spec:
 
 ## Conformance Details
 
-Basic support for configuring retries in HTTPRoute up to a specified maximum count and with a minimum duration between attempts will be gated on the `SupportHTTPRouteRetry` feature. Retries will be tested in combination with request and backend timeouts if supported by the implementation.
-
 Retrying requests based on HTTP status codes will be gated under the following features:
 
 * `SupportHTTPRouteRetryCodes`
@@ -408,6 +406,8 @@ Retrying requests based on HTTP status codes will be gated under the following f
 * `SupportHTTPRouteRetryConnectionError`
 
   * Will test that connections interrupted by a TCP failure, disconnect or reset are retried if a `retry` stanza is configured.
+
+The `attempts` field to configure retries up to a specified maximum count is tested only in combination with the above features. Retries will be tested in combination with request and backend timeouts if supported by the implementation.
 
 {{% alert color="warning" %}}
 
