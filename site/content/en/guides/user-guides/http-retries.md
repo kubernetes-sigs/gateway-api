@@ -3,8 +3,8 @@ title: "HTTP retries"
 weight: 9
 ---
 
-{{< details title="Extended Support Feature: HTTPRouteRetry" open="true" >}}
-This feature is part of extended support, and requires your implementation to support the feature `HTTPRouteRetry`. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
+{{< details title="Extended Support Feature" open="true" >}}
+This feature is part of extended support, and requires your implementation to support the feature `HTTPRouteRetryCodes` and/or `HTTPRouteRetryConnectionError`. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 {{< /details >}}
 
 {{< details title="Standard Channel since v1.7.0" color="success" >}}
