@@ -189,6 +189,12 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
+					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer", Headers: map[string]string{"Header-A": "A", "Header-B": "B"}},
+					Backend:   confsuite.InfraBackendServiceNameV2,
+					Namespace: ns,
+				})
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+				http.ExpectedResponse{
 					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer", Headers: map[string]string{"Header-B": "B"}},
 					Backend:   confsuite.InfraBackendServiceNameV1,
 					Namespace: ns,
@@ -333,6 +339,12 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, olderRouteNN, gwNN)
 			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, newerRouteNN, gwNN)
 
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+				http.ExpectedResponse{
+					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer", Headers: map[string]string{"Header-A": "A", "Header-B": "B"}},
+					Backend:   confsuite.InfraBackendServiceNameV2,
+					Namespace: ns,
+				})
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
 					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer", Headers: map[string]string{"Header-B": "B"}},
