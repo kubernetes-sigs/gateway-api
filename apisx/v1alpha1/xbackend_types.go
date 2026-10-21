@@ -254,6 +254,7 @@ type LabelSelector struct {
 	// +required
 	// +kubebuilder:validation:MinProperties=1
 	// +kubebuilder:validation:MaxProperties=64
+	// +kubebuilder:validation:XValidation:message="Label keys must be in the form of an optional DNS subdomain prefix not longer than 253 characters followed by a required name segment of up to 63 characters.",rule="self.all(key, !format.qualifiedName().validate(key).hasValue())"
 	MatchLabels map[v1.LabelKey]v1.LabelValue `json:"matchLabels"` //nolint:kubeapilinter
 }
 
