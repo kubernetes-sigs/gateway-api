@@ -118,7 +118,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: &gatewayv1.HTTPPathMatch{
 								Type:  ptr.To(gatewayv1.PathMatchPathPrefix),
-								Value: ptr.To("/prefix"),
+								Value: new("/prefix"),
 							},
 						}},
 						BackendRefs: []gatewayv1.HTTPBackendRef{{
@@ -167,7 +167,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: &gatewayv1.HTTPPathMatch{
 								Type:  ptr.To(gatewayv1.PathMatchPathPrefix),
-								Value: ptr.To("/prefix"),
+								Value: new("/prefix"),
 							},
 							Headers: []gatewayv1.HTTPHeaderMatch{{
 								Type:  ptr.To(gatewayv1.HeaderMatchExact),
@@ -264,7 +264,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: &gatewayv1.HTTPPathMatch{
 								Type:  ptr.To(gatewayv1.PathMatchPathPrefix),
-								Value: ptr.To("/prefix"),
+								Value: new("/prefix"),
 							},
 						}},
 						BackendRefs: []gatewayv1.HTTPBackendRef{{
@@ -313,7 +313,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: &gatewayv1.HTTPPathMatch{
 								Type:  ptr.To(gatewayv1.PathMatchPathPrefix),
-								Value: ptr.To("/prefix"),
+								Value: new("/prefix"),
 							},
 							Headers: []gatewayv1.HTTPHeaderMatch{{
 								Type:  ptr.To(gatewayv1.HeaderMatchExact),
