@@ -148,6 +148,10 @@ type BackendSpec struct {
 	// In cases where the protocol is negotiated on the wire (e.g. HTTP/1.1
 	// Upgrade or ALPN), implementations MUST include the protocol set here
 	// in the negotiation options presented to the backend.
+	//
+	// In cases the implementation does not support the configured protocol, it
+	// MUST set the "Accepted" condition to "False" with the reason
+	// "UnsupportedProtocol".
 	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
@@ -407,6 +411,7 @@ type BackendAncestorStatus struct {
 	//
 	// Defined condition types include:
 	// - "Accepted": the resource has been acknowledged and accepted by the controller
+	// - "ResolvedRefs": all references of the resource have been resolved
 	//
 	// The status of each condition is one of True, False, or Unknown.
 	//
@@ -425,9 +430,95 @@ type BackendConditionReason string
 const (
 	// BackendConditionAccepted indicates whether the Backend has been accepted
 	// by a controller.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "Accepted"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "NoValidCACertificate"
+	// * "NoValidClientCertificate"
+	// * "UnsupportedProtocol"
+	// * "UnsupportedValue"
+	//
+	// Controllers may raise this condition with other reasons, but should
+	// prefer to use the reasons listed above to improve interoperability.
 	BackendConditionAccepted BackendConditionType = "Accepted"
 
 	// BackendReasonAccepted is used with the "Accepted" condition when the
 	// Backend has been accepted.
 	BackendReasonAccepted BackendConditionReason = "Accepted"
+
+	// BackendReasonNoValidCACertificate is used with the "Accepted" condition
+	// when it is set false because all CACertificateRefs of the Backend are
+	// invalid.
+	BackendReasonNoValidCACertificate BackendConditionReason = "NoValidCACertificate"
+
+	// BackendReasonNoValidClientCertificate is used with the "Accepted" condition
+	// when it is set to false because the ClientCertificateRef of the Backend
+	// is invalid.
+	BackendReasonNoValidClientCertificate BackendConditionReason = "NoValidClientCertificate"
+
+	// BackendReasonUnsupportedProtocol is used with the "Accepted" condition
+	// when it is set false because protocol type is not supported.
+	BackendReasonUnsupportedProtocol BackendConditionReason = "UnsupportedProtocol"
+
+	// BackendReasonUnsupportedValue is used with the "Accepted" condition when
+	// it is set to false because the implementation does not support a
+	// specified value, e.g., a backend type or TLS mode.
+	BackendReasonUnsupportedValue BackendConditionReason = "UnsupportedValue"
+
+	// BackendConditionResolvedRefs indicates whether the controller was able
+	// to resolve all object references of the Backend.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "ResolvedRefs"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "InvalidCACertificateRef"
+	// * "InvalidClientCertificateRef"
+	// * "InvalidKind"
+	// * "RefNotPermitted"
+	//
+	// Controllers may raise this condition with other reasons, but should
+	// prefer to use the reasons listed above to improve interoperability.
+	BackendConditionResolvedRefs BackendConditionType = "ResolvedRefs"
+
+	// BackendReasonResolvedRefs is used with the "ResolvedRefs" condition
+	// when the condition is true.
+	BackendReasonResolvedRefs BackendConditionReason = "ResolvedRefs"
+
+	// BackendReasonInvalidCACertificateRef is used with the "ResolvedRefs"
+	// condition when the condition is set false because one of the Backend's
+	// CACertificateRefs is invalid.
+	// A CACertificateRef is considered invalid when it refers to a nonexistent
+	// resource or when the data within that resource is malformed.
+	BackendReasonInvalidCACertificateRef BackendConditionReason = "InvalidCACertificateRef"
+
+	// BackendReasonInvalidClientCertificateRef is used with the "ResolvedRefs"
+	// condition when the condition is set false because the Backend has an
+	// invalid ClientCertificateRef.
+	// A ClientCertificateRef is considered invalid when it refers to a
+	// nonexistent resource, or when the data within that resource is malformed.
+	// This reason must be used only when the reference is allowed, either by
+	// referencing an object in the same namespace as the Backend, or when
+	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.
+	// If the reference is not allowed, the reason RefNotPermitted must be used
+	// instead.
+	BackendReasonInvalidClientCertificateRef BackendConditionReason = "InvalidClientCertificateRef"
+
+	// BackendReasonInvalidKind is used with the "ResolvedRefs" condition when
+	// the condition is set to false because one of the Backend's
+	// CACertificateRefs or its ClientCertificateRef references an unknown or
+	// unsupported Group and/or Kind.
+	BackendReasonInvalidKind BackendConditionReason = "InvalidKind"
+
+	// BackendReasonRefNotPermitted is used with the "ResolvedRefs" condition
+	// when the condition is set false because the Backend has a reference to
+	// an object in another namespace, where the object in the other namespace
+	// does not have a ReferenceGrant explicitly allowing the reference.
+	BackendReasonRefNotPermitted BackendConditionReason = "RefNotPermitted"
 )
