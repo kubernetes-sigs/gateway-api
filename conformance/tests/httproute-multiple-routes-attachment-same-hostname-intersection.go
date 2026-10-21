@@ -141,7 +141,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				})
 		})
 
-		t.Run("Older HTTPRoute wildcard hostname match receives traffic that is unmatched by newer HTTPRoute exact hostname match that takes precedence", func(t *testing.T) {
+		t.Run("HTTPRoute exact hostname match passes unmatched traffic to HTTPRoute wildcard hostname match", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gw-httproute-exact-hostname-x", Namespace: ns}
 			olderRouteNN := types.NamespacedName{Name: "httproute-wc-hostname-x-path-header-older", Namespace: ns}
 			newerRouteNN := types.NamespacedName{Name: "httproute-exact-hostname-x-path-header-newer", Namespace: ns}
@@ -287,7 +287,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 				})
 		})
 
-		t.Run("Older HTTPRoute less specific wildcard hostname match receives traffic that is unmatched by newer HTTPRoute more specific wildcard hostname match that takes precedence", func(t *testing.T) {
+		t.Run("HTTPRoute more specific wildcard hostname match passes unmatched traffic to HTTPRoute less specific wildcard hostname match", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gw-httproute-wc-hostname-x", Namespace: ns}
 			olderRouteNN := types.NamespacedName{Name: "httproute-less-specific-wc-hostname-x-path-header-older", Namespace: ns}
 			newerRouteNN := types.NamespacedName{Name: "httproute-more-specific-wc-hostname-x-path-header-newer", Namespace: ns}
