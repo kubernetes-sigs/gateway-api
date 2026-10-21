@@ -2,6 +2,12 @@
 title: "HTTP retries"
 weight: 9
 ---
+{{< details title="Standard Channel since v1.7.0" color="success" >}}
+The HTTPRoute `retry` field is GA and has been part of the Standard Channel since
+`v1.7.0`. For more information on release channels, refer to our [versioning
+guide](/docs/concepts/versioning/).
+{{< /details >}}
+
 The [HTTPRoute resource](/reference/api-types/httproute/) can be configured to
 automatically retry unsuccessful requests to a backend before returning a
 response to the client. This is useful for hiding transient backend failures
