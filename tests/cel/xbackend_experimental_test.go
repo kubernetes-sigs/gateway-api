@@ -22,6 +22,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -412,7 +413,35 @@ func TestXBackendEndpointSelectorMatchLabels(t *testing.T) {
 		{
 			name: "matchLabels is accepted",
 			matchLabels: map[gatewayv1.LabelKey]gatewayv1.LabelValue{
-				"app": "foo",
+				"app":             "foo",
+				"example.com/app": "bar",
+			},
+		},
+		{
+			name: "invalid characters in matchLabels key",
+			matchLabels: map[gatewayv1.LabelKey]gatewayv1.LabelValue{
+				"a p p": "foo",
+			},
+			wantErrors: []string{
+				"Label keys must be in the form of an optional DNS subdomain prefix not longer than 253 characters followed by a required name segment of up to 63 characters",
+			},
+		},
+		{
+			name: "too long name segment in matchLabels key",
+			matchLabels: map[gatewayv1.LabelKey]gatewayv1.LabelValue{
+				gatewayv1.LabelKey(strings.Repeat("a", 64)): "foo",
+			},
+			wantErrors: []string{
+				"Label keys must be in the form of an optional DNS subdomain prefix not longer than 253 characters followed by a required name segment of up to 63 characters",
+			},
+		},
+		{
+			name: "too long DNS prefix in matchLabels key",
+			matchLabels: map[gatewayv1.LabelKey]gatewayv1.LabelValue{
+				gatewayv1.LabelKey(strings.Repeat("a", 254) + "/" + strings.Repeat("a", 63)): "foo",
+			},
+			wantErrors: []string{
+				"Label keys must be in the form of an optional DNS subdomain prefix not longer than 253 characters followed by a required name segment of up to 63 characters",
 			},
 		},
 	}
