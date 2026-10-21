@@ -31,7 +31,8 @@ returns a `500`, `503`, or `504`, up to two additional attempts:
   documentation before relying on them.
 - `attempts` is the maximum number of retries beyond the initial request.
   With `attempts: 2`, the gateway may send up to three requests to the
-  backend in total.
+  backend in total. Setting `attempts: 0` disables retries. If `attempts`
+  is unspecified, it defaults to `1`.
 
 ## Retrying on connection errors
 {{< details title="Extended Support Feature: HTTPRouteRetryConnectionError" open="true" >}}
@@ -86,4 +87,30 @@ to 2s, and retries up to three times:
       - 503
       - 504
       attempts: 3
+```
+
+## Configuring backoff between retries
+{{< details title="Implementation-specific Feature" open="true" >}}
+This feature is part of implementation-specific support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+{{< /details >}}
+
+The `backoff` field sets the base interval the gateway waits before each
+retry attempt (for example `100ms` or `1s`). The actual delay is derived from
+this base interval by the implementation's retry strategy, typically exponential
+backoff with random jitter to avoid many clients retrying at the same moment.
+The delay may also be capped at an implementation-defined maximum. If `backoff`
+is unspecified, the strategy and base interval are implementation-specific.
+
+The following rule retries `503` responses up to three times, with the delay
+between retries derived from a base backoff interval of `100ms`:
+
+```yaml
+  - backendRefs:
+    - name: backend-svc
+      port: 8080
+    retry:
+      codes:
+      - 503
+      attempts: 3
+      backoff: 100ms
 ```
