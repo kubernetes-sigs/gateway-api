@@ -335,9 +335,12 @@ type EndpointSelectorBackend struct {
   // resolution until the upstream EndpointSelector resource (KEP-6116) is
   // available. Implementations SHOULD set ownerReferences so the created
   // resource's lifecycle is tied to this Backend. Implementations MUST set
-  // the annotation "gateway.networking.k8s.io/controller-name" on the created
-  // Service to the controller name, to prevent conflicts with other
-  // controllers.
+  // the annotation "gateway.networking.x-k8s.io/controller-name" on the
+  // created Service to the controller name (i.e., the same value used as
+  // controllerName in GatewayClass objects), to prevent conflicts with other
+  // controllers. Implementations MUST only reconcile generated Services
+  // whose annotation matches their controller name and MUST ignore Services
+  // annotated for another controller.
   //
   // This Service only exists to produce EndpointSlices; Service-level
   // behaviors (including but not limited to internalTrafficPolicy,
@@ -346,9 +349,14 @@ type EndpointSelectorBackend struct {
   // SHOULD be set to Backend.spec.port.number.
   // Implementations SHOULD create the Service as headless (clusterIP: None),
   // since no ClusterIP or kube-proxy load balancing is needed.
-  // Implementations MUST name the Service with generateName rather than a
-  // predictable name, so that a name like <backend-name>-backend.svc.cluster.local
-  // does not become a relied-upon DNS entry.
+  // Implementations MUST give the Service an obfuscated name rather than a
+  // human-readable name derived from the Backend, so that a name like
+  // <backend-name>-backend.svc.cluster.local does not become a relied-upon
+  // DNS entry. Implementations MAY use generateName, or MAY derive a
+  // deterministic but obfuscated name (e.g., a hash of the Backend's
+  // namespace, name, and controllerName, or another implementation-specific
+  // seed), provided the resulting name is not reasonably guessable from the
+  // Backend's name alone.
   // </gateway:util:excludeFromCRD>
   //
   // +optional
@@ -722,6 +730,59 @@ the user's behalf instead. This is a stop-gap: the upstream EndpointSelector res
 session persistence, retries, and load balancing. A Service reuses endpoint-resolution machinery every
 implementation already has: it resolves EndpointSlices exactly as a `kind: Service` backendRef does today, with no
 new endpoint-management logic.
+
+The generated Service exists only to produce EndpointSlices, which is reflected in how it is shaped:
+- The name MUST be obfuscated so that a name like `<backend>-backend.svc.cluster.local` does not become a
+  relied-upon DNS entry.
+- The `gateway.networking.x-k8s.io/controller-name` annotation MUST be set to the implementation's
+  `controllerName` and implementations MUST only reconcile Services carrying their own controller name, allowing
+  multiple controllers to coexist.
+- An `ownerReference` SHOULD be set to tie the Service's lifecycle to the Backend.
+- The Service SHOULD be headless `clusterIP: None` with `targetPort` set to the Backend's port.
+- Service-level behaviors such as `internalTrafficPolicy`, `externalTrafficPolicy`, `sessionAffinity`, and
+  `trafficDistribution` play no role as no ClusterIP or kube-proxy load balancing is involved.
+
+#### Example
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: XBackend
+metadata:
+  name: my-backend
+  namespace: default
+  uid: 67ea5822-5ffb-4ba1-aa67-114b633e6588
+spec:
+  type: EndpointSelector
+  endpointSelector:
+    matchLabels:
+      app: backend
+  port:
+    number: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-x7k2p
+  namespace: default
+  annotations:
+    gateway.networking.k8s.io/controller-name: example.net/gateway-controller
+  ownerReferences:
+  - apiVersion: gateway.networking.x-k8s.io/v1alpha1
+    kind: XBackend
+    name: my-backend
+    uid: 67ea5822-5ffb-4ba1-aa67-114b633e6588
+spec:
+  type: ClusterIP
+  clusterIP: None
+  clusterIPs:
+  - None
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: backend
+```
 
 ## Extension Framework
 
