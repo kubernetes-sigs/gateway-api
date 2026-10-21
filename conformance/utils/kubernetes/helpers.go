@@ -1230,7 +1230,7 @@ func HTTPRouteMustHaveRouteAcceptedConditionsTrue(t *testing.T, client client.Cl
 
 func parentRefToString(p gatewayv1.ParentReference) string {
 	if p.Namespace != nil && *p.Namespace != "" {
-		return fmt.Sprintf("%v/%v", p.Namespace, p.Name)
+		return fmt.Sprintf("%v/%v", *p.Namespace, p.Name)
 	}
 	return string(p.Name)
 }

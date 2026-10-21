@@ -396,6 +396,36 @@ func Test_listenersMatch(t *testing.T) {
 	}
 }
 
+func Test_parentRefToString(t *testing.T) {
+	tests := []struct {
+		name string
+		ref  gatewayv1.ParentReference
+		want string
+	}{
+		{
+			name: "no namespace",
+			ref:  gatewayv1.ParentReference{Name: "gw"},
+			want: "gw",
+		},
+		{
+			name: "empty namespace",
+			ref:  gatewayv1.ParentReference{Name: "gw", Namespace: new(gatewayv1.Namespace(""))},
+			want: "gw",
+		},
+		{
+			name: "namespace is printed by value",
+			ref:  gatewayv1.ParentReference{Name: "gw", Namespace: new(gatewayv1.Namespace("ns1"))},
+			want: "ns1/gw",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, parentRefToString(test.ref))
+		})
+	}
+}
+
 // TestRouteMustHaveParentsIgnoresStaleControllerEntries seeds an entry that is
 // stale on purpose: it sits at generation 1 while the Route is at generation 2,
 // so the wait only succeeds if entries owned by StaleControllerName are left out
