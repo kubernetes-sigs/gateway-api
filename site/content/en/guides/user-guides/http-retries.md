@@ -2,8 +2,13 @@
 title: "HTTP retries"
 weight: 9
 ---
+
+{{< details title="Extended Support Feature: HTTPRouteRetry" open="true" >}}
+This feature is part of extended support, and requires your implementation to support the feature `HTTPRouteRetry`. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
+{{< /details >}}
+
 {{< details title="Standard Channel since v1.7.0" color="success" >}}
-The HTTPRoute `retry` field is GA and has been part of the Standard Channel since
+The HTTPRoute `retry` field has been part of the Standard Channel since
 `v1.7.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 {{< /details >}}
