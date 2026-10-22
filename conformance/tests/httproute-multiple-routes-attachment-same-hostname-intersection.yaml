@@ -137,7 +137,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /prefix/longer
+        value: /path/prefix
     backendRefs:
     - name: infra-backend-v1
       port: 8080
@@ -157,7 +157,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /prefix/longer
+        value: /path/prefix
       headers:
       - type: Exact
         name: Header-B
@@ -197,7 +197,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /prefix/longer
+        value: /path/prefix
     backendRefs:
     - name: infra-backend-v1
       port: 8080
@@ -217,7 +217,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /prefix/longer
+        value: /path/prefix
       headers:
       - type: Exact
         name: Header-B
