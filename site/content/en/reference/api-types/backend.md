@@ -20,8 +20,28 @@ should go and how the Gateway should connect to that destination.
 This is especially useful for:
 
 - Defining external destinations without synthetic `ExternalName` Services.
+- Defining internal (in-cluster) destinations without directly configuring a
+  `Service`.
 - Setting backend connection protocol expectations.
 - Defining backend TLS settings directly on the backend destination.
+
+## Internal (in-cluster) destinations
+
+`Backend` uses `spec.endpointSelector` for defining internal destinations. To
+use it, set `spec.type` to `EndpointSelector` and provide the labels of the
+workload Pods in `spec.endpointSelector.matchLabels`. Currently,
+`matchLabels` is the only supported endpoint selection mechanism.
+
+An `EndpointSelector` Backend decorates internal endpoints with Gateway-specific
+configuration, such as TLS and session persistence config. It is an additional
+way to represent an internal destination, not a replacement for `Service`. Routes
+can continue to target `Service` backends.
+
+Users configure only the `Backend` for the internal destinations. There is no
+need to create or manage a separate `Service` or endpoint resource. While the end
+goal is to use [EndpointSelector](https://github.com/kubernetes/enhancements/issues/6116),
+it is still being developed. Until then, the controller may use a `Service` behind
+the scenes to resolve endpoints.
 
 ## ExternalHostname vs ExternalName
 
@@ -48,18 +68,24 @@ this with admission and network-level controls.
 
 The specification of a [Backend][backend] consists of:
 
-- `Type` - Defines the backend type. Currently, `ExternalHostname` is supported.
+- `Type` - Defines the backend type: `EndpointSelector` for internal
+  destinations or `ExternalHostname` for external destinations.
 - `Port` - Defines the destination port used for backend connections.
+- `EndpointSelector` - Selects workload Pods by label when `type` is
+  `EndpointSelector`.
 - `ExternalHostname` - Defines the external FQDN destination when `type` is
   `ExternalHostname`.
+- `SessionPersistence` - Defines session persistence across endpoints when
+  `type` is `EndpointSelector`.
 - `Protocol` - Defines the protocol the implementation should use when
   connecting to the backend.
 - `TLS` - Defines TLS settings for backend connections.
 
-## Example
+## Examples
 
-The following example defines an external hostname backend and references it
-from an `HTTPRoute`.
+### External Destinations
+
+The following example defines an external hostname backend.
 
 ```yaml
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
@@ -69,12 +95,13 @@ metadata:
 spec:
   type: ExternalHostname
   port:
-    port: 443
+    number: 443
   externalHostname:
     hostname: api.openai.com
   tls:
     mode: ServerOnly
     validation:
+      wellKnownCACertificates: System
       hostname: api.openai.com
 ```
 
@@ -91,13 +118,32 @@ spec:
     - group: gateway.networking.x-k8s.io
       kind: XBackend
       name: openai-api
-      port: 443
+```
+
+### Internal (In-Cluster) Destinations
+
+The following example defines an internal backend by selecting workload Pods
+with the label `app: store`.
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XBackend
+metadata:
+  name: store-api
+spec:
+  type: EndpointSelector
+  port:
+    number: 8080
+  endpointSelector:
+    matchLabels:
+      app: store
 ```
 
 ## Status
 
-`Backend` status is reported through ancestor conditions in `status.ancestors`.
-These conditions indicate whether parent resources have accepted and programmed
-this backend destination.
+`Backend` status is reported for each associated ancestor in
+`status.ancestors`. The `Accepted` condition indicates whether the Backend has
+been accepted by the controller, while `ResolvedRefs` indicates whether all
+references in the Backend have been resolved.
 
 [backend]: /reference/api-spec/main/specx/#xbackend
