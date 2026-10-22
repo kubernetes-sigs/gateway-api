@@ -9,11 +9,14 @@ repo.
 
 ### Conformant
 
-Conformant implementations have submitted at least one conformance report that:
+Implementations may submit multiple conformance reports.
 
-  * All core conformance tests for at least one combination of Route type and
-    Profile
-  * All claimed Extended features for one of the two (2) most recent Gateway API releases.
+For a report to be Conformant, it:
+
+* MUST be from a _released_ version of the implementation, available to download and/or use via a tagged release number. Commit hashes are not acceptable, but this MAY be a prerelease, of a form like `v1.2.3-pre.0`, `v1.2.3-alpha1` or similar.
+* MUST have _all_ profiles in the report pass conformance, with a minimal number of test skips. Implementations can skip up to 5 tests _in total_ across the conformance report.
+* MUST have at least one report Conformant if multiple reports are submitted for different modes or similar reason.
+* MUST be for the most recent Gateway API release (`n`), or _one_ version before (`n-1`).
 
 So, it's conformant to support Mesh + HTTPRoute, or Gateway + HTTPRoute, or
 Gateway + TLSRoute, or Gateway + Mesh + HTTPRoute, plus any extended features
@@ -22,13 +25,14 @@ Profile and one Route type in that profile, and must pass all Core conformance
 tests for that Profile and Route type in addition to all claimed Extended
 features.
 
-### Partially Conformant
+Note that currently, it is proposed that in Gateway API v1.8, _no_ test skips are allowed.
 
-These implementations are aiming for full conformance but are not currently
-achieving it. They have submitted at least one conformance report passing some
-of the tests to be Conformant (as above) for one of the three (3) most recent
-Gateway API releases. Note that the requirements to be considered "partially
-conformant" may be tightened in a future release of Gateway API.
+### Stale
+
+For an implementation to have Stale conformance, it:
+
+* MUST have the first three points above be true (released version, all profiles pass, at least one report Conformant)
+* the supported Gateway API version is from exactly _two_ versions before the current release (`n-2`)
 
 ## Implementation traffic types
 
@@ -59,3 +63,10 @@ For help running the test suite, see the [Running the suite](/docs/conformance/r
 [reports-folder]: https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/
 [conformance-guide]: https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/README.md
 
+## Prerelease reports
+
+For handling prerelease reports, which we can use to prove that an implementation _will_ support a forthcoming feature, we will handle differently. The intent here is that they are used as evidence that we can graduate a feature from Experimental to Standard.
+
+Prerelease reports are stored in a different location and are _not_ used to generate conformance information such as the Implementations List, the feature matrices, or the feature wizard.
+
+Prerelease reports MAY use a commit hash rather than a tagged version, as they are evidence a feature has been implemented, not a record for end users.

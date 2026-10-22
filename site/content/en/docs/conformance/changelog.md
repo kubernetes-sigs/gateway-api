@@ -6,6 +6,24 @@ weight: 999
 This page lists changes made to the Gateway API conformance process, descending by version.
 Only versions that included changes to conformance are listed.
 
+## PROPOSED for Gateway API v1.8
+
+* Core behavior conformance test skips are not allowed, and render a profile nonconformant.
+
+## Gateway API v1.7
+
+* ALL profiles in a report must now be conformant for the report to be conformant.
+* Implementations are conformant as long as one entire report is Conformant.
+* The Partial Conformance state is removed. Implementations are either conformant or they are not.
+* Re-introduce the idea of Stale conformance, and apply it only to Gateway API version `n-2`.
+This effectively moves the Partial Conformance due to stale supports to the Stale state.
+* No core test skips are allowed, and only 5 tests _in total_ across a report are allowed.
+* Conformance reports may only be submitted from released versions, which must be tagged
+and usable by the public.
+* Add a new process for prerelase reports, which may be commit hashes, and are used
+for proving that an implementation _will_ support a Gateway API version.
+
+
 ## Gateway API v1.6
 
 * Stale category removed.
