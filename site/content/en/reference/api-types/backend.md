@@ -87,57 +87,14 @@ The specification of a [Backend][backend] consists of:
 
 The following example defines an external hostname backend.
 
-```yaml
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XBackend
-metadata:
-  name: openai-api
-spec:
-  type: ExternalHostname
-  port:
-    number: 443
-  externalHostname:
-    hostname: api.openai.com
-  tls:
-    mode: ServerOnly
-    validation:
-      wellKnownCACertificates: System
-      hostname: api.openai.com
-```
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: external-api-route
-spec:
-  parentRefs:
-  - name: my-gateway
-  rules:
-  - backendRefs:
-    - group: gateway.networking.x-k8s.io
-      kind: XBackend
-      name: openai-api
-```
+{{< readfile file="/examples/experimental/xbackend/external.yaml" code="true" lang="yaml" >}}
 
 ### Internal (In-Cluster) Destinations
 
 The following example defines an internal backend by selecting workload Pods
 with the label `app: store`.
 
-```yaml
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XBackend
-metadata:
-  name: store-api
-spec:
-  type: EndpointSelector
-  port:
-    number: 8080
-  endpointSelector:
-    matchLabels:
-      app: store
-```
+{{< readfile file="/examples/experimental/xbackend/internal.yaml" code="true" lang="yaml" >}}
 
 ## Status
 
