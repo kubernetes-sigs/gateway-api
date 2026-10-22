@@ -27,6 +27,8 @@ import (
 //
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
+//
+// <gateway:experimental:validation:XValidation:message="filters may only be set when protocol is HTTP or HTTPS",rule="!has(self.filters) || self.protocol in ['HTTP', 'HTTPS']">
 type ListenerApplyConfiguration struct {
 	// Name is the name of the Listener. This name MUST be unique within a
 	// Gateway.
@@ -80,11 +82,14 @@ type ListenerApplyConfiguration struct {
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
 	// Support: Core
+	//
 	Hostname *apisv1.Hostname `json:"hostname,omitempty"`
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
 	//
 	// Support: Core
+	//
+	//
 	Port *int32 `json:"port,omitempty"`
 	// Protocol specifies the network protocol this listener expects to receive.
 	//
@@ -101,6 +106,7 @@ type ListenerApplyConfiguration struct {
 	// available certificates for any TLS handshake.
 	//
 	// Support: Core
+	//
 	TLS *ListenerTLSConfigApplyConfiguration `json:"tls,omitempty"`
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -127,6 +133,16 @@ type ListenerApplyConfiguration struct {
 	//
 	// Support: Core
 	AllowedRoutes *AllowedRoutesApplyConfiguration `json:"allowedRoutes,omitempty"`
+	// Filters groups the pre-routing filter lists that run on every
+	// request accepted on this Listener, before route matching is
+	// performed. Filters is only valid when Protocol is `HTTP` or
+	// `HTTPS`; this constraint is enforced by CEL validation on the
+	// enclosing Listener struct.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	Filters *ListenerFiltersApplyConfiguration `json:"filters,omitempty"`
 }
 
 // ListenerApplyConfiguration constructs a declarative configuration of the Listener type for use with
@@ -180,5 +196,13 @@ func (b *ListenerApplyConfiguration) WithTLS(value *ListenerTLSConfigApplyConfig
 // If called multiple times, the AllowedRoutes field is set to the value of the last call.
 func (b *ListenerApplyConfiguration) WithAllowedRoutes(value *AllowedRoutesApplyConfiguration) *ListenerApplyConfiguration {
 	b.AllowedRoutes = value
+	return b
+}
+
+// WithFilters sets the Filters field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Filters field is set to the value of the last call.
+func (b *ListenerApplyConfiguration) WithFilters(value *ListenerFiltersApplyConfiguration) *ListenerApplyConfiguration {
+	b.Filters = value
 	return b
 }

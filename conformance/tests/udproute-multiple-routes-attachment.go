@@ -29,7 +29,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
@@ -49,7 +48,6 @@ var UDPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportUDPRoute,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		gwNN := types.NamespacedName{Name: "udp-multi-route-attach-gateway", Namespace: ns}
@@ -67,29 +65,25 @@ var UDPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 		// is strictly newer than the first.
 		time.Sleep(time.Second)
 
-		newerRoute := &v1alpha2.UDPRoute{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      newerRouteNN.Name,
-				Namespace: newerRouteNN.Namespace,
-			},
-			Spec: v1alpha2.UDPRouteSpec{
+		newerRoute := &gatewayv1.UDPRoute{
+			Name:      newerRouteNN.Name,
+			Namespace: newerRouteNN.Namespace,
+			Spec: gatewayv1.UDPRouteSpec{
 				CommonRouteSpec: gatewayv1.CommonRouteSpec{
 					ParentRefs: []gatewayv1.ParentReference{{
 						Name:        gatewayv1.ObjectName(gwNN.Name),
 						SectionName: ptr.To(gatewayv1.SectionName("udp")),
 					}},
 				},
-				Rules: []v1alpha2.UDPRouteRule{{
+				Rules: []gatewayv1.UDPRouteRule{{
 					BackendRefs: []gatewayv1.BackendRef{{
-						BackendObjectReference: gatewayv1.BackendObjectReference{
-							Name: gatewayv1.ObjectName("udp-attach-backend-2"),
-							Port: ptr.To(gatewayv1.PortNumber(8080)),
-						},
+						Name: gatewayv1.ObjectName("udp-attach-backend-2"),
+						Port: ptr.To(gatewayv1.PortNumber(8080)),
 					}},
 				}},
 			},
 		}
-		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{newerRoute}, suite.Cleanup)
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{newerRoute}, suite.CleanupTestResources)
 
 		acceptedCond := metav1.Condition{
 			Type:   string(gatewayv1.RouteConditionAccepted),

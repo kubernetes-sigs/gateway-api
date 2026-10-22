@@ -42,21 +42,21 @@ _Appears in:_
 {{- end }}
 
 {{ if $type.Members -}}
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
+| Field | Description |
+| --- | --- |
 {{ if $type.GVK -}}
-| `apiVersion` _string_ | `{{ $type.GVK.Group }}/{{ $type.GVK.Version }}` | | |
-| `kind` _string_ | `{{ $type.GVK.Kind }}` | | |
+| `apiVersion` _string_ | `{{ $type.GVK.Group }}/{{ $type.GVK.Version }}` |
+| `kind` _string_ | `{{ $type.GVK.Kind }}` |
 {{ end -}}
 
 {{ range $type.Members -}}
-| `{{ .Name  }}` _{{ markdownRenderType .Type }}_ {{- if contains "<gateway:experimental>" .Doc -}}<br /> :warning: **Experimental**{{ end -}}{{- if contains "<gateway:union:" .Doc -}}<br /> :link: **Union Feature**: works with {{ template "unionFeatureLinks" .Doc }}{{ end -}}| {{ template "type_members" . }} | {{ markdownRenderDefault .Default }} | {{ range .Validation -}} {{ markdownRenderFieldDoc . }} <br />{{ end }} |
+| `{{ .Name  }}`<br />_{{ markdownRenderType .Type }}_{{- if contains "<gateway:experimental>" .Doc -}}<br /> :warning: **Experimental**{{ end -}}{{- if contains "<gateway:union:" .Doc -}}<br /> :link: **Union Feature**: works with {{ template "unionFeatureLinks" .Doc }}{{ end -}}{{- if .Default }}<p>Default: {{ markdownRenderDefault .Default }}</p>{{ end -}}<p>**Validations:**<br />{{ range .Validation -}}{{ markdownRenderValidation . }}<br />{{ end }}</p>| {{ template "type_members" . }} |
 {{ end -}}
 
 {{ end -}}
 
 {{ if $type.EnumValues -}} 
-| Field | Description |
+| Enum Value | Description |
 | --- | --- |
 {{ range $type.EnumValues -}}
 | `{{ .Name }}` | {{ markdownRenderFieldDoc .Doc }} |

@@ -93,10 +93,8 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 						SNI:  "https-listener.org",
 					},
 					ExpectedRequest: &h.ExpectedRequest{
-						Request: h.Request{
-							Path: "/backendtlspolicy",
-							SNI:  "abc.example.com",
-						},
+						Path: "/backendtlspolicy",
+						SNI:  "abc.example.com",
 					},
 					Response: h.Response{StatusCodes: []int{200}},
 				})
@@ -179,10 +177,8 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 			// Create test specific ConfigMap with copied CA data
 			testCMName := "tls-checks-ca-certificate-reconcile-test"
 			testCM := &corev1.ConfigMap{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      testCMName,
-					Namespace: ns,
-				},
+				Name:      testCMName,
+				Namespace: ns,
 				Data: map[string]string{
 					"ca.crt": originalCAData,
 				},
@@ -219,7 +215,7 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, invalidAcceptedCond)
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, invalidResolvedRefsCond)
-			suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{testCM}, suite.Cleanup)
+			suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{testCM}, suite.CleanupTestResources)
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, acceptedCond)
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, resolvedRefsCond)
 

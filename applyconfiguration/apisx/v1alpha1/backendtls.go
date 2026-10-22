@@ -29,12 +29,19 @@ import (
 // BackendTLS defines TLS configuration for connecting to a backend.
 type BackendTLSApplyConfiguration struct {
 	// Mode defines the TLS mode for the backend connection.
+	//
+	// Support: Core - None
+	//
+	// Support: Extended - ServerOnly, ClientAndServer
+	//
 	Mode *apisxv1alpha1.BackendTLSMode `json:"mode,omitempty"`
 	// ClientCertificateRef is a reference to a Secret containing the client
 	// TLS certificate and private key for mutual TLS. This field is required
 	// when mode is ClientAndServer and must be unset otherwise.
+	//
 	ClientCertificateRef *v1.SecretObjectReferenceApplyConfiguration `json:"clientCertificateRef,omitempty"`
 	// Validation contains TLS validation configuration for the backend connection.
+	//
 	Validation *v1.BackendTLSPolicyValidationApplyConfiguration `json:"validation,omitempty"`
 }
 

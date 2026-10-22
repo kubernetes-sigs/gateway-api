@@ -35,7 +35,7 @@ import (
 // XBackendTrafficPolicy defines the configuration for how traffic to a
 // target backend should be handled.
 type XBackendTrafficPolicyApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of BackendTrafficPolicy.
 	Spec *BackendTrafficPolicySpecApplyConfiguration `json:"spec,omitempty"`

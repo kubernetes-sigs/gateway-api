@@ -41,7 +41,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -51,6 +50,18 @@ import (
 // Accepted or Provisioned in its default state. This is generally helpful for
 // tests which validate fixing broken Gateways, e.t.c.
 const GatewayExcludedFromReadinessChecks = "gateway-api/skip-this-for-readiness"
+
+// StaleControllerName is a controllerName that tests can put on a Route
+// status.parents or Policy status.ancestors entry to stand in for another
+// implementation sharing the cluster. Nothing reconciles such an entry, so the
+// status helpers leave its observedGeneration alone.
+const StaleControllerName = gatewayv1.GatewayController("gateway.networking.k8s.io/stale-controller")
+
+// StaleConditionType is a condition type that tests can seed into a status
+// conditions list to stand in for a condition owned by another controller.
+// Nothing reconciles such a condition, so FilterStaleConditions leaves its
+// observedGeneration alone.
+const StaleConditionType = "conformance.gateway.networking.k8s.io/StaleCondition"
 
 const GatewayKind = gatewayv1.Kind("Gateway")
 
@@ -239,10 +250,15 @@ func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []meta
 }
 
 // FilterStaleConditions returns the list of status condition whose observedGeneration does not
-// match the object's metadata.Generation
+// match the object's metadata.Generation. Conditions of StaleConditionType are
+// exempt: they belong to no controller, so they never catch up.
 func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []metav1.Condition {
 	stale := make([]metav1.Condition, 0, len(conditions))
 	for _, condition := range conditions {
+		if condition.Type == StaleConditionType {
+			continue
+		}
+
 		if obj.GetGeneration() != condition.ObservedGeneration {
 			stale = append(stale, condition)
 		}
@@ -516,7 +532,7 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
 func GatewayAndUDPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &v1alpha2.UDPRoute{}, true, routeNNs...)
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.UDPRoute{}, true, routeNNs...)
 }
 
 // WaitForGatewayAddress waits until at least one IP Address has been set in the
@@ -774,7 +790,7 @@ func TLSRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 }
 
 // RouteTypeMustHaveParentsField ensures the provided routeType has a
-// routeType.Status.Parents field of type []v1alpha2.RouteParentStatus.
+// routeType.Status.Parents field of type []gatewayv1.RouteParentStatus.
 func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 	t.Helper()
 	routeTypePointerObj := reflect.TypeOf(routeType)
@@ -788,9 +804,26 @@ func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 
 	parentsField, ok := statusField.Type.FieldByName("Parents")
 	require.True(t, ok, "%s.Status does not have a Parents field", routeTypeName)
-	require.Equal(t, parentsField.Type, reflect.TypeFor[[]v1alpha2.RouteParentStatus]())
+	require.Equal(t, parentsField.Type, reflect.TypeFor[[]gatewayv1.RouteParentStatus]())
 
 	return routeTypeName
+}
+
+// staleParentStatus returns the first status entry whose conditions have not
+// caught up with the object generation. Entries owned by StaleControllerName
+// are exempt: nothing reconciles them, so their observedGeneration never moves.
+func staleParentStatus(obj metav1.Object, parents []gatewayv1.RouteParentStatus) (gatewayv1.RouteParentStatus, error) {
+	for _, parent := range parents {
+		if parent.ControllerName == StaleControllerName {
+			continue
+		}
+
+		if err := ConditionsHaveLatestObservedGeneration(obj, parent.Conditions); err != nil {
+			return parent, err
+		}
+	}
+
+	return gatewayv1.RouteParentStatus{}, nil
 }
 
 func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool, routeType any) {
@@ -811,14 +844,13 @@ func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.
 			return false, fmt.Errorf("error fetching %s: %w", routeTypeName, err)
 		}
 
-		for _, parent := range actual {
-			if err := ConditionsHaveLatestObservedGeneration(metaObj, parent.Conditions); err != nil {
-				tlog.Logf(t, "%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
-				return false, nil
-			}
+		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]gatewayv1.RouteParentStatus)
+
+		if parent, err := staleParentStatus(metaObj, actual); err != nil {
+			tlog.Logf(t, "%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
+			return false, nil
 		}
 
-		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]v1alpha2.RouteParentStatus)
 		return parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s to have parents matching expectations", routeTypeName)
@@ -835,14 +867,14 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 // in status that match the expected parents. This will cause the test to halt
 // if the specified timeout is exceeded.
 func UDPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
-	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1alpha2.UDPRoute{})
+	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &gatewayv1.UDPRoute{})
 }
 
 // TCPRouteMustHaveParents waits for the specified TCPRoute to have parents
 // in status that match the expected parents. This will cause the test to halt
 // if the specified timeout is exceeded.
 func TCPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
-	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1alpha2.TCPRoute{})
+	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &gatewayv1.TCPRoute{})
 }
 
 // TCPRouteMustHaveCondition checks that the supplied TCPRoute has the supplied Condition,
@@ -851,7 +883,7 @@ func TCPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.TCPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.TCPRoute{}
+		route := &gatewayv1.TCPRoute{}
 		err := client.Get(ctx, routeNN, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TCPRoute: %w", err)
@@ -886,7 +918,7 @@ func UDPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.UDPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.UDPRoute{}
+		route := &gatewayv1.UDPRoute{}
 		err := client.Get(ctx, routeNN, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching UDPRoute: %w", err)
@@ -924,7 +956,7 @@ func TCPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 	emptyChecked := false
 	// We explicitly do not use timeoutConfig.DefaultPollInterval here since we are doing negative testing
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.TCPRoute{}
+		route := &gatewayv1.TCPRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TCPRoute: %w", err)
@@ -966,7 +998,7 @@ func TCPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
 func GatewayAndTCPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &v1alpha2.TCPRoute{}, true, routeNNs...)
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.TCPRoute{}, true, routeNNs...)
 }
 
 // TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
@@ -1129,7 +1161,7 @@ func UDPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 	emptyChecked := false
 	// We explicitly do not use timeoutConfig.DefaultPollInterval here since we are doing negative testing
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.UDPRoute{}
+		route := &gatewayv1.UDPRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching UDPRoute: %w", err)
@@ -1198,7 +1230,7 @@ func HTTPRouteMustHaveRouteAcceptedConditionsTrue(t *testing.T, client client.Cl
 
 func parentRefToString(p gatewayv1.ParentReference) string {
 	if p.Namespace != nil && *p.Namespace != "" {
-		return fmt.Sprintf("%v/%v", p.Namespace, p.Name)
+		return fmt.Sprintf("%v/%v", *p.Namespace, p.Name)
 	}
 	return string(p.Name)
 }
@@ -1628,6 +1660,10 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 		}
 
 		for _, parent := range policy.Status.Ancestors {
+			if parent.ControllerName == StaleControllerName {
+				continue
+			}
+
 			if err := ConditionsHaveLatestObservedGeneration(policy, parent.Conditions); err != nil {
 				tlog.Logf(t, "BackendTLSPolicy %s (parentRef=%v) %v",
 					policyNN, parentRefToString(parent.AncestorRef), err,
@@ -1662,6 +1698,10 @@ func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *gatewayv1.Backend
 	t.Helper()
 
 	for _, ancestor := range r.Status.Ancestors {
+		if ancestor.ControllerName == StaleControllerName {
+			continue
+		}
+
 		if err := ConditionsHaveLatestObservedGeneration(r, ancestor.Conditions); err != nil {
 			tlog.Fatalf(t, "BackendTLSPolicy(controller=%v, ancestorRef=%#v) %v", ancestor.ControllerName, parentRefToString(ancestor.AncestorRef), err)
 		}
@@ -1733,7 +1773,7 @@ func GetGatewayProgrammedCondition() metav1.Condition {
 // NOTE: Used in Gateway API Inference Extension conformance.
 func DeleteHTTPRoute(t *testing.T, c client.Client, routeNN types.NamespacedName) {
 	httpRoute := &gatewayv1.HTTPRoute{
-		ObjectMeta: metav1.ObjectMeta{Name: routeNN.Name, Namespace: routeNN.Namespace},
+		Name: routeNN.Name, Namespace: routeNN.Namespace,
 	}
 	t.Logf("Deleting HTTPRoute %s", routeNN.String())
 	require.NoError(t, c.Delete(context.TODO(), httpRoute), "failed to delete httproute %s", routeNN.String())

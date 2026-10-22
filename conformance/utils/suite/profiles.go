@@ -103,10 +103,13 @@ var (
 			features.SupportReferenceGrant,
 			features.SupportTLSRoute,
 		),
-		ExtendedFeatures: features.SetsToNamesSet(
-			features.GatewayExtendedFeatures,
-			features.TLSRouteExtendedFeatures,
-		),
+		ExtendedFeatures: sets.New[features.FeatureName]().
+			Insert(features.SetsToNamesSet(
+				features.GatewayExtendedFeatures,
+				features.TLSRouteExtendedFeatures,
+				features.BackendTLSPolicyCoreFeatures,
+				features.BackendTLSPolicyExtendedFeatures,
+			).UnsortedList()...),
 	}
 
 	// GatewayTCPConformanceProfile is a ConformanceProfile that covers testing TCP
@@ -148,7 +151,12 @@ var (
 			features.SupportReferenceGrant,
 			features.SupportGRPCRoute,
 		),
-		ExtendedFeatures: features.SetsToNamesSet(features.GatewayExtendedFeatures),
+		ExtendedFeatures: sets.New[features.FeatureName]().
+			Insert(features.SetsToNamesSet(
+				features.GatewayExtendedFeatures,
+				features.BackendTLSPolicyCoreFeatures,
+				features.BackendTLSPolicyExtendedFeatures,
+			).UnsortedList()...),
 	}
 
 	// MeshHTTPConformanceProfile is a ConformanceProfile that covers testing HTTP

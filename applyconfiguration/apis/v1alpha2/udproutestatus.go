@@ -27,7 +27,7 @@ import (
 //
 // UDPRouteStatus defines the observed state of UDPRoute.
 type UDPRouteStatusApplyConfiguration struct {
-	v1.RouteStatusApplyConfiguration `json:",inline"`
+	v1.RouteStatusApplyConfiguration `json:""`
 }
 
 // UDPRouteStatusApplyConfiguration constructs a declarative configuration of the UDPRouteStatus type for use with

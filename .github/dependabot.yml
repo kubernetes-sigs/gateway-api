@@ -1,4 +1,13 @@
 version: 2
+multi-ecosystem-groups:
+  gateway-api-conformance-images:
+    schedule:
+      interval: "daily"
+    labels:
+      - dependencies
+      - ok-to-test
+      - release-note-none
+      - ail/0
 updates:
   # Dependencies listed in go.mod
   - package-ecosystem: "gomod"
@@ -15,47 +24,51 @@ updates:
           - "k8s.io/*"
           - "sigs.k8s.io/*"
       k8s.io: # Group k8s.io golang dependencies updates
-          patterns:
-            - "k8s.io/*"
-            - "sigs.k8s.io/*"
-    labels:
-      - go
-      - dependencies
-      - ok-to-test
-      - release-note-none
-
-  # Dependencies listed in conformance/echo-basic/go.mod
-  - package-ecosystem: "gomod"
-    directory: "/conformance/echo-basic/" # Location of package manifests
-    schedule:
-      interval: "weekly"
-    groups:
-      non-k8s:
         patterns:
-          - "*"
+          - "k8s.io/*"
+          - "sigs.k8s.io/*"
         exclude-patterns:
-          - "k8s.io/*"
-          - "sigs.k8s.io/*"
-      k8s.io: # Group k8s.io golang dependencies updates
-        patterns:
-          - "k8s.io/*"
-          - "sigs.k8s.io/*"
+          - "sigs.k8s.io/gateway-api-conformance-images"
+    ignore:
+      - dependency-name: "sigs.k8s.io/gateway-api-conformance-images"
     labels:
       - go
       - dependencies
       - ok-to-test
       - release-note-none
-
-  # Dependencies listed in Dockerfile
-  - package-ecosystem: "docker"
+      - ail/0
+  - package-ecosystem: "gomod"
     directory: "/"
+    patterns:
+      - "sigs.k8s.io/gateway-api-conformance-images"
+    multi-ecosystem-group: "gateway-api-conformance-images"
+
+  # Images listed in Dockerfile or Kubernetes manifests
+  - package-ecosystem: "docker"
+    directories:
+      - "/conformance/base"
+      - "/conformance/mesh"
+      - "/conformance/tests"
+      - "/conformance/tests/mesh"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    ignore:
+      - dependency-name: "gateway-api/conformance/*"
     labels:
       - docker
       - dependencies
       - ok-to-test
       - release-note-none
+      - ail/0
+  - package-ecosystem: "docker"
+    directories:
+      - "/conformance/base"
+      - "/conformance/mesh"
+      - "/conformance/tests"
+      - "/conformance/tests/mesh"
+    patterns:
+      - "gateway-api/conformance/*"
+    multi-ecosystem-group: "gateway-api-conformance-images"
 
   #  Github actions updates
   - package-ecosystem: "github-actions"
@@ -77,5 +90,6 @@ updates:
       - dependencies
       - ok-to-test
       - release-note-none
+      - ail/0
 
 

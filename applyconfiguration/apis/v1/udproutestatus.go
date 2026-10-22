@@ -23,7 +23,7 @@ package v1
 //
 // UDPRouteStatus defines the observed state of UDPRoute.
 type UDPRouteStatusApplyConfiguration struct {
-	RouteStatusApplyConfiguration `json:",inline"`
+	RouteStatusApplyConfiguration `json:""`
 }
 
 // UDPRouteStatusApplyConfiguration constructs a declarative configuration of the UDPRouteStatus type for use with

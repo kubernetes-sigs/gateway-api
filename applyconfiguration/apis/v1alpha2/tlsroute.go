@@ -34,7 +34,7 @@ import (
 // to match against TLS-specific metadata. This allows more flexibility
 // in matching streams for a given TLS listener.
 type TLSRouteApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of TLSRoute.
 	Spec *TLSRouteSpecApplyConfiguration `json:"spec,omitempty"`

@@ -34,11 +34,39 @@ import (
 )
 
 // HTTPRouteInformer provides access to a shared informer and lister for
-// HTTPRoutes.
+// HTTPRoutes. Prefer using the type-safe variant (see [TypedHTTPRouteInformer]).
 type HTTPRouteInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1beta1.HTTPRouteLister
 }
+
+// TypedHTTPRouteInformer provides access to a shared informer and lister for
+// HTTPRoutes, including the type-safe TypedInformer variant.
+// It is a superset of HTTPRouteInformer.
+type TypedHTTPRouteInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() HTTPRouteIndexInformer
+	Lister() apisv1beta1.HTTPRouteLister
+}
+
+// HTTPRouteIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type HTTPRouteIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1beta1.HTTPRoute]
+
+// HTTPRouteHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for HTTPRoute.
+type HTTPRouteHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1beta1.HTTPRoute]
+
+// HTTPRouteDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for HTTPRoute.
+type HTTPRouteDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1beta1.HTTPRoute]
+
+// HTTPRouteFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for HTTPRoute.
+type HTTPRouteFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1beta1.HTTPRoute]
+
+// HTTPRouteIndexers is a specialization of [cache.TypedIndexers] for HTTPRoute.
+type HTTPRouteIndexers = cache.TypedIndexers[*gatewayapiapisv1beta1.HTTPRoute]
+
+// DeletedHTTPRoute is a specialization of [cache.DeletedObject] for HTTPRoute.
+type DeletedHTTPRoute = cache.DeletedObject[*gatewayapiapisv1beta1.HTTPRoute]
 
 type hTTPRouteInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type hTTPRouteInformer struct {
 // NewHTTPRouteInformer constructs a new informer for HTTPRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedHTTPRouteInformer]).
 func NewHTTPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewHTTPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedHTTPRouteInformer constructs a new informer for HTTPRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedHTTPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers HTTPRouteIndexers) HTTPRouteIndexInformer {
+	return NewTypedHTTPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredHTTPRouteInformer constructs a new informer for HTTPRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredHTTPRouteInformer]).
 func NewFilteredHTTPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewHTTPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedHTTPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredHTTPRouteInformer constructs a new informer for HTTPRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredHTTPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers HTTPRouteIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) HTTPRouteIndexInformer {
+	return NewTypedHTTPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewHTTPRouteInformerWithOptions constructs a new informer for HTTPRoute type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedHTTPRouteInformerWithOptions]).
 func NewHTTPRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedHTTPRouteInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedHTTPRouteInformerWithOptions constructs a new informer for HTTPRoute type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedHTTPRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) HTTPRouteIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1beta1", Resource: "httproutes"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1beta1.HTTPRoute](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewHTTPRouteInformerWithOptions(client versioned.Interface, namespace strin
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *hTTPRouteInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewHTTPRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedHTTPRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *hTTPRouteInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1beta1.HTTPRoute{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *hTTPRouteInformer) TypedInformer() HTTPRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1beta1.HTTPRoute](f.factory.InformerFor(&gatewayapiapisv1beta1.HTTPRoute{}, f.defaultInformer))
 }
 
 func (f *hTTPRouteInformer) Lister() apisv1beta1.HTTPRouteLister {
 	return apisv1beta1.NewHTTPRouteLister(f.Informer().GetIndexer())
+}
+
+// ToTypedHTTPRouteInformer converts an untyped informer into a TypedHTTPRouteInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *HTTPRoute. If that is not the case, calling type-safe methods of the returned
+// TypedHTTPRouteInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedHTTPRouteInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedHTTPRouteInformer(informer HTTPRouteInformer) TypedHTTPRouteInformer {
+	if informer, ok := informer.(TypedHTTPRouteInformer); ok {
+		return informer
+	}
+	return &hTTPRouteTypedInformerAdapter{informer}
+}
+
+type hTTPRouteTypedInformerAdapter struct {
+	HTTPRouteInformer
+}
+
+func (a *hTTPRouteTypedInformerAdapter) TypedInformer() HTTPRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1beta1.HTTPRoute](a.Informer())
+}
+
+// ToHTTPRouteIndexInformer converts an untyped informer into a HTTPRouteIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *HTTPRoute. If that is not the case, calling type-safe methods of the returned
+// HTTPRouteIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a HTTPRouteIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToHTTPRouteIndexInformer(informer cache.SharedIndexInformer) HTTPRouteIndexInformer {
+	if informer, ok := informer.(HTTPRouteIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1beta1.HTTPRoute](informer)
 }

@@ -31,7 +31,7 @@ import (
 // GRPCRouteApplyConfiguration represents a declarative configuration of the GRPCRoute type for use
 // with apply.
 type GRPCRouteApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of GRPCRoute.
 	Spec *apisv1.GRPCRouteSpecApplyConfiguration `json:"spec,omitempty"`

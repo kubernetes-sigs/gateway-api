@@ -38,7 +38,6 @@ var MeshHTTPRouteNamedRule = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportMeshHTTPRouteNamedRouteRule,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := suite.MeshNamespace
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
@@ -46,12 +45,12 @@ var MeshHTTPRouteNamedRule = suite.ConformanceTest{
 		testCases := []http.ExpectedResponse{
 			{
 				Request:         http.Request{Path: "/named"},
-				ExpectedRequest: &http.ExpectedRequest{Request: http.Request{Path: "/named"}},
+				ExpectedRequest: &http.ExpectedRequest{Path: "/named"},
 				Backend:         "echo-v1",
 				Namespace:       ns,
 			}, {
 				Request:         http.Request{Path: "/unnamed"},
-				ExpectedRequest: &http.ExpectedRequest{Request: http.Request{Path: "/named"}},
+				ExpectedRequest: &http.ExpectedRequest{Path: "/named"},
 				Backend:         "echo-v2",
 				Namespace:       ns,
 			},

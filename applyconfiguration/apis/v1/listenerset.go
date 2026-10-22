@@ -59,11 +59,12 @@ import (
 // - The ListenerSet has a valid ParentRef selecting the Gateway
 // - The ListenerSet's status has the condition "Accepted: true"
 type ListenerSetApplyConfiguration struct {
-	metav1.TypeMetaApplyConfiguration    `json:",inline"`
+	metav1.TypeMetaApplyConfiguration    `json:""`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of ListenerSet.
 	Spec *ListenerSetSpecApplyConfiguration `json:"spec,omitempty"`
 	// Status defines the current state of ListenerSet.
+	//
 	Status *ListenerSetStatusApplyConfiguration `json:"status,omitempty"`
 }
 

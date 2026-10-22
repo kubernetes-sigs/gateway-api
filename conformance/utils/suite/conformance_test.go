@@ -54,11 +54,13 @@ func TestParseKeyValuePairs(t *testing.T) {
 		"",
 		"a=b",
 		"b=c,d=e,f=g",
+		"example.com/url=https://x.test/path?a=b",
 	}
 	labels := []map[string]string{
 		nil,
 		{"a": "b"},
 		{"b": "c", "d": "e", "f": "g"},
+		{"example.com/url": "https://x.test/path?a=b"},
 	}
 
 	for i, f := range flags {

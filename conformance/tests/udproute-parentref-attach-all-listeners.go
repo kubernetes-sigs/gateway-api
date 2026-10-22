@@ -41,7 +41,6 @@ var UDPRouteParentRefAttachAllListeners = confsuite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportUDPRoute,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		gwNN := types.NamespacedName{Name: "udp-attach-all-listeners-gateway", Namespace: ns}
@@ -126,7 +125,7 @@ var UDPRouteParentRefAttachAllListeners = confsuite.ConformanceTest{
 				if err != nil {
 					t.Fatalf("error getting gateway address for listener %q: %v", listener, err)
 				}
-				udp.ExpectEchoResponseFromBackend(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr, udp.ExpectedResponse{
+				udp.ExpectEchoResponseFromBackend(t, suite.TimeoutConfig, gwAddr, udp.ExpectedResponse{
 					Service:   backend,
 					Namespace: ns,
 				})

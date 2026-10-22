@@ -40,6 +40,10 @@ func (c *FakeExperimentalV1alpha1) XMeshes() v1alpha1.XMeshInterface {
 	return newFakeXMeshes(c)
 }
 
+func (c *FakeExperimentalV1alpha1) XTelemetryPolicies(namespace string) v1alpha1.XTelemetryPolicyInterface {
+	return newFakeXTelemetryPolicies(c, namespace)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeExperimentalV1alpha1) RESTClient() rest.Interface {

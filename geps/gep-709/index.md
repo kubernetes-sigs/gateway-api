@@ -75,11 +75,11 @@ metadata:
   namespace: bar
 spec:
   from:
-  - group: networking.gateway.k8s.io
+  - group: gateway.networking.k8s.io
     kind: HTTPRoute
     namespace: foo
   to:
-  - group: core
+  - group: ""
     kind: Service
 ```
 

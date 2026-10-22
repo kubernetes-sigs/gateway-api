@@ -31,7 +31,7 @@ import (
 // BackendTLSPolicyApplyConfiguration represents a declarative configuration of the BackendTLSPolicy type for use
 // with apply.
 type BackendTLSPolicyApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of BackendTLSPolicy.
 	Spec *apisv1.BackendTLSPolicySpecApplyConfiguration `json:"spec,omitempty"`

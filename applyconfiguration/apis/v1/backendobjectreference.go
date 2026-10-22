@@ -44,9 +44,12 @@ import (
 // If the backend service requires TLS, use BackendTLSPolicy to tell the
 // implementation to supply the TLS details to be used to connect to that
 // backend.
+//
+// <gateway:experimental:validation:XValidation:message="Must not have port for Backend reference",rule="(self.group == 'gateway.networking.x-k8s.io' && self.kind == 'XBackend') ? !has(self.port) : true">
 type BackendObjectReferenceApplyConfiguration struct {
 	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
 	// When unspecified or empty string, core API group is inferred.
+	//
 	Group *apisv1.Group `json:"group,omitempty"`
 	// Kind is the Kubernetes resource kind of the referent. For example
 	// "Service".
@@ -62,6 +65,7 @@ type BackendObjectReferenceApplyConfiguration struct {
 	// Support: Core (Services with a type other than ExternalName)
 	//
 	// Support: Implementation-specific (Services with type ExternalName)
+	//
 	Kind *apisv1.Kind `json:"kind,omitempty"`
 	// Name is the name of the referent.
 	Name *apisv1.ObjectName `json:"name,omitempty"`
@@ -74,12 +78,14 @@ type BackendObjectReferenceApplyConfiguration struct {
 	// documentation for details.
 	//
 	// Support: Core
+	//
 	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 	// Port specifies the destination port number to use for this resource.
 	// Port is required when the referent is a Kubernetes Service. In this
 	// case, the port number is the service port number, not the target port.
 	// For other resources, destination port might be derived from the referent
 	// resource or this field.
+	//
 	Port *int32 `json:"port,omitempty"`
 }
 

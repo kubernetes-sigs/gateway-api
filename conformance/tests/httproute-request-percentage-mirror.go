@@ -62,7 +62,6 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteRequestPercentageMirror,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		var (
 			ns      = confsuite.InfrastructureNamespace
@@ -78,36 +77,28 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 				Request:   http.Request{Path: "/percent-mirror"},
 				Namespace: ns,
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/percent-mirror",
-					},
+					Path: "/percent-mirror",
 				},
 				Backend: confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV2,
-							Namespace: ns,
-						},
-						Percent: new(int32(20)),
+						Name:      confsuite.InfraBackendServiceNameV2,
+						Namespace: ns,
+						Percent:   new(int32(20)),
 					},
 				},
 			}, {
 				Request:   http.Request{Path: "/percent-mirror-fraction"},
 				Namespace: ns,
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/percent-mirror-fraction",
-					},
+					Path: "/percent-mirror-fraction",
 				},
 				Backend: confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV2,
-							Namespace: ns,
-						},
-						Percent: new(int32(50)),
+						Name:      confsuite.InfraBackendServiceNameV2,
+						Namespace: ns,
+						Percent:   new(int32(50)),
 					},
 				},
 			}, {
@@ -119,13 +110,11 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/percent-mirror-and-modify-headers",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
+					Path: "/percent-mirror-and-modify-headers",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Set":        "set-overwrites-values",
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
@@ -133,11 +122,9 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV2,
-							Namespace: ns,
-						},
-						Percent: new(int32(35)),
+						Name:      confsuite.InfraBackendServiceNameV2,
+						Namespace: ns,
+						Percent:   new(int32(35)),
 					},
 				},
 			},

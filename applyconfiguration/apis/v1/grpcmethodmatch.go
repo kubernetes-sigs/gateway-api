@@ -36,16 +36,19 @@ type GRPCMethodMatchApplyConfiguration struct {
 	// Support: Implementation-specific (Exact with method specified but no service specified)
 	//
 	// Support: Implementation-specific (RegularExpression)
+	//
 	Type *apisv1.GRPCMethodMatchType `json:"type,omitempty"`
 	// Value of the service to match against. If left empty or omitted, will
 	// match any service.
 	//
 	// At least one of Service and Method MUST be a non-empty string.
+	//
 	Service *string `json:"service,omitempty"`
 	// Value of the method to match against. If left empty or omitted, will
 	// match all services.
 	//
 	// At least one of Service and Method MUST be a non-empty string.
+	//
 	Method *string `json:"method,omitempty"`
 }
 

@@ -1,8 +1,9 @@
 <!--  Thanks for sending a pull request! Here are some tips for you:
 
 1. If this is your first time contributing to Gateway API, please read our
-   developer guide (https://gateway-api.sigs.k8s.io/contributing/devguide/)
-   and our community page (https://gateway-api.sigs.k8s.io/contributing/).
+   developer guide (https://gateway-api.sigs.k8s.io/contributing/devguide/),
+   our community page (https://gateway-api.sigs.k8s.io/contributing/), and our
+   AI Policy (https://github.com/kubernetes-sigs/gateway-api/blob/main/AI-POLICY.md)
 2. If this is your first time contributing to a Kubernetes project, please read
    our contributor guidelines:
    https://git.k8s.io/community/contributors/guide/first-contribution.md#your-first-contribution
@@ -56,3 +57,17 @@ If yes, please enter a release note below:
 ```release-note
 
 ```
+
+**Was AI used in preparing this PR?**
+<!--
+Please declare if any AI was used in the preparation of this PR by applying one of the 
+following labels based on the the AIL scale 
+(https://danielmiessler.com/blog/ai-influence-level-ail).
+
+/label ail/0
+/label ail/1
+/label ail/2
+/label ail/3
+/label ail/4
+/label ail/5
+-->

@@ -23,7 +23,7 @@ package v1
 //
 // TLSRouteStatus defines the observed state of TLSRoute
 type TLSRouteStatusApplyConfiguration struct {
-	RouteStatusApplyConfiguration `json:",inline"`
+	RouteStatusApplyConfiguration `json:""`
 }
 
 // TLSRouteStatusApplyConfiguration constructs a declarative configuration of the TLSRouteStatus type for use with

@@ -108,6 +108,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GRPCRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCRouteStatus"):
 		return &apisv1.GRPCRouteStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HeaderConfig"):
+		return &apisv1.HeaderConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPAuthConfig"):
 		return &apisv1.HTTPAuthConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPBackendRef"):
@@ -156,6 +158,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.ListenerEntryApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerEntryStatus"):
 		return &apisv1.ListenerEntryStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ListenerFilter"):
+		return &apisv1.ListenerFilterApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ListenerFilters"):
+		return &apisv1.ListenerFiltersApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerNamespaces"):
 		return &apisv1.ListenerNamespacesApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerSet"):
@@ -288,6 +294,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.ReferenceGrantApplyConfiguration{}
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("Attribute"):
+		return &apisxv1alpha1.AttributeApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendAncestorStatus"):
 		return &apisxv1alpha1.BackendAncestorStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendPort"):
@@ -302,22 +310,38 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.BackendTrafficPolicySpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BudgetDetails"):
 		return &apisxv1alpha1.BudgetDetailsApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("EndpointSelectorBackend"):
+		return &apisxv1alpha1.EndpointSelectorBackendApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ExternalHostnameBackend"):
 		return &apisxv1alpha1.ExternalHostnameBackendApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("LabelSelector"):
+		return &apisxv1alpha1.LabelSelectorApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MeshSpec"):
 		return &apisxv1alpha1.MeshSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MeshStatus"):
 		return &apisxv1alpha1.MeshStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ParentBasedSampling"):
+		return &apisxv1alpha1.ParentBasedSamplingApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("RequestRate"):
 		return &apisxv1alpha1.RequestRateApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("RetryConstraint"):
 		return &apisxv1alpha1.RetryConstraintApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TelemetryPolicySpec"):
+		return &apisxv1alpha1.TelemetryPolicySpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TelemetryPolicyStatus"):
+		return &apisxv1alpha1.TelemetryPolicyStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TracingConfig"):
+		return &apisxv1alpha1.TracingConfigApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TracingProvider"):
+		return &apisxv1alpha1.TracingProviderApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XBackend"):
 		return &apisxv1alpha1.XBackendApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XBackendTrafficPolicy"):
 		return &apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XMesh"):
 		return &apisxv1alpha1.XMeshApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("XTelemetryPolicy"):
+		return &apisxv1alpha1.XTelemetryPolicyApplyConfiguration{}
 
 	}
 	return nil

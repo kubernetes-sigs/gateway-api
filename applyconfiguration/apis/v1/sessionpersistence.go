@@ -27,18 +27,15 @@ import (
 //
 // SessionPersistence defines the desired state of SessionPersistence.
 type SessionPersistenceApplyConfiguration struct {
-	// SessionName defines the name of the persistent session token
-	// which may be reflected in the cookie or the header. Users
-	// should avoid reusing session names to prevent unintended
-	// consequences, such as rejection or unpredictable behavior.
-	//
-	// Support: Implementation-specific
-	SessionName *string `json:"sessionName,omitempty"`
 	// AbsoluteTimeout defines the absolute timeout of the persistent
 	// session. Once the AbsoluteTimeout duration has elapsed, the
 	// session becomes invalid.
 	//
-	// Support: Extended
+	// Support: Core when cookie.lifetimeType is "Permanent".
+	//
+	// Support: Extended when cookie.lifetimeType is "Session" or
+	// type is "Header".
+	//
 	AbsoluteTimeout *apisv1.Duration `json:"absoluteTimeout,omitempty"`
 	// Type defines the type of session persistence such as through
 	// the use of a header or cookie. Defaults to cookie based session
@@ -47,26 +44,26 @@ type SessionPersistenceApplyConfiguration struct {
 	// Support: Core for "Cookie" type
 	//
 	// Support: Extended for "Header" type
+	//
 	Type *apisv1.SessionPersistenceType `json:"type,omitempty"`
-	// CookieConfig provides configuration settings that are specific
+	// Cookie provides configuration settings that are specific
 	// to cookie-based session persistence.
 	//
 	// Support: Core
-	CookieConfig *CookieConfigApplyConfiguration `json:"cookieConfig,omitempty"`
+	//
+	Cookie *CookieConfigApplyConfiguration `json:"cookie,omitempty"`
+	// Header provides configuration settings that are specific
+	// to header-based session persistence.
+	//
+	// Support: Extended
+	//
+	Header *HeaderConfigApplyConfiguration `json:"header,omitempty"`
 }
 
 // SessionPersistenceApplyConfiguration constructs a declarative configuration of the SessionPersistence type for use with
 // apply.
 func SessionPersistence() *SessionPersistenceApplyConfiguration {
 	return &SessionPersistenceApplyConfiguration{}
-}
-
-// WithSessionName sets the SessionName field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the SessionName field is set to the value of the last call.
-func (b *SessionPersistenceApplyConfiguration) WithSessionName(value string) *SessionPersistenceApplyConfiguration {
-	b.SessionName = &value
-	return b
 }
 
 // WithAbsoluteTimeout sets the AbsoluteTimeout field in the declarative configuration to the given value
@@ -85,10 +82,18 @@ func (b *SessionPersistenceApplyConfiguration) WithType(value apisv1.SessionPers
 	return b
 }
 
-// WithCookieConfig sets the CookieConfig field in the declarative configuration to the given value
+// WithCookie sets the Cookie field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the CookieConfig field is set to the value of the last call.
-func (b *SessionPersistenceApplyConfiguration) WithCookieConfig(value *CookieConfigApplyConfiguration) *SessionPersistenceApplyConfiguration {
-	b.CookieConfig = value
+// If called multiple times, the Cookie field is set to the value of the last call.
+func (b *SessionPersistenceApplyConfiguration) WithCookie(value *CookieConfigApplyConfiguration) *SessionPersistenceApplyConfiguration {
+	b.Cookie = value
+	return b
+}
+
+// WithHeader sets the Header field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Header field is set to the value of the last call.
+func (b *SessionPersistenceApplyConfiguration) WithHeader(value *HeaderConfigApplyConfiguration) *SessionPersistenceApplyConfiguration {
+	b.Header = value
 	return b
 }

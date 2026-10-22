@@ -1,0 +1,9 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: gravitee.io
+project: gravitee-kubernetes-operator
+fullName: Gravitee Kubernetes Operator
+description: |
+  The [Gravitee Kubernetes Operator](https://documentation.gravitee.io/gravitee-kubernetes-operator-gko) (GKO) lets you manage [Gravitee](https://www.gravitee.io/) APIs, applications, and other assets in a Kubernetes-native and declarative way.
+
+  For support, feedback, or to engage in a discussion about the Gravitee Kubernetes Operator, please feel free to submit an [issue](https://github.com/gravitee-io/issues/issues) or visit our community [forum](https://community.gravitee.io/c/support/gravitee-kubernetes-operator-gko/26).

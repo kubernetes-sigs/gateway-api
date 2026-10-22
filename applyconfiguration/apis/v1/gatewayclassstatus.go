@@ -61,6 +61,7 @@ type GatewayClassStatusApplyConfiguration struct {
 	// if relevant.)
 	//
 	// </gateway:util:excludeFromCRD>
+	//
 	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 	// SupportedFeatures is the set of features the GatewayClass support.
 	// It MUST be sorted in ascending alphabetical order by the Name key.

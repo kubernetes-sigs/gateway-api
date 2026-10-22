@@ -89,6 +89,7 @@ type HTTPRouteRuleApplyConfiguration struct {
 	//
 	// When no rules matching a request have been successfully attached to the
 	// parent a request is coming from, a HTTP 404 status code MUST be returned.
+	//
 	Matches []HTTPRouteMatchApplyConfiguration `json:"matches,omitempty"`
 	// Filters define the filters that are applied to requests that match
 	// this rule.
@@ -126,6 +127,7 @@ type HTTPRouteRuleApplyConfiguration struct {
 	// this configuration error.
 	//
 	// Support: Core
+	//
 	Filters []HTTPRouteFilterApplyConfiguration `json:"filters,omitempty"`
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
@@ -162,17 +164,25 @@ type HTTPRouteRuleApplyConfiguration struct {
 	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
+	//
 	BackendRefs []HTTPBackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 	// Timeouts defines the timeouts that can be configured for an HTTP request.
 	//
 	// Support: Extended
+	//
 	Timeouts *HTTPRouteTimeoutsApplyConfiguration `json:"timeouts,omitempty"`
 	// Retry defines the configuration for when to retry an HTTP request.
 	//
+	// A request is retried when attempts is greater than 0 and the backend did
+	// not process it. This is the case when the connection could not be
+	// established, or when the backend explicitly rejected the request, either
+	// before processing it or with one of the configured status codes.
+	//
 	// Support: Extended
 	//
-	// <gateway:experimental>
 	Retry *HTTPRouteRetryApplyConfiguration `json:"retry,omitempty"`
+	// Deprecated: use the Backend resource for session persistence (GEP-4894).
+	//
 	// SessionPersistence defines and configures session persistence
 	// for the route rule.
 	//

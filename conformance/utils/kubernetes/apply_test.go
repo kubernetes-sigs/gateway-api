@@ -17,13 +17,72 @@ limitations under the License.
 package kubernetes
 
 import (
+	"context"
+	"io/fs"
 	"strings"
 	"testing"
+	"testing/fstest"
+	"time"
 
 	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/yaml"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
+
+func TestGetContentsFromManifestFS(t *testing.T) {
+	tests := []struct {
+		name       string
+		manifestFS []fs.FS
+		location   string
+		want       string
+		wantErr    error
+	}{
+		{
+			name: "manifest found in later filesystem",
+			manifestFS: []fs.FS{
+				fstest.MapFS{},
+				fstest.MapFS{"manifest.yaml": {Data: []byte("kind: ConfigMap\n")}},
+			},
+			location: "manifest.yaml",
+			want:     "kind: ConfigMap\n",
+		},
+		{
+			name:       "empty manifest exists",
+			manifestFS: []fs.FS{fstest.MapFS{"manifest.yaml": {Data: nil}}},
+			location:   "manifest.yaml",
+		},
+		{
+			name: "manifest missing from all filesystems",
+			manifestFS: []fs.FS{
+				fstest.MapFS{},
+				fstest.MapFS{"other.yaml": {Data: []byte("kind: Secret\n")}},
+			},
+			location: "manifest.yaml",
+			wantErr:  fs.ErrNotExist,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			contents, err := getContentsFromPathOrURL(test.manifestFS, test.location, config.DefaultTimeoutConfig())
+			if test.wantErr != nil {
+				require.ErrorIs(t, err, test.wantErr)
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, test.want, contents.String())
+		})
+	}
+}
 
 func TestPrepareResources(t *testing.T) {
 	tests := []struct {
@@ -178,6 +237,59 @@ spec:
 
 			require.NoError(t, err, "unexpected error preparing resources")
 			require.Equal(t, tc.expected, resources)
+		})
+	}
+}
+
+func TestDeleteAndWaitBlocksUntilGone(t *testing.T) {
+	scheme := runtime.NewScheme()
+	require.NoError(t, corev1.AddToScheme(scheme))
+
+	tests := []struct {
+		name string
+		obj  client.Object
+	}{
+		{
+			name: "namespace held by a finalizer",
+			obj: &corev1.Namespace{
+				Name: "conformance-ns", Finalizers: []string{"conformance.gateway-api/test"},
+			},
+		},
+		{
+			name: "namespaced resource held by a finalizer",
+			obj: &corev1.ConfigMap{
+				Name: "held", Namespace: "default", Finalizers: []string{"conformance.gateway-api/test"},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			key := client.ObjectKeyFromObject(tc.obj)
+
+			// Object present on the first poll, gone on the next: drives the wait loop with no timing dependence.
+			var polls int
+			c := fake.NewClientBuilder().WithScheme(scheme).WithObjects(tc.obj).
+				WithInterceptorFuncs(interceptor.Funcs{
+					Get: func(ctx context.Context, cl client.WithWatch, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+						polls++
+						if polls >= 2 {
+							fresh := tc.obj.DeepCopyObject().(client.Object)
+							if err := cl.Get(ctx, key, fresh); err == nil {
+								fresh.SetFinalizers(nil)
+								_ = cl.Update(ctx, fresh)
+							}
+						}
+						return cl.Get(ctx, key, obj, opts...)
+					},
+				}).Build()
+
+			deleteAndWait(t, c, tc.obj, config.TimeoutConfig{DeleteTimeout: 5 * time.Second, DefaultPollInterval: time.Millisecond})
+
+			probe := tc.obj.DeepCopyObject().(client.Object)
+			err := c.Get(context.Background(), key, probe)
+			require.True(t, apierrors.IsNotFound(err),
+				"%s must be fully deleted after deleteAndWait returns, got err=%v", tc.name, err)
 		})
 	}
 }

@@ -1,5 +1,5 @@
 ---
-title: "GEP-1619: Session Persistence via BackendLBPolicy"
+title: "GEP-1619: Session Persistence"
 ---
 
 * Issue: [#1619](https://github.com/kubernetes-sigs/gateway-api/issues/1619)
@@ -9,34 +9,18 @@ title: "GEP-1619: Session Persistence via BackendLBPolicy"
 
 ## Graduation Criteria
 
-### Implementable
-
-This GEP was accidentally merged as Provisional before the required approval
-from 2 maintainers had been received. Before this graduates to implementable,
-we need to get at least one of @robscott or @youngnick to also approve this GEP.
-
-Before this GEP graduates to Implementable, we must fulfill the following criteria:
-
- 1. Should we leave room in this policy to add additional concepts in the future
-    such as Session Affinity? If so, how would we adjust the naming and overall
-    scope of this policy?
-    - **Answer**: Yes. We adjusted the API to use `BackendLBPolicy`. See [API](#api) for more details.
- 2. Should we leave room for configuring different forms of Session Persistence?
-    If so, what would that look like?
-    - **Answer**: Yes. See the [BackendLBPolicy API](#backendlbpolicy-api) and [API Granularity](#api-granularity)
-      sections for more details.
- 3. What name appropriately describe the API responsible for configuring load-balancing options for backend traffic?
-    - **Answer**: We decided on `BackendLBPolicy` since it is aligned with `BackendTLSPolicy`, describes configuration
-      related to load balancing, and isn't too long.
- 4. Finish designing the [Route Rule API](#route-rule-api) and document edge cases in [Edge Case Behavior](#edge-case-behavior)
-    for configuring session persistence on both `BackendLBPolicy` and route rules.
-    - **Answer**: Yes. See [Route Rule API](#route-rule-api) and [Edge Case Behavior](#edge-case-behavior) for more details.
+**Note:** This GEP was moved to Experimental in March 2024, before the new GEP process rules were established in [discussion #4164](https://github.com/kubernetes-sigs/gateway-api/discussions/4164) (October 2024). As a result, this GEP is grandfathered in and exempt from the new sponsor requirements and six-month progress rules that apply to GEPs entering Experimental after October 2024.
 
 ### Standard
 
 Before this GEP graduates to the Standard channel, we must fulfill the following criteria:
 
-- Sign-off from the GAMMA leads to ensure service mesh gets fully considered.
+- [ ] At least 3 implementations passing conformance tests
+- [ ] Comprehensive conformance test suite covering cookie and header persistence types
+- [x] Resolve attachment model ([#4462](https://github.com/kubernetes-sigs/gateway-api/discussions/4462)) for session persistence — [Backend](../gep-4894/index.md) resource ([GEP-4894](../gep-4894/index.md))
+- [x] Define cookie path default behavior ([#4713](https://github.com/kubernetes-sigs/gateway-api/issues/4713))
+- [ ] Define session name conflict resolution rules ([#4268](https://github.com/kubernetes-sigs/gateway-api/issues/4268))
+- [ ] Sign-off from GAMMA leads to ensure service mesh is fully considered
 
 ## TLDR
 
@@ -212,7 +196,8 @@ sequenceDiagram
     Note right of C: [cookie] indicates a request<br> with one or more cookies
     C->>+G: Request Web Page<br>[cookie]
     G->>G: Consistent lookup of<br>server using cookie value
-    G->>+B: Request<br>[cookie]
+    G->>+B: Request<br>[cookie]*
+    Note right of G: *The Gateway-generated persistence<br>cookie MAY be removed before forwarding.
     B-->>-G: Response
     G-->>-C: Response
 ```
@@ -347,61 +332,6 @@ This tiered decision-based logic is consistent with the idea that session persis
 Though there are different ways to frame this relationship, this design will influence the separation between
 persistence and affinity API design.
 
-### Implementations
-
-In this section, we will describe how implementations achieve session persistence, along with a breakdown of related configuration options. Input from implementations is appreciated to complete this information.
-
-In the following tables, we will example two types of APIs:
-
-1. Dataplane APIs
-2. Implementation APIs
-
-Generally, the implementation API programs the dataplane API; however these two are not always clearly separated. The two types of APIs can use different API structures for configuring the same feature. Examining the dataplane APIs helps to remove the layer of API abstraction that implementations provide. Removing this layer avoids situations where implementations don’t fully implement all capabilities of a dataplane API or obfuscate certain configuration around session persistence. On the other hand, examining implementation APIs provides valuable data points in what implementations are interested in configuring.
-
-**Table Last Updated:** Feb 21, 2024
-
-| **Technology** 	| **Technology Type** 	| **Session Persistence Type** 	| **Configuration Options** 	| **Configuration Association (Global, Gateway, Route, or Backends)** 	| **Notes** 	|
-|---	|---	|---	|---	|---	|---	|
-| Acnodal EPIC 	| Implementation (Envoy) 	| N/A 	| Supports Gateway API Only* 	| N/A 	| *Acnodal Epic solely uses Gateway API; therefore, it doesn’t yet have a way to configure session persistence. [Acnodal EPIC Docs](https://www.epic-gateway.org/) 	|
-| Amazon Elastic Kubernetes Service | Implementation / Dataplane | N/A | Supports Gateway API Only* | N/A | *Amazon Elastic Kubernetes Service solely uses Gateway API; therefore, it doesn’t yet have a way to configure session persistence. [Amazon Elastic Kubernetes Service Docs](https://www.gateway-api-controller.eks.aws.dev/) |
-| Apache APISIX 	| Implementation (Nginx) 	| [Cookie-Based](https://apisix.apache.org/docs/apisix/admin-api/#upstream) 	| hash_on=[vars \| header \| cookie \| consumer]<br>key=cookie_name 	| [Upstream](https://apisix.apache.org/docs/apisix/admin-api/#upstream) (Route or Backends) 	| N/A 	|
-|  	| Implementation (Nginx) 	| [Header-Based](https://apisix.apache.org/docs/apisix/terminology/upstream/#header) 	| hash_on=[vars \| header \| cookie \| consumer]<br>key=header_name 	| [Upstream](https://apisix.apache.org/docs/apisix/admin-api/#upstream) (Route or Backends) 	| N/A 	|
-| Apache httpd 	| Web Server 	| [Cookie-Based / URL-Encoded](https://httpd.apache.org/docs/2.4/mod/mod_proxy_balancer.html) 	| Cookie Attributes 	| N/A 	| N/A 	|
-| Avi Kubernetes Operator | Implementation / Dataplane | [Cookie-Based](https://docs.vmware.com/en/VMware-NSX-T-Data-Center/3.2/administration/GUID-8B5C8D64-2B69-4C95-86A5-C5396CB9E51F.html) | Shared Persistence Cookie Mode=[Insert \| Prefix \| Rewrite] Cookie Name=name Cookie Domain=domain Cookie Fallback=domain Cookie Path=path Cookie Garbling Cookie Type=[ Session Cookie \| Persistence Cookie] Http Only Flag Secure Flag Max Idle Time=time Max Cookie Age=time | [Route](https://docs.vmware.com/en/VMware-NSX-Advanced-Load-Balancer/1.11/Avi-Kubernetes-Operator-Guide/GUID-E8F3C338-46FB-412E-8B46-16EE2C12A8AF.html) | N/A |
-| Azure Application Gateway for Containers | Implementation / Dataplane | [Cookie-Based](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/session-affinity?tabs=session-affinity-gateway-api) | affinityType=[application-cookie \| managed-cookie]<br>cookieName=name<br>cookieDuration=seconds | [Route](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/application-gateway/for-containers/api-specification-kubernetes.md#alb.networking.azure.io/v1.RoutePolicy) | RoutePolicy which attaches to HTTPRoutes |
-| BIG-IP Kubernetes Gateway | Implementation (F5 BIG-IP) | N/A | Supports Gateway API Only* | N/A | *BIG-IP Kubernetes Gateway solely uses Gateway API; therefore, it doesn’t yet have a way to configure session persistence. [BIG-IP Kubernetes Gateway Docs](https://gateway-api.f5se.io/) |
-| Cilium 	| Implementation / Dataplane 	| None 	| None 	| None 	| Cilium has no documented way of doing session persistence. [Cilium Docs](https://cilium.io/)  	|
-| Contour 	| Implementation (Envoy) 	| [Cookie-Based](https://projectcontour.io/docs/1.24/config/api/#projectcontour.io/v1.CookieRewritePolicy)  	| Name=name<br>pathRewrite=path<br>domainRewrite=domain<br>secure<br>sameSite 	| [Route](https://projectcontour.io/docs/1.24/config/api/#projectcontour.io/v1.Route) and [Service](https://projectcontour.io/docs/1.24/config/api/#projectcontour.io/v1.Service) (Backends) 	| Envoy does not natively support cookie attribute rewriting nor adding attributes other than path and TTL, but rewriting and adding additional attributes is possible via Lua ([Contour design reference](https://github.com/projectcontour/contour/blob/main/design/cookie-rewrite-design.md), [Envoy Issue](https://github.com/envoyproxy/envoy/issues/15612)). 	|
-| Easegress | Implementation / Dataplane | None | None | None | [Easegress Docs](https://megaease.com/docs/easegress/) |
-| Emissary-Ingress 	| Implementation (Envoy) 	| [Cookie-Based](https://www.getambassador.io/docs/emissary/latest/topics/running/load-balancer#cookie) 	| Name=name<br>Path=path<br>TTL=duration 	| [Module or Mapping](https://www.getambassador.io/docs/emissary/latest/topics/running/load-balancer#cookie) (Global or Route) 	| N/A 	|
-|  	|  	| [Header-Based](https://www.getambassador.io/docs/emissary/latest/topics/running/load-balancer#header) 	| Name=name 	| [Module or Mapping](https://www.getambassador.io/docs/emissary/latest/topics/running/load-balancer#cookie) (Global or Route) 	| N/A 	|
-| Envoy 	| Dataplane 	| [Cookie-Based](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/http/stateful_session/cookie/v3/cookie.proto) 	| Name=name<br>Path=path<br>TTL=duration 	| [HttpConnectionManager](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto) (Route) 	| Envoy does not natively support cookie attribute rewriting nor adding attributes other than path and TTL, but rewriting and adding additional attributes is possible via Lua ([Contour design reference](https://github.com/projectcontour/contour/blob/main/design/cookie-rewrite-design.md), [Envoy Issue](https://github.com/envoyproxy/envoy/issues/15612)). 	|
-|  	|  	| [Header-Based](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/http/stateful_session/header/v3/header.proto) 	| Name=name 	| [HttpConnectionManager](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto) (Route) 	| N/A 	|
-| Envoy Gateway 	| Implementation (Envoy) 	| N/A 	| Supports Gateway API Only* 	| N/A 	| *Envoy Gateway solely uses Gateway API; therefore, it doesn’t yet have a way to configure session persistence. [Envoy Gateway Docs](https://gateway.envoyproxy.io/v0.3.0/index.html) 	|
-| Flomesh Service Mesh 	| Implementation / Dataplane (Pipy) 	| ? 	| ? 	| ? 	| ? 	|
-| Gloo Gateway | Implementation (Envoy) | [Cookie-Based](https://docs.solo.io/gloo-edge/latest/reference/api/envoy/api/v2/route/route.proto.sk/#cookie) | Name=name Path=path TTL=duration | [Route](https://docs.solo.io/gloo-edge/latest/reference/api/envoy/api/v2/route/route.proto.sk/#route) (Route) | N/A |
-|  	|  	| [Header-Based](https://docs.solo.io/gloo-edge/latest/reference/api/envoy/api/v2/route/route.proto.sk/#hashpolicy) 	| Name=name 	| [Route](https://docs.solo.io/gloo-edge/latest/reference/api/envoy/api/v2/route/route.proto.sk/#route) (Route) 	| N/A 	|
-| Google CloudRun 	| Dataplane 	| [Cookie-Based](https://cloud.google.com/run/docs/configuring/session-affinity) 	| Enabled / Disabled 	| [Service](https://cloud.google.com/run/docs/configuring/session-affinity) (Backends) 	| Only allowed to turn off or on, no other configuration items 	|
-| Google Kubernetes Engine 	| Implementation / Dataplane 	| [Cookie-Based](https://cloud.google.com/load-balancing/docs/backend-service#session_affinity) 	| GENERATED_COOKIE or HTTP_COOKIE=name<br>cookieTtlSec 	| [Backend Policy](https://cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources#session_affinity) (Backends) 	| Google Kubernetes Engine [lists](https://cloud.google.com/load-balancing/docs/backend-service#bs-session-affinity) the products that can do persistence/affinity mode. All persistence/affinity options are exclusive and can’t be used at the same time.<br>Note: Google Kubernetes Engine defines everything (persistence and affinity) as session affinity. 	|
-|  	|  	| [Header-Based](https://cloud.google.com/load-balancing/docs/backend-service#header_field_affinity) 	| httpHeaderName=name 	| [Backend Policy](https://cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources#session_affinity) (Backends) 	| N/A 	|
-| HAProxy 	| Dataplane 	| [Cookie-Based](https://docs.haproxy.org/2.6/configuration.html#4.2-cookie) 	| name=name<br>[rewrite \| insert \| prefix ]<br>indirect<br>nocache<br>postonly<br>preserve<br>httponly<br>secure<br>domain=domain<br>maxidle=idle<br>maxlife=life<br>dynamic<br>attr=value 	| [Default or Backends](https://docs.haproxy.org/2.6/configuration.html#4.2-cookie) (Global or Backends) 	| HAProxy allows for operational cookie strategy configuration (i.e. when/how HAProxy should inject cookies) 	|
-| HAProxy Ingress 	| Implementation (HAProxy) 	| [Cookie-Based](https://haproxy-ingress.github.io/docs/configuration/keys/#affinity) 	| affinity (enable/disable)<br>cookie-key=key<br>session-cookie-domain=domain<br>session-cookie-dynamic=[true \| false]<br>session-cookie-keywords=keywords<br>session-cookie-name=name<br>session-cookie-preserve=[true \| false]<br>session-cookie-same-site=[true \| false]<br>session-cookie-shared=[true \| false]<br>session-cookie-strategy=strategy<br>session-cookie-value-strategy=value_strategy	 	| [Backend](https://haproxy-ingress.github.io/docs/configuration/keys/#affinity) (Backends) 	| N/A 	|
-| Hashicorp Consul  	| Implementation (Envoy) 	| N/A 	| Supports Gateway API Only* 	| N/A 	| *Hashicorp Consul solely uses Gateway API; therefore, it doesn’t yet have a way to configure session persistence. [Hashicorp Consul API Gateway Docs](https://developer.hashicorp.com/consul/docs/api-gateway) 	|
-| Istio 	| Implementation (Envoy) 	| [Cookie-Based](https://istio.io/latest/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-ConsistentHashLB-HTTPCookie) 	| Name=name<br>Path=path<br>TTL=duration 	| [ConsistentHashLB](https://istio.io/latest/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-ConsistentHashLB) (Backends) 	| Istio also supports turning on cookie-based session persistence via the Pilot ENV variable [PILOT_PERSISTENT_SESSION_LABEL](https://istio.io/latest/docs/reference/commands/pilot-discovery/#envvars). 	|
-|  	| Implementation (Envoy) 	| [Header-Based](https://istio.io/latest/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-ConsistentHashLB) 	| Name=name 	| [ConsistentHashLB](https://istio.io/latest/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-ConsistentHashLB) (Backends) 	| N/A 	|
-| Java Servlet 	| Web Server 	| [Cookie-Based / URL-Encoded](https://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpSession.html) 	| invalidate()<br>setAttribute(String name, Object value)<br>setMaxInactiveInterval(int interval) 	| N/A 	| Java Servlets do not natively support proxy functions. 	|
-| Kong 	| Implementation / Dataplane 	| [Cookie-Based](https://docs.konghq.com/hub/kong-inc/session/) 	| cookie_name=name<br>rolling_timeout=timeout<br>absolute_timeout=timeout<br>idling_timeout=timeout<br>cookie_path=path<br>cookie_domain=domain<br>cookie_same_site=[Strict \| Lax \| None \| off]<br>cookie_http_only<br>cookie_secure=[true \| false]<br>stale_ttl=duration<br>cookie_persistent=[true \| false]<br>storage=storage_type 	| [Route, Service, Global](https://docs.konghq.com/hub/kong-inc/session/) (Route or Backends or Global) 	| N/A 	|
-|  	|  	| [Header-Based](https://docs.konghq.com/gateway/latest/how-kong-works/load-balancing/#balancing-algorithms) 	| name 	| [Upstreams](https://docs.konghq.com/gateway/3.2.x/admin-api/#add-upstream) (Backends) 	| N/A 	|
-| Kuma 	| Implementation (Envoy) 	| None 	| None 	| None 	| Kuma has no documentation on how it supports session persistence or cookies. [Kuma Docs](https://kuma.io/docs/2.1.x/) 	|
-| Linkerd | Gamma Implementation | None | None | None | [Linkerd Docs](https://linkerd.io/)  |
-| LiteSpeed Ingress Controller | ? | ? | ? | ? | ? |
-| Nginx  	| Dataplane 	| [Cookie-Based (Nginx Plus Only)](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#enabling-session-persistence) 	| Name=name<br>Expires=time<br>Domain=domain<br>HttpOnly<br>SameSite = [strict \| lax \| none \| $variable]<br>Secure<br>path=path 	| [Upstream](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#enabling-session-persistence) (Backends) 	| See also [Sticky Cookie](https://nginx.org/en/docs/http/ngx_http_upstream_module.html?&_ga=2.184452070.1306763907.1680031702-1761609832.1671225057#sticky_cookie) 	|
-| NGINX Gateway Fabric 	| Implementation (Nginx) 	| N/A 	| Supports Gateway API Only* 	| N/A 	| *NGINX Gateway Fabric solely uses Gateway API; therefore, it doesn’t yet have a way to configure session persistence. [NGINX Gateway Fabric Docs](https://github.com/nginxinc/nginx-gateway-fabric) 	|
-| STUNner | Implementation / Dataplane | None | None | None | [STUNner Docs](https://github.com/l7mp/stunner) |
-| Traefik 	| Implementation / Dataplane 	| [Cookie-Based](https://doc.traefik.io/traefik/routing/services/#sticky-sessions) 	| name=name<br>secure<br>httpOnly<br>sameSite=[none \| lax \| strict ] 	| [Services](https://doc.traefik.io/traefik/routing/services/#sticky-sessions) (Backends) 	| N/A 	|
-| Tyk | Implementation / Dataplane | None | None | None | [Tyk Docs](https://tyk.io/docs/) |
-| WSO2 APK | Implementation / Dataplane | None | None | None | [WSO2 APK Docs](https://apk.docs.wso2.com/en/latest/) |
-
 ### Sessions in Java
 
 Java application servers such as Tomcat and Jetty, were the first to standardize the API around cookies and sessions.
@@ -422,91 +352,42 @@ these two configurations.
 
 In this section, we will explore the questions and design elements associated with a session persistence API.
 
-We will present two distinct patterns for configuring session persistence:
+Session persistence is configured on the [Backend](../gep-4894/index.md) resource and is only available when the
+Backend type is `EndpointSelector`.
 
-1. `BackendLBPolicy`: a Direct Policy Attachment for backends (Services, ServiceImports, or any
-   implementation-specific backendRef)
-2. An inline API update to HTTPRoute and GRPCRoute rules
-
-### BackendLBPolicy API
-
-In order to apply session persistence configuration to a backend, we will implement it as a [Policy Attachment](/reference/policy-attachment).
-The new metaresource is named `BackendLBPolicy` and is responsible for configuring load balancing-related configuration
-for traffic intended for a backend after routing has occurred. It is defined as a [Direct Policy Attachment](../gep-713/index.md#direct-policy-attachment)
-without defaults or overrides, applied to the targeted backend.
-
-Instead of utilizing a specific, session persistence-only policy object, we introduce a more generic API object named
-`BackendLBPolicy`. This design provides tighter coupling with other load balancing configuration which helps reduce
-CRD proliferation. For instance, `BackendLBPolicy` could be augmented to add configuration for selecting a load
-balancing algorithm for traffic to the backends, as desired in issue [#1778](https://github.com/kubernetes-sigs/gateway-api/issues/1778).
-`BackendLBPolicy` could also be later expanded to contain [session affinity](#the-relationship-of-session-persistence-and-session-affinity)
-configuration. This would provide a convenient grouping of the two related APIs within the same policy object.
-Additionally, other future enhancements to the API may include the addition of timeouts, connection draining, and
-logging within `BackendLBPolicy`.
-
-As for achieving session persistence, this API currently exposes the `Type` field which allows selection between
-cookie-based and header-based session persistence. Cookie-based session persistence is considered a core feature,
-while header-based session persistence is extended and therefore optional.
+### Backend API
 
 ```go
-// BackendLBPolicy provides a way to define load balancing rules
-// for a backend.
-type BackendLBPolicy struct {
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
-
-    // Spec defines the desired state of BackendLBPolicy.
-    Spec BackendLBPolicySpec `json:"spec"`
-
-    // Status defines the current state of BackendLBPolicy.
-    Status PolicyStatus `json:"status,omitempty"`
-}
-
-// BackendLBPolicySpec defines the desired state of
-// BackendLBPolicy.
-// Note: there is no Override or Default policy configuration.
-type BackendLBPolicySpec struct {
-    // TargetRef identifies an API object to apply policy to.
-    // Currently, Backends (i.e. Service, ServiceImport, or any
-    // implementation-specific backendRef) are the only valid API
-    // target references.
-    // +listType=map
-    // +listMapKey=group
-    // +listMapKey=kind
-    // +listMapKey=name
-    // +kubebuilder:validation:MinItems=1
-    // +kubebuilder:validation:MaxItems=16
-    TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
+// +kubebuilder:validation:XValidation:rule="has(self.sessionPersistence) ? self.type == 'EndpointSelector' : true",message="sessionPersistence can only be set when type is EndpointSelector"
+type BackendSpec struct {
+    [...]
 
     // SessionPersistence defines and configures session persistence
-    // for the backend.
+    // across the endpoints selected by this backend.
+    //
+    // This field can only be configured when type is EndpointSelector.
     //
     // Support: Extended
     //
     // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+    SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
-// SessionPersistence defines the desired state of
-// SessionPersistence.
-// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// SessionPersistence defines the desired state of SessionPersistence.
+// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookie) || !has(self.cookie.lifetimeType) || self.cookie.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// +kubebuilder:validation:XValidation:message="cookie must be nil if type is not Cookie",rule="!has(self.cookie) || self.type == 'Cookie'"
+// +kubebuilder:validation:XValidation:message="cookie must be specified for Cookie type",rule="self.type != 'Cookie' || has(self.cookie)"
+// +kubebuilder:validation:XValidation:message="header must be nil if type is not Header",rule="!has(self.header) || self.type == 'Header'"
+// +kubebuilder:validation:XValidation:message="header must be specified for Header type",rule="self.type != 'Header' || has(self.header)"
 type SessionPersistence struct {
-    // SessionName defines the name of the persistent session token
-    // which may be reflected in the cookie or the header. Users
-    // should avoid reusing session names to prevent unintended
-    // consequences, such as rejection or unpredictable behavior.
-    //
-    // Support: Implementation-specific
-    //
-    // +optional
-    // +kubebuilder:validation:MaxLength=128
-    SessionName *string `json:"sessionName,omitempty"`
-
     // AbsoluteTimeout defines the absolute timeout of the persistent
     // session. Once the AbsoluteTimeout duration has elapsed, the
     // session becomes invalid.
     //
-    // Support: Extended
+    // Support: Core when cookie.lifetimeType is "Permanent".
+    //
+    // Support: Extended when cookie.lifetimeType is "Session" or
+    // type is "Header".
     //
     // +optional
     AbsoluteTimeout *Duration `json:"absoluteTimeout,omitempty"`
@@ -519,17 +400,26 @@ type SessionPersistence struct {
     //
     // Support: Extended for "Header" type
     //
+    // +unionDiscriminator
     // +optional
     // +kubebuilder:default=Cookie
     Type *SessionPersistenceType `json:"type,omitempty"`
 
-    // CookieConfig provides configuration settings that are specific
+    // Cookie provides configuration settings that are specific
     // to cookie-based session persistence.
     //
     // Support: Core
     //
     // +optional
-    CookieConfig *CookieConfig `json:"cookieConfig,omitempty"`
+    Cookie *CookieConfig `json:"cookie,omitempty"`
+
+    // Header provides configuration settings that are specific
+    // to header-based session persistence.
+    //
+    // Support: Extended
+    //
+    // +optional
+    Header *HeaderConfig `json:"header,omitempty"`
 }
 
 // Duration is a string value representing a duration in time. The format is as specified
@@ -557,6 +447,26 @@ const (
 
 // CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfig struct {
+    // Name defines the name of the cookie used for session persistence.
+    // If not specified, a unique cookie name will be generated.
+    // Users should avoid reusing cookie names to prevent unintended
+    // consequences, such as rejection or unpredictable behavior.
+    //
+    // Support: Core
+    //
+    // +optional
+    Name *CookieName `json:"name,omitempty"`
+
+    // Path defines the cookie Path attribute. When not specified,
+    // implementations MUST default the cookie path to "/".
+    //
+    // Support: Extended
+    //
+    // +optional
+    // +kubebuilder:default="/"
+    // +kubebuilder:validation:MaxLength=1024
+    Path *string `json:"path,omitempty"`
+
     // LifetimeType specifies whether the cookie has a permanent or
     // session-based lifetime. A permanent cookie persists until its
     // specified expiry time, defined by the Expires or Max-Age cookie
@@ -571,9 +481,7 @@ type CookieConfig struct {
     // absolute lifetime of the cookie tracked by the gateway and
     // is optional.
     //
-    // Support: Core for "Session" type
-    //
-    // Support: Extended for "Permanent" type
+    // Support: Core
     //
     // +optional
     // +kubebuilder:default=Session
@@ -593,43 +501,20 @@ const (
     // PermanentCookieLifetimeType specifies the type for a permanent
     // cookie.
     //
-    // Support: Extended
+    // Support: Core
     PermanentCookieLifetimeType  CookieLifetimeType = "Permanent"
 )
-```
 
-### Route Rule API
-
-To support route rule level configuration, this GEP also introduces an API as inline fields within HTTPRouteRule and GRPCRouteRule.
-Any configuration that is specified at Route Rule level MUST override configuration that is attached at the backend level because route rule have a more global view and responsibility for the overall traffic routing.
-This route rule level API for enabling session persistence currently uses the same `SessionPersistence` struct from the
-`BackendLBPolicy` API.
-
-```go
-type HTTPRouteRule struct {
-    [...]
-
-    // SessionPersistence defines and configures session persistence
-    // for the route rule.
+// HeaderConfig defines the configuration for header-based session persistence.
+type HeaderConfig struct {
+    // Name defines the name of the header used for session persistence.
+    // The client must include this header in subsequent requests to
+    // maintain the session.
     //
-    // Support: Extended
+    // Support: Core
     //
-    // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
-}
-```
-
-```go
-type GRPCRouteRule struct {
-    [...]
-
-    // SessionPersistence defines and configures session persistence
-    // for the route rule.
-    //
-    // Support: Extended
-    //
-    // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+    // +required
+    Name HeaderName `json:"name"`
 }
 ```
 
@@ -661,51 +546,76 @@ functionality of their applications.
 
 ### Prior Art
 
-Referring to our [Implementations](#implementations) table on session persistence, the majority of Gateway API
-implementations designed session persistence in their APIs to be attached to a service or backends. This should be
-considered cautiously, as making associations to Gateway API's notion of Gateway, Route, and Service to other
-implementation's objects is hard to directly translate. The idea of a route in Gateway API is often not the same as a
-route in any given implementation.
+The following table summarizes session persistence support across Gateway API dataplanes and
+[implementations](https://gateway-api.sigs.k8s.io/docs/implementations/list/). Dataplanes are listed separately because
+implementations don't always expose the full capabilities of their underlying dataplane. Only implementations with
+session persistence or session affinity support are included.
+
+:white_check_mark: = strong persistence  :yellow_circle: = session affinity (hash-based)  :x: = not supported
+
+| Implementation | Cookie | Header | Attachment |
+|---|---|---|---|
+| **Dataplanes** | | | |
+| Envoy | :white_check_mark: | :white_check_mark: | route |
+| HAProxy | :white_check_mark: | :x: | service |
+| NGINX | :white_check_mark: | :x: | service |
+| **Implementations** | | | |
+| Contour | :yellow_circle: | :x: | route + service |
+| Envoy Gateway | :white_check_mark: | :white_check_mark: | route |
+| GKE | :yellow_circle: | :yellow_circle: | service |
+| Gloo Gateway | :yellow_circle: | :yellow_circle: | route |
+| HAProxy Ingress | :white_check_mark: | :x: | service |
+| Istio | :white_check_mark: | :white_check_mark: | service |
+| kgateway | :white_check_mark: | :white_check_mark: | route |
+| Kong | :yellow_circle: | :yellow_circle: | route + service |
+| NGINX Gateway Fabric | :white_check_mark: | :x: | route |
+| Traefik | :white_check_mark: | :white_check_mark: | service |
 
 ### API Attachment Points
 
-The new `BackendLBPolicy` metaresource only supports attaching to a backend. A backend can be a Service,
-ServiceImport (see [GEP-1748](../gep-1748/index.md)), or any implementation-specific backends that are a valid
-[`BackendObjectReference`](/reference/api-spec/main/spec/#backendobjectreference). Enabling session
-persistence for a backend enables subsequently enables it for any route directing traffic to this backend. To learn more
-about the process of attaching a policy to a backend, please refer to [GEP-713](../gep-713/index.md).
+The [Backend](../gep-4894/index.md) resource is the primary attachment point for session persistence. The Backend
+resource (GEP-4894) provides a consumer-focused, namespace-scoped resource that can be referenced via `backendRefs`
+in routes, combining the advantages of the previous attachment points:
 
-On the other hand, configuring the `sessionPersistence` field in the route rule enables session persistence exclusively
-for the traffic directed to the `backendRefs` in this route rule. This means applying session persistence configuration
-to a route rule MUST NOT affect traffic for other routes or route rules. Designing the configuration for a specific
-route rule section rather than the route entirely, allows users to configure session persistence in a more granular
-fashion. This approach avoids the need to decompose routes if the configuration is specific to a route path.
+- Session persistence is configured on the backend, where most prior art puts it
+- Referenced directly from the route via `backendRef`, making the configuration discoverable without a separate
+  policy resource
+- Different consumers can configure different session persistence for the same underlying endpoints by creating
+  separate Backend resources
 
-Session persistence configuration specified in a route rule SHALL override equivalent configuration in `BackendLBPolicy`.
-In this situation, implementations MAY want to indicate a warning via a log or status. Refer to [GEP-713](../gep-713/index.md)
-and/or [GEP-2648](../gep-2648/index.md) for more specific details on how to handle override scenarios.
+Having a single attachment point for session persistence reduces the conflict surface and eliminates the need for
+complex precedence rules between multiple configuration sources.
 
-Edge cases will arise when implementing session persistence support for both backends and route rules through
-`BackendLBPolicy` and the route rule's `sessionPersistence` field. For guidance on addressing conflicting
-attachments, please consult the [Edge Case Behavior](#edge-case-behavior) section, which outlines API
-use cases. Only a subset of implementations have already designed their data plane to incorporate route rule level session
-persistence, making it likely that route rule level session persistence will be less widely implemented.
+See [#4462](https://github.com/kubernetes-sigs/gateway-api/discussions/4462) for background on the attachment model
+discussion.
+
+#### Deprecated: Route-Inline and BackendTrafficPolicy Session Persistence
+
+This GEP previously defined two attachment points for session persistence: route-inline (`sessionPersistence` on
+HTTPRouteRule and GRPCRouteRule) and `BackendTrafficPolicy`. Both are deprecated in favor of the Backend resource
+and will be removed once Backend session persistence reaches Standard. Implementations that have already shipped
+route-inline support (NGINX Gateway Fabric, Envoy Gateway, kgateway) may need to support both during the transition.
+How these implementations handle the intersection is left to the implementation.
+
+### Backend Protocol Relationship
+
+The `Backend` object's `spec.protocol` defines the protocol between the Gateway and the backend endpoints. If this
+protocol does not support HTTP cookies or headers, the persistence cookie or header cannot be forwarded to the backend.
+This is acceptable because this GEP does not guarantee that either reaches the backend. Session persistence is applied
+by the Gateway when selecting an endpoint and does not depend on the persistence cookie or header being understood by
+the backend. See [Session Initiation Guidelines](#session-initiation-guidelines) for forwarding behavior.
 
 ### Traffic Splitting
 
-In scenarios involving traffic splitting, session persistence impacts load balancing done after routing.
-When a persistent session is established and traffic splitting is configured across services, the persistence to a single backend MUST be maintained across services, even if the weight is set to 0.
-Consequently, a persistent session takes precedence over traffic split
-weights when selecting a backend after route matching. It's important to note that session persistence does not impact
-the process of route matching.
+In scenarios involving traffic splitting, session persistence operates after backend selection. Traffic splitting
+selects which backend receives the request based on configured weights, and session persistence then pins the client
+to a specific endpoint within the selected backend. Session persistence MUST NOT override which backend is selected
+during traffic splitting, and it MUST NOT impact the process of route matching.
 
-When using multiple backends in traffic splitting, all backend services should have session persistence enabled.
-Nonetheless, implementations MUST carefully consider how to manage traffic splitting scenarios in which one service has
-persistence enabled while the other does not. This includes scenarios where users are transitioning to or from an
-implementation version designed with or without persistence. For traffic splitting scenario within a single route rule,
-this GEP leaves the decision to the implementation. Implementations MUST choose to apply session persistence to all
-backends equally, reject the session persistence configuration entirely, or apply session persistence only for the
-backends with it configured.
+When using multiple backends in traffic splitting, all backends should have session persistence enabled for consistent
+behavior. In scenarios where one backend has persistence enabled while the other does not, each backend operates
+independently: the backend with session persistence will pin returning clients to a specific endpoint, while the
+backend without session persistence will distribute requests normally.
 
 See [Edge Case Behavior](#edge-case-behavior) for more use cases on traffic splitting.
 
@@ -740,16 +650,22 @@ Let's discuss some of these cookie attributes in more detail.
 
 #### Name
 
-The `Name` cookie attribute MAY be configured via the `SessionName` field in `sessionPersistence`. However, this field
-is implementation-specific because it's impossible to create a conformance test for it, given that sessions could be
-created in a variety of ways. Additionally, `SessionName` is not universally supported as some implementations, such as
-ones supporting global load balancers, don't have the capability to configure the cookie name. Some implementations
-have a fixed cookie name, and therefore `SessionName` may be reflected in the value of the cookie.
+##### Cookie Name
 
-The use case for modifying the cookie name using `SessionName` is that certain users might need to align it with an
-existing cookie name, such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines)
-for details on how this GEP supports existing sessions. If `SessionName` is not specified, then a unique cookie name
-should be generated.
+The cookie name is configured via the `cookie.name` field (Extended support). Not all implementations support
+configuring the cookie name. For example, GKE's stateful generated cookie
+([GSSA](https://pkg.go.dev/github.com/GoogleCloudPlatform/gke-gateway-api/apis/networking/v1#StatefulGeneratedCookieConfig)) uses a fixed cookie
+name that cannot be changed by the user. If `cookie.name` is not specified, a unique cookie name SHOULD be generated.
+
+The use case for configuring the cookie name is that certain users might need to align it with an existing cookie name,
+such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines) for details on
+how this GEP supports existing sessions.
+
+##### Header Name
+
+The header name is configured via the `header.name` field (Core support). Unlike cookies, headers are not automatically
+managed by browsers, so clients must know the header name to include it in subsequent requests. For this reason,
+`header.name` is a required field.
 
 #### Expires / Max-Age
 
@@ -765,7 +681,8 @@ or timeout for both session and permanent cookies is represented by `AbsoluteTim
 Conversely, if `LifetimeType` is `Session`, `AbsoluteTimeout` MUST regulate the cookie's lifespan through a
 different mechanism, as mentioned above. If `LifetimeType` is set to `Permanent`, then `AbsoluteTimeout` MUST
 also be set as well. This requirement is necessary because an expiration value is required to set `Expires` or `Max-Age`.
-`LifetimeType` of `Session` is core support level and the default, while `LifetimeType` of `Permanent` is extended.
+Both `LifetimeType` values have Core support. `AbsoluteTimeout` has Core support when `LifetimeType` is `Permanent`,
+and Extended support when `LifetimeType` is `Session`.
 
 See [issue #2747](https://github.com/kubernetes-sigs/gateway-api/issues/2747) for more context regarding distinguishing
 between permanent and session cookies.
@@ -773,27 +690,23 @@ between permanent and session cookies.
 #### Path
 
 The cookie's `Path` attribute defines the URL path that must exist in order for the client to send the `cookie` header.
-Whether attaching session persistence to an xRoute or a service, it's important to consider the relationship the cookie
-`Path` attribute has with the route path.
 
-When session persistence is enabled on a xRoute rule, the implementor should interpret the path as
-configured on the xRoute. To interpret the `Path` attribute from an xRoute, implementors should take note of the
-following:
+Implementations MUST default the cookie `Path` to `/` when no explicit path is configured.
 
-1. For an xRoute that matches all paths, the `Path` should be set to `/`.
-2. For an xRoute that has multiple paths, the `Path` should be interpreted based on the route path that was matched.
-3. For an xRoute using a path that is a regex, the `Path` should be set to the longest non-regex prefix (.e.g. if the
-   path is /p1/p2/*/p3 and the request path was /p1/p2/foo/p3, then the cookie path would be /p1/p2).
+This GEP previously specified that the cookie path should be computed from the matched route path. That approach was
+removed because no prior art computes a cookie path from route matches, it is underspecified for regex matches, and it
+breaks with edge proxy path rewrites (see [#4713](https://github.com/kubernetes-sigs/gateway-api/issues/4713)).
 
-It is also important to note that this design makes persistent session unique per route path. For instance, if two
-distinct routes, one with path prefix `/foo` and the other with `/bar`, both target the same service, the persistent
-session won't be shared between these two paths.
+Defaulting to `/` was chosen because it is the most portable behavior — the majority of implementations default to `/`
+and every dataplane can deliver it.
 
-Conversely, if the `BackendLBPolicy` policy is attached to a service, the `Path` attribute MUST be left
-unset. This is because multiple routes can target a single service. If the `Path` cookie attribute is configured in this
-scenario, it could result in problems due to the possibility of different paths being taken for the same cookie.
-Implementations MUST also handle the case where the client is a browser making requests to multiple persistent services
-from the same page.
+While `Path=/` is broader than a route-specific path, the security impact is limited. The cookie value is an opaque
+backend identifier (e.g., an encoded IP address), not a session token containing sensitive data. A cookie with `Path=/`
+being sent to other routes on the same domain does not expose sensitive information — it only causes the receiving
+route's proxy to attempt (and fail) to use the persistence token, falling back to normal load balancing.
+
+Users who need a cookie scoped to a specific path can configure it explicitly via the `cookie.path` field (Extended
+support). When set, `cookie.path` overrides the default `/`.
 
 #### Secure, HttpOnly, SameSite
 
@@ -823,116 +736,29 @@ persistent session). In general, inserting an additional cookie is a generally s
 implementations to exercise their own discretion. However, regardless of the implementation's design choice, the
 implementation MUST be able to handle multiple cookies.
 
+For [gateway-initiated](#gateway-initiated-session-example) cookie-based or header-based session persistence,
+implementations SHOULD forward the Gateway-generated persistence cookie or header to the selected backend when supported
+by the backend protocol. Backends should not rely on receiving a Gateway-generated persistence cookie or header. This
+does not affect the normal forwarding of application cookies or headers that are unrelated to Gateway-managed session
+persistence.
+
 ### Session Persistence Failure Behavior
 
-In a situation where session persistence is configured and the backend becomes unhealthy, this GEP doesn't specify a
-prescribed fallback behavior mechanism or HTTP status code. Implementations MAY exhibit different behaviors depending
-on whether active health checking is enabled. Data planes MAY fall back to available backends, disregarding the broken
-session, and reestablish session persistence when the backend becomes available again.
+In a situation where session persistence is configured and the backend becomes unhealthy or is draining, this GEP doesn't
+specify a prescribed fallback behavior mechanism or HTTP status code. Implementations MAY exhibit different behaviors
+depending on whether active health checking is enabled. Data planes MAY continue routing existing persistent sessions to
+backends that are draining but still serving, and SHOULD fall back to available backends when the original backend is no
+longer serving, reestablishing session persistence with a new backend.
 
 ### Edge Case Behavior
 
 Implementing session persistence is complex and involves many edge cases. In this section, we will outline API
 configuration scenarios (use cases) and how implementations should handle them.
 
-#### Attaching Session Persistence to both Service and a Route Rule
-
-In a situation which:
-
-- `ServiceA` with `BackendLBPolicy` attached
-- `RouteX` with `sessionPersistence` configured on the route rule and backend `ServiceA`
-
-The `sessionPersistence` configuration inline to `RouteX` route rule MUST take precedence over `BackendLBPolicy`. Since
-routes direct traffic to services, the policy attached to route operates at a higher-level and MUST override policies
-applied to individual services.
-
-```mermaid
-graph TB
-   RouteX ----> ServiceA((ServiceA))
-   BackendLBPolicyServiceA[BackendLBPolicy] -.-> ServiceA
-   BackendLBPolicyRouteA[SessionPersistence] -.Precedence.-> RouteX
-   linkStyle 2 stroke:red;
-```
-
-#### Two Routes Rules have Session Persistence to the Same Service
-
-Consider the situation in which two different route paths have session persistence configured and are going to the same
-service:
-
-```yaml
-kind: HTTPRoute
-metadata:
-  name: routeX
-spec:
-  rules:
-  - matches:
-    - path:
-      value: /a
-    backendRefs:
-    - name: servicev1
-    sessionPersistence:
-      name: session-a
-  - matches:
-    - path:
-      value: /b
-    backendRefs:
-    - name: servicev1
-      weight: 0
-    - name: servicev2
-      weight: 100
-    sessionPersistence:
-      name: session-b
-```
-
-Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie). Let's illustrate
-this by the following commands:
-
-1. Curl to `/a` which establishes a persistent session with `servicev1`
-2. Curl to `/b` routes MUST direct traffic to `servicev2` since the persistent session established earlier is not
-   shared with this route path.
-
-#### Route Rules Referencing to a Session Persistent Enabled Service Must Not Share Sessions
-
-Consider the situation in which two different route paths are going to the same service, and session persistence is enabled with the service via `BackendLBPolicy`:
-
-```yaml
-kind: HTTPRoute
-metadata:
-  name: routeX
-spec:
-  rules:
-  - matches:
-    - path:
-      value: /a
-    backendRefs:
-    - name: servicev1
-  - matches:
-    - path:
-      value: /b
-    backendRefs:
-    - name: servicev1
----
-kind: BackendLBPolicy
-metadata:
-  name: lbp
-spec:
-  targetRef:
-    kind: Service
-    Name: servicev1
-  sessionPersistence:
-    sessionName: service-cookie
-    type: Cookie
-```
-
-Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie), even if the session persistence is attached to the service via `BackendLBPolicy`, and each route rule should have different persistent sessions.
-
-1. Curl to `/a` which establishes a persistent session with `servicev1`
-2. Curl to `/b` which establishes another persistent session with `servicev1` since the previous session established earlier is not shared with this route path.
-
 #### Session Naming Collision
 
-Consider the situation in which two different services have cookie-based session persistence configured with the
-same `sessionName`:
+Consider the situation in which two different Backends have cookie-based session persistence configured with the
+same cookie name in a traffic split:
 
 ```yaml
 kind: HTTPRoute
@@ -941,68 +767,47 @@ metadata:
 spec:
   rules:
   - backendRefs:
-    - name: servicev1
+    - kind: Backend
+      name: backend-v1
       weight: 50
-    - name: servicev2
+    - kind: Backend
+      name: backend-v2
       weight: 50
 ---
-kind: BackendLBPolicy
+kind: Backend
 metadata:
-  name: lbp-split-route
+  name: backend-v1
 spec:
-  targetRef:
-    kind: Service
-    Name: servicev1
+  type: EndpointSelector
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: split-route-cookie
+  endpointSelector:
+    matchLabels:
+      app: backend-v1
 ---
-kind: BackendLBPolicy
+kind: Backend
 metadata:
-  name: lbp-split-route2
+  name: backend-v2
 spec:
-  targetRef:
-    kind: Service
-    Name: servicev2
+  type: EndpointSelector
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: split-route-cookie
+  endpointSelector:
+    matchLabels:
+      app: backend-v2
 ```
 
 This is an invalid configuration as two separate sessions cannot have the same cookie name. Implementations SHOULD
 address this scenario in manner they deem appropriate. Implementations MAY choose to reject the configuration, or they
 MAY non-deterministically allow one cookie to work (e.g. whichever cookie is configured first).
 
-#### Traffic Splitting with route rule inline sessionPersistence field
+#### Traffic Splitting with Session Persistence
 
-Consider the scenario where a route is traffic splitting between two backends, and additionally, an inline route rule `sessionPersistence` config is applied:
-
-```yaml
-kind: HTTPRoute
-metadata:
-  name: split-route
-spec:
-  rules:
-  - backendRefs:
-    - name: servicev1
-      weight: 50
-    - name: servicev2
-      weight: 50
-    sessionPersistence:
-      sessionName: split-route-cookie
-      type: Cookie
-```
-
-In this scenario, session persistence is enabled at route rule level and all services in the traffic split have persistent session.
-
-That is to say, traffic routing to `servicev1` previously MUST continue to be routed to `servicev1` when cookie is present, and traffic routing to `servicev2` previously MUST continue to be routed to `servicev2` when cookie is present.
-
-When cookie is not present, such as, a new session, it will be routed based on the `weight` configuration and choose one of the services.
-
-#### Traffic Splitting with BackendLBPolicy attached to some Backends (not all)
-
-Consider the scenario where a route is traffic splitting between two backends, and additionally, a
-`BackendLBPolicy` with `sessionPersistence` config is attached to one of the services:
+Consider the scenario where a route is traffic splitting between two Backends, both with session persistence:
 
 ```yaml
 kind: HTTPRoute
@@ -1011,31 +816,47 @@ metadata:
 spec:
   rules:
   - backendRefs:
-    - name: servicev1
+    - kind: Backend
+      name: backend-v1
       weight: 50
-    - name: servicev2
+    - kind: Backend
+      name: backend-v2
       weight: 50
 ---
-kind: BackendLBPolicy
+kind: Backend
 metadata:
-  name: lbp-split-route
+  name: backend-v1
 spec:
-  targetRef:
-    kind: Service
-    Name: servicev1
+  type: EndpointSelector
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: session-v1
+  endpointSelector:
+    matchLabels:
+      app: backend-v1
+---
+kind: Backend
+metadata:
+  name: backend-v2
+spec:
+  type: EndpointSelector
+  sessionPersistence:
+    type: Cookie
+    cookie:
+      name: session-v2
+  endpointSelector:
+    matchLabels:
+      app: backend-v2
 ```
 
-In this traffic splitting scenario within a single route rule, this GEP leaves the decision to the implementation. An
-implementation MUST choose one of the following:
+Traffic splitting selects a backend based on the `weight` configuration. Once a backend is selected and session
+persistence is configured on that backend, the client is pinned to a specific endpoint within that backend. On
+subsequent requests, traffic splitting selects a backend again based on weights. If the same backend is selected,
+the session cookie routes the client to the same endpoint. If a different backend is selected, a new session is
+established within that backend.
 
-1. Apply session persistence configured in `BackendLBPolicy` to `servicev1` and `servicev2` equally
-2. Reject the session persistence configured in `BackendLBPolicy` so that `servicev1` does not have session persistence
-3. Apply session persistence for only `servicev1`, potentially causing all traffic to eventually migrate to `servicev1`
-
-This is also described in [Traffic Splitting](#traffic-splitting).
+In summary, session persistence applies after the routing decision, not before it.
 
 #### A Service's Selector is Dynamically Updated
 
@@ -1055,65 +876,33 @@ The expected behavior is that the gateway SHOULD retain existing persistent sess
 selected, and establish new persistent sessions after a selector update. This use case is uncommon and may not be
 supported by some implementations due to their current designs.
 
-### Open Questions
-
-- What happens when session persistence causes traffic splitting scenarios to overload a backend?
-- Should we add status somewhere when a user gets into a "risky" configuration with session persistence?
-- Should there be an API configuration field that specifies how already established sessions are handled?
-- How do implementations drain established sessions during backend upgrades without disruption?
-    - Do we need a "session draining timeout" as documented by [A55: xDS-Based Stateful Session Affinity for Proxyless gRPC](https://github.com/grpc/proposal/blob/master/A55-xds-stateful-session-affinity.md#background)
-      defined in this API?
-- How do we provide a standard way to communicate that an implementation does not support Route Rule API?
-    - Do we want something conceptually similar to the `IncompatibleFilters` reason?
-
 ## Conformance Details
 
 **Note**: Conformance tests are still WIP, and additional test coverage will be added in future PRs.
 
-###  Feature Names
+### Feature Names
 
-* HTTPRouteSessionPersistence - Core feature for session persistence support (Extended).
-* HTTPRouteSessionPersistenceCookieLifetimeTypePermanent - Permanent Lifetime for cookie-based session persistence (Extended).
+| Feature | Fields | Capability | Why Extended |
+| :---- | :---- | :---- | :---- |
+| `BackendSessionPersistenceCookie` | `type: Cookie`, `cookie.name`, `cookie.lifetimeType`, required `absoluteTimeout` for `Permanent` | Cookie-based session persistence. | Basis of the new Backend session persistence capability. |
+| `BackendSessionPersistenceHeader` | `type: Header`, `header.name`, `absoluteTimeout` | Header-based session persistence. | Not supported by some dataplanes, including NGINX. |
+| `BackendSessionPersistenceSessionCookieAbsoluteTimeout` | `absoluteTimeout` with `cookie.lifetimeType: Session` | Server-tracked timeout for Session cookies. | Not supported by some dataplanes, including Envoy and NGINX. |
+| `BackendSessionPersistenceCookiePath` | `cookie.path` | Configurable cookie Path; `/` is the default. | Not supported directly by some dataplanes, including HAProxy. |
 
-### HTTPRoute Conformance tests
+### Backend Conformance Tests
 
-| Description | Outcome | Features |
-| :---- | :---- | :---- |
-| Simple Cookie Session Persistence: An HTTPRoute with sessionPersistence configured with type: Cookie (default) on a single backend in gateway-conformance-infra namespace. | HTTPRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie header in response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | HTTPRouteSessionPersistence |
-| Session Cookie Lifetime (Default): HTTPRoute with sessionPersistence and cookieConfig.lifetimeType: Session (default). | HTTPRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age`. | HTTPRouteSessionPersistence |
-| Multiple Weighted Backends - Initial Distribution Honored: HTTPRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30) on a path. | HTTPRoute MUST have Accepted=True in parent status. Initial requests (without session cookie) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with cookie MUST route to the same backend regardless of weight configuration. | HTTPRouteSessionPersistence |
-| Session Persistence Scoped to Route Rule: HTTPRoute with two rules: Rule 1 (path /a) and Rule 2 (path /b), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | HTTPRoute MUST have Accepted=True in parent status. Each rule MUST independently establish and maintain its own session. Verify with: 1) Send an initial request to /a (no cookie) — the response sets a session cookie binding /a to Pod-A, 2) Send an initial request to /b (no cookie) — the response sets a session cookie independently binding /b to Pod-B (Pod-B may or may not be the same pod as Pod-A), 3) N subsequent requests to /a with the /a session cookie MUST all route to Pod-A, 4) N subsequent requests to /b with the /b session cookie MUST all route to Pod-B. | HTTPRouteSessionPersistence |
-| Session Persistence with cookieConfig.lifetimeType: Permanent and absoluteTimeout: 5min. | HTTPRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `Expires` or `Max-Age` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires. | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookieLifetimeTypePermanent |
-
-### GRPCRoute Feature Names
-
-* GRPCRouteSessionPersistence - Core feature for session persistence support on GRPCRoute (Extended).
-* GRPCRouteSessionPersistenceHeader - Header-based session persistence on GRPCRoute (Extended).
-
-### GRPCRoute Conformance tests
+These tests use HTTPRoute and GRPCRoute resources that reference Backends with
+session persistence configured. Unless otherwise noted, each scenario MUST be
+tested with both route types.
 
 | Description | Outcome | Features |
 | :---- | :---- | :---- |
-| Simple Cookie-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Cookie (default) on a single backend. The test client MUST explicitly extract the Set-Cookie response header and include it as a Cookie header in subsequent requests. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie response header. Subsequent requests with the cookie header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence |
-| Header-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Header on a single backend. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a session identity header in the response metadata. Subsequent requests with that header included in request metadata MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence, GRPCRouteSessionPersistenceHeader |
-| Session Cookie Lifetime (Default) (GRPCRoute): GRPCRoute with sessionPersistence and cookieConfig.lifetimeType: Session (default). | GRPCRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age` attributes. | GRPCRouteSessionPersistence |
-| Multiple Weighted Backends - Initial Distribution Honored (GRPCRoute): GRPCRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30). | GRPCRoute MUST have Accepted=True in parent status. Initial requests (without session token) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with the session token MUST route to the same backend regardless of weight configuration. | GRPCRouteSessionPersistence |
-| Session Persistence Scoped to Route Rule (GRPCRoute): GRPCRoute with two rules matching different gRPC methods (e.g., Rule 1 matches `/service.Foo/MethodA` and Rule 2 matches `/service.Foo/MethodB`), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | GRPCRoute MUST have Accepted=True in parent status. Each rule MUST independently establish and maintain its own session. Verify with: 1) Send an initial request to MethodA (no session token) — the response sets a session token binding MethodA to Pod-A, 2) Send an initial request to MethodB (no session token) — the response sets a session token independently binding MethodB to Pod-B (Pod-B may or may not be the same pod as Pod-A), 3) N subsequent requests to MethodA with the MethodA session token MUST all route to Pod-A, 4) N subsequent requests to MethodB with the MethodB session token MUST all route to Pod-B. | GRPCRouteSessionPersistence |
-
-## TODO
-
-The following are items that we intend to resolve in future revisions:
-
-- We need to identify and document requirements regarding session draining and migration.
-- We need to document sessions with Java in greater detail. Java standardized the API and behavior of session persistence long ago and would be worth examining.
-- We need to add a small section on compliance regarding the browser and client relationship.
-- We need to finish enumerating all the edge cases in [Edge Case Behavior](#edge-case-behavior) and identify
-potential scenarios where session persistence could break so an implementation can implement session persistence in a
-predicable way.
-- We need to clean up the [Implementations](#implementations) table to make it more organized and readable.
-- We need to revisit how to indicate to a user that a `BackendLBPolicy` configuration is being overridden by a route
-configuration via a warning status or log.
-    - This might require addressing as part of an update to [GEP-2648](/geps/gep-2648/).
+| Simple Cookie Session Persistence: A Route references a Backend with sessionPersistence configured with type: Cookie (default). | The Route MUST have Accepted=True in parent status. The first request MUST receive a Set-Cookie header in the response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | BackendSessionPersistenceCookie |
+| Session Cookie Lifetime (Default): A Route references a Backend with cookie.lifetimeType: Session (default). | The Route MUST have Accepted=True in parent status. The cookie MUST NOT contain `Expires` or `Max-Age`. | BackendSessionPersistenceCookie |
+| Session Cookie Absolute Timeout: A Route references a Backend with cookie.lifetimeType: Session and absoluteTimeout configured. | The Route MUST have Accepted=True in parent status. The cookie MUST NOT contain `Expires` or `Max-Age`. Session persistence MUST stop functioning after the configured absoluteTimeout duration. | BackendSessionPersistenceCookie, BackendSessionPersistenceSessionCookieAbsoluteTimeout |
+| Header-based Session Persistence: A Route references a Backend with sessionPersistence configured with type: Header. | The Route MUST have Accepted=True in parent status. The first request MUST receive a session identity header. Subsequent requests with that header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | BackendSessionPersistenceHeader |
+| Multiple Weighted Backends - Session Persistence Does Not Override Traffic Splitting: A Route has multiple backendRefs with weights (e.g., 70/30) that reference Backends with cookie-based session persistence configured. | The Route MUST have Accepted=True in parent status. Requests MUST respect weight distribution (~70/30 within statistical tolerance). Session persistence MUST NOT override backend selection. | BackendSessionPersistenceCookie |
+| Permanent Cookie Lifetime: A Route references a Backend with cookie.lifetimeType: Permanent and absoluteTimeout: 5min. | The Route MUST have Accepted=True in parent status. The response Set-Cookie header MUST contain an `Expires` or `Max-Age` attribute whose value corresponds to the configured absoluteTimeout duration. Session persistence MUST function correctly until the cookie expires. | BackendSessionPersistenceCookie |
 
 ## Alternatives
 
@@ -1137,7 +926,7 @@ than containing all load balancing configuration within a single metaresource, w
 with a metaresource called `SessionPersistencePolicy`, specifically to handle session persistence configuration.
 
 The advantage of `SessionPersistencePolicy` is that it is more specific, which may enable a smoother transition to
-attaching to routes in the future (see [Route Attachment Future Work](#route-attachment-future-work)).
+attaching to routes in the future.
 
 ```go
 // SessionPersistencePolicy provides a way to define session persistence rules
@@ -1175,7 +964,7 @@ Alternatively, the API for session persistence could be tightly coupled to cooki
 described in [API Granularity](#api-granularity). The advantage here is the API's ability to offer greater control
 through specific cookie attributes and configuration, catering to the needs of advanced users. However, there could be
 challenges with implementations adhering to an API that is closely tied to cookies. This alternative could apply to the
-current [`BackendLBPolicy`](#api) design or the [`SessionPersistencePolicy`](#sessionpersistence-api-alternative)
+current [`BackendTrafficPolicy`](#api) design or the [`SessionPersistencePolicy`](#sessionpersistence-api-alternative)
 alternative.
 
 The cookie attributes can be defined either as a loosely-typed list of attributes or as strongly-typed attribute fields.

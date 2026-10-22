@@ -34,11 +34,39 @@ import (
 )
 
 // GatewayInformer provides access to a shared informer and lister for
-// Gateways.
+// Gateways. Prefer using the type-safe variant (see [TypedGatewayInformer]).
 type GatewayInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1.GatewayLister
 }
+
+// TypedGatewayInformer provides access to a shared informer and lister for
+// Gateways, including the type-safe TypedInformer variant.
+// It is a superset of GatewayInformer.
+type TypedGatewayInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() GatewayIndexInformer
+	Lister() apisv1.GatewayLister
+}
+
+// GatewayIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type GatewayIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1.Gateway]
+
+// GatewayHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for Gateway.
+type GatewayHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1.Gateway]
+
+// GatewayDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for Gateway.
+type GatewayDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1.Gateway]
+
+// GatewayFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for Gateway.
+type GatewayFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1.Gateway]
+
+// GatewayIndexers is a specialization of [cache.TypedIndexers] for Gateway.
+type GatewayIndexers = cache.TypedIndexers[*gatewayapiapisv1.Gateway]
+
+// DeletedGateway is a specialization of [cache.DeletedObject] for Gateway.
+type DeletedGateway = cache.DeletedObject[*gatewayapiapisv1.Gateway]
 
 type gatewayInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type gatewayInformer struct {
 // NewGatewayInformer constructs a new informer for Gateway type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedGatewayInformer]).
 func NewGatewayInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedGatewayInformer constructs a new informer for Gateway type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedGatewayInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers GatewayIndexers) GatewayIndexInformer {
+	return NewTypedGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredGatewayInformer constructs a new informer for Gateway type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredGatewayInformer]).
 func NewFilteredGatewayInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredGatewayInformer constructs a new informer for Gateway type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredGatewayInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers GatewayIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) GatewayIndexInformer {
+	return NewTypedGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewGatewayInformerWithOptions constructs a new informer for Gateway type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedGatewayInformerWithOptions]).
 func NewGatewayInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedGatewayInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedGatewayInformerWithOptions constructs a new informer for Gateway type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedGatewayInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) GatewayIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1", Resource: "gateways"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.Gateway](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewGatewayInformerWithOptions(client versioned.Interface, namespace string,
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *gatewayInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewGatewayInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedGatewayInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *gatewayInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1.Gateway{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *gatewayInformer) TypedInformer() GatewayIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.Gateway](f.factory.InformerFor(&gatewayapiapisv1.Gateway{}, f.defaultInformer))
 }
 
 func (f *gatewayInformer) Lister() apisv1.GatewayLister {
 	return apisv1.NewGatewayLister(f.Informer().GetIndexer())
+}
+
+// ToTypedGatewayInformer converts an untyped informer into a TypedGatewayInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Gateway. If that is not the case, calling type-safe methods of the returned
+// TypedGatewayInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedGatewayInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedGatewayInformer(informer GatewayInformer) TypedGatewayInformer {
+	if informer, ok := informer.(TypedGatewayInformer); ok {
+		return informer
+	}
+	return &gatewayTypedInformerAdapter{informer}
+}
+
+type gatewayTypedInformerAdapter struct {
+	GatewayInformer
+}
+
+func (a *gatewayTypedInformerAdapter) TypedInformer() GatewayIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.Gateway](a.Informer())
+}
+
+// ToGatewayIndexInformer converts an untyped informer into a GatewayIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Gateway. If that is not the case, calling type-safe methods of the returned
+// GatewayIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a GatewayIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToGatewayIndexInformer(informer cache.SharedIndexInformer) GatewayIndexInformer {
+	if informer, ok := informer.(GatewayIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.Gateway](informer)
 }

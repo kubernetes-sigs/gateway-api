@@ -42,7 +42,7 @@ import (
 //
 // <gateway:union:BackendTLSPolicy>
 type TLSRouteApplyConfiguration struct {
-	metav1.TypeMetaApplyConfiguration    `json:",inline"`
+	metav1.TypeMetaApplyConfiguration    `json:""`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of TLSRoute.
 	Spec *TLSRouteSpecApplyConfiguration `json:"spec,omitempty"`

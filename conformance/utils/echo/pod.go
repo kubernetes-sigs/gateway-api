@@ -59,7 +59,7 @@ const (
 func (m *MeshPod) MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, exp http.ExpectedResponse, timeoutConfig config.TimeoutConfig) {
 	t.Helper()
 
-	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
+	http.AwaitConvergence(t, timeoutConfig, func(elapsed time.Duration) bool {
 		req := makeRequest(t, &exp)
 
 		resp, err := m.request(req)
@@ -98,9 +98,8 @@ func makeRequestWithCount(t *testing.T, exp *http.ExpectedResponse, count int) [
 		exp.Request.Method = "GET"
 	}
 
-	// if the deprecated field StatusCode is set, append it to StatusCodes for backwards compatibility
-	//nolint:staticcheck
-	if exp.Response.StatusCode != 0 {
+	// if StatusCode is set, append it to StatusCodes for backwards compatibility
+	if exp.Response.StatusCode != 0 && !slices.Contains(exp.Response.StatusCodes, exp.Response.StatusCode) {
 		exp.Response.StatusCodes = append(exp.Response.StatusCodes, exp.Response.StatusCode)
 	}
 

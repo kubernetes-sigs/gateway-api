@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 2645
 name: UDPRoute - Add support for routing based on a UDP port
-status: Experimental
+status: Standard
 authors:
   - zac-nixon
   - rikatz
@@ -18,3 +18,4 @@ featureNames:
   - UDPRoute
 changelog:
   - 2026/May/18 (rikatz) - Add request flow, conflict management, conformance scenarios, feature names, and graduation criteria
+  - 2026/Jun/29 (rikatz) - Mark UDPRoute as standard

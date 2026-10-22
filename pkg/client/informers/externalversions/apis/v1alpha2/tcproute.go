@@ -34,11 +34,39 @@ import (
 )
 
 // TCPRouteInformer provides access to a shared informer and lister for
-// TCPRoutes.
+// TCPRoutes. Prefer using the type-safe variant (see [TypedTCPRouteInformer]).
 type TCPRouteInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1alpha2.TCPRouteLister
 }
+
+// TypedTCPRouteInformer provides access to a shared informer and lister for
+// TCPRoutes, including the type-safe TypedInformer variant.
+// It is a superset of TCPRouteInformer.
+type TypedTCPRouteInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() TCPRouteIndexInformer
+	Lister() apisv1alpha2.TCPRouteLister
+}
+
+// TCPRouteIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type TCPRouteIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1alpha2.TCPRoute]
+
+// TCPRouteHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for TCPRoute.
+type TCPRouteHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1alpha2.TCPRoute]
+
+// TCPRouteDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for TCPRoute.
+type TCPRouteDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1alpha2.TCPRoute]
+
+// TCPRouteFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for TCPRoute.
+type TCPRouteFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1alpha2.TCPRoute]
+
+// TCPRouteIndexers is a specialization of [cache.TypedIndexers] for TCPRoute.
+type TCPRouteIndexers = cache.TypedIndexers[*gatewayapiapisv1alpha2.TCPRoute]
+
+// DeletedTCPRoute is a specialization of [cache.DeletedObject] for TCPRoute.
+type DeletedTCPRoute = cache.DeletedObject[*gatewayapiapisv1alpha2.TCPRoute]
 
 type tCPRouteInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type tCPRouteInformer struct {
 // NewTCPRouteInformer constructs a new informer for TCPRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedTCPRouteInformer]).
 func NewTCPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewTCPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedTCPRouteInformer constructs a new informer for TCPRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedTCPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers TCPRouteIndexers) TCPRouteIndexInformer {
+	return NewTypedTCPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredTCPRouteInformer constructs a new informer for TCPRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredTCPRouteInformer]).
 func NewFilteredTCPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewTCPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedTCPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredTCPRouteInformer constructs a new informer for TCPRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredTCPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers TCPRouteIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) TCPRouteIndexInformer {
+	return NewTypedTCPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewTCPRouteInformerWithOptions constructs a new informer for TCPRoute type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedTCPRouteInformerWithOptions]).
 func NewTCPRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedTCPRouteInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedTCPRouteInformerWithOptions constructs a new informer for TCPRoute type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedTCPRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) TCPRouteIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "tcproutes"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.TCPRoute](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewTCPRouteInformerWithOptions(client versioned.Interface, namespace string
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *tCPRouteInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewTCPRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedTCPRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *tCPRouteInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1alpha2.TCPRoute{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *tCPRouteInformer) TypedInformer() TCPRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.TCPRoute](f.factory.InformerFor(&gatewayapiapisv1alpha2.TCPRoute{}, f.defaultInformer))
 }
 
 func (f *tCPRouteInformer) Lister() apisv1alpha2.TCPRouteLister {
 	return apisv1alpha2.NewTCPRouteLister(f.Informer().GetIndexer())
+}
+
+// ToTypedTCPRouteInformer converts an untyped informer into a TypedTCPRouteInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *TCPRoute. If that is not the case, calling type-safe methods of the returned
+// TypedTCPRouteInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedTCPRouteInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedTCPRouteInformer(informer TCPRouteInformer) TypedTCPRouteInformer {
+	if informer, ok := informer.(TypedTCPRouteInformer); ok {
+		return informer
+	}
+	return &tCPRouteTypedInformerAdapter{informer}
+}
+
+type tCPRouteTypedInformerAdapter struct {
+	TCPRouteInformer
+}
+
+func (a *tCPRouteTypedInformerAdapter) TypedInformer() TCPRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.TCPRoute](a.Informer())
+}
+
+// ToTCPRouteIndexInformer converts an untyped informer into a TCPRouteIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *TCPRoute. If that is not the case, calling type-safe methods of the returned
+// TCPRouteIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a TCPRouteIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTCPRouteIndexInformer(informer cache.SharedIndexInformer) TCPRouteIndexInformer {
+	if informer, ok := informer.(TCPRouteIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.TCPRoute](informer)
 }

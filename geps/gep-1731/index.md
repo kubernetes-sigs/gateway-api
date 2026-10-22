@@ -15,7 +15,7 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 
 * To allow specification of [HTTP status codes](https://www.rfc-editor.org/rfc/rfc9110#name-overview-of-status-codes) for which a request should be retried.
 * To allow specification of the maximum number of times to retry a request.
-* To allow specification of the minimum backoff interval between retry attempts.
+* To allow specification of the base interval for a backoff strategy used to calculate the duration between retry attempts.
 * To define any interaction with configured HTTPRoute [timeouts](../gep-1742/index.md).
 * Retry configuration must be applicable to most known Gateway API implementations.
 
@@ -26,7 +26,7 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 
 ## Non-Goals
 
-* To allow more granular control of the backoff strategy than many dataplanes allow customizing, such as whether to use an exponential backoff interval between retry attempts, add jitter, or cap the backoff interval to a maximum duration.
+* To allow more granular control of the backoff strategy than many dataplanes allow customizing, such as whether to add jitter, or cap the backoff interval to a maximum duration.
 * To allow specification of a default retry policy for all routes in a given namespace or attached to a particular Gateway.
 * A standard API for approaches for retry logic other than max count or "budget", such as interaction with rate limiting headers.
 * To allow specification of gRPC status codes for which a request should be retried (this should be covered in a separate GEP).
@@ -264,9 +264,15 @@ type HTTPRouteRule struct {
 
 // HTTPRouteRetry defines retry configuration for an HTTPRoute.
 //
-// Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
-// TCP failure) if a retry stanza is configured.
+// Implementations SHOULD retry when a retry stanza is configured and the
+// connection could not be established (e.g., connect timeout, connection
+// refused, TLS handshake failure), or the backend explicitly rejected the
+// request before processing it (e.g., HTTP/2 REFUSED_STREAM, gRPC UNAVAILABLE)
 //
+// Implementations SHOULD NOT retry by default on failures where the request
+// may have been processed (e.g., a connection reset after the request was
+// sent). Implementations that do retry on such conditions MUST clearly
+// document this behavior, as it is unsafe for non-idempotent requests.
 type HTTPRouteRetry struct {
     // Codes defines the HTTP response status codes for which a backend request
     // should be retried.
@@ -274,36 +280,36 @@ type HTTPRouteRetry struct {
     // Support: Extended
     //
     // +optional
-    // <gateway:experimental>
+    // +listType=set
     Codes []HTTPRouteRetryStatusCode `json:"codes,omitempty"`
 
     // Attempts specifies the maximum number of times an individual request
-    // from the gateway to a backend should be retried.
+    // from the Gateway to a backend should be retried in addition to the
+    // initial request.
     //
     // If the maximum number of retries has been attempted without a successful
     // response from the backend, the Gateway MUST return an error.
     //
-    // When this field is unspecified, the number of times to attempt to retry
-    // a backend request is implementation-specific.
+    // An explicit zero value MUST disable retries.
     //
     // Support: Extended
     //
     // +optional
-    Attempts *Int `json:"attempts,omitempty"`
-
-    // Backoff specifies the minimum duration a Gateway should wait between
+    // +kubebuilder:default=1
+    // +kubebuilder:validation:Minimum:=0
+    Attempts *int `json:"attempts,omitempty"`
+    
+    // Backoff specifies the base interval for a backoff strategy between
     // retry attempts and is represented in Gateway API Duration formatting.
+    // The duration a Gateway waits before a retry attempt is determined
+    // by the base interval and the implementation's retry strategy.
     //
-    // For example, setting the `rules[].retry.backoff` field to the value
-    // `100ms` will cause a backend request to first be retried approximately
-    // 100 milliseconds after timing out or receiving a response code configured
-    // to be retriable.
-    //
-    // An implementation MAY use an exponential or alternative backoff strategy
-    // for subsequent retry attempts, MAY cap the maximum backoff duration to
-    // some amount greater than the specified minimum, and MAY add arbitrary
-    // jitter to stagger requests, as long as unsuccessful backend requests are
-    // not retried before the configured minimum duration.
+    // Implementations MAY add random jitter and MAY cap the delay at an
+    // implementation-defined maximum, which SHOULD NOT be less than the base
+    // interval. The precise backoff curve and jitter calculation are
+    // implementation-specific and not exposed in the Gateway API specification.
+    // Implementations typically apply exponential backoff with jitter to
+    // mitigate thundering-herd issues.
     //
     // If a Request timeout (`rules[].timeouts.request`) is configured on the
     // route, the entire duration of the initial request and any retry attempts
@@ -315,18 +321,23 @@ type HTTPRouteRetry struct {
     // If a BackendRequest timeout (`rules[].timeouts.backendRequest`) is
     // configured on the route, any retry attempts which reach the configured
     // BackendRequest timeout duration without a response SHOULD be canceled if
-    // possible and the Gateway should wait for at least the specified backoff
-    // duration before attempting to retry the backend request again.
+    // possible and the Gateway SHOULD schedule the next retry attempt according
+    // to the configured backoff.
     //
     // If a BackendRequest timeout is _not_ configured on the route, retry
     // attempts MAY time out after an implementation default duration, or MAY
     // remain pending until a configured Request timeout or implementation
     // default duration for total request time is reached.
     //
-    // When this field is unspecified, the time to wait between retry attempts
-    // is implementation-specific.
+    // When this field is unspecified, the backoff strategy and base interval
+    // are implementation-specific.
     //
-    // Support: Extended
+    // Implementations which retry immediately with no backoff MUST NOT advertise
+    // support for this field and MUST set the Accepted Condition for the Route
+    // to `status: False` with a Reason of `UnsupportedValue` when this field is
+    // set.
+    //
+    // Support: Implementation-specific
     //
     // +optional
     Backoff *Duration `json:"backoff,omitempty"`
@@ -345,18 +356,11 @@ type HTTPRouteRetry struct {
 // Implementations MAY support specifying additional discrete values in the
 // 500-599 range.
 //
-// Implementations SHOULD NOT support retrying status codes in the 100-399
-// range, as these responses are generally not appropriate to retry.
-//
 // Implementations MAY support specifying discrete values in the 400-499 range,
 // which are often inadvisable to retry.
 //
-// Implementations MAY support discrete values in the 600-999 (inclusive)
-// range, which are not valid for HTTP clients, but are sometimes used for
-// communicating application-specific errors.
-//
-// +kubebuilder:validation:Minimum:=100
-// +kubebuilder:validation:Maximum:=999
+// +kubebuilder:validation:Minimum:=400
+// +kubebuilder:validation:Maximum:=599
 type HTTPRouteRetryStatusCode int
 
 // Duration is a string value representing a duration in time. The format is
@@ -392,18 +396,7 @@ spec:
 
 ## Conformance Details
 
-Basic support for configuring retries in HTTPRoute up to a specified maximum count and with a minimum duration between attempts will be gated on the `SupportHTTPRouteRetry` feature. Retries will be tested in combination with request and backend timeouts if supported by the implementation.
-
 Retrying requests based on HTTP status codes will be gated under the following features:
-
-* `SupportHTTPRouteRetryBackendTimeout`
-
-  * Will test that backend requests that exceed a BackendRequest timeout duration are retried if a `retry` stanza is configured.
-
-* `SupportHTTPRouteRetryBackoff`
-
-  * Backoff will only be tested that a retry does not start before the duration specified for conformance, not that the backoff duration is precise.
-  * Not currently supportable by NGINX or HAProxy.
 
 * `SupportHTTPRouteRetryCodes`
 
@@ -413,6 +406,14 @@ Retrying requests based on HTTP status codes will be gated under the following f
 * `SupportHTTPRouteRetryConnectionError`
 
   * Will test that connections interrupted by a TCP failure, disconnect or reset are retried if a `retry` stanza is configured.
+
+The `attempts` field to configure retries up to a specified maximum count is tested only in combination with the above features. Retries will be tested in combination with request and backend timeouts if supported by the implementation.
+
+{{% alert color="warning" %}}
+
+Backoff is not tested for conformance and is therefore considered implementation-specific. Since implementations may add jitter, only the distribution of delays over many requests is testable. This would require statistical timing assertions, which are too complex and too sensitive to timing variance for the current conformance suite.
+
+{{% /alert %}}
 
 ## Alternatives
 

@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: Varnish Software AS
+project: Varnish Gateway
+fullName: Varnish Gateway
+description: |
+  [Varnish Gateway][varnish-gateway] is an open source Kubernetes Gateway API implementation
+  developed by [Varnish Software AS][varnish-software], using [Varnish][varnish] as its data plane.
+
+  In addition to Gateway API resources, Varnish Gateway exposes a `VarnishCachePolicy` policy
+  attachment for fine-grained caching control (TTL, grace, request coalescing, cache key
+  customization, bypass conditions) at the Gateway, HTTPRoute, or rule level.
+
+  [varnish-gateway]:https://gateway.varnish.org
+  [varnish-software]:https://www.varnish-software.com/
+  [varnish]:https://www.varnish.org/

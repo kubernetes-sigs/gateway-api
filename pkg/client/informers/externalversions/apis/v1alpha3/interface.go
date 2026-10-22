@@ -25,9 +25,9 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// BackendTLSPolicies returns a BackendTLSPolicyInformer.
-	BackendTLSPolicies() BackendTLSPolicyInformer
+	BackendTLSPolicies() TypedBackendTLSPolicyInformer
 	// TLSRoutes returns a TLSRouteInformer.
-	TLSRoutes() TLSRouteInformer
+	TLSRoutes() TypedTLSRouteInformer
 }
 
 type version struct {
@@ -41,12 +41,12 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// BackendTLSPolicies returns a BackendTLSPolicyInformer.
-func (v *version) BackendTLSPolicies() BackendTLSPolicyInformer {
+// BackendTLSPolicies returns a TypedBackendTLSPolicyInformer.
+func (v *version) BackendTLSPolicies() TypedBackendTLSPolicyInformer {
 	return &backendTLSPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// TLSRoutes returns a TLSRouteInformer.
-func (v *version) TLSRoutes() TLSRouteInformer {
+// TLSRoutes returns a TypedTLSRouteInformer.
+func (v *version) TLSRoutes() TypedTLSRouteInformer {
 	return &tLSRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

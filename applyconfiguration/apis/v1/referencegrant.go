@@ -47,7 +47,7 @@ import (
 // no grant, and MUST respond to the removal of a grant by revoking the access
 // that the grant allowed.
 type ReferenceGrantApplyConfiguration struct {
-	metav1.TypeMetaApplyConfiguration    `json:",inline"`
+	metav1.TypeMetaApplyConfiguration    `json:""`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of ReferenceGrant.
 	Spec *ReferenceGrantSpecApplyConfiguration `json:"spec,omitempty"`

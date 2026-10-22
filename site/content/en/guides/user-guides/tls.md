@@ -1,7 +1,7 @@
 ---
 title: "TLS Configuration"
 linkTitle: "TLS"
-weight: 12
+weight: 13
 ---
 
 Gateway API allows for a variety of ways to configure TLS. This document lays

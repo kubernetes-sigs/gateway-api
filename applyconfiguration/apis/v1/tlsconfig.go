@@ -32,6 +32,7 @@ type TLSConfigApplyConfiguration struct {
 	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
 	//
 	// Support: Core
+	//
 	Validation *FrontendTLSValidationApplyConfiguration `json:"validation,omitempty"`
 }
 

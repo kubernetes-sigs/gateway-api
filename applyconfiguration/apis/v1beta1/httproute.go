@@ -36,7 +36,7 @@ import (
 // used to specify additional processing steps. Backends specify where matching
 // requests should be routed.
 type HTTPRouteApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of HTTPRoute.
 	Spec *apisv1.HTTPRouteSpecApplyConfiguration `json:"spec,omitempty"`

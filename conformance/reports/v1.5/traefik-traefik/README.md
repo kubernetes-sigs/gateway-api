@@ -26,4 +26,4 @@ Run the conformance tests with:
 make test-gateway-api-conformance
 ```
 
-Check the produced report in the `./integration/conformance-reports` folder.
+Check the produced report in the `.integration/gateway-api-conformance-reports` folder.

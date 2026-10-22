@@ -34,11 +34,39 @@ import (
 )
 
 // XMeshInformer provides access to a shared informer and lister for
-// XMeshes.
+// XMeshes. Prefer using the type-safe variant (see [TypedXMeshInformer]).
 type XMeshInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisxv1alpha1.XMeshLister
 }
+
+// TypedXMeshInformer provides access to a shared informer and lister for
+// XMeshes, including the type-safe TypedInformer variant.
+// It is a superset of XMeshInformer.
+type TypedXMeshInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() XMeshIndexInformer
+	Lister() apisxv1alpha1.XMeshLister
+}
+
+// XMeshIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type XMeshIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XMesh]
+
+// XMeshHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for XMesh.
+type XMeshHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisxv1alpha1.XMesh]
+
+// XMeshDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for XMesh.
+type XMeshDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisxv1alpha1.XMesh]
+
+// XMeshFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for XMesh.
+type XMeshFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisxv1alpha1.XMesh]
+
+// XMeshIndexers is a specialization of [cache.TypedIndexers] for XMesh.
+type XMeshIndexers = cache.TypedIndexers[*gatewayapiapisxv1alpha1.XMesh]
+
+// DeletedXMesh is a specialization of [cache.DeletedObject] for XMesh.
+type DeletedXMesh = cache.DeletedObject[*gatewayapiapisxv1alpha1.XMesh]
 
 type xMeshInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -48,25 +76,49 @@ type xMeshInformer struct {
 // NewXMeshInformer constructs a new informer for XMesh type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedXMeshInformer]).
 func NewXMeshInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewXMeshInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedXMeshInformer constructs a new informer for XMesh type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedXMeshInformer(client versioned.Interface, resyncPeriod time.Duration, indexers XMeshIndexers) XMeshIndexInformer {
+	return NewTypedXMeshInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredXMeshInformer constructs a new informer for XMesh type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredXMeshInformer]).
 func NewFilteredXMeshInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewXMeshInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedXMeshInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredXMeshInformer constructs a new informer for XMesh type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredXMeshInformer(client versioned.Interface, resyncPeriod time.Duration, indexers XMeshIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) XMeshIndexInformer {
+	return NewTypedXMeshInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewXMeshInformerWithOptions constructs a new informer for XMesh type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedXMeshInformerWithOptions]).
 func NewXMeshInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedXMeshInformerWithOptions(client, options)
+}
+
+// NewTypedXMeshInformerWithOptions constructs a new informer for XMesh type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedXMeshInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) XMeshIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.x-k8s.io", Version: "v1alpha1", Resource: "xmeshs"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XMesh](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -99,17 +151,57 @@ func NewXMeshInformerWithOptions(client versioned.Interface, options internalint
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *xMeshInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewXMeshInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedXMeshInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *xMeshInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisxv1alpha1.XMesh{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *xMeshInformer) TypedInformer() XMeshIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XMesh](f.factory.InformerFor(&gatewayapiapisxv1alpha1.XMesh{}, f.defaultInformer))
 }
 
 func (f *xMeshInformer) Lister() apisxv1alpha1.XMeshLister {
 	return apisxv1alpha1.NewXMeshLister(f.Informer().GetIndexer())
+}
+
+// ToTypedXMeshInformer converts an untyped informer into a TypedXMeshInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *XMesh. If that is not the case, calling type-safe methods of the returned
+// TypedXMeshInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedXMeshInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedXMeshInformer(informer XMeshInformer) TypedXMeshInformer {
+	if informer, ok := informer.(TypedXMeshInformer); ok {
+		return informer
+	}
+	return &xMeshTypedInformerAdapter{informer}
+}
+
+type xMeshTypedInformerAdapter struct {
+	XMeshInformer
+}
+
+func (a *xMeshTypedInformerAdapter) TypedInformer() XMeshIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XMesh](a.Informer())
+}
+
+// ToXMeshIndexInformer converts an untyped informer into a XMeshIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *XMesh. If that is not the case, calling type-safe methods of the returned
+// XMeshIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a XMeshIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToXMeshIndexInformer(informer cache.SharedIndexInformer) XMeshIndexInformer {
+	if informer, ok := informer.(XMeshIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XMesh](informer)
 }

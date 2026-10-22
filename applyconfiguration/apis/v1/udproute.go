@@ -34,7 +34,7 @@ import (
 // listener, it can be used to forward traffic on the port specified by the
 // listener to a set of backends specified by the UDPRoute.
 type UDPRouteApplyConfiguration struct {
-	metav1.TypeMetaApplyConfiguration    `json:",inline"`
+	metav1.TypeMetaApplyConfiguration    `json:""`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of UDPRoute.
 	Spec *UDPRouteSpecApplyConfiguration `json:"spec,omitempty"`

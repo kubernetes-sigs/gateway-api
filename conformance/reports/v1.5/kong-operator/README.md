@@ -4,9 +4,8 @@
 
 | API channel  | Implementation version                                              | Mode                   | Report                                                                                                          |
 |--------------|---------------------------------------------------------------------|------------------------|-----------------------------------------------------------------------------------------------------------------|
-| experimental | [v2.2.0](https://github.com/Kong/kong-operator/releases/tag/v2.2.0) | expressions            | [v2.2.0 expressions report](./experimental-v2.2.0-expressions-standard-report.yaml)                             |
-| experimental | [v2.2.0](https://github.com/Kong/kong-operator/releases/tag/v2.2.0) | traditional_compatible | [v2.2.0 traditional compatible standard report](./experimental-v2.2.0-traditional_compatible-standard-report.yaml) |
-| experimental | [v2.2.0](https://github.com/Kong/kong-operator/releases/tag/v2.2.0) | traditional_compatible | [v2.2.0 traditional compatible hybrid report](./experimental-v2.2.0-traditional_compatible-hybrid-report.yaml)    |
+| experimental | [v2.2.6](https://github.com/Kong/kong-operator/releases/tag/v2.2.6) | expressions            | [v2.2.6 expressions report](./experimental-v2.2.6-expressions-standard-report.yaml)                             |
+| experimental | [v2.2.6](https://github.com/Kong/kong-operator/releases/tag/v2.2.6) | traditional_compatible | [v2.2.6 traditional compatible standard report](./experimental-v2.2.6-traditional_compatible-standard-report.yaml) |
 
 ## Reproduce
 

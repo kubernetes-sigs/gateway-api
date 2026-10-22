@@ -38,7 +38,7 @@ import (
 // If you need to forward traffic to a single target for a TLS listener, you
 // could choose to use a TCPRoute with a TLS listener.
 type TLSRouteApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of TLSRoute.
 	Spec *apisv1.TLSRouteSpecApplyConfiguration `json:"spec,omitempty"`

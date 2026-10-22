@@ -21,8 +21,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
+	pb "sigs.k8s.io/gateway-api-conformance-images/echo-basic/grpcechoserver"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -42,7 +42,6 @@ var GRPCRouteNamedRule = confsuite.ConformanceTest{
 		features.SupportGRPCRoute,
 		features.SupportGRPCRouteNamedRouteRule,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "grpc-named-rules", Namespace: ns}

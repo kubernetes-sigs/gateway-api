@@ -16,6 +16,13 @@ limitations under the License.
 
 package v1
 
+import (
+	"errors"
+	"fmt"
+
+	"golang.org/x/mod/semver"
+)
+
 // ProfileReport is the generated report for the test results of a specific
 // named conformance profile.
 type ProfileReport struct {
@@ -67,4 +74,45 @@ type Status struct {
 	// FailedTests indicates which tests were failing during the execution of
 	// test suite.
 	FailedTests []string `json:"failedTests,omitempty"`
+}
+
+func (p *ProfileReport) IsConformant(version string) error {
+	if p.Name == "" {
+		return errors.New("the ProfileReport must have a non-empty name")
+	}
+
+	if p.Summary == "" {
+		return errors.New("the ProfileReport must have a non-empty summary")
+	}
+
+	if err := p.Core.IsConformant(version); err != nil {
+		return fmt.Errorf("core feature error: %s", err)
+	}
+
+	if p.Extended != nil {
+		if err := p.Extended.IsConformant(version); err != nil {
+			return fmt.Errorf("extended features error: %s", err)
+		}
+	}
+
+	return nil
+}
+
+func (s *Status) IsConformant(version string) error {
+	if s.Result == Failure {
+		return errors.New("Status showed a failure")
+	}
+
+	if s.Result == Partial {
+		// TODO(youngnick): Update this to be zero skipped tests later.
+		// Check how many skipped tests there were
+		if semver.MajorMinor(version) == "v1.7" {
+			if s.Skipped > 5 {
+				return errors.New("Status showed too many skipped tests")
+			}
+		}
+	}
+
+	// This is a success, so we are good.
+	return nil
 }

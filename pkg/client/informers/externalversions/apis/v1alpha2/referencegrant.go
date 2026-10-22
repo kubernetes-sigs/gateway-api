@@ -34,11 +34,39 @@ import (
 )
 
 // ReferenceGrantInformer provides access to a shared informer and lister for
-// ReferenceGrants.
+// ReferenceGrants. Prefer using the type-safe variant (see [TypedReferenceGrantInformer]).
 type ReferenceGrantInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1alpha2.ReferenceGrantLister
 }
+
+// TypedReferenceGrantInformer provides access to a shared informer and lister for
+// ReferenceGrants, including the type-safe TypedInformer variant.
+// It is a superset of ReferenceGrantInformer.
+type TypedReferenceGrantInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() ReferenceGrantIndexInformer
+	Lister() apisv1alpha2.ReferenceGrantLister
+}
+
+// ReferenceGrantIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type ReferenceGrantIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1alpha2.ReferenceGrant]
+
+// ReferenceGrantHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for ReferenceGrant.
+type ReferenceGrantHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1alpha2.ReferenceGrant]
+
+// ReferenceGrantDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for ReferenceGrant.
+type ReferenceGrantDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1alpha2.ReferenceGrant]
+
+// ReferenceGrantFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for ReferenceGrant.
+type ReferenceGrantFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1alpha2.ReferenceGrant]
+
+// ReferenceGrantIndexers is a specialization of [cache.TypedIndexers] for ReferenceGrant.
+type ReferenceGrantIndexers = cache.TypedIndexers[*gatewayapiapisv1alpha2.ReferenceGrant]
+
+// DeletedReferenceGrant is a specialization of [cache.DeletedObject] for ReferenceGrant.
+type DeletedReferenceGrant = cache.DeletedObject[*gatewayapiapisv1alpha2.ReferenceGrant]
 
 type referenceGrantInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type referenceGrantInformer struct {
 // NewReferenceGrantInformer constructs a new informer for ReferenceGrant type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedReferenceGrantInformer]).
 func NewReferenceGrantInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewReferenceGrantInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedReferenceGrantInformer constructs a new informer for ReferenceGrant type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedReferenceGrantInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers ReferenceGrantIndexers) ReferenceGrantIndexInformer {
+	return NewTypedReferenceGrantInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredReferenceGrantInformer constructs a new informer for ReferenceGrant type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredReferenceGrantInformer]).
 func NewFilteredReferenceGrantInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewReferenceGrantInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedReferenceGrantInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredReferenceGrantInformer constructs a new informer for ReferenceGrant type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredReferenceGrantInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers ReferenceGrantIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) ReferenceGrantIndexInformer {
+	return NewTypedReferenceGrantInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewReferenceGrantInformerWithOptions constructs a new informer for ReferenceGrant type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedReferenceGrantInformerWithOptions]).
 func NewReferenceGrantInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedReferenceGrantInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedReferenceGrantInformerWithOptions constructs a new informer for ReferenceGrant type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedReferenceGrantInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) ReferenceGrantIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "referencegrants"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.ReferenceGrant](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewReferenceGrantInformerWithOptions(client versioned.Interface, namespace 
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *referenceGrantInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewReferenceGrantInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedReferenceGrantInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *referenceGrantInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1alpha2.ReferenceGrant{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *referenceGrantInformer) TypedInformer() ReferenceGrantIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.ReferenceGrant](f.factory.InformerFor(&gatewayapiapisv1alpha2.ReferenceGrant{}, f.defaultInformer))
 }
 
 func (f *referenceGrantInformer) Lister() apisv1alpha2.ReferenceGrantLister {
 	return apisv1alpha2.NewReferenceGrantLister(f.Informer().GetIndexer())
+}
+
+// ToTypedReferenceGrantInformer converts an untyped informer into a TypedReferenceGrantInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ReferenceGrant. If that is not the case, calling type-safe methods of the returned
+// TypedReferenceGrantInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedReferenceGrantInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedReferenceGrantInformer(informer ReferenceGrantInformer) TypedReferenceGrantInformer {
+	if informer, ok := informer.(TypedReferenceGrantInformer); ok {
+		return informer
+	}
+	return &referenceGrantTypedInformerAdapter{informer}
+}
+
+type referenceGrantTypedInformerAdapter struct {
+	ReferenceGrantInformer
+}
+
+func (a *referenceGrantTypedInformerAdapter) TypedInformer() ReferenceGrantIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.ReferenceGrant](a.Informer())
+}
+
+// ToReferenceGrantIndexInformer converts an untyped informer into a ReferenceGrantIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ReferenceGrant. If that is not the case, calling type-safe methods of the returned
+// ReferenceGrantIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a ReferenceGrantIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToReferenceGrantIndexInformer(informer cache.SharedIndexInformer) ReferenceGrantIndexInformer {
+	if informer, ok := informer.(ReferenceGrantIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.ReferenceGrant](informer)
 }

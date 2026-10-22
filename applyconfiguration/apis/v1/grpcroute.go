@@ -63,7 +63,7 @@ import (
 //
 // <gateway:union:BackendTLSPolicy>
 type GRPCRouteApplyConfiguration struct {
-	metav1.TypeMetaApplyConfiguration    `json:",inline"`
+	metav1.TypeMetaApplyConfiguration    `json:""`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of GRPCRoute.
 	Spec *GRPCRouteSpecApplyConfiguration `json:"spec,omitempty"`

@@ -37,12 +37,14 @@ type RouteNamespacesApplyConfiguration struct {
 	// * Same: Only Routes in the same namespace may be used by this Gateway.
 	//
 	// Support: Core
+	//
 	From *apisv1.FromNamespaces `json:"from,omitempty"`
 	// Selector must be specified when From is set to "Selector". In that case,
 	// only Routes in Namespaces matching this Selector will be selected by this
 	// Gateway. This field is ignored for other values of "From".
 	//
 	// Support: Core
+	//
 	Selector *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 

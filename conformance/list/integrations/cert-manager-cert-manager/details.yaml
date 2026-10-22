@@ -1,0 +1,13 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: cert-manager
+project: cert-manager
+url: http://github.com/cert-manager/cert-manager
+fullName: "cert-manager"
+description: |
+  [cert-manager][cert-manager] is a tool to automate certificate management in cloud native environments.
+
+  cert-manager can generate TLS certificates for Gateway resources. This is configured by adding annotations to a Gateway. It currently supports the `v1` spec of Gateway API. You can refer to the [cert-manager docs][cert-manager-docs] to try it out.
+
+  [cert-manager]: https://cert-manager.io/
+  [cert-manager-docs]: https://cert-manager.io/docs/usage/gateway/

@@ -34,11 +34,39 @@ import (
 )
 
 // XBackendInformer provides access to a shared informer and lister for
-// XBackends.
+// XBackends. Prefer using the type-safe variant (see [TypedXBackendInformer]).
 type XBackendInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisxv1alpha1.XBackendLister
 }
+
+// TypedXBackendInformer provides access to a shared informer and lister for
+// XBackends, including the type-safe TypedInformer variant.
+// It is a superset of XBackendInformer.
+type TypedXBackendInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() XBackendIndexInformer
+	Lister() apisxv1alpha1.XBackendLister
+}
+
+// XBackendIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type XBackendIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackend]
+
+// XBackendHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for XBackend.
+type XBackendHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisxv1alpha1.XBackend]
+
+// XBackendDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for XBackend.
+type XBackendDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisxv1alpha1.XBackend]
+
+// XBackendFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for XBackend.
+type XBackendFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisxv1alpha1.XBackend]
+
+// XBackendIndexers is a specialization of [cache.TypedIndexers] for XBackend.
+type XBackendIndexers = cache.TypedIndexers[*gatewayapiapisxv1alpha1.XBackend]
+
+// DeletedXBackend is a specialization of [cache.DeletedObject] for XBackend.
+type DeletedXBackend = cache.DeletedObject[*gatewayapiapisxv1alpha1.XBackend]
 
 type xBackendInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type xBackendInformer struct {
 // NewXBackendInformer constructs a new informer for XBackend type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedXBackendInformer]).
 func NewXBackendInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewXBackendInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedXBackendInformer constructs a new informer for XBackend type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedXBackendInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers XBackendIndexers) XBackendIndexInformer {
+	return NewTypedXBackendInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredXBackendInformer constructs a new informer for XBackend type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredXBackendInformer]).
 func NewFilteredXBackendInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewXBackendInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedXBackendInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredXBackendInformer constructs a new informer for XBackend type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredXBackendInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers XBackendIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) XBackendIndexInformer {
+	return NewTypedXBackendInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewXBackendInformerWithOptions constructs a new informer for XBackend type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedXBackendInformerWithOptions]).
 func NewXBackendInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedXBackendInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedXBackendInformerWithOptions constructs a new informer for XBackend type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedXBackendInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) XBackendIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.x-k8s.io", Version: "v1alpha1", Resource: "xbackends"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackend](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewXBackendInformerWithOptions(client versioned.Interface, namespace string
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *xBackendInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewXBackendInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedXBackendInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *xBackendInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisxv1alpha1.XBackend{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *xBackendInformer) TypedInformer() XBackendIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackend](f.factory.InformerFor(&gatewayapiapisxv1alpha1.XBackend{}, f.defaultInformer))
 }
 
 func (f *xBackendInformer) Lister() apisxv1alpha1.XBackendLister {
 	return apisxv1alpha1.NewXBackendLister(f.Informer().GetIndexer())
+}
+
+// ToTypedXBackendInformer converts an untyped informer into a TypedXBackendInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *XBackend. If that is not the case, calling type-safe methods of the returned
+// TypedXBackendInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedXBackendInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedXBackendInformer(informer XBackendInformer) TypedXBackendInformer {
+	if informer, ok := informer.(TypedXBackendInformer); ok {
+		return informer
+	}
+	return &xBackendTypedInformerAdapter{informer}
+}
+
+type xBackendTypedInformerAdapter struct {
+	XBackendInformer
+}
+
+func (a *xBackendTypedInformerAdapter) TypedInformer() XBackendIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackend](a.Informer())
+}
+
+// ToXBackendIndexInformer converts an untyped informer into a XBackendIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *XBackend. If that is not the case, calling type-safe methods of the returned
+// XBackendIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a XBackendIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToXBackendIndexInformer(informer cache.SharedIndexInformer) XBackendIndexInformer {
+	if informer, ok := informer.(XBackendIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackend](informer)
 }

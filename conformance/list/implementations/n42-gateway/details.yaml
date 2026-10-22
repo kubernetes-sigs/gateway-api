@@ -1,0 +1,11 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: N42 Gateway
+project: n42-gateway
+fullName: N42 Gateway
+description: |
+  [N42 Gateway][n42] is a community driven Ingress and Gateway API implementation for HAProxy.
+
+  N42 Gateway is a conformant Gateway API implementation since `v0.17`. It implements all core features from the standard channel, as well as TLSRoute and TCPRoute APIs from the experimental channel.
+
+  [n42]:https://n42-gateway.github.io/

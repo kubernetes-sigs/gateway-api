@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: lexfrei
+project: cloudflare-tunnel-gateway-controller
+fullName: Lexfrei's Cloudflare Tunnel Gateway Controller
+description: |
+  [Lexfrei's Cloudflare Tunnel Gateway Controller][cloudflare-tunnel-gateway-controller]
+  is a Kubernetes controller that implements the Gateway API on top of Cloudflare
+  Tunnel: it watches Gateway, HTTPRoute, and GRPCRoute resources and programs
+  Cloudflare Tunnel ingress through the Cloudflare API, serving traffic through an
+  in-process L7 proxy data plane that embeds the cloudflared tunnel transport.
+
+  It is open source under the BSD-3-Clause license, maintained by an individual
+  (lexfrei), and not affiliated with or endorsed by Cloudflare; see the
+  [documentation][cloudflare-tunnel-gateway-controller-docs] for setup and
+  configuration.
+
+  [cloudflare-tunnel-gateway-controller]: https://github.com/lexfrei/cloudflare-tunnel-gateway-controller
+  [cloudflare-tunnel-gateway-controller-docs]: https://cf.k8s.lex.la

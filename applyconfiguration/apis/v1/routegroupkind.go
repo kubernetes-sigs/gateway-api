@@ -28,6 +28,7 @@ import (
 // RouteGroupKind indicates the group and kind of a Route resource.
 type RouteGroupKindApplyConfiguration struct {
 	// Group is the group of the Route.
+	//
 	Group *apisv1.Group `json:"group,omitempty"`
 	// Kind is the kind of the Route.
 	Kind *apisv1.Kind `json:"kind,omitempty"`

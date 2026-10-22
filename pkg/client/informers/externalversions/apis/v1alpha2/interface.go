@@ -25,15 +25,15 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// GRPCRoutes returns a GRPCRouteInformer.
-	GRPCRoutes() GRPCRouteInformer
+	GRPCRoutes() TypedGRPCRouteInformer
 	// ReferenceGrants returns a ReferenceGrantInformer.
-	ReferenceGrants() ReferenceGrantInformer
+	ReferenceGrants() TypedReferenceGrantInformer
 	// TCPRoutes returns a TCPRouteInformer.
-	TCPRoutes() TCPRouteInformer
+	TCPRoutes() TypedTCPRouteInformer
 	// TLSRoutes returns a TLSRouteInformer.
-	TLSRoutes() TLSRouteInformer
+	TLSRoutes() TypedTLSRouteInformer
 	// UDPRoutes returns a UDPRouteInformer.
-	UDPRoutes() UDPRouteInformer
+	UDPRoutes() TypedUDPRouteInformer
 }
 
 type version struct {
@@ -47,27 +47,27 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// GRPCRoutes returns a GRPCRouteInformer.
-func (v *version) GRPCRoutes() GRPCRouteInformer {
+// GRPCRoutes returns a TypedGRPCRouteInformer.
+func (v *version) GRPCRoutes() TypedGRPCRouteInformer {
 	return &gRPCRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// ReferenceGrants returns a ReferenceGrantInformer.
-func (v *version) ReferenceGrants() ReferenceGrantInformer {
+// ReferenceGrants returns a TypedReferenceGrantInformer.
+func (v *version) ReferenceGrants() TypedReferenceGrantInformer {
 	return &referenceGrantInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// TCPRoutes returns a TCPRouteInformer.
-func (v *version) TCPRoutes() TCPRouteInformer {
+// TCPRoutes returns a TypedTCPRouteInformer.
+func (v *version) TCPRoutes() TypedTCPRouteInformer {
 	return &tCPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// TLSRoutes returns a TLSRouteInformer.
-func (v *version) TLSRoutes() TLSRouteInformer {
+// TLSRoutes returns a TypedTLSRouteInformer.
+func (v *version) TLSRoutes() TypedTLSRouteInformer {
 	return &tLSRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// UDPRoutes returns a UDPRouteInformer.
-func (v *version) UDPRoutes() UDPRouteInformer {
+// UDPRoutes returns a TypedUDPRouteInformer.
+func (v *version) UDPRoutes() TypedUDPRouteInformer {
 	return &uDPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

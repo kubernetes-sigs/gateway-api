@@ -34,11 +34,39 @@ import (
 )
 
 // XBackendTrafficPolicyInformer provides access to a shared informer and lister for
-// XBackendTrafficPolicies.
+// XBackendTrafficPolicies. Prefer using the type-safe variant (see [TypedXBackendTrafficPolicyInformer]).
 type XBackendTrafficPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisxv1alpha1.XBackendTrafficPolicyLister
 }
+
+// TypedXBackendTrafficPolicyInformer provides access to a shared informer and lister for
+// XBackendTrafficPolicies, including the type-safe TypedInformer variant.
+// It is a superset of XBackendTrafficPolicyInformer.
+type TypedXBackendTrafficPolicyInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() XBackendTrafficPolicyIndexInformer
+	Lister() apisxv1alpha1.XBackendTrafficPolicyLister
+}
+
+// XBackendTrafficPolicyIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type XBackendTrafficPolicyIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy]
+
+// XBackendTrafficPolicyHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for XBackendTrafficPolicy.
+type XBackendTrafficPolicyHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy]
+
+// XBackendTrafficPolicyDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for XBackendTrafficPolicy.
+type XBackendTrafficPolicyDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy]
+
+// XBackendTrafficPolicyFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for XBackendTrafficPolicy.
+type XBackendTrafficPolicyFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy]
+
+// XBackendTrafficPolicyIndexers is a specialization of [cache.TypedIndexers] for XBackendTrafficPolicy.
+type XBackendTrafficPolicyIndexers = cache.TypedIndexers[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy]
+
+// DeletedXBackendTrafficPolicy is a specialization of [cache.DeletedObject] for XBackendTrafficPolicy.
+type DeletedXBackendTrafficPolicy = cache.DeletedObject[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy]
 
 type xBackendTrafficPolicyInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type xBackendTrafficPolicyInformer struct {
 // NewXBackendTrafficPolicyInformer constructs a new informer for XBackendTrafficPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedXBackendTrafficPolicyInformer]).
 func NewXBackendTrafficPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewXBackendTrafficPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedXBackendTrafficPolicyInformer constructs a new informer for XBackendTrafficPolicy type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedXBackendTrafficPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers XBackendTrafficPolicyIndexers) XBackendTrafficPolicyIndexInformer {
+	return NewTypedXBackendTrafficPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredXBackendTrafficPolicyInformer constructs a new informer for XBackendTrafficPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredXBackendTrafficPolicyInformer]).
 func NewFilteredXBackendTrafficPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewXBackendTrafficPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedXBackendTrafficPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredXBackendTrafficPolicyInformer constructs a new informer for XBackendTrafficPolicy type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredXBackendTrafficPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers XBackendTrafficPolicyIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) XBackendTrafficPolicyIndexInformer {
+	return NewTypedXBackendTrafficPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewXBackendTrafficPolicyInformerWithOptions constructs a new informer for XBackendTrafficPolicy type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedXBackendTrafficPolicyInformerWithOptions]).
 func NewXBackendTrafficPolicyInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedXBackendTrafficPolicyInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedXBackendTrafficPolicyInformerWithOptions constructs a new informer for XBackendTrafficPolicy type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedXBackendTrafficPolicyInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) XBackendTrafficPolicyIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.x-k8s.io", Version: "v1alpha1", Resource: "xbackendtrafficpolicys"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewXBackendTrafficPolicyInformerWithOptions(client versioned.Interface, nam
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *xBackendTrafficPolicyInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewXBackendTrafficPolicyInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedXBackendTrafficPolicyInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *xBackendTrafficPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisxv1alpha1.XBackendTrafficPolicy{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *xBackendTrafficPolicyInformer) TypedInformer() XBackendTrafficPolicyIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy](f.factory.InformerFor(&gatewayapiapisxv1alpha1.XBackendTrafficPolicy{}, f.defaultInformer))
 }
 
 func (f *xBackendTrafficPolicyInformer) Lister() apisxv1alpha1.XBackendTrafficPolicyLister {
 	return apisxv1alpha1.NewXBackendTrafficPolicyLister(f.Informer().GetIndexer())
+}
+
+// ToTypedXBackendTrafficPolicyInformer converts an untyped informer into a TypedXBackendTrafficPolicyInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *XBackendTrafficPolicy. If that is not the case, calling type-safe methods of the returned
+// TypedXBackendTrafficPolicyInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedXBackendTrafficPolicyInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedXBackendTrafficPolicyInformer(informer XBackendTrafficPolicyInformer) TypedXBackendTrafficPolicyInformer {
+	if informer, ok := informer.(TypedXBackendTrafficPolicyInformer); ok {
+		return informer
+	}
+	return &xBackendTrafficPolicyTypedInformerAdapter{informer}
+}
+
+type xBackendTrafficPolicyTypedInformerAdapter struct {
+	XBackendTrafficPolicyInformer
+}
+
+func (a *xBackendTrafficPolicyTypedInformerAdapter) TypedInformer() XBackendTrafficPolicyIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy](a.Informer())
+}
+
+// ToXBackendTrafficPolicyIndexInformer converts an untyped informer into a XBackendTrafficPolicyIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *XBackendTrafficPolicy. If that is not the case, calling type-safe methods of the returned
+// XBackendTrafficPolicyIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a XBackendTrafficPolicyIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToXBackendTrafficPolicyIndexInformer(informer cache.SharedIndexInformer) XBackendTrafficPolicyIndexInformer {
+	if informer, ok := informer.(XBackendTrafficPolicyIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisxv1alpha1.XBackendTrafficPolicy](informer)
 }

@@ -117,11 +117,30 @@ spec:
                   the implementation. The implementation MUST raise an 'Accepted' Condition
                   with a status of `False` in the corresponding RouteParentStatus.
 
+                  In the event that multiple GRPCRoutes specify intersecting hostnames (e.g.
+                  overlapping wildcard matching and exact matching hostnames), precedence must
+                  be given to rules from the GRPCRoute with the largest number of:
+
+                  * Characters in a matching non-wildcard hostname.
+                  * Characters in a matching hostname.
+
+                  When multiple GRPCRoutes attach to the same Listener and yield identical
+                  Listener/Route intersected hostnames, implementations SHOULD evaluate
+                  precedence using the original hostnames configured on the Route, not the
+                  calculated Listener/Route hostname intersection.
+
+                  Resolving Route precedence using original Route hostname specificity is an
+                  Extended feature. Implementations that support this behavior SHOULD claim
+                  support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+                  Implementations that do not support this feature MAY evaluate precedence
+                  using the calculated Listener/Route hostname intersection.
+
                   If a Route (A) of type HTTPRoute or GRPCRoute is attached to a
                   Listener and that listener already has another Route (B) of the other
                   type attached and the intersection of the hostnames of A and B is
-                  non-empty, then the implementation MUST accept exactly one of these two
-                  routes, determined by the following criteria, in order:
+                  non-empty, then the implementation MAY reject one of the two routes.
+                  An implementation that does so MUST accept exactly one of them,
+                  determined by the following criteria, in order:
 
                   * The oldest Route based on creation timestamp.
                   * The Route appearing first in alphabetical order by
@@ -755,6 +774,10 @@ spec:
                                       - message: Must have port for Service reference
                                         rule: '(size(self.group) == 0 && self.kind
                                           == ''Service'') ? has(self.port) : true'
+                                      - message: Must not have port for Backend reference
+                                        rule: '(self.group == ''gateway.networking.x-k8s.io''
+                                          && self.kind == ''XBackend'') ? !has(self.port)
+                                          : true'
                                     fraction:
                                       description: |-
                                         Fraction represents the fraction of requests that should be
@@ -1103,6 +1126,9 @@ spec:
                         - message: Must have port for Service reference
                           rule: '(size(self.group) == 0 && self.kind == ''Service'')
                             ? has(self.port) : true'
+                        - message: Must not have port for Backend reference
+                          rule: '(self.group == ''gateway.networking.x-k8s.io'' &&
+                            self.kind == ''XBackend'') ? !has(self.port) : true'
                       maxItems: 16
                       type: array
                       x-kubernetes-list-type: atomic
@@ -1426,6 +1452,10 @@ spec:
                                 - message: Must have port for Service reference
                                   rule: '(size(self.group) == 0 && self.kind == ''Service'')
                                     ? has(self.port) : true'
+                                - message: Must not have port for Backend reference
+                                  rule: '(self.group == ''gateway.networking.x-k8s.io''
+                                    && self.kind == ''XBackend'') ? !has(self.port)
+                                    : true'
                               fraction:
                                 description: |-
                                   Fraction represents the fraction of requests that should be
@@ -1866,6 +1896,8 @@ spec:
                       type: string
                     sessionPersistence:
                       description: |-
+                        Deprecated: use the Backend resource for session persistence (GEP-4894).
+
                         SessionPersistence defines and configures session persistence
                         for the route rule.
 
@@ -1877,12 +1909,15 @@ spec:
                             session. Once the AbsoluteTimeout duration has elapsed, the
                             session becomes invalid.
 
-                            Support: Extended
+                            Support: Core when cookie.lifetimeType is "Permanent".
+
+                            Support: Extended when cookie.lifetimeType is "Session" or
+                            type is "Header".
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
-                        cookieConfig:
+                        cookie:
                           description: |-
-                            CookieConfig provides configuration settings that are specific
+                            Cookie provides configuration settings that are specific
                             to cookie-based session persistence.
 
                             Support: Core
@@ -1906,24 +1941,55 @@ spec:
 
                                 Defaults to "Session".
 
-                                Support: Core for "Session" type
-
-                                Support: Extended for "Permanent" type
+                                Support: Core
                               enum:
                               - Permanent
                               - Session
                               type: string
-                          type: object
-                        sessionName:
-                          description: |-
-                            SessionName defines the name of the persistent session token
-                            which may be reflected in the cookie or the header. Users
-                            should avoid reusing session names to prevent unintended
-                            consequences, such as rejection or unpredictable behavior.
+                            name:
+                              description: |-
+                                Name defines the name of the cookie used for session persistence.
+                                If not specified, a unique cookie name SHOULD be generated.
+                                Users should avoid reusing cookie names to prevent unintended
+                                consequences, such as rejection or unpredictable behavior.
 
-                            Support: Implementation-specific
-                          maxLength: 128
-                          type: string
+                                Support: Core
+                              maxLength: 256
+                              minLength: 1
+                              pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                              type: string
+                            path:
+                              default: /
+                              description: |-
+                                Path defines the cookie Path attribute. When not specified,
+                                implementations MUST default the cookie path to "/".
+
+
+                                Support: Extended
+                              maxLength: 1024
+                              type: string
+                          type: object
+                        header:
+                          description: |-
+                            Header provides configuration settings that are specific
+                            to header-based session persistence.
+
+                            Support: Extended
+                          properties:
+                            name:
+                              description: |-
+                                Name defines the name of the header used for session persistence.
+                                The client must include this header in subsequent requests to
+                                maintain the session.
+
+                                Support: Core
+                              maxLength: 256
+                              minLength: 1
+                              pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                              type: string
+                          required:
+                          - name
+                          type: object
                         type:
                           default: Cookie
                           description: |-
@@ -1942,10 +2008,16 @@ spec:
                       x-kubernetes-validations:
                       - message: AbsoluteTimeout must be specified when cookie lifetimeType
                           is Permanent
-                        rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
-                          || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
-                      - message: cookieConfig can only be set with type Cookie
-                        rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
+                        rule: '!has(self.cookie) || !has(self.cookie.lifetimeType)
+                          || self.cookie.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
+                      - message: cookie must be nil if type is not Cookie
+                        rule: '!has(self.cookie) || self.type == ''Cookie'''
+                      - message: cookie must be specified for Cookie type
+                        rule: self.type != 'Cookie' || has(self.cookie)
+                      - message: header must be nil if type is not Header
+                        rule: '!has(self.header) || self.type == ''Header'''
+                      - message: header must be specified for Header type
+                        rule: self.type != 'Header' || has(self.header)
                   type: object
                 maxItems: 16
                 type: array

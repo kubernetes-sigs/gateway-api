@@ -373,66 +373,6 @@ func TestHTTPRouteTimeouts(t *testing.T) {
 	}
 }
 
-func TestHTTPRouteRuleExperimental(t *testing.T) {
-	tests := []struct {
-		name       string
-		wantErrors []string
-		rules      []gatewayv1.HTTPRouteRule
-	}{
-		{
-			name:       "invalid because multiple names are repeated",
-			wantErrors: []string{"Rule name must be unique within the route"},
-			rules: []gatewayv1.HTTPRouteRule{
-				{
-					Name: new(gatewayv1.SectionName("name1")),
-				},
-				{
-					Name: new(gatewayv1.SectionName("name1")),
-				},
-			},
-		},
-		{
-			name:       "invalid because multiple names are repeated with others",
-			wantErrors: []string{"Rule name must be unique within the route"},
-			rules: []gatewayv1.HTTPRouteRule{
-				{
-					Name: new(gatewayv1.SectionName("name1")),
-				},
-				{
-					Name: new(gatewayv1.SectionName("not-name1")),
-				},
-				{
-					Name: new(gatewayv1.SectionName("name1")),
-				},
-			},
-		},
-		{
-			name:       "valid because names are unique",
-			wantErrors: nil,
-			rules: []gatewayv1.HTTPRouteRule{
-				// Ok to have multiple nil
-				{Name: nil},
-				{Name: nil},
-				{Name: new(gatewayv1.SectionName("name1"))},
-				{Name: new(gatewayv1.SectionName("name2"))},
-			},
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1.HTTPRoute{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
-				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
-			}
-			validateHTTPRoute(t, route, tc.wantErrors)
-		})
-	}
-}
-
 func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 	var percent int32 = 42
 	var denominator int32 = 1000
@@ -563,6 +503,67 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 					Namespace: metav1.NamespaceDefault,
 				},
 				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}
+
+func TestBackendRefPortExperimental(t *testing.T) {
+	portPtr := func(n int) *gatewayv1.PortNumber {
+		//nolint:gosec
+		return new(gatewayv1.PortNumber(n))
+	}
+
+	groupPtr := func(g string) *gatewayv1.Group {
+		return new(gatewayv1.Group(g))
+	}
+
+	kindPtr := func(k string) *gatewayv1.Kind {
+		return new(gatewayv1.Kind(k))
+	}
+
+	tests := []struct {
+		name       string
+		wantErrors []string
+		backendRef gatewayv1.BackendObjectReference
+	}{
+		{
+			name: "XBackend ref with no port",
+			backendRef: gatewayv1.BackendObjectReference{
+				Group: groupPtr("gateway.networking.x-k8s.io"),
+				Kind:  kindPtr("XBackend"),
+				Name:  "backend",
+			},
+		},
+		{
+			name:       "XBackend ref with port",
+			wantErrors: []string{"Must not have port for Backend reference"},
+			backendRef: gatewayv1.BackendObjectReference{
+				Group: groupPtr("gateway.networking.x-k8s.io"),
+				Kind:  kindPtr("XBackend"),
+				Name:  "backend",
+				Port:  portPtr(443),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{
+					Rules: []gatewayv1.HTTPRouteRule{{
+						BackendRefs: []gatewayv1.HTTPBackendRef{{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: tc.backendRef,
+							},
+						}},
+					}},
+				},
 			}
 			validateHTTPRoute(t, route, tc.wantErrors)
 		})

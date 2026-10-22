@@ -56,7 +56,7 @@ import (
 // where this struct is used for more information about the exact behavior.
 type BackendRefApplyConfiguration struct {
 	// BackendObjectReference references a Kubernetes object.
-	BackendObjectReferenceApplyConfiguration `json:",inline"`
+	BackendObjectReferenceApplyConfiguration `json:""`
 	// Weight specifies the proportion of requests forwarded to the referenced
 	// backend. This is computed as weight/(sum of all weights in this
 	// BackendRefs list). For non-zero values, there may be some epsilon from
@@ -70,6 +70,7 @@ type BackendRefApplyConfiguration struct {
 	// defaults to 1.
 	//
 	// Support for this field varies based on the context where used.
+	//
 	Weight *int32 `json:"weight,omitempty"`
 }
 

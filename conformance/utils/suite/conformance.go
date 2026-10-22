@@ -42,7 +42,7 @@ type ConformanceTest struct {
 // Run runs an individual tests, applying and cleaning up the required manifests
 // before calling the Test function.
 func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
-	if test.Parallel {
+	if test.Parallel && !suite.DisableParallelTests {
 		t.Parallel()
 	}
 
@@ -66,6 +66,12 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// check that the test should not be skipped
 	if suite.SkipTests.Has(test.ShortName) || suite.RunTest != "" && suite.RunTest != test.ShortName {
 		t.Skipf("Skipping %s: test explicitly skipped", test.ShortName)
+	}
+
+	// skip provisional tests before manifests/body: suite.Run only labels them,
+	// it does not stop execution.
+	if suite.SkipProvisionalTests && test.Provisional {
+		t.Skipf("Skipping %s: provisional tests skipped", test.ShortName)
 	}
 
 	for _, manifestLocation := range test.Manifests {
@@ -112,7 +118,7 @@ func ParseKeyValuePairs(f string) map[string]string {
 	}
 	res := map[string]string{}
 	for kv := range strings.SplitSeq(f, ",") {
-		parts := strings.Split(kv, "=")
+		parts := strings.SplitN(kv, "=", 2)
 		if len(parts) == 2 {
 			res[parts[0]] = parts[1]
 		}

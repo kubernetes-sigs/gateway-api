@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: kuadrant
+project: kuadrant-operator
+url: http://github.com/kuadrant/kuadrant-operator
+fullName: "Kuadrant"
+description: |
+  [Kuadrant][kuadrant] is an open source multi cluster Gateway API controller that integrates with and provides policies via policy attachment to other Gateway API providers.
+
+  Kuadrant supports Gateway API for defining gateways centrally and attaching policies such as DNS, TLS, Auth and Rate Limiting that apply to all of your Gateways.
+
+  Kuadrant works with both Istio and Envoy Gateway as underlying Gateway API providers, with plans to work with other gateway providers in future.
+
+  For help and support with Kuadrant's implementation please feel free to [create an issue][kuadrant-issue-new] or ask for help in the [#kuadrant channel on Kubernetes slack][kuadrant-slack].
+
+  [kuadrant]: https://kuadrant.io/
+  [kuadrant-issue-new]: https://github.com/Kuadrant/kuadrant-operator/issues/new
+  [kuadrant-slack]: https://kubernetes.slack.com/archives/C05J0D0V525

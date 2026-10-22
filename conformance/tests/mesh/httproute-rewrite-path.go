@@ -48,9 +48,7 @@ var MeshHTTPRouteRewritePath = suite.ConformanceTest{
 					Host: "echo",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/one/two",
-					},
+					Path: "/one/two",
 				},
 				Backend:   "echo-v1",
 				Namespace: ns,
@@ -61,9 +59,7 @@ var MeshHTTPRouteRewritePath = suite.ConformanceTest{
 					Host: "echo",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/three",
-					},
+					Path: "/three",
 				},
 				Backend:   "echo-v1",
 				Namespace: ns,
@@ -74,9 +70,7 @@ var MeshHTTPRouteRewritePath = suite.ConformanceTest{
 					Host: "echo",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/",
-					},
+					Path: "/",
 				},
 				Backend:   "echo-v1",
 				Namespace: ns,
@@ -87,9 +81,7 @@ var MeshHTTPRouteRewritePath = suite.ConformanceTest{
 					Host: "echo",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/one",
-					},
+					Path: "/one",
 				},
 				Backend:   "echo-v1",
 				Namespace: ns,
@@ -105,13 +97,11 @@ var MeshHTTPRouteRewritePath = suite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/test",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
+					Path: "/test",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Set":        "set-overwrites-values",
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
@@ -129,13 +119,11 @@ var MeshHTTPRouteRewritePath = suite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/prefix/one",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
+					Path: "/prefix/one",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Set":        "set-overwrites-values",
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},

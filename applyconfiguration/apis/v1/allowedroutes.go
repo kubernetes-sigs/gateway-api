@@ -27,6 +27,7 @@ type AllowedRoutesApplyConfiguration struct {
 	// Listener. This is restricted to the namespace of this Gateway by default.
 	//
 	// Support: Core
+	//
 	Namespaces *RouteNamespacesApplyConfiguration `json:"namespaces,omitempty"`
 	// Kinds specifies the groups and kinds of Routes that are allowed to bind
 	// to this Gateway Listener. When unspecified or empty, the kinds of Routes
@@ -39,6 +40,7 @@ type AllowedRoutesApplyConfiguration struct {
 	// "InvalidRouteKinds" reason.
 	//
 	// Support: Core
+	//
 	Kinds []RouteGroupKindApplyConfiguration `json:"kinds,omitempty"`
 }
 

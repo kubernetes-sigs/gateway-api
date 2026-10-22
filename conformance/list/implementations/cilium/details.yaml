@@ -1,0 +1,26 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: cilium
+project: cilium
+fullName: Cilium
+description: |
+  [Cilium][cilium] is an eBPF-based networking, observability and security
+  solution for Kubernetes and other networking environments. It includes [Cilium
+  Service Mesh][cilium-service-mesh], a highly efficient mesh data plane that can
+  be run in [sidecarless mode][cilium-sidecarless] to dramatically improve
+  performance, and avoid the operational complexity of sidecars. Cilium also
+  supports the sidecar proxy model, offering choice to users.
+  Cilium supports Gateway API, passing conformance for v1.4.0 as of Cilium 1.19
+
+  Cilium is open source and is a CNCF Graduated project.
+
+  If you have questions about Cilium Service Mesh the #service-mesh channel on
+  [Cilium Slack][cilium-slack] is a good place to start. For contributing to the development
+  effort, check out the #development channel or join our [weekly developer meeting][cilium-meeting].
+
+  [cilium]: https://cilium.io
+  [cilium-service-mesh]: https://docs.cilium.io/en/stable/gettingstarted/#service-mesh
+  [cilium-sidecarless]: https://isovalent.com/blog/post/cilium-service-mesh/
+  [cilium118blog]: https://isovalent.com/blog/post/cilium-1-18/#service-mesh-gateway-api
+  [cilium-slack]: https://slack.cilium.io
+  [cilium-meeting]: https://github.com/cilium/cilium#weekly-developer-meeting

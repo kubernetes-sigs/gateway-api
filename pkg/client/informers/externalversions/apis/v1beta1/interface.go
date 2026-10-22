@@ -25,13 +25,13 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// Gateways returns a GatewayInformer.
-	Gateways() GatewayInformer
+	Gateways() TypedGatewayInformer
 	// GatewayClasses returns a GatewayClassInformer.
-	GatewayClasses() GatewayClassInformer
+	GatewayClasses() TypedGatewayClassInformer
 	// HTTPRoutes returns a HTTPRouteInformer.
-	HTTPRoutes() HTTPRouteInformer
+	HTTPRoutes() TypedHTTPRouteInformer
 	// ReferenceGrants returns a ReferenceGrantInformer.
-	ReferenceGrants() ReferenceGrantInformer
+	ReferenceGrants() TypedReferenceGrantInformer
 }
 
 type version struct {
@@ -45,22 +45,22 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Gateways returns a GatewayInformer.
-func (v *version) Gateways() GatewayInformer {
+// Gateways returns a TypedGatewayInformer.
+func (v *version) Gateways() TypedGatewayInformer {
 	return &gatewayInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// GatewayClasses returns a GatewayClassInformer.
-func (v *version) GatewayClasses() GatewayClassInformer {
+// GatewayClasses returns a TypedGatewayClassInformer.
+func (v *version) GatewayClasses() TypedGatewayClassInformer {
 	return &gatewayClassInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// HTTPRoutes returns a HTTPRouteInformer.
-func (v *version) HTTPRoutes() HTTPRouteInformer {
+// HTTPRoutes returns a TypedHTTPRouteInformer.
+func (v *version) HTTPRoutes() TypedHTTPRouteInformer {
 	return &hTTPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// ReferenceGrants returns a ReferenceGrantInformer.
-func (v *version) ReferenceGrants() ReferenceGrantInformer {
+// ReferenceGrants returns a TypedReferenceGrantInformer.
+func (v *version) ReferenceGrants() TypedReferenceGrantInformer {
 	return &referenceGrantInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

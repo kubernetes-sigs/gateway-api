@@ -36,7 +36,7 @@ import (
 //
 // Support: Extended
 type XBackendApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of XBackend.
 	Spec *BackendSpecApplyConfiguration `json:"spec,omitempty"`

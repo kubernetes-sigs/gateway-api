@@ -38,6 +38,7 @@ type HTTPHeaderMatchApplyConfiguration struct {
 	// conformance, implementations can support POSIX, PCRE or any other dialects
 	// of regular expressions. Please read the implementation's documentation to
 	// determine the supported dialect.
+	//
 	Type *apisv1.HeaderMatchType `json:"type,omitempty"`
 	// Name is the name of the HTTP Header to be matched. Name matching MUST be
 	// case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).

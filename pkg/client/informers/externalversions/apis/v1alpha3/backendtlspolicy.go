@@ -34,11 +34,39 @@ import (
 )
 
 // BackendTLSPolicyInformer provides access to a shared informer and lister for
-// BackendTLSPolicies.
+// BackendTLSPolicies. Prefer using the type-safe variant (see [TypedBackendTLSPolicyInformer]).
 type BackendTLSPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1alpha3.BackendTLSPolicyLister
 }
+
+// TypedBackendTLSPolicyInformer provides access to a shared informer and lister for
+// BackendTLSPolicies, including the type-safe TypedInformer variant.
+// It is a superset of BackendTLSPolicyInformer.
+type TypedBackendTLSPolicyInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() BackendTLSPolicyIndexInformer
+	Lister() apisv1alpha3.BackendTLSPolicyLister
+}
+
+// BackendTLSPolicyIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type BackendTLSPolicyIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1alpha3.BackendTLSPolicy]
+
+// BackendTLSPolicyHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for BackendTLSPolicy.
+type BackendTLSPolicyHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1alpha3.BackendTLSPolicy]
+
+// BackendTLSPolicyDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for BackendTLSPolicy.
+type BackendTLSPolicyDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1alpha3.BackendTLSPolicy]
+
+// BackendTLSPolicyFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for BackendTLSPolicy.
+type BackendTLSPolicyFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1alpha3.BackendTLSPolicy]
+
+// BackendTLSPolicyIndexers is a specialization of [cache.TypedIndexers] for BackendTLSPolicy.
+type BackendTLSPolicyIndexers = cache.TypedIndexers[*gatewayapiapisv1alpha3.BackendTLSPolicy]
+
+// DeletedBackendTLSPolicy is a specialization of [cache.DeletedObject] for BackendTLSPolicy.
+type DeletedBackendTLSPolicy = cache.DeletedObject[*gatewayapiapisv1alpha3.BackendTLSPolicy]
 
 type backendTLSPolicyInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type backendTLSPolicyInformer struct {
 // NewBackendTLSPolicyInformer constructs a new informer for BackendTLSPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedBackendTLSPolicyInformer]).
 func NewBackendTLSPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewBackendTLSPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedBackendTLSPolicyInformer constructs a new informer for BackendTLSPolicy type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedBackendTLSPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers BackendTLSPolicyIndexers) BackendTLSPolicyIndexInformer {
+	return NewTypedBackendTLSPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredBackendTLSPolicyInformer constructs a new informer for BackendTLSPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredBackendTLSPolicyInformer]).
 func NewFilteredBackendTLSPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewBackendTLSPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedBackendTLSPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredBackendTLSPolicyInformer constructs a new informer for BackendTLSPolicy type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredBackendTLSPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers BackendTLSPolicyIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) BackendTLSPolicyIndexInformer {
+	return NewTypedBackendTLSPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewBackendTLSPolicyInformerWithOptions constructs a new informer for BackendTLSPolicy type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedBackendTLSPolicyInformerWithOptions]).
 func NewBackendTLSPolicyInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedBackendTLSPolicyInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedBackendTLSPolicyInformerWithOptions constructs a new informer for BackendTLSPolicy type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedBackendTLSPolicyInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) BackendTLSPolicyIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha3", Resource: "backendtlspolicys"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha3.BackendTLSPolicy](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewBackendTLSPolicyInformerWithOptions(client versioned.Interface, namespac
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *backendTLSPolicyInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewBackendTLSPolicyInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedBackendTLSPolicyInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *backendTLSPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1alpha3.BackendTLSPolicy{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *backendTLSPolicyInformer) TypedInformer() BackendTLSPolicyIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha3.BackendTLSPolicy](f.factory.InformerFor(&gatewayapiapisv1alpha3.BackendTLSPolicy{}, f.defaultInformer))
 }
 
 func (f *backendTLSPolicyInformer) Lister() apisv1alpha3.BackendTLSPolicyLister {
 	return apisv1alpha3.NewBackendTLSPolicyLister(f.Informer().GetIndexer())
+}
+
+// ToTypedBackendTLSPolicyInformer converts an untyped informer into a TypedBackendTLSPolicyInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *BackendTLSPolicy. If that is not the case, calling type-safe methods of the returned
+// TypedBackendTLSPolicyInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedBackendTLSPolicyInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedBackendTLSPolicyInformer(informer BackendTLSPolicyInformer) TypedBackendTLSPolicyInformer {
+	if informer, ok := informer.(TypedBackendTLSPolicyInformer); ok {
+		return informer
+	}
+	return &backendTLSPolicyTypedInformerAdapter{informer}
+}
+
+type backendTLSPolicyTypedInformerAdapter struct {
+	BackendTLSPolicyInformer
+}
+
+func (a *backendTLSPolicyTypedInformerAdapter) TypedInformer() BackendTLSPolicyIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha3.BackendTLSPolicy](a.Informer())
+}
+
+// ToBackendTLSPolicyIndexInformer converts an untyped informer into a BackendTLSPolicyIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *BackendTLSPolicy. If that is not the case, calling type-safe methods of the returned
+// BackendTLSPolicyIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a BackendTLSPolicyIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToBackendTLSPolicyIndexInformer(informer cache.SharedIndexInformer) BackendTLSPolicyIndexInformer {
+	if informer, ok := informer.(BackendTLSPolicyIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha3.BackendTLSPolicy](informer)
 }

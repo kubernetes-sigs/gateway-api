@@ -1,0 +1,13 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: higress-group
+project: higress
+fullName: Higress
+description: |
+  [Higress](https://higress.ai/) is a cloud-native API gateway built on Istio and
+  Envoy. It provides Kubernetes Gateway API and Ingress support alongside API
+  management and AI gateway capabilities. Higress is an open source
+  [CNCF project](https://www.cncf.io/projects/higress/).
+
+  Source code, documentation, and issue tracking are available in the
+  [Higress repository](https://github.com/higress-group/higress).

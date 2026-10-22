@@ -34,7 +34,7 @@ import (
 // listener, it can be used to forward connections on the port specified by the
 // listener to a set of backends specified by the TCPRoute.
 type TCPRouteApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of TCPRoute.
 	Spec *TCPRouteSpecApplyConfiguration `json:"spec,omitempty"`

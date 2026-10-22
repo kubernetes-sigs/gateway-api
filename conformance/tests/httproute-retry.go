@@ -43,7 +43,7 @@ var HTTPRouteRetry = confsuite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteRetry,
+		features.SupportHTTPRouteRetryCodes,
 	},
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
@@ -183,6 +183,51 @@ var HTTPRouteRetry = confsuite.ConformanceTest{
 				},
 				want: http.Response{StatusCode: 504},
 			},
+
+			{
+				name: "does not retry on 500 when attempts are set to 0",
+				args: args{
+					path: "/retry/code-all-attempts-0",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"500"},
+						"succeedAfter": []string{"1"},
+					},
+				},
+				want: http.Response{StatusCode: 500},
+			},
+			{
+				name: "does not retry on 502 when attempts are set to 0",
+				args: args{
+					path: "/retry/code-all-attempts-0",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"502"},
+						"succeedAfter": []string{"1"},
+					},
+				},
+				want: http.Response{StatusCode: 502},
+			},
+			{
+				name: "does not retry on 503 when attempts are set to 0",
+				args: args{
+					path: "/retry/code-all-attempts-0",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"503"},
+						"succeedAfter": []string{"1"},
+					},
+				},
+				want: http.Response{StatusCode: 503},
+			},
+			{
+				name: "does not retry on 504 when attempts are set to 0",
+				args: args{
+					path: "/retry/code-all-attempts-0",
+					retrySimulationConfig: url.Values{
+						"responseCode": []string{"504"},
+						"succeedAfter": []string{"1"},
+					},
+				},
+				want: http.Response{StatusCode: 504},
+			},
 		}
 		for i := range testCases {
 			// Declare tc here to avoid loop variable reuse issues across parallel tests.
@@ -198,7 +243,7 @@ var HTTPRouteRetry = confsuite.ConformanceTest{
 func assertConsistentRetryBehaviour(t *testing.T, suite *confsuite.ConformanceTestSuite, gwAddr string, ns string, path string, values url.Values, response http.Response) {
 	t.Helper()
 
-	http.AwaitConvergence(t, suite.TimeoutConfig.RequiredConsecutiveSuccesses, suite.TimeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
+	http.AwaitConvergence(t, suite.TimeoutConfig, func(elapsed time.Duration) bool {
 		// regenerate UUID on each probe so the retry simulation handler in the echo-basic backend tracks retries independently
 		values.Set("uuid", uuid.New().String())
 

@@ -27,8 +27,9 @@ import (
 //
 // TCPRouteSpec defines the desired state of TCPRoute
 type TCPRouteSpecApplyConfiguration struct {
-	CommonRouteSpecApplyConfiguration `json:",inline"`
+	CommonRouteSpecApplyConfiguration `json:""`
 	// Rules are a list of TCP matchers and actions.
+	//
 	Rules []TCPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 

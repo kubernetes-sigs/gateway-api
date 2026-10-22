@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: projectcalico
+project: calico
+fullName: Calico
+description: |
+  [Calico][calico] is an open-source networking and security solution for
+  Kubernetes and other cloud-native environments. Calico's Gateway API
+  implementation is built on the [tigera-operator][calico-operator] and
+  [Envoy Gateway][envoy-gateway]: the operator reconciles a `GatewayAPI`
+  custom resource, provisions an Envoy Gateway control plane, and creates
+  a default `tigera-gateway-class` GatewayClass on the cluster.
+
+  Questions and contributions are welcome on [GitHub][calico]. For
+  maintainer inquiries, see the [Tigera contact form][tigera-contact].
+
+  [calico]: https://github.com/projectcalico/calico
+  [calico-operator]: https://github.com/tigera/operator
+  [envoy-gateway]: https://gateway.envoyproxy.io
+  [tigera-contact]: https://www.tigera.io/contact/

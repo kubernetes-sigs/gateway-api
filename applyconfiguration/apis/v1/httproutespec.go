@@ -27,7 +27,7 @@ import (
 //
 // HTTPRouteSpec defines the desired state of HTTPRoute
 type HTTPRouteSpecApplyConfiguration struct {
-	CommonRouteSpecApplyConfiguration `json:",inline"`
+	CommonRouteSpecApplyConfiguration `json:""`
 	// Hostnames defines a set of hostnames that should match against the HTTP Host
 	// header to select a HTTPRoute used to process the request. Implementations
 	// MUST ignore any port value specified in the HTTP Host header while
@@ -77,14 +77,22 @@ type HTTPRouteSpecApplyConfiguration struct {
 	// * Characters in a matching non-wildcard hostname.
 	// * Characters in a matching hostname.
 	//
-	// If ties exist across multiple Routes, the matching precedence rules for
-	// HTTPRouteMatches takes over.
+	// When multiple HTTPRoutes attach to the same Listener and yield identical
+	// Listener/Route intersected hostnames, implementations SHOULD evaluate
+	// precedence using the original hostnames configured on the Route, not the
+	// calculated Listener/Route hostname intersection.
+	//
+	// Resolving Route precedence using original Route hostname specificity is an
+	// Extended feature. Implementations that support this behavior SHOULD claim
+	// support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+	// Implementations that do not support this feature MAY evaluate precedence
+	// using the calculated Listener/Route hostname intersection.
 	//
 	// Support: Core
+	//
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
-	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	// <gateway:util:excludeFromCRD>
 	// Validates that the total number of matches across all rules does not exceed 128.
 	// CEL does not support aggregate functions like sum() over lists, so each of the

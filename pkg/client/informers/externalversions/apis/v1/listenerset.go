@@ -34,11 +34,39 @@ import (
 )
 
 // ListenerSetInformer provides access to a shared informer and lister for
-// ListenerSets.
+// ListenerSets. Prefer using the type-safe variant (see [TypedListenerSetInformer]).
 type ListenerSetInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1.ListenerSetLister
 }
+
+// TypedListenerSetInformer provides access to a shared informer and lister for
+// ListenerSets, including the type-safe TypedInformer variant.
+// It is a superset of ListenerSetInformer.
+type TypedListenerSetInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() ListenerSetIndexInformer
+	Lister() apisv1.ListenerSetLister
+}
+
+// ListenerSetIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type ListenerSetIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1.ListenerSet]
+
+// ListenerSetHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for ListenerSet.
+type ListenerSetHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1.ListenerSet]
+
+// ListenerSetDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for ListenerSet.
+type ListenerSetDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1.ListenerSet]
+
+// ListenerSetFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for ListenerSet.
+type ListenerSetFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1.ListenerSet]
+
+// ListenerSetIndexers is a specialization of [cache.TypedIndexers] for ListenerSet.
+type ListenerSetIndexers = cache.TypedIndexers[*gatewayapiapisv1.ListenerSet]
+
+// DeletedListenerSet is a specialization of [cache.DeletedObject] for ListenerSet.
+type DeletedListenerSet = cache.DeletedObject[*gatewayapiapisv1.ListenerSet]
 
 type listenerSetInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type listenerSetInformer struct {
 // NewListenerSetInformer constructs a new informer for ListenerSet type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedListenerSetInformer]).
 func NewListenerSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewListenerSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedListenerSetInformer constructs a new informer for ListenerSet type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedListenerSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers ListenerSetIndexers) ListenerSetIndexInformer {
+	return NewTypedListenerSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredListenerSetInformer constructs a new informer for ListenerSet type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredListenerSetInformer]).
 func NewFilteredListenerSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewListenerSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedListenerSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredListenerSetInformer constructs a new informer for ListenerSet type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredListenerSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers ListenerSetIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) ListenerSetIndexInformer {
+	return NewTypedListenerSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewListenerSetInformerWithOptions constructs a new informer for ListenerSet type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedListenerSetInformerWithOptions]).
 func NewListenerSetInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedListenerSetInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedListenerSetInformerWithOptions constructs a new informer for ListenerSet type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedListenerSetInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) ListenerSetIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1", Resource: "listenersets"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.ListenerSet](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewListenerSetInformerWithOptions(client versioned.Interface, namespace str
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *listenerSetInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewListenerSetInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedListenerSetInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *listenerSetInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1.ListenerSet{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *listenerSetInformer) TypedInformer() ListenerSetIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.ListenerSet](f.factory.InformerFor(&gatewayapiapisv1.ListenerSet{}, f.defaultInformer))
 }
 
 func (f *listenerSetInformer) Lister() apisv1.ListenerSetLister {
 	return apisv1.NewListenerSetLister(f.Informer().GetIndexer())
+}
+
+// ToTypedListenerSetInformer converts an untyped informer into a TypedListenerSetInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ListenerSet. If that is not the case, calling type-safe methods of the returned
+// TypedListenerSetInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedListenerSetInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedListenerSetInformer(informer ListenerSetInformer) TypedListenerSetInformer {
+	if informer, ok := informer.(TypedListenerSetInformer); ok {
+		return informer
+	}
+	return &listenerSetTypedInformerAdapter{informer}
+}
+
+type listenerSetTypedInformerAdapter struct {
+	ListenerSetInformer
+}
+
+func (a *listenerSetTypedInformerAdapter) TypedInformer() ListenerSetIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.ListenerSet](a.Informer())
+}
+
+// ToListenerSetIndexInformer converts an untyped informer into a ListenerSetIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ListenerSet. If that is not the case, calling type-safe methods of the returned
+// ListenerSetIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a ListenerSetIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToListenerSetIndexInformer(informer cache.SharedIndexInformer) ListenerSetIndexInformer {
+	if informer, ok := informer.(ListenerSetIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.ListenerSet](informer)
 }

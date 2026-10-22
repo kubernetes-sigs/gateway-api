@@ -1,0 +1,36 @@
+{{- $dest := .Destination -}}
+{{- $ext := path.Ext $dest -}}
+{{- $base := strings.TrimSuffix $ext $dest -}}
+{{- $darkDest := printf "%s-dark%s" $base $ext -}}
+{{- $hasDark := false -}}
+
+{{- if $ext -}}
+  {{- /* Check various path locations for dark version */ -}}
+  {{- if fileExists (printf "site/static%s" $darkDest) -}}
+    {{- $hasDark = true -}}
+  {{- else if fileExists (printf "static%s" $darkDest) -}}
+    {{- $hasDark = true -}}
+  {{- else if fileExists (printf "site/content/en%s" $darkDest) -}}
+    {{- $hasDark = true -}}
+  {{- else if fileExists (printf "content/en%s" $darkDest) -}}
+    {{- $hasDark = true -}}
+  {{- else if .Page.File -}}
+    {{- $pageDir := .Page.File.Dir -}}
+    {{- if fileExists (printf "site/content/en/%s/%s" $pageDir $darkDest) -}}
+      {{- $hasDark = true -}}
+    {{- else if fileExists (printf "content/en/%s/%s" $pageDir $darkDest) -}}
+      {{- $hasDark = true -}}
+    {{- else if fileExists (printf "%s/%s" $pageDir $darkDest) -}}
+      {{- $hasDark = true -}}
+    {{- else if fileExists (printf "geps/%s/%s" $pageDir $darkDest) -}}
+      {{- $hasDark = true -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if $hasDark -}}
+<img src="{{ $dest | safeURL }}" alt="{{ .Text }}" class="img-fluid img-light-only"{{ with .Title }} title="{{ . }}"{{ end }} />
+<img src="{{ $darkDest | safeURL }}" alt="{{ .Text }}" class="img-fluid img-dark-only"{{ with .Title }} title="{{ . }}"{{ end }} />
+{{- else -}}
+<img src="{{ $dest | safeURL }}" alt="{{ .Text }}" class="img-fluid"{{ with .Title }} title="{{ . }}"{{ end }} />
+{{- end -}}

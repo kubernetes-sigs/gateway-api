@@ -62,9 +62,9 @@ const (
 	// HTTP 421 (Misdirected Request) when appropriate.
 	SupportGatewayHTTPSListenerDetectMisdirectedRequests = "GatewayHTTPSListenerDetectMisdirectedRequests"
 
-	// SupportGatewayInfrastructurePropagation option indicates support for
-	// spec.infrastructure.annotations and spec.infrastructure.labels
-	SupportGatewayInfrastructurePropagation FeatureName = "GatewayInfrastructurePropagation"
+	// SupportGatewayInfrastructure option indicates support for
+	// spec.infrastructure
+	SupportGatewayInfrastructure FeatureName = "GatewayInfrastructure"
 
 	// SupportGatewayAddressEmpty option indicates support for an empty
 	// spec.addresses.value field
@@ -87,6 +87,28 @@ const (
 	// SupportGatewayFrontendClientCertificateValidationInsecureFallback option indicates support
 	// for the `AllowInsecureFallback` client certificate validation mode.
 	SupportGatewayFrontendClientCertificateValidationInsecureFallback FeatureName = "GatewayFrontendClientCertificateValidationInsecureFallback"
+
+	// SupportGatewayAddressRoutability option indicates support for Gateway address routability.
+	SupportGatewayAddressRoutability FeatureName = "GatewayAddressRoutability"
+
+	// SupportGatewayAddressRoutabilityCluster option indicates support for Cluster Gateway address routability.
+	SupportGatewayAddressRoutabilityCluster FeatureName = "GatewayAddressRoutabilityCluster"
+
+	// SupportGatewayRouteHostnameIntersectionPrecedence option indicates support
+	// for resolving HTTPRoute, GRPCRoute, and TLSRoute precedence using original
+	// route hostname specificity rather than the calculated listener/route
+	// hostname intersection.
+	// Note: This feature is expected to move to Core conformance soon, so
+	// implementations are strongly encouraged to support it.
+	SupportGatewayRouteHostnameIntersectionPrecedence FeatureName = "GatewayRouteHostnameIntersectionPrecedence"
+
+	// SupportGatewayListenerFilters option indicates support for
+	// specifying filters on Gateway listeners.
+	SupportGatewayListenerFilters FeatureName = "GatewayListenerFilters"
+
+	// SupportClusterTrustBundle option indicates support for ClusterTrustBundle
+	// references in BackendTLSPolicyValidation and Gateway frontend TLS validation.
+	SupportClusterTrustBundle FeatureName = "ClusterTrustBundle"
 )
 
 var (
@@ -110,9 +132,9 @@ var (
 		Name:    SupportGatewayHTTPSListenerDetectMisdirectedRequests,
 		Channel: FeatureChannelStandard,
 	}
-	// GatewayInfrastructurePropagationFeature contains metadata for the GatewayInfrastructurePropagation feature.
-	GatewayInfrastructurePropagationFeature = Feature{
-		Name:    SupportGatewayInfrastructurePropagation,
+	// GatewayInfrastructureFeature contains metadata for the GatewayInfrastructure feature.
+	GatewayInfrastructureFeature = Feature{
+		Name:    SupportGatewayInfrastructure,
 		Channel: FeatureChannelStandard,
 	}
 	// GatewayEmptyAddressFeature contains metadata for the SupportGatewayAddressEmpty feature.
@@ -143,6 +165,40 @@ var (
 		Name:    SupportGatewayFrontendClientCertificateValidationInsecureFallback,
 		Channel: FeatureChannelStandard,
 	}
+	// GatewayAddressRoutabilityFeature contains metadata for the GatewayAddressRoutability feature.
+	GatewayAddressRoutabilityFeature = Feature{
+		Name:    SupportGatewayAddressRoutability,
+		Channel: FeatureChannelExperimental,
+	}
+	// GatewayAddressRoutabilityClusterFeature contains metadata for the GatewayAddressRoutabilityCluster feature.
+	GatewayAddressRoutabilityClusterFeature = Feature{
+		Name:    SupportGatewayAddressRoutabilityCluster,
+		Channel: FeatureChannelExperimental,
+	}
+
+	// GatewayRouteHostnameIntersectionPrecedenceFeature contains metadata for the GatewayRouteHostnameIntersectionPrecedence feature.
+	GatewayRouteHostnameIntersectionPrecedenceFeature = Feature{
+		Name:    SupportGatewayRouteHostnameIntersectionPrecedence,
+		Channel: FeatureChannelStandard,
+	}
+
+	// GatewayListenerFiltersFeature contains metadata for the SupportGatewayListenerFilters feature.
+	GatewayListenerFiltersFeature = Feature{
+		Name:    SupportGatewayListenerFilters,
+		Channel: FeatureChannelExperimental,
+	}
+
+	// ClusterTrustBundleFeature contains metadata for the ClusterTrustBundle
+	// reference feature. It is a union feature: it belongs to both
+	// GatewayExtendedFeatures and BackendTLSPolicyExtendedFeatures, so an
+	// implementation claiming it alongside GatewayFrontendClientCertificateValidation
+	// must support ClusterTrustBundle references in Gateway frontend TLS validation,
+	// and an implementation claiming it alongside BackendTLSPolicy must support
+	// ClusterTrustBundle references in BackendTLSPolicyValidation.
+	ClusterTrustBundleFeature = Feature{
+		Name:    SupportClusterTrustBundle,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -152,10 +208,15 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayStaticAddressesFeature,
 	GatewayHTTPListenerIsolationFeature,
 	GatewayHTTPSListenerDetectMisdirectedRequestsFeature,
-	GatewayInfrastructurePropagationFeature,
+	GatewayInfrastructureFeature,
 	GatewayEmptyAddressFeature,
 	GatewayBackendClientCertificateFeature,
 	GatewayFrontendClientCertificateValidationFeature,
 	GatewayFrontendClientCertificateValidationInsecureFallbackFeature,
+	GatewayAddressRoutabilityFeature,
+	GatewayAddressRoutabilityClusterFeature,
+	GatewayRouteHostnameIntersectionPrecedenceFeature,
+	ClusterTrustBundleFeature,
 	ListenerSetFeature,
+	GatewayListenerFiltersFeature,
 )

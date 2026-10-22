@@ -33,10 +33,12 @@ type ParametersReferenceApplyConfiguration struct {
 	// Kind is kind of the referent.
 	Kind *apisv1.Kind `json:"kind,omitempty"`
 	// Name is the name of the referent.
+	//
 	Name *string `json:"name,omitempty"`
 	// Namespace is the namespace of the referent.
 	// This field is required when referring to a Namespace-scoped resource and
 	// MUST be unset when referring to a Cluster-scoped resource.
+	//
 	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 }
 

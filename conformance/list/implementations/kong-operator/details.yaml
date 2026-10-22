@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: Kong
+project: kong-operator
+fullName: Kong Operator
+description: |
+  [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
+
+  The [Kong Operator][kong-operator-docs] can be used to configure managed Gateways and orchestrate instances of Kong Kubernetes Ingress Controllers.
+
+  For help and support with Kong Operator please feel free to [create an issue][kong-operator-issue-new] or a [discussion][kong-operator-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
+
+  [kong-operator-docs]: https://developer.konghq.com/operator/
+  [kong-operator-issue-new]: https://github.com/Kong/kong-operator/issues/new
+  [kong-operator-disc-new]: https://github.com/Kong/kong-operator/discussions/new
+  [kong]: https://konghq.com
+  [kong-slack]: https://kubernetes.slack.com/archives/CDCA87FRD

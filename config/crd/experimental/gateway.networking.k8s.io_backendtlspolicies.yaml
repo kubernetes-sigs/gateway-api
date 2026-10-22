@@ -246,12 +246,24 @@ spec:
                       ensure the `Accepted` Condition on the BackendTLSPolicy is set to
                       `status: False`, with a Reason `NoValidCACertificate`.
 
+
+                      References to cluster-scoped resources (such as ClusterTrustBundle)
+                      are supported: the implementation resolves the scope based on the kind.
+                      A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped
+                      resource by name. A reference to a namespaced resource (such as ConfigMap
+                      or Secret) uses the local namespace.
+
+
                       A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
                       Implementations MAY choose to support attaching multiple certificates to
                       a backend, but this behavior is implementation-specific.
 
                       Support: Core - An optional single reference to a Kubernetes ConfigMap,
                       with the CA certificate in a key named `ca.crt`.
+
+
+                      Support: Extended - A single reference to a ClusterTrustBundle (certificates.k8s.io).
+
 
                       Support: Implementation-specific - More than one reference, other kinds
                       of resources, or a single reference that includes multiple certificates.
@@ -291,6 +303,7 @@ spec:
                       - name
                       type: object
                     maxItems: 8
+                    minItems: 1
                     type: array
                     x-kubernetes-list-type: atomic
                   hostname:
@@ -403,14 +416,10 @@ spec:
                 - hostname
                 type: object
                 x-kubernetes-validations:
-                - message: must not contain both CACertificateRefs and WellKnownCACertificates
-                  rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                    > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                    != "")'
-                - message: must specify either CACertificateRefs or WellKnownCACertificates
-                  rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                    > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                    != "")
+                - message: exactly one of the fields in [caCertificateRefs wellKnownCACertificates]
+                    must be set
+                  rule: (has(self.caCertificateRefs)?1:0)+(has(self.wellKnownCACertificates)?1:0)
+                    == 1
             required:
             - targetRefs
             - validation
@@ -944,12 +953,24 @@ spec:
                       ensure the `Accepted` Condition on the BackendTLSPolicy is set to
                       `status: False`, with a Reason `NoValidCACertificate`.
 
+
+                      References to cluster-scoped resources (such as ClusterTrustBundle)
+                      are supported: the implementation resolves the scope based on the kind.
+                      A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped
+                      resource by name. A reference to a namespaced resource (such as ConfigMap
+                      or Secret) uses the local namespace.
+
+
                       A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
                       Implementations MAY choose to support attaching multiple certificates to
                       a backend, but this behavior is implementation-specific.
 
                       Support: Core - An optional single reference to a Kubernetes ConfigMap,
                       with the CA certificate in a key named `ca.crt`.
+
+
+                      Support: Extended - A single reference to a ClusterTrustBundle (certificates.k8s.io).
+
 
                       Support: Implementation-specific - More than one reference, other kinds
                       of resources, or a single reference that includes multiple certificates.
@@ -989,6 +1010,7 @@ spec:
                       - name
                       type: object
                     maxItems: 8
+                    minItems: 1
                     type: array
                     x-kubernetes-list-type: atomic
                   hostname:
@@ -1101,14 +1123,10 @@ spec:
                 - hostname
                 type: object
                 x-kubernetes-validations:
-                - message: must not contain both CACertificateRefs and WellKnownCACertificates
-                  rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                    > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                    != "")'
-                - message: must specify either CACertificateRefs or WellKnownCACertificates
-                  rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                    > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                    != "")
+                - message: exactly one of the fields in [caCertificateRefs wellKnownCACertificates]
+                    must be set
+                  rule: (has(self.caCertificateRefs)?1:0)+(has(self.wellKnownCACertificates)?1:0)
+                    == 1
             required:
             - targetRefs
             - validation

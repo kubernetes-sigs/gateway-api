@@ -34,11 +34,39 @@ import (
 )
 
 // UDPRouteInformer provides access to a shared informer and lister for
-// UDPRoutes.
+// UDPRoutes. Prefer using the type-safe variant (see [TypedUDPRouteInformer]).
 type UDPRouteInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1alpha2.UDPRouteLister
 }
+
+// TypedUDPRouteInformer provides access to a shared informer and lister for
+// UDPRoutes, including the type-safe TypedInformer variant.
+// It is a superset of UDPRouteInformer.
+type TypedUDPRouteInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() UDPRouteIndexInformer
+	Lister() apisv1alpha2.UDPRouteLister
+}
+
+// UDPRouteIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type UDPRouteIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1alpha2.UDPRoute]
+
+// UDPRouteHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for UDPRoute.
+type UDPRouteHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1alpha2.UDPRoute]
+
+// UDPRouteDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for UDPRoute.
+type UDPRouteDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1alpha2.UDPRoute]
+
+// UDPRouteFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for UDPRoute.
+type UDPRouteFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1alpha2.UDPRoute]
+
+// UDPRouteIndexers is a specialization of [cache.TypedIndexers] for UDPRoute.
+type UDPRouteIndexers = cache.TypedIndexers[*gatewayapiapisv1alpha2.UDPRoute]
+
+// DeletedUDPRoute is a specialization of [cache.DeletedObject] for UDPRoute.
+type DeletedUDPRoute = cache.DeletedObject[*gatewayapiapisv1alpha2.UDPRoute]
 
 type uDPRouteInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type uDPRouteInformer struct {
 // NewUDPRouteInformer constructs a new informer for UDPRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedUDPRouteInformer]).
 func NewUDPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewUDPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedUDPRouteInformer constructs a new informer for UDPRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedUDPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers UDPRouteIndexers) UDPRouteIndexInformer {
+	return NewTypedUDPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredUDPRouteInformer constructs a new informer for UDPRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredUDPRouteInformer]).
 func NewFilteredUDPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewUDPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedUDPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredUDPRouteInformer constructs a new informer for UDPRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredUDPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers UDPRouteIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) UDPRouteIndexInformer {
+	return NewTypedUDPRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewUDPRouteInformerWithOptions constructs a new informer for UDPRoute type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedUDPRouteInformerWithOptions]).
 func NewUDPRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedUDPRouteInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedUDPRouteInformerWithOptions constructs a new informer for UDPRoute type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedUDPRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) UDPRouteIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "udproutes"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.UDPRoute](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewUDPRouteInformerWithOptions(client versioned.Interface, namespace string
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *uDPRouteInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewUDPRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedUDPRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *uDPRouteInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1alpha2.UDPRoute{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *uDPRouteInformer) TypedInformer() UDPRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.UDPRoute](f.factory.InformerFor(&gatewayapiapisv1alpha2.UDPRoute{}, f.defaultInformer))
 }
 
 func (f *uDPRouteInformer) Lister() apisv1alpha2.UDPRouteLister {
 	return apisv1alpha2.NewUDPRouteLister(f.Informer().GetIndexer())
+}
+
+// ToTypedUDPRouteInformer converts an untyped informer into a TypedUDPRouteInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *UDPRoute. If that is not the case, calling type-safe methods of the returned
+// TypedUDPRouteInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedUDPRouteInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedUDPRouteInformer(informer UDPRouteInformer) TypedUDPRouteInformer {
+	if informer, ok := informer.(TypedUDPRouteInformer); ok {
+		return informer
+	}
+	return &uDPRouteTypedInformerAdapter{informer}
+}
+
+type uDPRouteTypedInformerAdapter struct {
+	UDPRouteInformer
+}
+
+func (a *uDPRouteTypedInformerAdapter) TypedInformer() UDPRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.UDPRoute](a.Informer())
+}
+
+// ToUDPRouteIndexInformer converts an untyped informer into a UDPRouteIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *UDPRoute. If that is not the case, calling type-safe methods of the returned
+// UDPRouteIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a UDPRouteIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToUDPRouteIndexInformer(informer cache.SharedIndexInformer) UDPRouteIndexInformer {
+	if informer, ok := informer.(UDPRouteIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1alpha2.UDPRoute](informer)
 }

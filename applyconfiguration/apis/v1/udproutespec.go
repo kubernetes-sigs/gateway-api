@@ -27,8 +27,9 @@ import (
 //
 // UDPRouteSpec defines the desired state of UDPRoute.
 type UDPRouteSpecApplyConfiguration struct {
-	CommonRouteSpecApplyConfiguration `json:",inline"`
+	CommonRouteSpecApplyConfiguration `json:""`
 	// Rules are a list of UDP matchers and actions.
+	//
 	Rules []UDPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 

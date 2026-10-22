@@ -34,11 +34,39 @@ import (
 )
 
 // GRPCRouteInformer provides access to a shared informer and lister for
-// GRPCRoutes.
+// GRPCRoutes. Prefer using the type-safe variant (see [TypedGRPCRouteInformer]).
 type GRPCRouteInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1.GRPCRouteLister
 }
+
+// TypedGRPCRouteInformer provides access to a shared informer and lister for
+// GRPCRoutes, including the type-safe TypedInformer variant.
+// It is a superset of GRPCRouteInformer.
+type TypedGRPCRouteInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() GRPCRouteIndexInformer
+	Lister() apisv1.GRPCRouteLister
+}
+
+// GRPCRouteIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type GRPCRouteIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1.GRPCRoute]
+
+// GRPCRouteHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for GRPCRoute.
+type GRPCRouteHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1.GRPCRoute]
+
+// GRPCRouteDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for GRPCRoute.
+type GRPCRouteDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1.GRPCRoute]
+
+// GRPCRouteFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for GRPCRoute.
+type GRPCRouteFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1.GRPCRoute]
+
+// GRPCRouteIndexers is a specialization of [cache.TypedIndexers] for GRPCRoute.
+type GRPCRouteIndexers = cache.TypedIndexers[*gatewayapiapisv1.GRPCRoute]
+
+// DeletedGRPCRoute is a specialization of [cache.DeletedObject] for GRPCRoute.
+type DeletedGRPCRoute = cache.DeletedObject[*gatewayapiapisv1.GRPCRoute]
 
 type gRPCRouteInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type gRPCRouteInformer struct {
 // NewGRPCRouteInformer constructs a new informer for GRPCRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedGRPCRouteInformer]).
 func NewGRPCRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewGRPCRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedGRPCRouteInformer constructs a new informer for GRPCRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedGRPCRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers GRPCRouteIndexers) GRPCRouteIndexInformer {
+	return NewTypedGRPCRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredGRPCRouteInformer constructs a new informer for GRPCRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredGRPCRouteInformer]).
 func NewFilteredGRPCRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewGRPCRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedGRPCRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredGRPCRouteInformer constructs a new informer for GRPCRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredGRPCRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers GRPCRouteIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) GRPCRouteIndexInformer {
+	return NewTypedGRPCRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewGRPCRouteInformerWithOptions constructs a new informer for GRPCRoute type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedGRPCRouteInformerWithOptions]).
 func NewGRPCRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedGRPCRouteInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedGRPCRouteInformerWithOptions constructs a new informer for GRPCRoute type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedGRPCRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) GRPCRouteIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1", Resource: "grpcroutes"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.GRPCRoute](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewGRPCRouteInformerWithOptions(client versioned.Interface, namespace strin
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *gRPCRouteInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewGRPCRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedGRPCRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *gRPCRouteInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1.GRPCRoute{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *gRPCRouteInformer) TypedInformer() GRPCRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.GRPCRoute](f.factory.InformerFor(&gatewayapiapisv1.GRPCRoute{}, f.defaultInformer))
 }
 
 func (f *gRPCRouteInformer) Lister() apisv1.GRPCRouteLister {
 	return apisv1.NewGRPCRouteLister(f.Informer().GetIndexer())
+}
+
+// ToTypedGRPCRouteInformer converts an untyped informer into a TypedGRPCRouteInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *GRPCRoute. If that is not the case, calling type-safe methods of the returned
+// TypedGRPCRouteInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedGRPCRouteInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedGRPCRouteInformer(informer GRPCRouteInformer) TypedGRPCRouteInformer {
+	if informer, ok := informer.(TypedGRPCRouteInformer); ok {
+		return informer
+	}
+	return &gRPCRouteTypedInformerAdapter{informer}
+}
+
+type gRPCRouteTypedInformerAdapter struct {
+	GRPCRouteInformer
+}
+
+func (a *gRPCRouteTypedInformerAdapter) TypedInformer() GRPCRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.GRPCRoute](a.Informer())
+}
+
+// ToGRPCRouteIndexInformer converts an untyped informer into a GRPCRouteIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *GRPCRoute. If that is not the case, calling type-safe methods of the returned
+// GRPCRouteIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a GRPCRouteIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToGRPCRouteIndexInformer(informer cache.SharedIndexInformer) GRPCRouteIndexInformer {
+	if informer, ok := informer.(GRPCRouteIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.GRPCRoute](informer)
 }

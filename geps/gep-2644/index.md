@@ -3,7 +3,7 @@ title: "GEP-2644: TCPRoute"
 ---
 
 - Issue: [#2644](https://github.com/kubernetes-sigs/gateway-api/issues/2644)
-- Status: Provisional
+- Status: Standard
 
 (See definitions in [GEP States](../overview.md#gep-states).)
 

@@ -34,11 +34,39 @@ import (
 )
 
 // TLSRouteInformer provides access to a shared informer and lister for
-// TLSRoutes.
+// TLSRoutes. Prefer using the type-safe variant (see [TypedTLSRouteInformer]).
 type TLSRouteInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() apisv1.TLSRouteLister
 }
+
+// TypedTLSRouteInformer provides access to a shared informer and lister for
+// TLSRoutes, including the type-safe TypedInformer variant.
+// It is a superset of TLSRouteInformer.
+type TypedTLSRouteInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() TLSRouteIndexInformer
+	Lister() apisv1.TLSRouteLister
+}
+
+// TLSRouteIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type TLSRouteIndexInformer cache.TypedSharedIndexInformer[*gatewayapiapisv1.TLSRoute]
+
+// TLSRouteHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for TLSRoute.
+type TLSRouteHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*gatewayapiapisv1.TLSRoute]
+
+// TLSRouteDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for TLSRoute.
+type TLSRouteDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*gatewayapiapisv1.TLSRoute]
+
+// TLSRouteFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for TLSRoute.
+type TLSRouteFilteringHandler = cache.TypedFilteringResourceEventHandler[*gatewayapiapisv1.TLSRoute]
+
+// TLSRouteIndexers is a specialization of [cache.TypedIndexers] for TLSRoute.
+type TLSRouteIndexers = cache.TypedIndexers[*gatewayapiapisv1.TLSRoute]
+
+// DeletedTLSRoute is a specialization of [cache.DeletedObject] for TLSRoute.
+type DeletedTLSRoute = cache.DeletedObject[*gatewayapiapisv1.TLSRoute]
 
 type tLSRouteInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type tLSRouteInformer struct {
 // NewTLSRouteInformer constructs a new informer for TLSRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedTLSRouteInformer]).
 func NewTLSRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewTLSRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedTLSRouteInformer constructs a new informer for TLSRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedTLSRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers TLSRouteIndexers) TLSRouteIndexInformer {
+	return NewTypedTLSRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredTLSRouteInformer constructs a new informer for TLSRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredTLSRouteInformer]).
 func NewFilteredTLSRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewTLSRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedTLSRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredTLSRouteInformer constructs a new informer for TLSRoute type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredTLSRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers TLSRouteIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) TLSRouteIndexInformer {
+	return NewTypedTLSRouteInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewTLSRouteInformerWithOptions constructs a new informer for TLSRoute type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedTLSRouteInformerWithOptions]).
 func NewTLSRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedTLSRouteInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedTLSRouteInformerWithOptions constructs a new informer for TLSRoute type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedTLSRouteInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) TLSRouteIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1", Resource: "tlsroutes"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.TLSRoute](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewTLSRouteInformerWithOptions(client versioned.Interface, namespace string
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *tLSRouteInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewTLSRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedTLSRouteInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *tLSRouteInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&gatewayapiapisv1.TLSRoute{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *tLSRouteInformer) TypedInformer() TLSRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.TLSRoute](f.factory.InformerFor(&gatewayapiapisv1.TLSRoute{}, f.defaultInformer))
 }
 
 func (f *tLSRouteInformer) Lister() apisv1.TLSRouteLister {
 	return apisv1.NewTLSRouteLister(f.Informer().GetIndexer())
+}
+
+// ToTypedTLSRouteInformer converts an untyped informer into a TypedTLSRouteInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *TLSRoute. If that is not the case, calling type-safe methods of the returned
+// TypedTLSRouteInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedTLSRouteInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedTLSRouteInformer(informer TLSRouteInformer) TypedTLSRouteInformer {
+	if informer, ok := informer.(TypedTLSRouteInformer); ok {
+		return informer
+	}
+	return &tLSRouteTypedInformerAdapter{informer}
+}
+
+type tLSRouteTypedInformerAdapter struct {
+	TLSRouteInformer
+}
+
+func (a *tLSRouteTypedInformerAdapter) TypedInformer() TLSRouteIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.TLSRoute](a.Informer())
+}
+
+// ToTLSRouteIndexInformer converts an untyped informer into a TLSRouteIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *TLSRoute. If that is not the case, calling type-safe methods of the returned
+// TLSRouteIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a TLSRouteIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTLSRouteIndexInformer(informer cache.SharedIndexInformer) TLSRouteIndexInformer {
+	if informer, ok := informer.(TLSRouteIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*gatewayapiapisv1.TLSRoute](informer)
 }

@@ -23,7 +23,7 @@ package v1
 //
 // TCPRouteStatus defines the observed state of TCPRoute
 type TCPRouteStatusApplyConfiguration struct {
-	RouteStatusApplyConfiguration `json:",inline"`
+	RouteStatusApplyConfiguration `json:""`
 }
 
 // TCPRouteStatusApplyConfiguration constructs a declarative configuration of the TCPRouteStatus type for use with

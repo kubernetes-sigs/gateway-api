@@ -145,9 +145,12 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts":                               schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteTimeouts(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPURLRewriteFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HeaderConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_HeaderConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.Listener":                                        schema_sigsk8sio_gateway_api_apis_v1_Listener(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntry":                                   schema_sigsk8sio_gateway_api_apis_v1_ListenerEntry(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntryStatus":                             schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerFilter":                                  schema_sigsk8sio_gateway_api_apis_v1_ListenerFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerFilters":                                 schema_sigsk8sio_gateway_api_apis_v1_ListenerFilters(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerNamespaces":                              schema_sigsk8sio_gateway_api_apis_v1_ListenerNamespaces(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerSet":                                     schema_sigsk8sio_gateway_api_apis_v1_ListenerSet(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerSetList":                                 schema_sigsk8sio_gateway_api_apis_v1_ListenerSetList(ref),
@@ -233,6 +236,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                             schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute":                                schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref),
@@ -240,17 +244,26 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend":                  schema_sigsk8sio_gateway_api_apisx_v1alpha1_EndpointSelectorBackend(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend":                  schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.LabelSelector":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_LabelSelector(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshSpec":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshStatus":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicyStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackend(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendList":                             schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicyList":                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh":                                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMesh(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMeshList":                                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy":                         schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicyList":                     schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicyList(ref),
 	}
 }
 
@@ -295,8 +308,7 @@ func schema_pkg_apis_meta_v1_APIGroup(ref common.ReferenceCallback) common.OpenA
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.GroupVersionForDiscovery{}.OpenAPIModelName()),
+										Ref: ref(v1.GroupVersionForDiscovery{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -321,8 +333,7 @@ func schema_pkg_apis_meta_v1_APIGroup(ref common.ReferenceCallback) common.OpenA
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.ServerAddressByClientCIDR{}.OpenAPIModelName()),
+										Ref: ref(v1.ServerAddressByClientCIDR{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -370,8 +381,7 @@ func schema_pkg_apis_meta_v1_APIGroupList(ref common.ReferenceCallback) common.O
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.APIGroup{}.OpenAPIModelName()),
+										Ref: ref(v1.APIGroup{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -446,9 +456,8 @@ func schema_pkg_apis_meta_v1_APIResource(ref common.ReferenceCallback) common.Op
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -466,9 +475,8 @@ func schema_pkg_apis_meta_v1_APIResource(ref common.ReferenceCallback) common.Op
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -486,9 +494,8 @@ func schema_pkg_apis_meta_v1_APIResource(ref common.ReferenceCallback) common.Op
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -549,8 +556,7 @@ func schema_pkg_apis_meta_v1_APIResourceList(ref common.ReferenceCallback) commo
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.APIResource{}.OpenAPIModelName()),
+										Ref: ref(v1.APIResource{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -598,9 +604,8 @@ func schema_pkg_apis_meta_v1_APIVersions(ref common.ReferenceCallback) common.Op
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -618,8 +623,7 @@ func schema_pkg_apis_meta_v1_APIVersions(ref common.ReferenceCallback) common.Op
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.ServerAddressByClientCIDR{}.OpenAPIModelName()),
+										Ref: ref(v1.ServerAddressByClientCIDR{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -667,9 +671,8 @@ func schema_pkg_apis_meta_v1_ApplyOptions(ref common.ReferenceCallback) common.O
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -792,9 +795,8 @@ func schema_pkg_apis_meta_v1_CreateOptions(ref common.ReferenceCallback) common.
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -880,9 +882,8 @@ func schema_pkg_apis_meta_v1_DeleteOptions(ref common.ReferenceCallback) common.
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -950,9 +951,8 @@ func schema_pkg_apis_meta_v1_FieldSelectorRequirement(ref common.ReferenceCallba
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -1235,9 +1235,8 @@ func schema_pkg_apis_meta_v1_LabelSelector(ref common.ReferenceCallback) common.
 								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -1255,8 +1254,7 @@ func schema_pkg_apis_meta_v1_LabelSelector(ref common.ReferenceCallback) common.
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.LabelSelectorRequirement{}.OpenAPIModelName()),
+										Ref: ref(v1.LabelSelectorRequirement{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1310,9 +1308,8 @@ func schema_pkg_apis_meta_v1_LabelSelectorRequirement(ref common.ReferenceCallba
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -1685,9 +1682,8 @@ func schema_pkg_apis_meta_v1_ObjectMeta(ref common.ReferenceCallback) common.Ope
 								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -1701,9 +1697,8 @@ func schema_pkg_apis_meta_v1_ObjectMeta(ref common.ReferenceCallback) common.Ope
 								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -1726,8 +1721,7 @@ func schema_pkg_apis_meta_v1_ObjectMeta(ref common.ReferenceCallback) common.Ope
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.OwnerReference{}.OpenAPIModelName()),
+										Ref: ref(v1.OwnerReference{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1746,9 +1740,8 @@ func schema_pkg_apis_meta_v1_ObjectMeta(ref common.ReferenceCallback) common.Ope
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -1766,8 +1759,7 @@ func schema_pkg_apis_meta_v1_ObjectMeta(ref common.ReferenceCallback) common.Ope
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.ManagedFieldsEntry{}.OpenAPIModelName()),
+										Ref: ref(v1.ManagedFieldsEntry{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1917,8 +1909,7 @@ func schema_pkg_apis_meta_v1_PartialObjectMetadataList(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.PartialObjectMetadata{}.OpenAPIModelName()),
+										Ref: ref(v1.PartialObjectMetadata{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1977,9 +1968,8 @@ func schema_pkg_apis_meta_v1_PatchOptions(ref common.ReferenceCallback) common.O
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -2058,9 +2048,8 @@ func schema_pkg_apis_meta_v1_RootPaths(ref common.ReferenceCallback) common.Open
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -2276,8 +2265,7 @@ func schema_pkg_apis_meta_v1_StatusDetails(ref common.ReferenceCallback) common.
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.StatusCause{}.OpenAPIModelName()),
+										Ref: ref(v1.StatusCause{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2338,8 +2326,7 @@ func schema_pkg_apis_meta_v1_Table(ref common.ReferenceCallback) common.OpenAPID
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.TableColumnDefinition{}.OpenAPIModelName()),
+										Ref: ref(v1.TableColumnDefinition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2357,8 +2344,7 @@ func schema_pkg_apis_meta_v1_Table(ref common.ReferenceCallback) common.OpenAPID
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.TableRow{}.OpenAPIModelName()),
+										Ref: ref(v1.TableRow{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2499,8 +2485,7 @@ func schema_pkg_apis_meta_v1_TableRow(ref common.ReferenceCallback) common.OpenA
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.TableRowCondition{}.OpenAPIModelName()),
+										Ref: ref(v1.TableRowCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2667,9 +2652,8 @@ func schema_pkg_apis_meta_v1_UpdateOptions(ref common.ReferenceCallback) common.
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -2728,7 +2712,7 @@ func schema_k8sio_apimachinery_pkg_runtime_RawExtension(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RawExtension is used to hold extensions in external versions.\n\nTo use this, make a field which has RawExtension as its type in your external, versioned struct, and Object in your internal struct. You also need to register your various plugin types.\n\n// Internal package:\n\n\ttype MyAPIObject struct {\n\t\truntime.TypeMeta `json:\",inline\"`\n\t\tMyPlugin runtime.Object `json:\"myPlugin\"`\n\t}\n\n\ttype PluginA struct {\n\t\tAOption string `json:\"aOption\"`\n\t}\n\n// External package:\n\n\ttype MyAPIObject struct {\n\t\truntime.TypeMeta `json:\",inline\"`\n\t\tMyPlugin runtime.RawExtension `json:\"myPlugin\"`\n\t}\n\n\ttype PluginA struct {\n\t\tAOption string `json:\"aOption\"`\n\t}\n\n// On the wire, the JSON will look something like this:\n\n\t{\n\t\t\"kind\":\"MyAPIObject\",\n\t\t\"apiVersion\":\"v1\",\n\t\t\"myPlugin\": {\n\t\t\t\"kind\":\"PluginA\",\n\t\t\t\"aOption\":\"foo\",\n\t\t},\n\t}\n\nSo what happens? Decode first uses json or yaml to unmarshal the serialized data into your external MyAPIObject. That causes the raw JSON to be stored, but not unpacked. The next step is to copy (using pkg/conversion) into the internal struct. The runtime package's DefaultScheme has conversion functions installed which will unpack the JSON stored in RawExtension, turning it into the correct object type, and storing it in the Object. (TODO: In the case where the object is of an unknown type, a runtime.Unknown object will be created and stored.)",
+				Description: "RawExtension is used to hold extensions in external versions.\n\nTo use this, make a field which has RawExtension as its type in your external, versioned struct, and Object in your internal struct. You also need to register your various plugin types.\n\n// Internal package:\n\n\ttype MyAPIObject struct {\n\t\truntime.TypeMeta `json:\"\"`\n\t\tMyPlugin runtime.Object `json:\"myPlugin\"`\n\t}\n\n\ttype PluginA struct {\n\t\tAOption string `json:\"aOption\"`\n\t}\n\n// External package:\n\n\ttype MyAPIObject struct {\n\t\truntime.TypeMeta `json:\"\"`\n\t\tMyPlugin runtime.RawExtension `json:\"myPlugin\"`\n\t}\n\n\ttype PluginA struct {\n\t\tAOption string `json:\"aOption\"`\n\t}\n\n// On the wire, the JSON will look something like this:\n\n\t{\n\t\t\"kind\":\"MyAPIObject\",\n\t\t\"apiVersion\":\"v1\",\n\t\t\"myPlugin\": {\n\t\t\t\"kind\":\"PluginA\",\n\t\t\t\"aOption\":\"foo\",\n\t\t},\n\t}\n\nSo what happens? Decode first uses json or yaml to unmarshal the serialized data into your external MyAPIObject. That causes the raw JSON to be stored, but not unpacked. The next step is to copy (using pkg/conversion) into the internal struct. The runtime package's DefaultScheme has conversion functions installed which will unpack the JSON stored in RawExtension, turning it into the correct object type, and storing it in the Object. (TODO: In the case where the object is of an unknown type, a runtime.Unknown object will be created and stored.)",
 				Type:        []string{"object"},
 			},
 		},
@@ -2739,7 +2723,7 @@ func schema_k8sio_apimachinery_pkg_runtime_TypeMeta(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "TypeMeta is shared by all top level objects. The proper way to use it is to inline it in your type, like this:\n\n\ttype MyAwesomeAPIObject struct {\n\t     runtime.TypeMeta    `json:\",inline\"`\n\t     ... // other fields\n\t}\n\nfunc (obj *MyAwesomeAPIObject) SetGroupVersionKind(gvk *metav1.GroupVersionKind) { metav1.UpdateTypeMeta(obj,gvk) }; GroupVersionKind() *GroupVersionKind\n\nTypeMeta is provided here for convenience. You may use it directly from this package or define your own with the same fields.",
+				Description: "TypeMeta is shared by all top level objects. The proper way to use it is to inline it in your type, like this:\n\n\ttype MyAwesomeAPIObject struct {\n\t     runtime.TypeMeta    `json:\"\"`\n\t     ... // other fields\n\t}\n\nfunc (obj *MyAwesomeAPIObject) SetGroupVersionKind(gvk *metav1.GroupVersionKind) { metav1.UpdateTypeMeta(obj,gvk) }; GroupVersionKind() *GroupVersionKind\n\nTypeMeta is provided here for convenience. You may use it directly from this package or define your own with the same fields.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"apiVersion": {
@@ -2955,8 +2939,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_AllowedRoutes(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"),
 									},
 								},
 							},
@@ -2974,7 +2957,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendObjectReference(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendObjectReference defines how an ObjectReference that is specific to BackendRef. It includes a few additional fields and features than a regular ObjectReference.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\nThe API object must be valid in the cluster; the Group and Kind must be registered in the cluster for this reference to be valid.\n\nReferences to objects with invalid Group and Kind are not valid, and must be rejected by the implementation, with appropriate Conditions set on the containing object.\n\nIf the backend service requires TLS, use BackendTLSPolicy to tell the implementation to supply the TLS details to be used to connect to that backend.",
+				Description: "BackendObjectReference defines how an ObjectReference that is specific to BackendRef. It includes a few additional fields and features than a regular ObjectReference.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\nThe API object must be valid in the cluster; the Group and Kind must be registered in the cluster for this reference to be valid.\n\nReferences to objects with invalid Group and Kind are not valid, and must be rejected by the implementation, with appropriate Conditions set on the containing object.\n\nIf the backend service requires TLS, use BackendTLSPolicy to tell the implementation to supply the TLS details to be used to connect to that backend.\n\n<gateway:experimental:validation:XValidation:message=\"Must not have port for Backend reference\",rule=\"(self.group == 'gateway.networking.x-k8s.io' && self.kind == 'XBackend') ? !has(self.port) : true\">",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
@@ -3160,8 +3143,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyList(ref common.Refere
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicy"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicy"),
 									},
 								},
 							},
@@ -3195,8 +3177,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref common.Refere
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.LocalPolicyTargetReferenceWithSectionName"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalPolicyTargetReferenceWithSectionName"),
 									},
 								},
 							},
@@ -3217,9 +3198,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref common.Refere
 								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -3238,7 +3218,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendTLSPolicyValidation contains backend TLS validation configuration.",
+				Description: "BackendTLSPolicyValidation contains backend TLS validation configuration. <gateway:util:excludeFromCRD> Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates must be set. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"must not contain both CACertificateRefs and WellKnownCACertificates\",rule=\"!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:standard:validation:XValidation:message=\"must specify either CACertificateRefs or WellKnownCACertificates\",rule=\"(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \\\"\\\")\"> <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;wellKnownCACertificates>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"caCertificateRefs": {
@@ -3248,13 +3228,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used to validate a TLS handshake between the Gateway and backend Pod.\n\nIf CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If CACertificateRefs is empty or unspecified, the configuration for WellKnownCACertificates MUST be honored instead if supported by the implementation.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key\n  named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this case, the Reason\n  must be set to `InvalidKind` and the Message of the Condition must explain which\n  kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace. This may change in future\n  spec updates.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message must be set for the invalid reference.\n\nIn all cases, the implementation MUST ensure the `ResolvedRefs` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason and Message that indicate the cause of the error. Connections using an invalid CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `NoValidCACertificate`.\n\nA single CACertificateRef to a Kubernetes ConfigMap kind has \"Core\" support. Implementations MAY choose to support attaching multiple certificates to a backend, but this behavior is implementation-specific.\n\nSupport: Core - An optional single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.",
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used to validate a TLS handshake between the Gateway and backend Pod.\n\nIf CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If CACertificateRefs is empty or unspecified, the configuration for WellKnownCACertificates MUST be honored instead if supported by the implementation.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key\n  named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this case, the Reason\n  must be set to `InvalidKind` and the Message of the Condition must explain which\n  kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace. This may change in future\n  spec updates.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message must be set for the invalid reference.\n\nIn all cases, the implementation MUST ensure the `ResolvedRefs` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason and Message that indicate the cause of the error. Connections using an invalid CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `NoValidCACertificate`.\n\n<gateway:experimental:description> References to cluster-scoped resources (such as ClusterTrustBundle) are supported: the implementation resolves the scope based on the kind. A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped resource by name. A reference to a namespaced resource (such as ConfigMap or Secret) uses the local namespace. </gateway:experimental:description>\n\nA single CACertificateRef to a Kubernetes ConfigMap kind has \"Core\" support. Implementations MAY choose to support attaching multiple certificates to a backend, but this behavior is implementation-specific.\n\nSupport: Core - An optional single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\n<gateway:experimental:description> Support: Extended - A single reference to a ClusterTrustBundle (certificates.k8s.io). </gateway:experimental:description>\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.\n\n<gateway:util:excludeFromCRD> The standard channel rules reject an empty list via `size(...) > 0`, while the experimental ExactlyOneOf rule only tests for presence. MinItems keeps an empty list invalid in the experimental channel too. </gateway:util:excludeFromCRD> <gateway:experimental:validation:MinItems=1>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
 									},
 								},
 							},
@@ -3287,8 +3266,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.SubjectAltName"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.SubjectAltName"),
 									},
 								},
 							},
@@ -3322,8 +3300,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref common.ReferenceCa
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -3351,9 +3328,23 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 				Description: "CookieConfig defines the configuration for cookie-based session persistence.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name defines the name of the cookie used for session persistence. If not specified, a unique cookie name SHOULD be generated. Users should avoid reusing cookie names to prevent unintended consequences, such as rejection or unpredictable behavior.\n\nSupport: Core",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"path": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Path defines the cookie Path attribute. When not specified, implementations MUST default the cookie path to \"/\".\n\n<gateway:util:excludeFromCRD> This field is Extended because not all dataplanes support configuring the cookie path (e.g. HAProxy hardcodes path=/). Implementations SHOULD support this field if the underlying dataplane allows setting the cookie path attribute. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"lifetimeType": {
 						SchemaProps: spec.SchemaProps{
-							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nDefaults to \"Session\".\n\nSupport: Core for \"Session\" type\n\nSupport: Extended for \"Permanent\" type",
+							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nDefaults to \"Session\".\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3439,8 +3430,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSConfig(ref common.Reference
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.TLSPortConfig"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.TLSPortConfig"),
 									},
 								},
 							},
@@ -3469,13 +3459,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used as a trust anchor to validate the certificates presented by the client.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the\n  referenced resource does not exist) or is misconfigured (e.g., a\n  ConfigMap does not contain a key named `ca.crt`). In this case, the\n  Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this\n  case, the Reason on all matching HTTPS listeners must be set to\n  `InvalidCACertificateKind` and the Message of the Condition must explain\n  which kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace UNLESS there is a\n  ReferenceGrant in the target namespace that allows the CA\n  certificate to be attached. If a ReferenceGrant does not allow this\n  reference, the `ResolvedRefs` on all matching HTTPS listeners condition\n  MUST be set with the Reason `RefNotPermitted`.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nIn all cases, the implementation MUST ensure that the `ResolvedRefs` condition is set to `status: False` on all targeted listeners (i.e., listeners serving HTTPS on a matching port). The condition MUST include a Reason and Message that indicate the cause of the error. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` condition on the listener is set to `status: False`, with the Reason `NoValidCACertificate`. Implementations MAY choose to support attaching multiple CA certificates to a listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.",
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used as a trust anchor to validate the certificates presented by the client.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the\n  referenced resource does not exist) or is misconfigured (e.g., a\n  ConfigMap does not contain a key named `ca.crt`). In this case, the\n  Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this\n  case, the Reason on all matching HTTPS listeners must be set to\n  `InvalidCACertificateKind` and the Message of the Condition must explain\n  which kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace UNLESS there is a\n  ReferenceGrant in the target namespace that allows the CA\n  certificate to be attached. If a ReferenceGrant does not allow this\n  reference, the `ResolvedRefs` on all matching HTTPS listeners condition\n  MUST be set with the Reason `RefNotPermitted`.\n\n<gateway:experimental:description> For cluster-scoped resources (such as ClusterTrustBundle), the `namespace` field MUST be unset. The implementation resolves the scope based on the kind. </gateway:experimental:description>\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nIn all cases, the implementation MUST ensure that the `ResolvedRefs` condition is set to `status: False` on all targeted listeners (i.e., listeners serving HTTPS on a matching port). The condition MUST include a Reason and Message that indicate the cause of the error. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` condition on the listener is set to `status: False`, with the Reason `NoValidCACertificate`. Implementations MAY choose to support attaching multiple CA certificates to a listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\n<gateway:experimental:description> Support: Extended - References to ClusterTrustBundle (certificates.k8s.io), with `namespace` unset. </gateway:experimental:description>\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.\n\n<gateway:experimental:validation:XValidation:message=\"ClusterTrustBundle references must not specify namespace\",rule=\"self.all(r, !(r.group == 'certificates.k8s.io' && r.kind == 'ClusterTrustBundle' && has(r.namespace)))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ObjectReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ObjectReference"),
 									},
 								},
 							},
@@ -3516,9 +3505,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCAuthConfig(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -3592,8 +3580,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter"),
 									},
 								},
 							},
@@ -3810,8 +3797,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteList(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRoute"),
 									},
 								},
 							},
@@ -3854,8 +3840,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteMatch(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch"),
 									},
 								},
 							},
@@ -3895,8 +3880,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch"),
 									},
 								},
 							},
@@ -3914,8 +3898,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter"),
 									},
 								},
 							},
@@ -3933,8 +3916,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef"),
 									},
 								},
 							},
@@ -3942,7 +3924,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 					},
 					"sessionPersistence": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
 						},
 					},
@@ -3973,8 +3955,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -3994,14 +3975,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostnames defines a set of hostnames to match against the GRPC Host header to select a GRPCRoute to process the request. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label MUST appear by itself as the first label.\n\nIf a hostname is specified by both the Listener and GRPCRoute, there MUST be at least one intersecting hostname for the GRPCRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches GRPCRoutes\n  that have either not specified any hostnames, or have specified at\n  least one of `test.example.com` or `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches GRPCRoutes\n  that have either not specified any hostnames or have specified at least\n  one hostname that matches the Listener hostname. For example,\n  `test.example.com` and `*.example.com` would both match. On the other\n  hand, `example.com` and `test.example.net` would not match.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nIf both the Listener and GRPCRoute have specified hostnames, any GRPCRoute hostnames that do not match the Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the GRPCRoute specified `test.example.com` and `test.example.net`, `test.example.net` MUST NOT be considered for a match.\n\nIf both the Listener and GRPCRoute have specified hostnames, and none match with the criteria above, then the GRPCRoute MUST NOT be accepted by the implementation. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nIf a Route (A) of type HTTPRoute or GRPCRoute is attached to a Listener and that listener already has another Route (B) of the other type attached and the intersection of the hostnames of A and B is non-empty, then the implementation MUST accept exactly one of these two routes, determined by the following criteria, in order:\n\n* The oldest Route based on creation timestamp. * The Route appearing first in alphabetical order by\n  \"{namespace}/{name}\".\n\nThe rejected Route MUST raise an 'Accepted' condition with a status of 'False' in the corresponding RouteParentStatus.\n\nSupport: Core",
+							Description: "Hostnames defines a set of hostnames to match against the GRPC Host header to select a GRPCRoute to process the request. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label MUST appear by itself as the first label.\n\nIf a hostname is specified by both the Listener and GRPCRoute, there MUST be at least one intersecting hostname for the GRPCRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches GRPCRoutes\n  that have either not specified any hostnames, or have specified at\n  least one of `test.example.com` or `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches GRPCRoutes\n  that have either not specified any hostnames or have specified at least\n  one hostname that matches the Listener hostname. For example,\n  `test.example.com` and `*.example.com` would both match. On the other\n  hand, `example.com` and `test.example.net` would not match.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nIf both the Listener and GRPCRoute have specified hostnames, any GRPCRoute hostnames that do not match the Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the GRPCRoute specified `test.example.com` and `test.example.net`, `test.example.net` MUST NOT be considered for a match.\n\nIf both the Listener and GRPCRoute have specified hostnames, and none match with the criteria above, then the GRPCRoute MUST NOT be accepted by the implementation. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nIn the event that multiple GRPCRoutes specify intersecting hostnames (e.g. overlapping wildcard matching and exact matching hostnames), precedence must be given to rules from the GRPCRoute with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname.\n\nWhen multiple GRPCRoutes attach to the same Listener and yield identical Listener/Route intersected hostnames, implementations SHOULD evaluate precedence using the original hostnames configured on the Route, not the calculated Listener/Route hostname intersection.\n\nResolving Route precedence using original Route hostname specificity is an Extended feature. Implementations that support this behavior SHOULD claim support for the `GatewayRouteHostnameIntersectionPrecedence` feature. Implementations that do not support this feature MAY evaluate precedence using the calculated Listener/Route hostname intersection.\n\nIf a Route (A) of type HTTPRoute or GRPCRoute is attached to a Listener and that listener already has another Route (B) of the other type attached and the intersection of the hostnames of A and B is non-empty, then the implementation MAY reject one of the two routes. An implementation that does so MUST accept exactly one of them, determined by the following criteria, in order:\n\n* The oldest Route based on creation timestamp. * The Route appearing first in alphabetical order by\n  \"{namespace}/{name}\".\n\nThe rejected Route MUST raise an 'Accepted' condition with a status of 'False' in the corresponding RouteParentStatus.\n\nSupport: Core",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -4014,13 +3994,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of GRPC matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
+							Description: "Rules are a list of GRPC matchers, filters and actions.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteRule"),
 									},
 								},
 							},
@@ -4053,8 +4032,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteStatus(ref common.ReferenceCa
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -4223,8 +4201,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassList(ref common.ReferenceC
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GatewayClass"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GatewayClass"),
 									},
 								},
 							},
@@ -4298,8 +4275,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassStatus(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4349,9 +4325,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayInfrastructure(ref common.Refer
 								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -4365,9 +4340,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayInfrastructure(ref common.Refer
 								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -4420,8 +4394,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayList(ref common.ReferenceCallba
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.Gateway"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.Gateway"),
 									},
 								},
 							},
@@ -4466,8 +4439,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.Listener"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.Listener"),
 									},
 								},
 							},
@@ -4485,8 +4457,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress"),
 									},
 								},
 							},
@@ -4547,6 +4518,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.Referenc
 							Format:      "",
 						},
 					},
+					"routability": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Routability specifies the requested reachability scope of this address. Valid values are empty, `Cluster`, or a prefixed implementation-specific value. The `k8s.io` domain and all its subdomains are reserved. When unset or empty, this field uses the implementation's default routability behavior.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},
@@ -4572,8 +4550,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GatewayStatusAddress"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.GatewayStatusAddress"),
 									},
 								},
 							},
@@ -4589,13 +4566,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Conditions describe the current conditions of the Gateway.\n\nImplementations should prefer to express Gateway conditions using the `GatewayConditionType` and `GatewayConditionReason` constants so that operators and tools can converge on a common vocabulary to describe Gateway state.\n\nKnown condition types are:\n\n* \"Accepted\" * \"Programmed\" * \"Ready\"\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nConditions are a listType `map`, which means that they function like a map with a key of the `type` field _in the k8s apiserver_.\n\nThis means that implementations must obey some rules when updating this section.\n\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n* Implementations MUST NOT remove or reorder Conditions that they are not\n  directly responsible for. For example, if an implementation sees a Condition\n  with type `special.io/SomeField`, it MUST NOT remove, change or update that\n  Condition.\n* Implementations MUST always _merge_ changes into Conditions of the same Type,\n  rather than creating more than one Condition of the same Type.\n* Implementations MUST always update the `observedGeneration` field of the\n  Condition to the `metadata.generation` of the Gateway at the time of update creation.\n* If the `observedGeneration` of a Condition is _greater than_ the value the\n  implementation knows about, then it MUST NOT perform the update on that Condition,\n  but must wait for a future reconciliation and status update. (The assumption is that\n  the implementation's copy of the object is stale and an update will be re-triggered\n  if relevant.)\n</gateway:util:excludeFromCRD>",
+							Description: "Conditions describe the current conditions of the Gateway.\n\nImplementations should prefer to express Gateway conditions using the `GatewayConditionType` and `GatewayConditionReason` constants so that operators and tools can converge on a common vocabulary to describe Gateway state.\n\nKnown condition types are:\n\n* \"Accepted\" * \"Programmed\" * \"Ready\" * \"AddressesAssigned\"\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nConditions are a listType `map`, which means that they function like a map with a key of the `type` field _in the k8s apiserver_.\n\nThis means that implementations must obey some rules when updating this section.\n\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n* Implementations MUST NOT remove or reorder Conditions that they are not\n  directly responsible for. For example, if an implementation sees a Condition\n  with type `special.io/SomeField`, it MUST NOT remove, change or update that\n  Condition.\n* Implementations MUST always _merge_ changes into Conditions of the same Type,\n  rather than creating more than one Condition of the same Type.\n* Implementations MUST always update the `observedGeneration` field of the\n  Condition to the `metadata.generation` of the Gateway at the time of update creation.\n* If the `observedGeneration` of a Condition is _greater than_ the value the\n  implementation knows about, then it MUST NOT perform the update on that Condition,\n  but must wait for a future reconciliation and status update. (The assumption is that\n  the implementation's copy of the object is stale and an update will be re-triggered\n  if relevant.)\n</gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4616,8 +4592,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ListenerStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ListenerStatus"),
 									},
 								},
 							},
@@ -4656,6 +4631,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref common.Refere
 						SchemaProps: spec.SchemaProps{
 							Description: "Value of the address. The validity of the values will depend on the type and support by the controller.\n\nExamples: `1.2.3.4`, `128::1`, `my-ip-address`.",
 							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"routability": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Routability reports the reachability scope of this address. When empty or unset, this field uses the implementation's default routability behavior. The `k8s.io` domain and all its subdomains are reserved for well-known values.\n\n<gateway:experimental>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4720,9 +4702,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPAuthConfig(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -4740,9 +4721,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPAuthConfig(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -4816,8 +4796,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter"),
 									},
 								},
 							},
@@ -4851,9 +4830,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -4878,9 +4856,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -4898,9 +4875,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -4918,9 +4894,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -5039,8 +5014,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderFilter(ref common.ReferenceC
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"),
 									},
 								},
 							},
@@ -5061,8 +5035,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderFilter(ref common.ReferenceC
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"),
 									},
 								},
 							},
@@ -5080,9 +5053,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderFilter(ref common.ReferenceC
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -5305,7 +5277,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestRedirectFilter(ref common.R
 					},
 					"statusCode": {
 						SchemaProps: spec.SchemaProps{
-							Description: "StatusCode is the HTTP status code to be used in response.\n\nNote that values may be added to this enum, implementations must ensure that unknown values will not cause a crash.\n\nUnknown values here must result in the implementation setting the Accepted Condition for the Route to `status: False`, with a Reason of `UnsupportedValue`.\n\nSupport: Core",
+							Description: "StatusCode is the HTTP status code to be used in response.\n\nNote that values may be added to this enum, implementations must ensure that unknown values will not cause a crash.\n\nUnknown values here must result in the implementation setting the Accepted Condition for the Route to `status: False`, with a Reason of `UnsupportedValue`.\n\nSupport: statusCode 301 and 302 are Core; all others are Extended.\n\n<gateway:util:excludeFromCRD> Extended codes have their own features:\n  HTTPRoute303RedirectStatusCode,\n  HTTPRoute307RedirectStatusCode, and\n  HTTPRoute308RedirectStatusCode\n</gateway:util:excludeFromCRD>",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -5473,8 +5445,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteList(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRoute"),
 									},
 								},
 							},
@@ -5517,8 +5488,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderMatch"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderMatch"),
 									},
 								},
 							},
@@ -5539,8 +5509,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPQueryParamMatch"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPQueryParamMatch"),
 									},
 								},
 							},
@@ -5565,7 +5534,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteRetry defines retry configuration for an HTTPRoute.\n\nImplementations SHOULD retry on connection errors (disconnect, reset, timeout, TCP failure) if a retry stanza is configured.",
+				Description: "HTTPRouteRetry defines retry configuration for an HTTPRoute.\n\nImplementations SHOULD retry when a retry stanza is configured and the connection could not be established (e.g., connect timeout, connection refused, TLS handshake failure), or the backend explicitly rejected the request before processing it (e.g., HTTP/2 REFUSED_STREAM, gRPC UNAVAILABLE)\n\nImplementations SHOULD NOT retry by default on failures where the request may have been processed (e.g., a connection reset after the request was sent). Implementations that do retry on such conditions MUST clearly document this behavior, as it is unsafe for non-idempotent requests.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"codes": {
@@ -5580,9 +5549,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: 0,
-										Type:    []string{"integer"},
-										Format:  "int32",
+										Type:   []string{"integer"},
+										Format: "int32",
 									},
 								},
 							},
@@ -5590,14 +5558,14 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 					},
 					"attempts": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Attempts specifies the maximum number of times an individual request from the gateway to a backend should be retried.\n\nIf the maximum number of retries has been attempted without a successful response from the backend, the Gateway MUST return an error.\n\nWhen this field is unspecified, the number of times to attempt to retry a backend request is implementation-specific.\n\nSupport: Extended",
+							Description: "Attempts specifies the maximum number of times an individual request from the Gateway to a backend should be retried in addition to the initial request.\n\nIf the maximum number of retries has been attempted without a successful response from the backend, the Gateway MUST return an error.\n\nAn explicit zero value MUST disable retries.\n\nSupport: Extended",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 					"backoff": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Backoff specifies the minimum duration a Gateway should wait between retry attempts and is represented in Gateway API Duration formatting.\n\nFor example, setting the `rules[].retry.backoff` field to the value `100ms` will cause a backend request to first be retried approximately 100 milliseconds after timing out or receiving a response code configured to be retriable.\n\nAn implementation MAY use an exponential or alternative backoff strategy for subsequent retry attempts, MAY cap the maximum backoff duration to some amount greater than the specified minimum, and MAY add arbitrary jitter to stagger requests, as long as unsuccessful backend requests are not retried before the configured minimum duration.\n\nIf a Request timeout (`rules[].timeouts.request`) is configured on the route, the entire duration of the initial request and any retry attempts MUST not exceed the Request timeout duration. If any retry attempts are still in progress when the Request timeout duration has been reached, these SHOULD be canceled if possible and the Gateway MUST immediately return a timeout error.\n\nIf a BackendRequest timeout (`rules[].timeouts.backendRequest`) is configured on the route, any retry attempts which reach the configured BackendRequest timeout duration without a response SHOULD be canceled if possible and the Gateway should wait for at least the specified backoff duration before attempting to retry the backend request again.\n\nIf a BackendRequest timeout is _not_ configured on the route, retry attempts MAY time out after an implementation default duration, or MAY remain pending until a configured Request timeout or implementation default duration for total request time is reached.\n\nWhen this field is unspecified, the time to wait between retry attempts is implementation-specific.\n\nSupport: Extended",
+							Description: "Backoff specifies the base interval for a backoff strategy between retry attempts and is represented in Gateway API Duration formatting. The duration a Gateway waits before a retry attempt is determined by the base interval and the implementation's retry strategy.\n\nImplementations MAY add random jitter and MAY cap the delay at an implementation-defined maximum, which SHOULD NOT be less than the base interval. The precise backoff curve and jitter calculation are implementation-specific and not exposed in the Gateway API specification. Implementations typically apply exponential backoff with jitter to mitigate thundering-herd issues.\n\nIf a Request timeout (`rules[].timeouts.request`) is configured on the route, the entire duration of the initial request and any retry attempts MUST not exceed the Request timeout duration. If any retry attempts are still in progress when the Request timeout duration has been reached, these SHOULD be canceled if possible and the Gateway MUST immediately return a timeout error.\n\nIf a BackendRequest timeout (`rules[].timeouts.backendRequest`) is configured on the route, any retry attempts which reach the configured BackendRequest timeout duration without a response SHOULD be canceled if possible and the Gateway SHOULD schedule the next retry attempt according to the configured backoff.\n\nIf a BackendRequest timeout is _not_ configured on the route, retry attempts MAY time out after an implementation default duration, or MAY remain pending until a configured Request timeout or implementation default duration for total request time is reached.\n\nWhen this field is unspecified, the backoff strategy and base interval are implementation-specific.\n\nImplementations which retry immediately with no backoff MUST NOT advertise support for this field and MUST set the Accepted Condition for the Route to `status: False` with a Reason of `UnsupportedValue` when this field is set.\n\nSupport: Implementation-specific",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5634,8 +5602,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch"),
 									},
 								},
 							},
@@ -5653,8 +5620,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter"),
 									},
 								},
 							},
@@ -5672,8 +5638,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef"),
 									},
 								},
 							},
@@ -5687,13 +5652,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"retry": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nA request is retried when attempts is greater than 0 and the backend did not process it. This is the case when the connection could not be established, or when the backend explicitly rejected the request, either before processing it or with one of the configured status codes.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry"),
 						},
 					},
 					"sessionPersistence": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
 						},
 					},
@@ -5724,8 +5689,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -5745,14 +5709,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostnames defines a set of hostnames that should match against the HTTP Host header to select a HTTPRoute used to process the request. Implementations MUST ignore any port value specified in the HTTP Host header while performing a match and (absent of any applicable header modification configuration) MUST forward this header unmodified to the backend.\n\nValid values for Hostnames are determined by RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label must appear by itself as the first label.\n\nIf a hostname is specified by both the Listener and HTTPRoute, there must be at least one intersecting hostname for the HTTPRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches HTTPRoutes\n  that have either not specified any hostnames, or have specified at\n  least one of `test.example.com` or `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches HTTPRoutes\n  that have either not specified any hostnames or have specified at least\n  one hostname that matches the Listener hostname. For example,\n  `*.example.com`, `test.example.com`, and `foo.test.example.com` would\n  all match. On the other hand, `example.com` and `test.example.net` would\n  not match.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nIf both the Listener and HTTPRoute have specified hostnames, any HTTPRoute hostnames that do not match the Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the HTTPRoute specified `test.example.com` and `test.example.net`, `test.example.net` must not be considered for a match.\n\nIf both the Listener and HTTPRoute have specified hostnames, and none match with the criteria above, then the HTTPRoute is not accepted. The implementation must raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nIn the event that multiple HTTPRoutes specify intersecting hostnames (e.g. overlapping wildcard matching and exact matching hostnames), precedence must be given to rules from the HTTPRoute with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname.\n\nIf ties exist across multiple Routes, the matching precedence rules for HTTPRouteMatches takes over.\n\nSupport: Core",
+							Description: "Hostnames defines a set of hostnames that should match against the HTTP Host header to select a HTTPRoute used to process the request. Implementations MUST ignore any port value specified in the HTTP Host header while performing a match and (absent of any applicable header modification configuration) MUST forward this header unmodified to the backend.\n\nValid values for Hostnames are determined by RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label must appear by itself as the first label.\n\nIf a hostname is specified by both the Listener and HTTPRoute, there must be at least one intersecting hostname for the HTTPRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches HTTPRoutes\n  that have either not specified any hostnames, or have specified at\n  least one of `test.example.com` or `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches HTTPRoutes\n  that have either not specified any hostnames or have specified at least\n  one hostname that matches the Listener hostname. For example,\n  `*.example.com`, `test.example.com`, and `foo.test.example.com` would\n  all match. On the other hand, `example.com` and `test.example.net` would\n  not match.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nIf both the Listener and HTTPRoute have specified hostnames, any HTTPRoute hostnames that do not match the Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the HTTPRoute specified `test.example.com` and `test.example.net`, `test.example.net` must not be considered for a match.\n\nIf both the Listener and HTTPRoute have specified hostnames, and none match with the criteria above, then the HTTPRoute is not accepted. The implementation must raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nIn the event that multiple HTTPRoutes specify intersecting hostnames (e.g. overlapping wildcard matching and exact matching hostnames), precedence must be given to rules from the HTTPRoute with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname.\n\nWhen multiple HTTPRoutes attach to the same Listener and yield identical Listener/Route intersected hostnames, implementations SHOULD evaluate precedence using the original hostnames configured on the Route, not the calculated Listener/Route hostname intersection.\n\nResolving Route precedence using original Route hostname specificity is an Extended feature. Implementations that support this behavior SHOULD claim support for the `GatewayRouteHostnameIntersectionPrecedence` feature. Implementations that do not support this feature MAY evaluate precedence using the calculated Listener/Route hostname intersection.\n\nSupport: Core",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -5765,13 +5728,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\"> <gateway:util:excludeFromCRD> Validates that the total number of matches across all rules does not exceed 128. CEL does not support aggregate functions like sum() over lists, so each of the (up to 16) rules is checked individually and their match counts are summed explicitly. </gateway:util:excludeFromCRD>",
+							Description: "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:util:excludeFromCRD> Validates that the total number of matches across all rules does not exceed 128. CEL does not support aggregate functions like sum() over lists, so each of the (up to 16) rules is checked individually and their match counts are summed explicitly. </gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRule"),
 									},
 								},
 							},
@@ -5804,8 +5766,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteStatus(ref common.ReferenceCa
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -5875,11 +5836,33 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPURLRewriteFilter(ref common.Refere
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_HeaderConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HeaderConfig defines the configuration for header-based session persistence.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name defines the name of the header used for session persistence. The client must include this header in subsequent requests to maintain the session.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_Listener(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Listener embodies the concept of a logical endpoint where a Gateway accepts network connections.",
+				Description: "Listener embodies the concept of a logical endpoint where a Gateway accepts network connections.\n\n<gateway:experimental:validation:XValidation:message=\"filters may only be set when protocol is HTTP or HTTPS\",rule=\"!has(self.filters) || self.protocol in ['HTTP', 'HTTPS']\">",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
@@ -5925,12 +5908,18 @@ func schema_sigsk8sio_gateway_api_apis_v1_Listener(ref common.ReferenceCallback)
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes"),
 						},
 					},
+					"filters": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Filters groups the pre-routing filter lists that run on every request accepted on this Listener, before route matching is performed. Filters is only valid when Protocol is `HTTP` or `HTTPS`; this constraint is enforced by CEL validation on the enclosing Listener struct.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ListenerFilters"),
+						},
+					},
 				},
 				Required: []string{"name", "port", "protocol"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerFilters", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
 	}
 }
 
@@ -5980,12 +5969,18 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntry(ref common.ReferenceCall
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes"),
 						},
 					},
+					"filters": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Filters groups the pre-routing filter lists that run on every request accepted on this Listener, before route matching is performed. Filters is only valid when Protocol is `HTTP` or `HTTPS`; this constraint is enforced by CEL validation on the enclosing Listener struct.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ListenerFilters"),
+						},
+					},
 				},
 				Required: []string{"name", "port", "protocol"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.ListenerFilters", "sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig"},
 	}
 }
 
@@ -6015,8 +6010,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref common.Referen
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"),
 									},
 								},
 							},
@@ -6045,8 +6039,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref common.Referen
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -6058,6 +6051,73 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref common.Referen
 		},
 		Dependencies: []string{
 			v1.Condition{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ListenerFilter(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListenerFilter is one element of a ListenerFilters.Requests list. Unlike HTTPRouteFilter, which runs after a route is selected and whose ordering is a SHOULD, ListenerFilter runs before route selection and its ordering within the containing list is a MUST.\n\nOnly a subset of HTTPRouteFilter variants are permitted: ExternalAuth (to establish identity that route matching can consume) and ExtensionRef (the escape hatch for custom pre-routing behavior, for example body-based routing or JWT-claim projection). The other HTTPRouteFilter variants are excluded because they either cannot influence route selection or can already be expressed post-routing with equal expressiveness. See the GEP text for details.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type identifies which variant of the discriminated union below is populated. Uses the same union-discriminator pattern as HTTPRouteFilter and GRPCRouteFilter.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"externalAuth": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter"),
+						},
+					},
+					"extensionRef": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
+						},
+					},
+				},
+				Required: []string{"type"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ListenerFilters(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListenerFilters is the container for pre-routing filter lists on a Listener.\n\nToday only the request phase (Requests) is defined. In the future a connection-oriented phase (Connection) may be added.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"requests": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Implementations MUST execute the filters in the exact order they appear here and MUST NOT reorder them. If an implementation can not implement the filters in the order they are specified, the implementation MUST set the \"Accepted\" Listener condition to \"false\" with the \"InvalidListenerFilterOrder\" reason.\n\nRequests only apply to connections with a visible HTTP stream and metadata (Protocol=HTTP, or Protocol=HTTPS with TLS terminated at the Gateway).\n\nRequests may mutate inputs that route matching consumes (path, request headers, method, computed metadata), with the explicit exception of the `Host` and `:authority` headers. If a ListenerFilter attempts to modify either header, implementations MUST NOT allow that modification to take effect. Implementations SHOULD satisfy this by ignoring the mutation and continuing to process the request with the original value; they MAY instead fail the request with a 5xx response. Implementations MUST evaluate route matching exactly once after the last ListenerFilter has run.\n\nRequests MUST NOT be interpreted as changing which Listener handles the request. Listener selection is decided from inputs the client committed to before any pre-routing filter runs: TLS SNI (for HTTPS) or the request's initial Host header (for HTTP). Because filters cannot modify Host or :authority, the input to cleartext-HTTP Listener selection cannot change; Listener selection therefore does not need to be re-evaluated after pre-routing filters run, and MUST NOT be.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ListenerFilter"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.ListenerFilter"},
 	}
 }
 
@@ -6171,8 +6231,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerSetList(ref common.ReferenceCa
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ListenerSet"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ListenerSet"),
 									},
 								},
 							},
@@ -6216,8 +6275,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerSetSpec(ref common.ReferenceCa
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ListenerEntry"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ListenerEntry"),
 									},
 								},
 							},
@@ -6253,8 +6311,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerSetStatus(ref common.Reference
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -6275,8 +6332,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerSetStatus(ref common.Reference
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ListenerEntryStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ListenerEntryStatus"),
 									},
 								},
 							},
@@ -6317,8 +6373,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"),
 									},
 								},
 							},
@@ -6347,8 +6402,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -6389,8 +6443,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerTLSConfig(ref common.Reference
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"),
 									},
 								},
 							},
@@ -6404,9 +6457,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerTLSConfig(ref common.Reference
 								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -6851,8 +6903,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_PolicyAncestorStatus(ref common.Refere
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -6886,8 +6937,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_PolicyStatus(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"),
 									},
 								},
 							},
@@ -7016,8 +7066,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantList(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant"),
 									},
 								},
 							},
@@ -7051,8 +7100,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom"),
 									},
 								},
 							},
@@ -7070,8 +7118,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo"),
 									},
 								},
 							},
@@ -7217,8 +7264,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref common.Reference
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -7252,8 +7298,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_RouteStatus(ref common.ReferenceCallba
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -7318,16 +7363,9 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 				Description: "SessionPersistence defines the desired state of SessionPersistence.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"sessionName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "SessionName defines the name of the persistent session token which may be reflected in the cookie or the header. Users should avoid reusing session names to prevent unintended consequences, such as rejection or unpredictable behavior.\n\nSupport: Implementation-specific",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"absoluteTimeout": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AbsoluteTimeout defines the absolute timeout of the persistent session. Once the AbsoluteTimeout duration has elapsed, the session becomes invalid.\n\nSupport: Extended",
+							Description: "AbsoluteTimeout defines the absolute timeout of the persistent session. Once the AbsoluteTimeout duration has elapsed, the session becomes invalid.\n\nSupport: Core when cookie.lifetimeType is \"Permanent\".\n\nSupport: Extended when cookie.lifetimeType is \"Session\" or type is \"Header\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7339,17 +7377,23 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 							Format:      "",
 						},
 					},
-					"cookieConfig": {
+					"cookie": {
 						SchemaProps: spec.SchemaProps{
-							Description: "CookieConfig provides configuration settings that are specific to cookie-based session persistence.\n\nSupport: Core",
+							Description: "Cookie provides configuration settings that are specific to cookie-based session persistence.\n\nSupport: Core",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.CookieConfig"),
+						},
+					},
+					"header": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Header provides configuration settings that are specific to header-based session persistence.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HeaderConfig"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.CookieConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.CookieConfig", "sigs.k8s.io/gateway-api/apis/v1.HeaderConfig"},
 	}
 }
 
@@ -7492,8 +7536,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TCPRouteList(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.TCPRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.TCPRoute"),
 									},
 								},
 							},
@@ -7534,8 +7577,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TCPRouteRule(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
 									},
 								},
 							},
@@ -7569,8 +7611,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TCPRouteSpec(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -7595,8 +7636,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TCPRouteSpec(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.TCPRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.TCPRouteRule"),
 									},
 								},
 							},
@@ -7630,8 +7670,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TCPRouteStatus(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -7780,8 +7819,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSRouteList(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.TLSRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.TLSRoute"),
 									},
 								},
 							},
@@ -7822,8 +7860,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSRouteRule(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
 									},
 								},
 							},
@@ -7857,8 +7894,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSRouteSpec(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -7878,14 +7914,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSRouteSpec(ref common.ReferenceCallb
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostnames defines a set of SNI hostnames that should match against the SNI attribute of TLS ClientHello message in TLS handshake. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed in SNI hostnames per RFC 6066. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label must appear by itself as the first label.\n\n<gateway:util:excludeFromCRD> If a hostname is specified by both the Listener and TLSRoute, there must be at least one intersecting hostname for the TLSRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches TLSRoutes\n  that have specified at least one of `test.example.com` or\n  `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches TLSRoutes\n  that have specified at least one hostname that matches the Listener\n  hostname. For example, `test.example.com` and `*.example.com` would both\n  match. On the other hand, `example.com` and `test.example.net` would not\n  match.\n* A listener with `something.example.com` as the hostname matches a\n  TLSRoute with hostname `*.example.com`.\n\nIf both the Listener and TLSRoute have specified hostnames, any TLSRoute hostnames that do not match any Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the TLSRoute specified `test.example.com` and `test.example.net`, `test.example.net` must not be considered for a match.\n\nIf both the Listener and TLSRoute have specified hostnames, and none match with the criteria above, then the TLSRoute is not accepted for that Listener. If the TLSRoute does not match any Listener on its parent, the implementation must raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nA Listener MUST be have protocol set to TLS when a TLSRoute attaches to it. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus with the reason of \"UnsupportedValue\" in case a Listener of the wrong type is used. Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`. Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`. </gateway:util:excludeFromCRD>",
+							Description: "Hostnames defines a set of SNI hostnames that should match against the SNI attribute of TLS ClientHello message in TLS handshake. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed in SNI hostnames per RFC 6066. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label must appear by itself as the first label.\n\n<gateway:util:excludeFromCRD> If a hostname is specified by both the Listener and TLSRoute, there must be at least one intersecting hostname for the TLSRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches TLSRoutes\n  that have specified at least one of `test.example.com` or\n  `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches TLSRoutes\n  that have specified at least one hostname that matches the Listener\n  hostname. For example, `test.example.com` and `*.example.com` would both\n  match. On the other hand, `example.com` and `test.example.net` would not\n  match.\n* A listener with `something.example.com` as the hostname matches a\n  TLSRoute with hostname `*.example.com`.\n\nIf both the Listener and TLSRoute have specified hostnames, any TLSRoute hostnames that do not match any Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the TLSRoute specified `test.example.com` and `test.example.net`, `test.example.net` must not be considered for a match.\n\nIf both the Listener and TLSRoute have specified hostnames, and none match with the criteria above, then the TLSRoute is not accepted for that Listener. If the TLSRoute does not match any Listener on its parent, the implementation must raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nA Listener MUST be have protocol set to TLS when a TLSRoute attaches to it. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus with the reason of \"UnsupportedValue\" in case a Listener of the wrong type is used. Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`. Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`. </gateway:util:excludeFromCRD>\n\nIn the event that multiple TLSRoutes specify intersecting hostnames (e.g. overlapping wildcard matching and exact matching hostnames), precedence must be given to rules from the TLSRoute with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname.\n\nWhen multiple TLSRoutes attach to the same Listener and yield identical Listener/Route intersected hostnames, implementations SHOULD evaluate precedence using the original hostnames configured on the Route, not the calculated Listener/Route hostname intersection.\n\nResolving Route precedence using original Route hostname specificity is an Extended feature. Implementations that support this behavior SHOULD claim support for the `GatewayRouteHostnameIntersectionPrecedence` feature. Implementations that do not support this feature MAY evaluate precedence using the calculated Listener/Route hostname intersection.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -7903,8 +7938,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSRouteSpec(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.TLSRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.TLSRouteRule"),
 									},
 								},
 							},
@@ -7938,8 +7972,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSRouteStatus(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -8037,8 +8070,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_UDPRouteList(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.UDPRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.UDPRoute"),
 									},
 								},
 							},
@@ -8079,8 +8111,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_UDPRouteRule(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
 									},
 								},
 							},
@@ -8114,8 +8145,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_UDPRouteSpec(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -8140,8 +8170,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_UDPRouteSpec(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.UDPRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.UDPRouteRule"),
 									},
 								},
 							},
@@ -8175,8 +8204,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_UDPRouteStatus(ref common.ReferenceCal
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -8293,8 +8321,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref common.Referen
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute"),
 									},
 								},
 							},
@@ -8470,8 +8497,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyAncestorStatus(ref common.
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -8504,8 +8530,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyStatus(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"),
 									},
 								},
 							},
@@ -8596,8 +8621,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrantList(ref common.Re
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.ReferenceGrant"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.ReferenceGrant"),
 									},
 								},
 							},
@@ -8695,8 +8719,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteList(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRoute"),
 									},
 								},
 							},
@@ -8737,8 +8760,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteRule(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
 									},
 								},
 							},
@@ -8772,8 +8794,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -8798,8 +8819,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteRule"),
 									},
 								},
 							},
@@ -8833,8 +8853,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteStatus(ref common.Refere
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -8932,8 +8951,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteList(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRoute"),
 									},
 								},
 							},
@@ -8974,8 +8992,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteRule(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
 									},
 								},
 							},
@@ -9009,8 +9026,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -9035,9 +9051,8 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -9055,8 +9070,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteRule"),
 									},
 								},
 							},
@@ -9090,8 +9104,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteStatus(ref common.Refere
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -9189,8 +9202,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteList(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRoute"),
 									},
 								},
 							},
@@ -9231,8 +9243,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteRule(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
 									},
 								},
 							},
@@ -9266,8 +9277,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -9292,8 +9302,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteRule"),
 									},
 								},
 							},
@@ -9327,8 +9336,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteStatus(ref common.Refere
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
 									},
 								},
 							},
@@ -9424,8 +9432,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyList(ref common.
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicy"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicy"),
 									},
 								},
 							},
@@ -9523,8 +9530,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteList(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha3.TLSRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha3.TLSRoute"),
 									},
 								},
 							},
@@ -9558,8 +9564,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 									},
 								},
 							},
@@ -9579,14 +9584,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref common.Referenc
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostnames defines a set of SNI hostnames that should match against the SNI attribute of TLS ClientHello message in TLS handshake. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed in SNI hostnames per RFC 6066. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label must appear by itself as the first label.\n\n<gateway:util:excludeFromCRD> If a hostname is specified by both the Listener and TLSRoute, there must be at least one intersecting hostname for the TLSRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches TLSRoutes\n  that have specified at least one of `test.example.com` or\n  `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches TLSRoutes\n  that have specified at least one hostname that matches the Listener\n  hostname. For example, `test.example.com` and `*.example.com` would both\n  match. On the other hand, `example.com` and `test.example.net` would not\n  match.\n* A listener with `something.example.com` as the hostname matches a\n  TLSRoute with hostname `*.example.com`.\n\nIf both the Listener and TLSRoute have specified hostnames, any TLSRoute hostnames that do not match any Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the TLSRoute specified `test.example.com` and `test.example.net`, `test.example.net` must not be considered for a match.\n\nIf both the Listener and TLSRoute have specified hostnames, and none match with the criteria above, then the TLSRoute is not accepted for that Listener. If the TLSRoute does not match any Listener on its parent, the implementation must raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nA Listener MUST be have protocol set to TLS when a TLSRoute attaches to it. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus with the reason of \"UnsupportedValue\" in case a Listener of the wrong type is used. Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`. Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`. </gateway:util:excludeFromCRD>",
+							Description: "Hostnames defines a set of SNI hostnames that should match against the SNI attribute of TLS ClientHello message in TLS handshake. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed in SNI hostnames per RFC 6066. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label must appear by itself as the first label.\n\n<gateway:util:excludeFromCRD> If a hostname is specified by both the Listener and TLSRoute, there must be at least one intersecting hostname for the TLSRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches TLSRoutes\n  that have specified at least one of `test.example.com` or\n  `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches TLSRoutes\n  that have specified at least one hostname that matches the Listener\n  hostname. For example, `test.example.com` and `*.example.com` would both\n  match. On the other hand, `example.com` and `test.example.net` would not\n  match.\n* A listener with `something.example.com` as the hostname matches a\n  TLSRoute with hostname `*.example.com`.\n\nIf both the Listener and TLSRoute have specified hostnames, any TLSRoute hostnames that do not match any Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the TLSRoute specified `test.example.com` and `test.example.net`, `test.example.net` must not be considered for a match.\n\nIf both the Listener and TLSRoute have specified hostnames, and none match with the criteria above, then the TLSRoute is not accepted for that Listener. If the TLSRoute does not match any Listener on its parent, the implementation must raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nA Listener MUST be have protocol set to TLS when a TLSRoute attaches to it. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus with the reason of \"UnsupportedValue\" in case a Listener of the wrong type is used. Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`. Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`. </gateway:util:excludeFromCRD>\n\nIn the event that multiple TLSRoutes specify intersecting hostnames (e.g. overlapping wildcard matching and exact matching hostnames), precedence must be given to rules from the TLSRoute with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname.\n\nWhen multiple TLSRoutes attach to the same Listener and yield identical Listener/Route intersected hostnames, implementations SHOULD evaluate precedence using the original hostnames configured on the Route, not the calculated Listener/Route hostname intersection.\n\nResolving Route precedence using original Route hostname specificity is an Extended feature. Implementations that support this behavior SHOULD claim support for the `GatewayRouteHostnameIntersectionPrecedence` feature. Implementations that do not support this feature MAY evaluate precedence using the calculated Listener/Route hostname intersection.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -9604,8 +9608,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.TLSRouteRule"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.TLSRouteRule"),
 									},
 								},
 							},
@@ -9753,8 +9756,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClassList(ref common.Refer
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClass"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClass"),
 									},
 								},
 							},
@@ -9802,8 +9804,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayList(ref common.ReferenceC
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1beta1.Gateway"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1beta1.Gateway"),
 									},
 								},
 							},
@@ -9901,8 +9902,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRoute"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRoute"),
 									},
 								},
 							},
@@ -9993,8 +9993,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant"),
 									},
 								},
 							},
@@ -10009,11 +10008,62 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Attribute defines a single flat key-value pair to attach to traces.\n\nThis allows users to enrich spans with context like HTTP headers (e.g., \"X-User-ID\"), static tags, or built-in variables.\n\nSupport: Core",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the key of the attribute as it will appear in the output (i.e., as a span tag).",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"sourceType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SourceType specifies where the attribute value comes from. Valid values are \"Header\", \"Literal\", or \"Attribute\".",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"headerName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "HeaderName specifies the HTTP header to extract the value from. This is required if SourceType is \"Header\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"literalValue": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LiteralValue specifies a static string value to attach. This is required if SourceType is \"Literal\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"attributeKey": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AttributeKey refers to a standard OpenTelemetry attribute. For example: \"http.response.status_code\" or \"http.request.method\". This is required if SourceType is \"Attribute\". See: https://opentelemetry.io/docs/specs/semconv/",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name", "sourceType"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendAncestorStatus describes the status of a Backend with respect to a specific parent resource (typically a Gateway).",
+				Description: "BackendAncestorStatus describes the status of a Backend with respect to a specific ancestor resource (typically a Gateway).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"controllerName": {
@@ -10024,9 +10074,9 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 							Format:      "",
 						},
 					},
-					"parentRef": {
+					"ancestorRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AncestorRef identifies the parent resource that this status is associated with.",
+							Description: "AncestorRef identifies the ancestor resource that this status is associated with.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 						},
@@ -10041,20 +10091,19 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepteed by the controller\n\nThe status of each condition is one of True, False, or Unknown.",
+							Description: "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepted by the controller - \"ResolvedRefs\": all references of the resource have been resolved\n\nThe status of each condition is one of True, False, or Unknown.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
 						},
 					},
 				},
-				Required: []string{"controllerName", "parentRef"},
+				Required: []string{"controllerName", "ancestorRef"},
 			},
 		},
 		Dependencies: []string{
@@ -10066,25 +10115,17 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendPort describes the port the implementation should use when connecting to a Backend. Inspired by discoveryv1.EndpointPort.",
+				Description: "BackendPort describes the port the implementation should use when connecting to a Backend.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"name": {
+					"number": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name represents the name of this port. All ports in a Backend must have a unique name. Name must either be an empty string or pass DNS_LABEL validation (lowercase alphanumeric or '-', starting and ending with an alphanumeric character, at most 63 characters).",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"port": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Port represents the port number of the endpoint.",
+							Description: "Number represents the port number of the destination.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 				},
-				Required: []string{"port"},
 			},
 		},
 	}
@@ -10107,7 +10148,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 					},
 					"port": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Port defines the port that the implementation should use when connecting to this backend.",
+							Description: "Port defines the port to connect to on this backend. For ExternalHostname, this is the port on the external host. For EndpointSelector, this specifies which endpoint port to connect to.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort"),
 						},
@@ -10118,16 +10159,28 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"),
 						},
 					},
+					"endpointSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EndpointSelector specifies the configuration for an EndpointSelector backend. This field must be set when type is EndpointSelector and must be unset otherwise.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend"),
+						},
+					},
+					"sessionPersistence": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionPersistence defines and configures session persistence across the endpoints selected by this backend.\n\nThis field can only be configured when type is EndpointSelector.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
+						},
+					},
 					"protocol": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - HTTP, HTTP2, H2C, and HTTP11\n\nSupport: Extended - GRPC, MCP, TCP\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend. </gateway:util:excludeFromCRD>",
+							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - HTTP, H2C, and HTTP11\n\nSupport: Extended - GRPC, HTTP2, MCP, TCP, WSS\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend.\n\nIn cases the implementation does not support the configured protocol, it MUST set the \"Accepted\" condition to \"False\" with the reason \"UnsupportedProtocol\". </gateway:util:excludeFromCRD>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"tls": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TLS defines the TLS configuration that the implementation should use when connecting to the backend.\n\nExternalHostname backends SHOULD have TLS configured; the lack of TLS for external hostnames should be considered insecure and a security risk.\n\nSupport: Extended",
+							Description: "TLS defines the TLS configuration that the implementation should use when connecting to the backend.\n\nExternalHostname backends SHOULD have TLS configured; the lack of TLS for external hostnames should be considered insecure and a security risk.\n\nSupport: Core - for TLS mode None\n\nSupport: Extended - for TLS mode ServerOnly and ClientAndServer",
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS"),
 						},
 					},
@@ -10136,7 +10189,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"},
+			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS", "sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"},
 	}
 }
 
@@ -10147,20 +10200,19 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref common.Refere
 				Description: "BackendStatus defines the observed state of a Backend.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"parents": {
+					"ancestors": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
 								"x-kubernetes-list-type": "atomic",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Ancestors is a list of parent resources associated with this Backend, and the status of the Backend with respect to each parent.\n\nA maximum of 32 parents will be represented in this list. An empty list indicates that the Backend is not associated with any parents.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller that manages the Backend must add an entry for each parent it manages and remove the entry when the controller no longer considers the Backend to be associated with that parent.\n\nfor little benefit. It may also be unnecessarily complex for implementations to manage. If so, we'll remove the ancestor-based grouping and make it controller only. </gateway:util:excludeFromCRD>",
+							Description: "Ancestors is a list of ancestor resources (usually Gateways) that are associated with this Backend, and the status of the Backend with respect to each ancestor.\n\nA maximum of 32 ancestors will be represented in this list. An empty list indicates that the Backend is not associated with any ancestors.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller that manages the Backend must add an entry for each ancestor it manages and remove the entry when the controller no longer considers the Backend to be associated with that ancestor.\n\nfor little benefit. It may also be unnecessarily complex for implementations to manage. If so, we'll remove the ancestor-based grouping and make it controller only. </gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus"),
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus"),
 									},
 								},
 							},
@@ -10183,7 +10235,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"mode": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Mode defines the TLS mode for the backend connection.",
+							Description: "Mode defines the TLS mode for the backend connection.\n\nSupport: Core - None\n\nSupport: Extended - ServerOnly, ClientAndServer",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -10198,7 +10250,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref common.Reference
 					"validation": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Validation contains TLS validation configuration for the backend connection.",
-							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation"),
 						},
 					},
@@ -10235,8 +10286,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref co
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.LocalPolicyTargetReference"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalPolicyTargetReference"),
 									},
 								},
 							},
@@ -10250,7 +10300,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref co
 					},
 					"sessionPersistence": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
+							Description: "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
 						},
 					},
@@ -10290,6 +10340,35 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref common.Refere
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_EndpointSelectorBackend(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "EndpointSelectorBackend specifies the configuration for a backend that selects a set of pods by label.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"matchLabels": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MatchLabels contains a set of required {key,value} pairs. An object must match every label in this map to be selected. The matching logic is an AND operation on all entries.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"matchLabels"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10306,6 +10385,35 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref com
 					},
 				},
 				Required: []string{"hostname"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_LabelSelector(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LabelSelector defines a query for resources based on their labels.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"matchLabels": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MatchLabels contains a set of required {key,value} pairs. An object must match every label in this map to be selected. The matching logic is an AND operation on all entries.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"matchLabels"},
 			},
 		},
 	}
@@ -10369,8 +10477,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref common.Reference
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+										Ref: ref(v1.Condition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -10402,6 +10509,34 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref common.Reference
 		},
 		Dependencies: []string{
 			v1.Condition{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.SupportedFeature"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream trace parent.\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mode explicitly controls if parent-based sampling is enabled. Valid values are \"Enabled\", \"Disabled\", \"ImplementationDefault\".\n\nIn the absence of this field, it defaults to \"ImplementationDefault\".\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"samplingRate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SamplingRate is the sampling rate to apply when parent-based sampling is active.\n\nThis acts as a downsampling governor. It allows an operator to say: \"I want to respect the parent's decision, but only for 50% of those requests\". Even if a parent is already marked as \"Sampled\", this allows the Gateway to apply a secondary filter so that it can respect the parent's intent while still controlling the volume of spans reported.\n\nWhen Mode is \"Enabled\" and this field is absent, a 100% sampling rate ({numerator: 100, denominator: 100}) is used.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.Fraction"},
 	}
 }
 
@@ -10456,6 +10591,202 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.Refe
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails", "sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicySpec defines the desired state and target of TelemetryPolicy.\n\nSpecifying at least one target resource in `targetRefs` is required. Tracing behavior can be configured via the `tracing` field.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"targetRefs": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRefs identifies the gateways to which this policy applies (GEP-713).\n\nWhen configured, the telemetry settings defined in this policy are applied uniformly to the referenced resources. In the absence of targetRefs, the policy is invalid and will not be accepted.\n\nTargetRefs must be distinct.\n\nSupport: Core for Gateway",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
+									},
+								},
+							},
+						},
+					},
+					"tracing": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Tracing defines the configuration for distributed tracing.\n\nWhen configured, distributed tracing spans are generated and exported. In the absence of this configuration, tracing behavior is determined by implementation defaults.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"),
+						},
+					},
+				},
+				Required: []string{"targetRefs"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicyStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicyStatus defines the observed state of TelemetryPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ancestors": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "For Policy Status API conventions, see: https://gateway-api.sigs.k8s.io/geps/gep-713/#the-status-stanza-of-policy-objects\n\nAncestors is a list of ancestor resources (specifically Gateway resources) that are associated with the policy, and the status of the policy with respect to each ancestor. When this policy attaches to a parent, the controller that manages the parent and the ancestors MUST add an entry to this list when the controller first sees the policy and SHOULD update the entry as appropriate when the relevant ancestor is modified.\n\nFor TelemetryPolicy, the ancestor MUST be the Gateway resource referenced in spec.targetRefs.\n\nNote also that implementations MUST ONLY populate ancestor status for the Ancestor resources they are responsible for. Implementations MUST use the ControllerName field to uniquely identify the entries in this list that they are responsible for.\n\nNote that to achieve this, the list of PolicyAncestorStatus structs MUST be treated as a map with a composite key, made up of the AncestorRef and ControllerName fields combined.\n\nA maximum of 16 ancestors will be represented in this list. An empty list means the Policy is not relevant for any ancestors.\n\nIf this slice is full, implementations MUST NOT add further entries. Instead they MUST consider the policy unimplementable and signal that on any related resources such as the ancestor that would be referenced here.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"ancestors"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TracingConfig defines the configuration for distributed tracing.\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mode explicitly controls if tracing is enabled. Valid values are \"Enabled\", \"Disabled\", \"ImplementationDefault\".\n\nIn the absence of this field, it defaults to \"ImplementationDefault\".\n\nSupport: Core (within TelemetryPolicy feature)",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"provider": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Provider specifies the tracing collector or backend endpoint receiving OTLP spans.\n\nWhen configured, spans generated by the Gateway proxy are exported to this destination. This field is required when Mode is \"Enabled\", and must not be set otherwise.\n\nSupport: Core (within Tracing feature)",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider"),
+						},
+					},
+					"samplingRate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SamplingRate specifies the base probability of sampling new traces.\n\nThe sampling probability is represented as a fraction.\n\nFor example, a Numerator of 5 and Denominator of 100 represents a 5% sampling rate. * If configured, only the specified percentage of new traces will be initiated. * In the absence of this field, an implementation-defined default is used.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nPermutations of numerator > denominator are invalid and MUST be rejected via validation. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
+						},
+					},
+					"parentBasedSampling": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ParentBasedSampling configures whether to respect the sampling decision of the parent span.\n\n* When Mode is \"Enabled\", the proxy will respect the upstream trace parent's sampling\n  decision.\n* When Mode is \"Disabled\", the proxy ignores the upstream trace parent's sampling\n  decision and applies its own local sampling rate decision.\n* When Mode is \"ImplementationDefault\" or absent, the implementation's default behavior\n  is used.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyParentBasedSampling",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling"),
+						},
+					},
+					"serviceName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ServiceName is the \"service.name\" attribute of the OpenTelemetry resource. If absent, the implementation's default service name will be used.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"spanName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SpanName defines a custom name for the OTel span. By default, the name is implementation-specific.\n\nSupport: Extended\n\nFeature Name: TelemetryPolicyTracing",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"attributes": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Attributes is a list of custom key-value pairs (or variables) attached to every span.\n\nWhen configured, these attributes are injected into every generated tracing span. In the absence of attributes, only standard proxy-defined attributes are emitted.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.Fraction", "sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TracingProvider identifies the tracing backend that receives generated spans.\n\nSupport: Core for Service\n\nSupport: Implementation-specific for any other resource",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"backendRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BackendRef is a reference to a Kubernetes Service or other supported backend that receives OTLP traces.\n\nWhen configured, tracing data is exported to the referenced backend.\n\nCross-namespace references are only valid if they are explicitly allowed by ReferenceGrant in the target namespace.\n\nIf the reference is invalid (e.g., the Service does not exist, has an unsupported Group or Kind, or is a cross-namespace reference not permitted by a ReferenceGrant), the implementation MUST set the \"ResolvedRefs\" condition on the Policy status to \"status: False\", with Reason \"BackendNotFound\", \"InvalidKind\", or \"RefNotPermitted\" as appropriate.\n\nTLS configuration for the connection to the backend is managed by the referenced object. For example, if the BackendRef points to a Service, a BackendTLSPolicy can be attached to configure TLS. Alternatively, the referenced backend could be a custom resource (e.g., XBackend) that natively manages TLS.\n\nSupport: Core",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference"),
+						},
+					},
+					"headers": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Headers specifies a list of custom headers to be added to the telemetry export requests (e.g., for authentication).\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"backendRef"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference", "sigs.k8s.io/gateway-api/apis/v1.HTTPHeader"},
 	}
 }
 
@@ -10542,8 +10873,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendList(ref common.Referen
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend"),
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend"),
 									},
 								},
 							},
@@ -10641,8 +10971,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref c
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy"),
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy"),
 									},
 								},
 							},
@@ -10739,8 +11068,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref common.ReferenceC
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh"),
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh"),
 									},
 								},
 							},
@@ -10752,5 +11080,103 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref common.ReferenceC
 		},
 		Dependencies: []string{
 			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TelemetryPolicy defines a Direct Attached Policy to configure telemetry/observability signals for Gateways.\n\nBy applying a TelemetryPolicy, platform operators and developers can ensure consistent collection, formatting, and export of observability signals.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nTelemetryPolicy is a Direct Attached Policy. Implementing controllers MUST adhere to the Policy Attachment guidelines (GEP-713).\n\nPrecedence and Conflict Resolution:\n  - To prevent complex merging semantics, only a single TelemetryPolicy is\n    permitted to apply to a specific Gateway resource at any given time.\n  - If multiple TelemetryPolicy resources target the same Gateway, precedence\n    MUST be determined using the following criteria, continuing on ties:\n    1. The older policy by creation timestamp takes precedence.\n    2. The policy appearing first in alphabetical order by {namespace}/{name}.\n  - For any TelemetryPolicy that does not take precedence, the controller\n    MUST set the `Accepted` condition on the policy status to `status: False` with\n    Reason `Conflicted`.\n\nConformance: Implementations MUST support the core resource structure and `targetRefs`. Support for the tracing block is Extended, but if supported, its respective conformance profile must be met. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of TelemetryPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the observed state of TelemetryPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec", "sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "XTelemetryPolicyList contains a list of XTelemetryPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy"},
 	}
 }

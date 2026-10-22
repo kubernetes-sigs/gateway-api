@@ -40,6 +40,7 @@ var HTTPRouteBackendURLRewrite = confsuite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteBackendURLRewrite,
 	},
+	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "backend-url-rewrite", Namespace: ns}
@@ -53,9 +54,7 @@ var HTTPRouteBackendURLRewrite = confsuite.ConformanceTest{
 					Path: "/full/original",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/rewritten-full",
-					},
+					Path: "/rewritten-full",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
@@ -65,9 +64,7 @@ var HTTPRouteBackendURLRewrite = confsuite.ConformanceTest{
 					Path: "/prefix/original",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/rewritten-prefix/original",
-					},
+					Path: "/rewritten-prefix/original",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,

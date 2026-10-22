@@ -132,14 +132,13 @@ Given that the release branch exists:
 - Create a `release-$tag` branch off the release branch.
 - Update the CHANGELOG as described above.
 - Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
-- Update regex `spec.validations.expression` in
-  `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
-  to match older versions. (Look for a regex like `v1.[0-n].`, and make
-  sure that  the `n` in `0-n` is the current minor version number -1.)
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
   exist until the tag is cut and image is promoted to production registry.)
+- Verify `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
+  - Has the updated `gateway.networking.k8s.io/bundle-version`.
+  - Has the updated `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, where `3` is the latest minor version number -1)
 - Commit all of the above to the new `release-x.x.x` branch.
 - Create a pull request of the `release-x.x.x` branch into the `release-x.x` branch upstream. Add a hold on this PR waiting for at least one maintainer/codeowner to provide a `lgtm`. Approval
 of the PR is the community consensus for a new release.
@@ -147,26 +146,33 @@ of the PR is the community consensus for a new release.
 - Tag `HEAD` of the `release-x.x` branch with the version number (including the initial `v`, so e.g. `v1.5.0-rc.1` or `v1.6.1`). This can be done using the `git` CLI or
   the GitHub UI, but **note well**: if the release manager can't create the tag due to Git permissions, a maintainer will need to do it, and in that case it's more polite for the maintainer to create and push the _tag_, then let the release manager create the _release_, so that it's easier for people to find the manager if there are problems!
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
-  Attach these files to the GitHub release.
-- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
+- Update the `README.md` and `site/content/en/guides/getting-started/introduction.md` files to point links and examples to the new release.
+- Update the versions in `tools/implist/main.go`:
+  * CurrentVersion     is the new release
+  * ConformantVersions is the last _two_ versions. So, n, and n - 1
+  * StaleVersions      is the version before that (n-2)
+	
 
 #### For a **MAJOR** or **MINOR** release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.
 - Check out the `release-major.minor` release branch locally.
 - Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
-- Update `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
-  - Update the `gateway.networking.k8s.io/bundle-version`.
-  - Update regex `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, and replace the `3` with the new minor version number -1).
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
   exist until the tag is cut and image is promoted to production registry.)
+- Verify `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
+  - Has the updated `gateway.networking.k8s.io/bundle-version`.
+  - Has the updated `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, where `3` is the latest minor version number -1).
 - Verify the CI tests pass before continuing.
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
   GitHub's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
-  Attach these files to the GitHub release.
-- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
+- Update the `README.md` and `site/content/en/guides/getting-started/introduction.md` files to point links and examples to the new release.
 - Edit the text blurb in `hack/docsy-generate-conformance.py` to reflect the added past version if necessary.
 
 #### For an **RC** release:
@@ -182,22 +188,15 @@ of the PR is the community consensus for a new release.
   page.
 - Run the `make build-install-yaml` command which will generate
   install files in the `release/` directory.
-- Attach these files to the GitHub release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
 
-### Promoting images to production registry
-Gateway API follows the standard kubernetes image promotion process described [here][kubernetes-image-promotion].
+### Promoting conformance images to production registry
 
-1. Once the tag has been cut and the image is available in the staging registry,
-   identify the SHA-256 image digest of the image that you want to promote.
-2. Modify the
-   [k8s-staging-gateway-api/images.yaml](https://github.com/kubernetes/k8s.io/blob/main/registry.k8s.io/images/k8s-staging-gateway-api/images.yaml)
-   file under [kubernetes/k8s.io](https://github.com/kubernetes/k8s.io)
-   repository and add the image digest along with the new tag under the correct
-   component.
-   1. Currently, the following images are included: `admission-server`, `echo-server`
-3. Create a PR with the above changes.
-4. Image will get promoted by [automated prow jobs][kubernetes-image-promotion]
-   once the PR merges
+Conformance test images, i.e., `echo-basic`, `echo-advanced`, are now maintained in the [gateway-api-conformance-images](https://github.com/kubernetes-sigs/gateway-api-conformance-images) repository.
+The image release and promotion process is documented in that repository's [RELEASE.md](https://github.com/kubernetes-sigs/gateway-api-conformance-images/blob/main/RELEASE.md).
+
+It may be worth releasing the conformance test images *before* drafting a new Gateway API release, so the release can reference up-to-date image tags.
 
 [release]: https://github.com/kubernetes-sigs/gateway-api/releases
 [gateway-api-team]: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml

@@ -187,7 +187,7 @@ listeners, you should consider allowing your users to set their hostnames direct
 on the routes of each namespaces but limiting what namespace can use what hostname
 by relying on a mechanism like `ValidatingAdmissionPolicy`.
 
-In case you opt to use (the still experimental) `ListenerSet`, a similar mechanism
+In case you opt to use `ListenerSet`, a similar mechanism
 should also be considered to limit what hostnames a `ListenerSet` can claim.
 
 #### Example of a ValidatingAdmissionPolicy

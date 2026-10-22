@@ -37,6 +37,7 @@ type MeshSpecApplyConfiguration struct {
 	// This field is not mutable and cannot be empty.
 	//
 	// Support: Core
+	//
 	ControllerName *v1.GatewayController `json:"controllerName,omitempty"`
 	// ParametersRef is an optional reference to a resource that contains
 	// implementation-specific configuration for this Mesh. If no
@@ -53,8 +54,10 @@ type MeshSpecApplyConfiguration struct {
 	// "InvalidParameters" reason.
 	//
 	// Support: Implementation-specific
+	//
 	ParametersRef *apisv1.ParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
 	// Description optionally provides a human-readable description of a Mesh.
+	//
 	Description *string `json:"description,omitempty"`
 }
 

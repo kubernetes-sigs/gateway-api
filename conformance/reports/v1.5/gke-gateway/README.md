@@ -29,7 +29,7 @@ go test ./conformance -run TestConformance -v -timeout=3h -args \
     --url=https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api \
     --version=1.35.2-gke.1751000 \
     --contact=gke-gateway-dev@google.com \
-    --supported-features=Gateway,HTTPRoute,GatewayPort8080,HTTPRouteHostRewrite,HTTPRoutePathRedirect,HTTPRouteRequestMirror,HTTPRouteRequestPercentageMirror,HTTPRouteResponseHeaderModification,HTTPRouteSchemeRedirect \
+    --supported-features=Gateway,HTTPRoute,GatewayPort8080,HTTPRouteHostRewrite,HTTPRoutePathRedirect,HTTPRouteRequestMirror,HTTPRouteRequestPercentageMirror,HTTPRouteResponseHeaderModification,HTTPRouteSchemeRedirect,HTTPRouteQueryParamMatching,GatewayFrontendClientCertificateValidation,BackendTLSPolicy,BackendTLSPolicySANValidation \
     --report-output="/path/to/report"
 ```
 

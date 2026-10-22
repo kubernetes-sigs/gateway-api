@@ -69,12 +69,10 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 			},
 			ExpectedRequest: &http.ExpectedRequest{
-				Request: http.Request{
-					Path: "/set",
-					Headers: map[string]string{
-						"Some-Other-Header": "val",
-						"X-Header-Set":      "set-overwrites-values",
-					},
+				Path: "/set",
+				Headers: map[string]string{
+					"Some-Other-Header": "val",
+					"X-Header-Set":      "set-overwrites-values",
 				},
 			},
 			Backend:   confsuite.InfraBackendServiceNameV1,
@@ -88,12 +86,10 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 			},
 			ExpectedRequest: &http.ExpectedRequest{
-				Request: http.Request{
-					Path: "/set",
-					Headers: map[string]string{
-						"Some-Other-Header": "val",
-						"X-Header-Set":      "set-overwrites-values",
-					},
+				Path: "/set",
+				Headers: map[string]string{
+					"Some-Other-Header": "val",
+					"X-Header-Set":      "set-overwrites-values",
 				},
 			},
 			Backend:   confsuite.InfraBackendServiceNameV1,
@@ -106,12 +102,10 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 			},
 			ExpectedRequest: &http.ExpectedRequest{
-				Request: http.Request{
-					Path: "/add",
-					Headers: map[string]string{
-						"Some-Other-Header": "val",
-						"X-Header-Add":      "add-appends-values",
-					},
+				Path: "/add",
+				Headers: map[string]string{
+					"Some-Other-Header": "val",
+					"X-Header-Add":      "add-appends-values",
 				},
 			},
 			Backend:   confsuite.InfraBackendServiceNameV1,
@@ -125,12 +119,10 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 			},
 			ExpectedRequest: &http.ExpectedRequest{
-				Request: http.Request{
-					Path: "/add",
-					Headers: map[string]string{
-						"Some-Other-Header": "val",
-						"X-Header-Add":      "some-other-value,add-appends-values",
-					},
+				Path: "/add",
+				Headers: map[string]string{
+					"Some-Other-Header": "val",
+					"X-Header-Add":      "some-other-value,add-appends-values",
 				},
 			},
 			Backend:   confsuite.InfraBackendServiceNameV1,
@@ -143,9 +135,7 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 			},
 			ExpectedRequest: &http.ExpectedRequest{
-				Request: http.Request{
-					Path: "/remove",
-				},
+				Path:          "/remove",
 				AbsentHeaders: []string{"X-Header-Remove"},
 			},
 			Backend:   confsuite.InfraBackendServiceNameV1,
@@ -161,16 +151,14 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 			},
 			ExpectedRequest: &http.ExpectedRequest{
-				Request: http.Request{
-					Path: "/multiple",
-					Headers: map[string]string{
-						"X-Header-Set-1": "header-set-1",
-						"X-Header-Set-2": "header-set-2",
-						"X-Header-Add-1": "header-add-1",
-						"X-Header-Add-2": "add-val-2,header-add-2",
-						"X-Header-Add-3": "header-add-3",
-						"Another-Header": "another-header-val",
-					},
+				Path: "/multiple",
+				Headers: map[string]string{
+					"X-Header-Set-1": "header-set-1",
+					"X-Header-Set-2": "header-set-2",
+					"X-Header-Add-1": "header-add-1",
+					"X-Header-Add-2": "add-val-2,header-add-2",
+					"X-Header-Add-3": "header-add-3",
+					"Another-Header": "another-header-val",
 				},
 				AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},
 			},
@@ -189,13 +177,11 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 			},
 			ExpectedRequest: &http.ExpectedRequest{
-				Request: http.Request{
-					Path: "/case-insensitivity",
-					Headers: map[string]string{
-						"X-Header-Set":   "header-set",
-						"X-Header-Add":   "original-val-add,header-add",
-						"Another-Header": "another-header-val",
-					},
+				Path: "/case-insensitivity",
+				Headers: map[string]string{
+					"X-Header-Set":   "header-set",
+					"X-Header-Add":   "original-val-add,header-add",
+					"Another-Header": "another-header-val",
 				},
 				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
 			},

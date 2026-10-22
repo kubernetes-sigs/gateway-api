@@ -53,6 +53,46 @@ spec:
           spec:
             description: Spec defines the desired state of XBackend.
             properties:
+              endpointSelector:
+                description: |-
+                  EndpointSelector specifies the configuration for an EndpointSelector
+                  backend. This field must be set when type is EndpointSelector and must
+                  be unset otherwise.
+                properties:
+                  matchLabels:
+                    additionalProperties:
+                      description: |-
+                        LabelValue is the value of a label in the Gateway API. This is used for validation
+                        of maps such as Gateway infrastructure labels. This matches the Kubernetes
+                        label validation rules:
+                        * must be 63 characters or less (can be empty),
+                        * unless empty, must begin and end with an alphanumeric character ([a-z0-9A-Z]),
+                        * could contain dashes (-), underscores (_), dots (.), and alphanumerics between.
+
+                        Valid values include:
+
+                        * MyValue
+                        * my.name
+                        * 123-my-value
+                      maxLength: 63
+                      minLength: 0
+                      pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
+                      type: string
+                    description: |-
+                      MatchLabels contains a set of required {key,value} pairs.
+                      An object must match every label in this map to be selected.
+                      The matching logic is an AND operation on all entries.
+                    maxProperties: 64
+                    minProperties: 1
+                    type: object
+                    x-kubernetes-validations:
+                    - message: Label keys must be in the form of an optional DNS subdomain
+                        prefix not longer than 253 characters followed by a required
+                        name segment of up to 63 characters.
+                      rule: self.all(key, !format.qualifiedName().validate(key).hasValue())
+                required:
+                - matchLabels
+                type: object
               externalHostname:
                 description: |-
                   ExternalHostname specifies the configuration for an ExternalHostname
@@ -77,29 +117,17 @@ spec:
                 type: object
               port:
                 description: |-
-                  Port defines the port that the implementation should use when connecting
-                  to this backend.
+                  Port defines the port to connect to on this backend.
+                  For ExternalHostname, this is the port on the external host.
+                  For EndpointSelector, this specifies which endpoint port to connect to.
+                minProperties: 1
                 properties:
-                  name:
-                    description: |-
-                      Name represents the name of this port. All ports in a Backend must have
-                      a unique name. Name must either be an empty string or pass DNS_LABEL
-                      validation (lowercase alphanumeric or '-', starting and ending with an
-                      alphanumeric character, at most 63 characters).
-                    maxLength: 63
-                    type: string
-                    x-kubernetes-validations:
-                    - message: Name must be a valid DNS label
-                      rule: size(self) == 0 || format.dns1123Label().validate(self)
-                        == null
-                  port:
-                    description: Port represents the port number of the endpoint.
+                  number:
+                    description: Number represents the port number of the destination.
                     format: int32
                     maximum: 65535
                     minimum: 1
                     type: integer
-                required:
-                - port
                 type: object
               protocol:
                 description: |-
@@ -115,9 +143,9 @@ spec:
                   to this backend. When not set, the implementation will use the protocol
                   determined by the route or listener configuration.
 
-                  Support: Core - HTTP, HTTP2, H2C, and HTTP11
+                  Support: Core - HTTP, H2C, and HTTP11
 
-                  Support: Extended - GRPC, MCP, TCP
+                  Support: Extended - GRPC, HTTP2, MCP, TCP, WSS
                 enum:
                 - TCP
                 - HTTP
@@ -125,8 +153,136 @@ spec:
                 - HTTP11
                 - H2C
                 - MCP
+                - GRPC
+                - WSS
                 type: string
+              sessionPersistence:
+                description: |-
+                  SessionPersistence defines and configures session persistence
+                  across the endpoints selected by this backend.
+
+                  This field can only be configured when type is EndpointSelector.
+
+                  Support: Extended
+                properties:
+                  absoluteTimeout:
+                    description: |-
+                      AbsoluteTimeout defines the absolute timeout of the persistent
+                      session. Once the AbsoluteTimeout duration has elapsed, the
+                      session becomes invalid.
+
+                      Support: Core when cookie.lifetimeType is "Permanent".
+
+                      Support: Extended when cookie.lifetimeType is "Session" or
+                      type is "Header".
+                    pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                    type: string
+                  cookie:
+                    description: |-
+                      Cookie provides configuration settings that are specific
+                      to cookie-based session persistence.
+
+                      Support: Core
+                    properties:
+                      lifetimeType:
+                        default: Session
+                        description: |-
+                          LifetimeType specifies whether the cookie has a permanent or
+                          session-based lifetime. A permanent cookie persists until its
+                          specified expiry time, defined by the Expires or Max-Age cookie
+                          attributes, while a session cookie is deleted when the current
+                          session ends.
+
+                          When set to "Permanent", AbsoluteTimeout indicates the
+                          cookie's lifetime via the Expires or Max-Age cookie attributes
+                          and is required.
+
+                          When set to "Session", AbsoluteTimeout indicates the
+                          absolute lifetime of the cookie tracked by the gateway and
+                          is optional.
+
+                          Defaults to "Session".
+
+                          Support: Core
+                        enum:
+                        - Permanent
+                        - Session
+                        type: string
+                      name:
+                        description: |-
+                          Name defines the name of the cookie used for session persistence.
+                          If not specified, a unique cookie name SHOULD be generated.
+                          Users should avoid reusing cookie names to prevent unintended
+                          consequences, such as rejection or unpredictable behavior.
+
+                          Support: Core
+                        maxLength: 256
+                        minLength: 1
+                        pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                        type: string
+                      path:
+                        default: /
+                        description: |-
+                          Path defines the cookie Path attribute. When not specified,
+                          implementations MUST default the cookie path to "/".
+
+
+                          Support: Extended
+                        maxLength: 1024
+                        type: string
+                    type: object
+                  header:
+                    description: |-
+                      Header provides configuration settings that are specific
+                      to header-based session persistence.
+
+                      Support: Extended
+                    properties:
+                      name:
+                        description: |-
+                          Name defines the name of the header used for session persistence.
+                          The client must include this header in subsequent requests to
+                          maintain the session.
+
+                          Support: Core
+                        maxLength: 256
+                        minLength: 1
+                        pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  type:
+                    default: Cookie
+                    description: |-
+                      Type defines the type of session persistence such as through
+                      the use of a header or cookie. Defaults to cookie based session
+                      persistence.
+
+                      Support: Core for "Cookie" type
+
+                      Support: Extended for "Header" type
+                    enum:
+                    - Cookie
+                    - Header
+                    type: string
+                type: object
+                x-kubernetes-validations:
+                - message: AbsoluteTimeout must be specified when cookie lifetimeType
+                    is Permanent
+                  rule: '!has(self.cookie) || !has(self.cookie.lifetimeType) || self.cookie.lifetimeType
+                    != ''Permanent'' || has(self.absoluteTimeout)'
+                - message: cookie must be nil if type is not Cookie
+                  rule: '!has(self.cookie) || self.type == ''Cookie'''
+                - message: cookie must be specified for Cookie type
+                  rule: self.type != 'Cookie' || has(self.cookie)
+                - message: header must be nil if type is not Header
+                  rule: '!has(self.header) || self.type == ''Header'''
+                - message: header must be specified for Header type
+                  rule: self.type != 'Header' || has(self.header)
               tls:
+                default:
+                  mode: None
                 description: |-
                   TLS defines the TLS configuration that the implementation should use
                   when connecting to the backend.
@@ -134,7 +290,9 @@ spec:
                   ExternalHostname backends SHOULD have TLS configured; the lack of TLS
                   for external hostnames should be considered insecure and a security risk.
 
-                  Support: Extended
+                  Support: Core - for TLS mode None
+
+                  Support: Extended - for TLS mode ServerOnly and ClientAndServer
                 properties:
                   clientCertificateRef:
                     description: |-
@@ -181,7 +339,12 @@ spec:
                     - name
                     type: object
                   mode:
-                    description: Mode defines the TLS mode for the backend connection.
+                    description: |-
+                      Mode defines the TLS mode for the backend connection.
+
+                      Support: Core - None
+
+                      Support: Extended - ServerOnly, ClientAndServer
                     enum:
                     - None
                     - ServerOnly
@@ -228,12 +391,24 @@ spec:
                           ensure the `Accepted` Condition on the BackendTLSPolicy is set to
                           `status: False`, with a Reason `NoValidCACertificate`.
 
+
+                          References to cluster-scoped resources (such as ClusterTrustBundle)
+                          are supported: the implementation resolves the scope based on the kind.
+                          A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped
+                          resource by name. A reference to a namespaced resource (such as ConfigMap
+                          or Secret) uses the local namespace.
+
+
                           A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
                           Implementations MAY choose to support attaching multiple certificates to
                           a backend, but this behavior is implementation-specific.
 
                           Support: Core - An optional single reference to a Kubernetes ConfigMap,
                           with the CA certificate in a key named `ca.crt`.
+
+
+                          Support: Extended - A single reference to a ClusterTrustBundle (certificates.k8s.io).
+
 
                           Support: Implementation-specific - More than one reference, other kinds
                           of resources, or a single reference that includes multiple certificates.
@@ -273,6 +448,7 @@ spec:
                           - name
                           type: object
                         maxItems: 8
+                        minItems: 1
                         type: array
                         x-kubernetes-list-type: atomic
                       hostname:
@@ -386,14 +562,10 @@ spec:
                     - hostname
                     type: object
                     x-kubernetes-validations:
-                    - message: must not contain both CACertificateRefs and WellKnownCACertificates
-                      rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                        > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                        != "")'
-                    - message: must specify either CACertificateRefs or WellKnownCACertificates
-                      rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
-                        > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
-                        != "")
+                    - message: exactly one of the fields in [caCertificateRefs wellKnownCACertificates]
+                        must be set
+                      rule: (has(self.caCertificateRefs)?1:0)+(has(self.wellKnownCACertificates)?1:0)
+                        == 1
                 required:
                 - mode
                 type: object
@@ -402,10 +574,14 @@ spec:
                     ClientAndServer
                   rule: 'self.mode == ''ClientAndServer'' ? has(self.clientCertificateRef)
                     : !has(self.clientCertificateRef)'
+                - message: validation must be set if and only if mode is either ClientAndServer
+                    or ServerOnly
+                  rule: 'self.mode == ''None'' ? !has(self.validation) : has(self.validation)'
               type:
                 description: Type defines the backend type.
                 enum:
                 - ExternalHostname
+                - EndpointSelector
                 type: string
             required:
             - port
@@ -416,108 +592,44 @@ spec:
                 and must be unset otherwise
               rule: 'self.type == ''ExternalHostname'' ? has(self.externalHostname)
                 : !has(self.externalHostname)'
+            - message: endpointSelector must be set when type is EndpointSelector
+                and must be unset otherwise
+              rule: 'self.type == ''EndpointSelector'' ? has(self.endpointSelector)
+                : !has(self.endpointSelector)'
+            - message: tls must be disabled when protocol is H2C, use protocol HTTP2
+                for HTTP/2 with tls
+              rule: '!has(self.protocol) || self.protocol != ''H2C'' || !has(self.tls)
+                || self.tls.mode == ''None'''
+            - message: tls must be enabled when protocol is HTTP2, use protocol H2C
+                for HTTP/2 without tls
+              rule: '!has(self.protocol) || self.protocol != ''HTTP2'' || (has(self.tls)
+                && self.tls.mode != ''None'')'
+            - message: tls must be enabled when protocol is WSS
+              rule: '!has(self.protocol) || self.protocol != ''WSS'' || (has(self.tls)
+                && self.tls.mode != ''None'')'
+            - message: sessionPersistence can only be set when type is EndpointSelector
+              rule: 'has(self.sessionPersistence) ? self.type == ''EndpointSelector''
+                : true'
           status:
             description: Status defines the current state of XBackend.
             properties:
-              parents:
+              ancestors:
                 description: |-
-                  Ancestors is a list of parent resources associated with this Backend,
-                  and the status of the Backend with respect to each parent.
+                  Ancestors is a list of ancestor resources (usually Gateways) that are
+                  associated with this Backend, and the status of the Backend with respect
+                  to each ancestor.
 
-                  A maximum of 32 parents will be represented in this list. An empty list
-                  indicates that the Backend is not associated with any parents.
+                  A maximum of 32 ancestors will be represented in this list. An empty list
+                  indicates that the Backend is not associated with any ancestors.
                 items:
                   description: |-
                     BackendAncestorStatus describes the status of a Backend with respect to a
-                    specific parent resource (typically a Gateway).
+                    specific ancestor resource (typically a Gateway).
                   properties:
-                    conditions:
+                    ancestorRef:
                       description: |-
-                        For Kubernetes API conventions, see:
-                        https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
-                        conditions represent the current state of the Backend resource.
-                        Each condition has a unique type and reflects the status of a specific aspect of the resource.
-
-                        Defined condition types include:
-                        - "Accepted": the resource has been acknowledged and accepteed by the controller
-
-                        The status of each condition is one of True, False, or Unknown.
-                      items:
-                        description: Condition contains details for one aspect of
-                          the current state of this API Resource.
-                        properties:
-                          lastTransitionTime:
-                            description: |-
-                              lastTransitionTime is the last time the condition transitioned from one status to another.
-                              This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-                            format: date-time
-                            type: string
-                          message:
-                            description: |-
-                              message is a human readable message indicating details about the transition.
-                              This may be an empty string.
-                            maxLength: 32768
-                            type: string
-                          observedGeneration:
-                            description: |-
-                              observedGeneration represents the .metadata.generation that the condition was set based upon.
-                              For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
-                              with respect to the current state of the instance.
-                            format: int64
-                            minimum: 0
-                            type: integer
-                          reason:
-                            description: |-
-                              reason contains a programmatic identifier indicating the reason for the condition's last transition.
-                              Producers of specific condition types may define expected values and meanings for this field,
-                              and whether the values are considered a guaranteed API.
-                              The value should be a CamelCase string.
-                              This field may not be empty.
-                            maxLength: 1024
-                            minLength: 1
-                            pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
-                            type: string
-                          status:
-                            description: status of the condition, one of True, False,
-                              Unknown.
-                            enum:
-                            - "True"
-                            - "False"
-                            - Unknown
-                            type: string
-                          type:
-                            description: type of condition in CamelCase or in foo.example.com/CamelCase.
-                            maxLength: 316
-                            pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
-                            type: string
-                        required:
-                        - lastTransitionTime
-                        - message
-                        - reason
-                        - status
-                        - type
-                        type: object
-                      type: array
-                      x-kubernetes-list-map-keys:
-                      - type
-                      x-kubernetes-list-type: map
-                    controllerName:
-                      description: |-
-                        ControllerName is a domain/path string that indicates the name of the
-                        controller that manages the Backend.
-
-                        Example: "example.net/gateway-controller".
-
-                        The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
-                        valid Kubernetes names
-                        (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-                      maxLength: 253
-                      minLength: 1
-                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
-                      type: string
-                    parentRef:
-                      description: AncestorRef identifies the parent resource that
-                        this status is associated with.
+                        AncestorRef identifies the ancestor resource that this status is
+                        associated with.
                       properties:
                         group:
                           default: gateway.networking.k8s.io
@@ -651,9 +763,94 @@ spec:
                       required:
                       - name
                       type: object
+                    conditions:
+                      description: |-
+                        For Kubernetes API conventions, see:
+                        https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
+                        conditions represent the current state of the Backend resource.
+                        Each condition has a unique type and reflects the status of a specific aspect of the resource.
+
+                        Defined condition types include:
+                        - "Accepted": the resource has been acknowledged and accepted by the controller
+                        - "ResolvedRefs": all references of the resource have been resolved
+
+                        The status of each condition is one of True, False, or Unknown.
+                      items:
+                        description: Condition contains details for one aspect of
+                          the current state of this API Resource.
+                        properties:
+                          lastTransitionTime:
+                            description: |-
+                              lastTransitionTime is the last time the condition transitioned from one status to another.
+                              This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                            format: date-time
+                            type: string
+                          message:
+                            description: |-
+                              message is a human readable message indicating details about the transition.
+                              This may be an empty string.
+                            maxLength: 32768
+                            type: string
+                          observedGeneration:
+                            description: |-
+                              observedGeneration represents the .metadata.generation that the condition was set based upon.
+                              For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                              with respect to the current state of the instance.
+                            format: int64
+                            minimum: 0
+                            type: integer
+                          reason:
+                            description: |-
+                              reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                              Producers of specific condition types may define expected values and meanings for this field,
+                              and whether the values are considered a guaranteed API.
+                              The value should be a CamelCase string.
+                              This field may not be empty.
+                            maxLength: 1024
+                            minLength: 1
+                            pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                            type: string
+                          status:
+                            description: status of the condition, one of True, False,
+                              Unknown.
+                            enum:
+                            - "True"
+                            - "False"
+                            - Unknown
+                            type: string
+                          type:
+                            description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                            maxLength: 316
+                            pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                            type: string
+                        required:
+                        - lastTransitionTime
+                        - message
+                        - reason
+                        - status
+                        - type
+                        type: object
+                      type: array
+                      x-kubernetes-list-map-keys:
+                      - type
+                      x-kubernetes-list-type: map
+                    controllerName:
+                      description: |-
+                        ControllerName is a domain/path string that indicates the name of the
+                        controller that manages the Backend.
+
+                        Example: "example.net/gateway-controller".
+
+                        The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
+                        valid Kubernetes names
+                        (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
+                      type: string
                   required:
+                  - ancestorRef
                   - controllerName
-                  - parentRef
                   type: object
                 maxItems: 32
                 type: array

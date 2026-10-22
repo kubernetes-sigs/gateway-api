@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	v1 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -40,7 +40,6 @@ var TCPRouteInvalidNonTCPListener = confsuite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportTCPRoute,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "tcp-route", Namespace: ns}

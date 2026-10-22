@@ -51,7 +51,7 @@ import (
 // A GatewayClass name SHOULD be compliant with RFC 1035, consisting of a maximum of 63 lower case alphanumeric
 // characters or hyphens ('-'), and MUST start and end with an alphanumeric character.
 type GatewayClassApplyConfiguration struct {
-	metav1.TypeMetaApplyConfiguration    `json:",inline"`
+	metav1.TypeMetaApplyConfiguration    `json:""`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of GatewayClass.
 	Spec *GatewayClassSpecApplyConfiguration `json:"spec,omitempty"`
@@ -59,6 +59,7 @@ type GatewayClassApplyConfiguration struct {
 	//
 	// Implementations MUST populate status on all GatewayClass resources which
 	// specify their controller name.
+	//
 	Status *GatewayClassStatusApplyConfiguration `json:"status,omitempty"`
 }
 

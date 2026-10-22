@@ -1,0 +1,108 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-07-23T15:47:30+03:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.6.1
+implementation:
+  contact:
+  - '@lexfrei'
+  organization: lexfrei
+  project: cloudflare-tunnel-gateway-controller
+  url: https://github.com/lexfrei/cloudflare-tunnel-gateway-controller
+  version: v3.3.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - HTTPRouteHTTPSListener
+    - HTTPRouteMultipleGateways
+    statistics:
+      Failed: 0
+      Passed: 35
+      Skipped: 2
+  extended:
+    result: partial
+    skippedTests:
+    - HTTPRouteListenerPortMatching
+    statistics:
+      Failed: 0
+      Passed: 37
+      Skipped: 1
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    - ListenerSet
+    unsupportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRouteRetry
+    - HTTPRouteRetryBackendTimeout
+    - HTTPRouteRetryConnectionError
+  name: GATEWAY-HTTP
+  summary: Core tests partially succeeded with 2 test skips. Extended tests partially
+    succeeded with 1 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 15
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 8
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - ListenerSet
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- GRPCRouteNamedRule
+- GatewayOptionalAddressValue
+- HTTPRoute303Redirect
+- HTTPRoute307Redirect
+- HTTPRoute308Redirect
+- HTTPRouteNamedRule
+- HTTPRouteRequestPercentageMirror

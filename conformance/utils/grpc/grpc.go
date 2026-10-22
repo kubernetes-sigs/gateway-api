@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -31,7 +32,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
+	pb "sigs.k8s.io/gateway-api-conformance-images/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
@@ -57,6 +58,10 @@ type Client interface {
 // DefaultClient is the default implementation of Client. It will
 // be used if a custom implementation is not specified.
 type DefaultClient struct {
+	// mu guards Conn so SendRPC is safe for concurrent use and the client is
+	// reusable after Close (Close drops Conn so the next SendRPC redials,
+	// instead of short-circuiting onto an already-closed connection).
+	mu   sync.Mutex
 	Conn *grpc.ClientConn
 }
 
@@ -155,25 +160,32 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 	return fmt.Sprintf("%s should receive a %s (%d)", reqStr, er.Response.Code.String(), er.Response.Code)
 }
 
-func (c *DefaultClient) ensureConnection(address string, req *RequestMetadata) error {
+func (c *DefaultClient) ensureConnection(address string, req *RequestMetadata) (*grpc.ClientConn, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if c.Conn != nil {
-		return nil
+		return c.Conn, nil
 	}
-	var err error
 	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	if req != nil && req.Authority != "" {
 		dialOpts = append(dialOpts, grpc.WithAuthority(req.Authority))
 	}
 
-	c.Conn, err = grpc.NewClient(address, dialOpts...)
+	conn, err := grpc.NewClient(address, dialOpts...)
 	if err != nil {
-		c.Conn = nil
-		return err
+		return nil, err
 	}
-	return nil
+	c.Conn = conn
+	return c.Conn, nil
 }
 
+// resetConnection closes and clears the shared connection so the next SendRPC
+// redials. SendRPC holds no lock during the RPC, so a reset triggered by one
+// caller (on a codes.Internal response) closes the connection other goroutines
+// may still be using; their in-flight RPCs surface the cancellation as an error.
 func (c *DefaultClient) resetConnection() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if c.Conn == nil {
 		return
 	}
@@ -186,7 +198,8 @@ func (c *DefaultClient) resetConnection() {
 // is received.
 func (c *DefaultClient) SendRPC(t *testing.T, address string, expected ExpectedResponse, timeout time.Duration) (*Response, error) {
 	t.Helper()
-	if err := c.ensureConnection(address, expected.RequestMetadata); err != nil {
+	conn, err := c.ensureConnection(address, expected.RequestMetadata)
+	if err != nil {
 		return &Response{}, err
 	}
 
@@ -202,8 +215,7 @@ func (c *DefaultClient) SendRPC(t *testing.T, address string, expected ExpectedR
 
 	defer cancel()
 
-	stub := pb.NewGrpcEchoClient(c.Conn)
-	var err error
+	stub := pb.NewGrpcEchoClient(conn)
 	tlog.Logf(t, "Sending RPC")
 
 	switch {
@@ -233,8 +245,11 @@ func (c *DefaultClient) SendRPC(t *testing.T, address string, expected ExpectedR
 }
 
 func (c *DefaultClient) Close() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if c.Conn != nil {
 		c.Conn.Close()
+		c.Conn = nil
 	}
 }
 
@@ -295,8 +310,31 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, c Client, ti
 		}
 		return true
 	}
-	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, sendRPC)
+	http.AwaitConvergence(t, timeoutConfig, sendRPC)
 	tlog.Logf(t, "Request passed")
+}
+
+func MakeRequestAndExpectEventuallyConsistentFailure(t *testing.T, c Client, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
+	t.Helper()
+	validateExpectedResponse(t, expected)
+	if c == nil {
+		c = &DefaultClient{Conn: nil}
+	}
+	defer c.Close()
+	sendRPC := func(elapsed time.Duration) bool {
+		resp, err := c.SendRPC(t, gwAddr, expected, timeoutConfig.MaxTimeToConsistency-elapsed)
+		if err != nil {
+			tlog.Logf(t, "Failed to send RPC, not ready yet: %v (after %v)", err, elapsed)
+			return false
+		}
+		if resp.Code == codes.OK {
+			t.Fatalf("Request should have failed, but got status OK")
+			return false
+		}
+		return true
+	}
+	http.AwaitConvergence(t, timeoutConfig, sendRPC)
+	tlog.Logf(t, "Expectation for failing request met")
 }
 
 // AddEntropy adds randomness to ExpectedResponse to avoid caching issues and ensure each request is unique.

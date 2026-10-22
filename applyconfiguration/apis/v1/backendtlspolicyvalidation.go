@@ -26,6 +26,13 @@ import (
 // with apply.
 //
 // BackendTLSPolicyValidation contains backend TLS validation configuration.
+// <gateway:util:excludeFromCRD>
+// Standard channel only: exactly one of caCertificateRefs or wellKnownCACertificates
+// must be set.
+// </gateway:util:excludeFromCRD>
+// <gateway:standard:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")">
+// <gateway:standard:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")">
+// <gateway:experimental:validation:ExactlyOneOf=caCertificateRefs;wellKnownCACertificates>
 type BackendTLSPolicyValidationApplyConfiguration struct {
 	// CACertificateRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to
@@ -62,6 +69,14 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// ensure the `Accepted` Condition on the BackendTLSPolicy is set to
 	// `status: False`, with a Reason `NoValidCACertificate`.
 	//
+	// <gateway:experimental:description>
+	// References to cluster-scoped resources (such as ClusterTrustBundle)
+	// are supported: the implementation resolves the scope based on the kind.
+	// A single CACertificateRef to a ClusterTrustBundle uses the cluster-scoped
+	// resource by name. A reference to a namespaced resource (such as ConfigMap
+	// or Secret) uses the local namespace.
+	// </gateway:experimental:description>
+	//
 	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
 	// Implementations MAY choose to support attaching multiple certificates to
 	// a backend, but this behavior is implementation-specific.
@@ -69,8 +84,19 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
 	// with the CA certificate in a key named `ca.crt`.
 	//
+	// <gateway:experimental:description>
+	// Support: Extended - A single reference to a ClusterTrustBundle (certificates.k8s.io).
+	// </gateway:experimental:description>
+	//
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
+	//
+	// <gateway:util:excludeFromCRD>
+	// The standard channel rules reject an empty list via `size(...) > 0`, while the
+	// experimental ExactlyOneOf rule only tests for presence. MinItems keeps an empty
+	// list invalid in the experimental channel too.
+	// </gateway:util:excludeFromCRD>
+	// <gateway:experimental:validation:MinItems=1>
 	CACertificateRefs []LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 	// WellKnownCACertificates specifies whether a well-known set of CA certificates
 	// may be used in the TLS handshake between the gateway and backend pod.
@@ -91,6 +117,7 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// `mycompany.com/my-custom-ca-certificates`.
 	//
 	// Support: Implementation-specific
+	//
 	WellKnownCACertificates *apisv1.WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
 	// Hostname is used for two purposes in the connection between Gateways and
 	// backends:
@@ -103,12 +130,14 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// of the Hostname field for authentication, you MUST add it to the SubjectAltNames list.
 	//
 	// Support: Core
+	//
 	Hostname *apisv1.PreciseHostname `json:"hostname,omitempty"`
 	// SubjectAltNames contains one or more Subject Alternative Names.
 	// When specified the certificate served from the backend MUST
 	// have at least one Subject Alternate Name matching one of the specified SubjectAltNames.
 	//
 	// Support: Extended
+	//
 	SubjectAltNames []SubjectAltNameApplyConfiguration `json:"subjectAltNames,omitempty"`
 }
 

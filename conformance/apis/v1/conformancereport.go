@@ -18,6 +18,9 @@ package v1
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -86,9 +89,9 @@ type Implementation struct {
 	Contact []string `json:"contact"`
 }
 
-// Validate ensures that the Implementation struct has valid fields set
+// Validate ensures that the Implementation struct has valid fields set.
+// See https://github.com/kubernetes-sigs/gateway-api/issues/2178.
 func (i *Implementation) Validate() error {
-	// TODO: add data validation https://github.com/kubernetes-sigs/gateway-api/issues/2178
 	if i.Organization == "" {
 		return errors.New("implementation's organization cannot be empty")
 	}
@@ -98,6 +101,9 @@ func (i *Implementation) Validate() error {
 	if i.URL == "" {
 		return errors.New("implementation's url cannot be empty")
 	}
+	if err := validateURL(i.URL); err != nil {
+		return fmt.Errorf("implementation's url is invalid: %w", err)
+	}
 	if i.Version == "" {
 		return errors.New("implementation's version cannot be empty")
 	}
@@ -105,4 +111,97 @@ func (i *Implementation) Validate() error {
 		return errors.New("implementation's contact cannot be empty")
 	}
 	return nil
+}
+
+// validateURL ensures that rawURL is a well-formed, absolute URL with a
+// recognized http(s) scheme and a non-empty host, so that it can reliably
+// point maintainers to more information about an implementation.
+func validateURL(rawURL string) error {
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return fmt.Errorf("could not parse url: %w", err)
+	}
+	if !parsed.IsAbs() {
+		return errors.New("url must be absolute (missing scheme)")
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return fmt.Errorf("url scheme must be http or https, got %q", parsed.Scheme)
+	}
+	if parsed.Host == "" {
+		return errors.New("url must include a host")
+	}
+	return nil
+}
+
+// IsConformant returns Result values for Gateway, Mesh, and an error that describes
+// if something went wrong.
+func (c *ConformanceReport) IsConformant(version string) (Result, Result, error) {
+	// Firstly, the Implementation struct must be valid.
+	if err := c.Validate(); err != nil {
+		return Failure, Failure, err
+	}
+
+	var returnErr error
+
+	gatewayResult := Failure
+	meshResult := Failure
+
+	// At least one profile must be valid for the report to be conformant.
+	for _, profile := range c.ProfileReports {
+		err := profile.IsConformant(version)
+		if err == nil {
+			// Assume this profile is good for now
+			profileResult := Success
+
+			// Do some additional checks here that require access to multiple parts
+			// of the report
+			// If the result was marked as partial, then it can only be partial.
+			if profile.Core.Result == Partial {
+				profileResult = Partial
+			}
+			// If there are Core skipped tests, then the profile can only ever be partial.
+			if len(profile.Core.SkippedTests) > 0 {
+				returnErr = errors.Join(returnErr, fmt.Errorf("core tests were skipped for %s", profile.Name))
+				profileResult = Partial
+			}
+
+			// Update the overall result with the temp result
+			if strings.HasPrefix(profile.Name, "MESH") {
+				meshResult = updateResult(meshResult, profileResult)
+			} else {
+				gatewayResult = updateResult(gatewayResult, profileResult)
+			}
+		} else {
+			// If there's errors, then this profile is counted as a Failure
+			// Update the overall results accordingly.
+			if strings.HasPrefix(profile.Name, "MESH") {
+				meshResult = updateResult(meshResult, Failure)
+			} else {
+				gatewayResult = updateResult(gatewayResult, Failure)
+			}
+			returnErr = errors.Join(returnErr, err)
+		}
+	}
+	return gatewayResult, meshResult, returnErr
+}
+
+func updateResult(oldResult, newResult Result) Result {
+	if oldResult == newResult {
+		return oldResult
+	}
+
+	if oldResult == Success {
+		return oldResult
+	}
+
+	if oldResult == Partial {
+		if newResult == Success {
+			return newResult
+		}
+		if newResult == Failure {
+			return oldResult
+		}
+	}
+
+	return newResult
 }

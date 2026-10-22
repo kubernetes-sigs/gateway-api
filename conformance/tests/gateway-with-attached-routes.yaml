@@ -111,6 +111,8 @@ kind: Gateway
 metadata:
   name: unresolved-gateway-with-one-attached-unresolved-route
   namespace: gateway-conformance-infra
+  annotations:
+    gateway-api/skip-this-for-readiness: "true"
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:

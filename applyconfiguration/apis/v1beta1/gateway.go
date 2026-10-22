@@ -34,11 +34,12 @@ import (
 // Gateway represents an instance of a service-traffic handling infrastructure
 // by binding Listeners to a set of IP addresses.
 type GatewayApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of Gateway.
 	Spec *apisv1.GatewaySpecApplyConfiguration `json:"spec,omitempty"`
 	// Status defines the current state of Gateway.
+	//
 	Status *apisv1.GatewayStatusApplyConfiguration `json:"status,omitempty"`
 }
 

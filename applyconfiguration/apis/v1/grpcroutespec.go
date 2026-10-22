@@ -27,7 +27,7 @@ import (
 //
 // GRPCRouteSpec defines the desired state of GRPCRoute
 type GRPCRouteSpecApplyConfiguration struct {
-	CommonRouteSpecApplyConfiguration `json:",inline"`
+	CommonRouteSpecApplyConfiguration `json:""`
 	// Hostnames defines a set of hostnames to match against the GRPC
 	// Host header to select a GRPCRoute to process the request. This matches
 	// the RFC 1123 definition of a hostname with 2 notable exceptions:
@@ -64,11 +64,30 @@ type GRPCRouteSpecApplyConfiguration struct {
 	// the implementation. The implementation MUST raise an 'Accepted' Condition
 	// with a status of `False` in the corresponding RouteParentStatus.
 	//
+	// In the event that multiple GRPCRoutes specify intersecting hostnames (e.g.
+	// overlapping wildcard matching and exact matching hostnames), precedence must
+	// be given to rules from the GRPCRoute with the largest number of:
+	//
+	// * Characters in a matching non-wildcard hostname.
+	// * Characters in a matching hostname.
+	//
+	// When multiple GRPCRoutes attach to the same Listener and yield identical
+	// Listener/Route intersected hostnames, implementations SHOULD evaluate
+	// precedence using the original hostnames configured on the Route, not the
+	// calculated Listener/Route hostname intersection.
+	//
+	// Resolving Route precedence using original Route hostname specificity is an
+	// Extended feature. Implementations that support this behavior SHOULD claim
+	// support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+	// Implementations that do not support this feature MAY evaluate precedence
+	// using the calculated Listener/Route hostname intersection.
+	//
 	// If a Route (A) of type HTTPRoute or GRPCRoute is attached to a
 	// Listener and that listener already has another Route (B) of the other
 	// type attached and the intersection of the hostnames of A and B is
-	// non-empty, then the implementation MUST accept exactly one of these two
-	// routes, determined by the following criteria, in order:
+	// non-empty, then the implementation MAY reject one of the two routes.
+	// An implementation that does so MUST accept exactly one of them,
+	// determined by the following criteria, in order:
 	//
 	// * The oldest Route based on creation timestamp.
 	// * The Route appearing first in alphabetical order by
@@ -78,10 +97,10 @@ type GRPCRouteSpecApplyConfiguration struct {
 	// 'False' in the corresponding RouteParentStatus.
 	//
 	// Support: Core
+	//
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of GRPC matchers, filters and actions.
 	//
-	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	Rules []GRPCRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 

@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	v1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
 // BackendSpecApplyConfiguration represents a declarative configuration of the BackendSpec type for use
@@ -28,16 +29,33 @@ import (
 // BackendSpec defines the desired state of a Backend.
 type BackendSpecApplyConfiguration struct {
 	// Type defines the backend type.
+	//
 	Type *apisxv1alpha1.BackendType `json:"type,omitempty"`
-	// Port defines the port that the implementation should use when connecting
-	// to this backend.
+	// Port defines the port to connect to on this backend.
+	// For ExternalHostname, this is the port on the external host.
+	// For EndpointSelector, this specifies which endpoint port to connect to.
+	//
 	Port *BackendPortApplyConfiguration `json:"port,omitempty"`
 	// ExternalHostname specifies the configuration for an ExternalHostname
 	// backend. This field must be set when type is ExternalHostname and must
 	// be unset otherwise.
 	//
 	// Support: Extended
+	//
 	ExternalHostname *ExternalHostnameBackendApplyConfiguration `json:"externalHostname,omitempty"`
+	// EndpointSelector specifies the configuration for an EndpointSelector
+	// backend. This field must be set when type is EndpointSelector and must
+	// be unset otherwise.
+	//
+	EndpointSelector *EndpointSelectorBackendApplyConfiguration `json:"endpointSelector,omitempty"`
+	// SessionPersistence defines and configures session persistence
+	// across the endpoints selected by this backend.
+	//
+	// This field can only be configured when type is EndpointSelector.
+	//
+	// Support: Extended
+	//
+	SessionPersistence *v1.SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 	// Protocol defines the protocol for backend communication.
 	//
 	// In the common case, the underlying transport protocol for the
@@ -50,9 +68,9 @@ type BackendSpecApplyConfiguration struct {
 	// to this backend. When not set, the implementation will use the protocol
 	// determined by the route or listener configuration.
 	//
-	// Support: Core - HTTP, HTTP2, H2C, and HTTP11
+	// Support: Core - HTTP, H2C, and HTTP11
 	//
-	// Support: Extended - GRPC, MCP, TCP
+	// Support: Extended - GRPC, HTTP2, MCP, TCP, WSS
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:
@@ -60,7 +78,12 @@ type BackendSpecApplyConfiguration struct {
 	// In cases where the protocol is negotiated on the wire (e.g. HTTP/1.1
 	// Upgrade or ALPN), implementations MUST include the protocol set here
 	// in the negotiation options presented to the backend.
+	//
+	// In cases the implementation does not support the configured protocol, it
+	// MUST set the "Accepted" condition to "False" with the reason
+	// "UnsupportedProtocol".
 	// </gateway:util:excludeFromCRD>
+	//
 	Protocol *apisxv1alpha1.BackendProtocol `json:"protocol,omitempty"`
 	// TLS defines the TLS configuration that the implementation should use
 	// when connecting to the backend.
@@ -68,7 +91,10 @@ type BackendSpecApplyConfiguration struct {
 	// ExternalHostname backends SHOULD have TLS configured; the lack of TLS
 	// for external hostnames should be considered insecure and a security risk.
 	//
-	// Support: Extended
+	// Support: Core - for TLS mode None
+	//
+	// Support: Extended - for TLS mode ServerOnly and ClientAndServer
+	//
 	TLS *BackendTLSApplyConfiguration `json:"tls,omitempty"`
 }
 
@@ -99,6 +125,22 @@ func (b *BackendSpecApplyConfiguration) WithPort(value *BackendPortApplyConfigur
 // If called multiple times, the ExternalHostname field is set to the value of the last call.
 func (b *BackendSpecApplyConfiguration) WithExternalHostname(value *ExternalHostnameBackendApplyConfiguration) *BackendSpecApplyConfiguration {
 	b.ExternalHostname = value
+	return b
+}
+
+// WithEndpointSelector sets the EndpointSelector field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the EndpointSelector field is set to the value of the last call.
+func (b *BackendSpecApplyConfiguration) WithEndpointSelector(value *EndpointSelectorBackendApplyConfiguration) *BackendSpecApplyConfiguration {
+	b.EndpointSelector = value
+	return b
+}
+
+// WithSessionPersistence sets the SessionPersistence field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the SessionPersistence field is set to the value of the last call.
+func (b *BackendSpecApplyConfiguration) WithSessionPersistence(value *v1.SessionPersistenceApplyConfiguration) *BackendSpecApplyConfiguration {
+	b.SessionPersistence = value
 	return b
 }
 

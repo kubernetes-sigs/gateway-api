@@ -35,6 +35,7 @@ type BackendTrafficPolicySpecApplyConfiguration struct {
 	//
 	// Currently, a TargetRef cannot be scoped to a specific port on a
 	// Service.
+	//
 	TargetRefs []v1.LocalPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
 	// RetryConstraint defines the configuration for when to allow or prevent
 	// further retries to a target backend, by dynamically calculating a 'retry
@@ -68,10 +69,13 @@ type BackendTrafficPolicySpecApplyConfiguration struct {
 	//
 	// <gateway:experimental>
 	RetryConstraint *RetryConstraintApplyConfiguration `json:"retryConstraint,omitempty"`
+	// Deprecated: use the Backend resource for session persistence (GEP-4894).
+	//
 	// SessionPersistence defines and configures session persistence
 	// for the backend.
 	//
 	// Support: Extended
+	//
 	SessionPersistence *v1.SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 

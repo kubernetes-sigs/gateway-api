@@ -37,10 +37,12 @@ type ListenerNamespacesApplyConfiguration struct {
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
 	// The default value None
+	//
 	From *apisv1.FromNamespaces `json:"from,omitempty"`
 	// Selector must be specified when From is set to "Selector". In that case,
 	// only ListenerSets in Namespaces matching this Selector will be selected by this
 	// Gateway. This field is ignored for other values of "From".
+	//
 	Selector *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 

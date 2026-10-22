@@ -49,7 +49,7 @@ Implementations only appear in this page if they pass Core conformance for the r
 """
 
 
-def generate_conformance_tables(reports, currVersion, out_dir, is_hidden=False):
+def generate_conformance_tables(reports, currVersion, out_dir, max_minor, is_hidden=False):
     gateway_tls_table = pandas.DataFrame()
     gateway_grpc_table = pandas.DataFrame()
 
@@ -80,7 +80,7 @@ def generate_conformance_tables(reports, currVersion, out_dir, is_hidden=False):
         minor = int(version_short.split(".")[1])
     except:
         pass
-    weight = (6 - minor) * 10
+    weight = (max_minor + 1 - minor) * 10
 
     try:
         f = StringIO()
@@ -342,7 +342,7 @@ def main():
     for i, group in enumerate(release_groups):
         confYamls = getYaml(group["paths"])
         is_hidden = i < len(release_groups) - 4
-        generate_conformance_tables(confYamls, group["latest"], out_dir, is_hidden)
+        generate_conformance_tables(confYamls, group["latest"], out_dir, int(release_groups[-1]['minor'].split(".")[1]), is_hidden)
 
 
 if __name__ == "__main__":

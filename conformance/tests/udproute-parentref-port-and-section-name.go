@@ -41,7 +41,6 @@ var UDPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportUDPRoute,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		gwNN := types.NamespacedName{Name: "udp-multi-listener-gateway", Namespace: ns}
@@ -112,7 +111,7 @@ var UDPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 				if err != nil {
 					t.Fatalf("error getting gateway address for listener %q: %v", s.listener, err)
 				}
-				udp.ExpectEchoResponseFromBackend(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr, udp.ExpectedResponse{
+				udp.ExpectEchoResponseFromBackend(t, suite.TimeoutConfig, gwAddr, udp.ExpectedResponse{
 					Service:   s.backend,
 					Namespace: ns,
 				})

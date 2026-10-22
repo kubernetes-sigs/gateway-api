@@ -15,7 +15,7 @@ spec:
         namespaces:
           from: Same
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: UDPRoute
 metadata:
   name: udproute-not-allowed-by-listeners
@@ -26,5 +26,5 @@ spec:
       sectionName: tls
   rules:
     - backendRefs:
-        - name: coredns
-          port: 53
+        - name: udp-echo
+          port: 8080

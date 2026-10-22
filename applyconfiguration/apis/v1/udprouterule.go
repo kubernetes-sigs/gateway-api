@@ -28,6 +28,7 @@ import (
 // UDPRouteRule is the configuration for a given rule.
 type UDPRouteRuleApplyConfiguration struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+	//
 	Name *apisv1.SectionName `json:"name,omitempty"`
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent. If unspecified or invalid (refers to a nonexistent resource or a
@@ -37,6 +38,7 @@ type UDPRouteRuleApplyConfiguration struct {
 	// the packets, then 80% of packets must be dropped instead.
 	//
 	// Support: Extended for Kubernetes Service
+	//
 	BackendRefs []BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 

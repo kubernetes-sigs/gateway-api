@@ -1,0 +1,10 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: openkruise
+project: kruise
+url: http://github.com/openkruise/kruise
+fullName: "OpenKruise Rollouts"
+description: |
+  [OpenKruise Rollouts][kruise-rollouts] is a plugin-n-play progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. OpenKruise Rollouts has built-in support for the Gateway API.
+
+  [kruise-rollouts]: https://openkruise.io/rollouts/introduction

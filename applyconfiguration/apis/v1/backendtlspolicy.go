@@ -41,7 +41,7 @@ import (
 // <gateway:union:TLSRoute>
 // <gateway:union:HTTPRequestMirrorFilter>
 type BackendTLSPolicyApplyConfiguration struct {
-	metav1.TypeMetaApplyConfiguration    `json:",inline"`
+	metav1.TypeMetaApplyConfiguration    `json:""`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of BackendTLSPolicy.
 	Spec *BackendTLSPolicySpecApplyConfiguration `json:"spec,omitempty"`
