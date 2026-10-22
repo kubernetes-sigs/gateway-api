@@ -25,6 +25,7 @@ limitations under the License.
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -123,6 +124,24 @@ func generateSnapshot(dir, release string) error {
 	if err != nil {
 		return err
 	}
+
+	// A patch release can rename or add features, so the snapshot of a release
+	// keeps every feature that any of its patch releases had. Reports of the
+	// earlier patch releases then still verify.
+	path := filepath.Join(dir, release+".yaml")
+	existing, readErr := os.ReadFile(path)
+	switch {
+	case readErr == nil:
+		var previous ReleaseFeatures
+		if parseErr := yaml.Unmarshal(existing, &previous); parseErr != nil {
+			return fmt.Errorf("parsing %s: %w", path, parseErr)
+		}
+		rf.Standard = sortedUnique(append(rf.Standard, previous.Standard...))
+		rf.Experimental = sortedUnique(append(rf.Experimental, previous.Experimental...))
+	case !errors.Is(readErr, fs.ErrNotExist):
+		return readErr
+	}
+
 	body, err := yaml.Marshal(rf)
 	if err != nil {
 		return err
@@ -132,7 +151,6 @@ func generateSnapshot(dir, release string) error {
 	if err = os.MkdirAll(dir, 0o750); err != nil {
 		return err
 	}
-	path := filepath.Join(dir, release+".yaml")
 	if err = os.WriteFile(path, content, 0o600); err != nil {
 		return err
 	}

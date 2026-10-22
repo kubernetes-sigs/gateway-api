@@ -171,6 +171,9 @@ of the PR is the community consensus for a new release.
   `go run ./tools/reportfeatures -generate vmajor.minor` and open a pull request against `main` adding the
   resulting `conformance/release-features/vmajor.minor.yaml`. It must be generated from the release branch
   as `main` may already contain features of the next release.
+  Do the same after every patch release: the command merges the features of the checked-out branch into the
+  existing file, so features that a patch release renames or adds stay valid for the reports of the earlier
+  patch releases.
 - Verify the CI tests pass before continuing.
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
   GitHub's [release][release] page.

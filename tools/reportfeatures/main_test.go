@@ -218,3 +218,25 @@ func TestGenerateSnapshotRoundTrips(t *testing.T) {
 			len(got.Standard), len(got.Experimental), len(current.Standard), len(current.Experimental))
 	}
 }
+
+func TestGenerateSnapshotKeepsTheFeaturesOfAnExistingSnapshot(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "v1.6.yaml"), "standard:\n- RenamedFeature\nexperimental:\n- OldExperimental\n")
+
+	if err := generateSnapshot(dir, "v1.6"); err != nil {
+		t.Fatalf("generateSnapshot returned error: %v", err)
+	}
+	snapshots, err := loadSnapshots(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	names := snapshots["v1.6"].Names()
+	for _, want := range []string{"RenamedFeature", "OldExperimental", "Gateway"} {
+		if !names.Has(want) {
+			t.Errorf("the merged snapshot is missing %q", want)
+		}
+	}
+}

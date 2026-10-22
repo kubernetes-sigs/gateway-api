@@ -19,6 +19,7 @@ standard:
 - GatewayFrontendClientCertificateValidationInsecureFallback
 - GatewayHTTPListenerIsolation
 - GatewayHTTPSListenerDetectMisdirectedRequests
+- GatewayInfrastructure
 - GatewayInfrastructurePropagation
 - GatewayPort8080
 - GatewayStaticAddresses
