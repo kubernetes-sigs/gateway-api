@@ -116,7 +116,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: &gatewayv1.HTTPPathMatch{
 								Type:  ptr.To(gatewayv1.PathMatchPathPrefix),
-								Value: new("/prefix"),
+								Value: new("/path"),
 							},
 						}},
 						BackendRefs: []gatewayv1.HTTPBackendRef{{
@@ -133,7 +133,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
-					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer"},
+					Request:   http.Request{Host: "abc.example.com", Path: "/path/prefix/longer"},
 					Backend:   confsuite.InfraBackendServiceNameV2,
 					Namespace: ns,
 				})
@@ -164,7 +164,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: &gatewayv1.HTTPPathMatch{
 								Type:  ptr.To(gatewayv1.PathMatchPathPrefix),
-								Value: new("/prefix"),
+								Value: new("/path"),
 							},
 							Headers: []gatewayv1.HTTPHeaderMatch{{
 								Type:  ptr.To(gatewayv1.HeaderMatchExact),
@@ -186,13 +186,13 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
-					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer", Headers: map[string]string{"Header-A": "A", "Header-B": "B"}},
+					Request:   http.Request{Host: "abc.example.com", Path: "/path/prefix/longer", Headers: map[string]string{"Header-A": "A", "Header-B": "B"}},
 					Backend:   confsuite.InfraBackendServiceNameV2,
 					Namespace: ns,
 				})
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
-					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer", Headers: map[string]string{"Header-B": "B"}},
+					Request:   http.Request{Host: "abc.example.com", Path: "/path/prefix/longer", Headers: map[string]string{"Header-B": "B"}},
 					Backend:   confsuite.InfraBackendServiceNameV1,
 					Namespace: ns,
 				})
@@ -265,7 +265,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: &gatewayv1.HTTPPathMatch{
 								Type:  ptr.To(gatewayv1.PathMatchPathPrefix),
-								Value: new("/prefix"),
+								Value: new("/path"),
 							},
 						}},
 						BackendRefs: []gatewayv1.HTTPBackendRef{{
@@ -282,7 +282,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
-					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer"},
+					Request:   http.Request{Host: "abc.example.com", Path: "/path/prefix/longer"},
 					Backend:   confsuite.InfraBackendServiceNameV2,
 					Namespace: ns,
 				})
@@ -313,7 +313,7 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: &gatewayv1.HTTPPathMatch{
 								Type:  ptr.To(gatewayv1.PathMatchPathPrefix),
-								Value: new("/prefix"),
+								Value: new("/path"),
 							},
 							Headers: []gatewayv1.HTTPHeaderMatch{{
 								Type:  ptr.To(gatewayv1.HeaderMatchExact),
@@ -335,13 +335,13 @@ var HTTPRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
-					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer", Headers: map[string]string{"Header-A": "A", "Header-B": "B"}},
+					Request:   http.Request{Host: "abc.example.com", Path: "/path/prefix/longer", Headers: map[string]string{"Header-A": "A", "Header-B": "B"}},
 					Backend:   confsuite.InfraBackendServiceNameV2,
 					Namespace: ns,
 				})
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
-					Request:   http.Request{Host: "abc.example.com", Path: "/prefix/longer", Headers: map[string]string{"Header-B": "B"}},
+					Request:   http.Request{Host: "abc.example.com", Path: "/path/prefix/longer", Headers: map[string]string{"Header-B": "B"}},
 					Backend:   confsuite.InfraBackendServiceNameV1,
 					Namespace: ns,
 				})
