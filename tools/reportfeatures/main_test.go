@@ -168,39 +168,6 @@ func TestVerifyReportsFailsWhenASnapshotIsMissing(t *testing.T) {
 	}
 }
 
-func TestPruneRemovesInvalidFeaturesAndLeavesAValidTree(t *testing.T) {
-	t.Parallel()
-	cfg := setup(t)
-	cfg.Prune = true
-
-	path := filepath.Join(cfg.ReportsDir, "v1.3.0", "impl", "bad.yaml")
-	writeFile(t, path, reportWith("    - HTTPRouteSchemeRedirect\n    - MeshHTTPRouteRedirectPort\n", "    - Nonexistent\n"))
-
-	problems, err := verifyReports(cfg)
-	if err != nil {
-		t.Fatalf("verifyReports returned error: %v", err)
-	}
-	if len(problems) != 0 {
-		t.Fatalf("prune mode must not report problems, got %v", problems)
-	}
-
-	got, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := reportWith("    - HTTPRouteSchemeRedirect\n", "")
-	want = strings.Replace(want, "    unsupportedFeatures:\n", "", 1)
-	if string(got) != want {
-		t.Errorf("unexpected pruned report:\n%s\nwant:\n%s", got, want)
-	}
-
-	cfg.Prune = false
-	problems, err = verifyReports(cfg)
-	if err != nil || len(problems) != 0 {
-		t.Fatalf("the pruned tree should verify cleanly, got problems=%v err=%v", problems, err)
-	}
-}
-
 func TestValidFeaturesUsesCurrentFeaturesForANewerRelease(t *testing.T) {
 	t.Parallel()
 	cfg := setup(t)
@@ -213,7 +180,7 @@ func TestValidFeaturesUsesCurrentFeaturesForANewerRelease(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !verifiable || len(names) == 0 {
+	if !verifiable || names.Len() == 0 {
 		t.Errorf("a release newer than every snapshot should be verified against pkg/features, got verifiable=%v with %d names", verifiable, len(names))
 	}
 }

@@ -31,10 +31,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"golang.org/x/mod/semver"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/yaml"
 
 	v1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
@@ -53,8 +53,6 @@ type config struct {
 	SnapshotsDir string
 	// Generate is the release (vMAJOR.MINOR) to write a snapshot for.
 	Generate string
-	// Prune removes invalid features from the reports instead of failing.
-	Prune bool
 }
 
 func main() {
@@ -62,7 +60,6 @@ func main() {
 	flag.StringVar(&cfg.ReportsDir, "r", "conformance/reports", "Defines the path relative to the repo root of the directory containing the conformance reports")
 	flag.StringVar(&cfg.SnapshotsDir, "s", "conformance/release-features", "Defines the path relative to the repo root of the directory containing the per-release feature snapshots")
 	flag.StringVar(&cfg.Generate, "generate", "", "Writes a snapshot of the features currently defined in pkg/features for the given release (vMAJOR.MINOR, e.g. v1.6) and exits. Run it when cutting a release")
-	flag.BoolVar(&cfg.Prune, "prune", false, "Removes the features that do not exist in a report's release from the report, instead of failing")
 	flag.Parse()
 
 	log.SetOutput(os.Stdout)
@@ -82,8 +79,9 @@ func main() {
 		for _, problem := range problems {
 			log.Print(problem)
 		}
-		log.Fatalf("%d conformance report(s) list features that do not exist in their release, "+
-			"run \"go run ./tools/reportfeatures -prune\" to remove them", len(problems))
+		log.Fatalf("%d conformance report(s) list features that do not exist in their release. "+
+			"A report must come from running the conformance suite of the release it is submitted for, "+
+			"so rerun the conformance tests against that release and submit the new report", len(problems))
 	}
 }
 
@@ -181,7 +179,7 @@ func loadSnapshots(dir string) (map[string]ReleaseFeatures, error) {
 //     pkg/features are used.
 //   - A release with no snapshot between two snapshots is an error, as its
 //     snapshot is missing.
-func validFeatures(release string, snapshots map[string]ReleaseFeatures) (map[string]struct{}, bool, error) {
+func validFeatures(release string, snapshots map[string]ReleaseFeatures) (sets.Set[string], bool, error) {
 	if rf, ok := snapshots[release]; ok {
 		return rf.Names(), true, nil
 	}
@@ -224,8 +222,7 @@ func reportFeatureNames(report *v1.ConformanceReport) []string {
 }
 
 // verifyReports checks that every report only lists features that exist in its
-// release. It returns a message for each report that does not. With
-// cfg.Prune the invalid features are removed from the reports instead.
+// release. It returns a message for each report that does not.
 func verifyReports(cfg config) ([]string, error) {
 	snapshots, err := loadSnapshots(cfg.SnapshotsDir)
 	if err != nil {
@@ -233,7 +230,7 @@ func verifyReports(cfg config) ([]string, error) {
 	}
 
 	type releaseFeatures struct {
-		names      map[string]struct{}
+		names      sets.Set[string]
 		verifiable bool
 	}
 	releases := make(map[string]releaseFeatures)
@@ -275,7 +272,7 @@ func verifyReports(cfg config) ([]string, error) {
 			return nil
 		}
 
-		problem, checkErr := checkReport(cfg, path, relPath, release, valid.names)
+		problem, checkErr := checkReport(path, relPath, release, valid.names)
 		if checkErr != nil {
 			return checkErr
 		}
@@ -290,14 +287,14 @@ func verifyReports(cfg config) ([]string, error) {
 	return problems, nil
 }
 
-// checkReport verifies a single report against the features of its release, or
-// prunes it when cfg.Prune is set. It returns a message if the report lists
-// features that do not exist in the release and was not pruned.
-func checkReport(cfg config, path, relPath, release string, valid map[string]struct{}) (string, error) {
+// checkReport verifies a single report against the features of its release.
+// It returns a message if the report lists features that do not exist in it.
+func checkReport(path, relPath, release string, valid sets.Set[string]) (string, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
+
 	report := &v1.ConformanceReport{}
 	if err = yaml.Unmarshal(content, report); err != nil {
 		return "", fmt.Errorf("parsing %s: %w", relPath, err)
@@ -307,28 +304,6 @@ func checkReport(cfg config, path, relPath, release string, valid map[string]str
 	if len(invalid) == 0 {
 		return "", nil
 	}
-
-	if !cfg.Prune {
-		return fmt.Sprintf("%s lists features that do not exist in Gateway API %s: %s",
-			relPath, release, strings.Join(invalid, ", ")), nil
-	}
-
-	invalidSet := make(map[string]struct{}, len(invalid))
-	for _, name := range invalid {
-		invalidSet[name] = struct{}{}
-	}
-	pruned, removed := pruneFeatures(content, invalidSet)
-	if !slices.Equal(removed, invalid) {
-		return "", fmt.Errorf("couldn't prune %s: removed %v but %v are invalid, the file layout is not the expected one",
-			relPath, removed, invalid)
-	}
-	info, err := os.Stat(path)
-	if err != nil {
-		return "", err
-	}
-	if err = os.WriteFile(path, pruned, info.Mode().Perm()); err != nil {
-		return "", err
-	}
-	log.Printf("Pruned %s from %s", strings.Join(removed, ", "), relPath)
-	return "", nil
+	return fmt.Sprintf("%s lists features that do not exist in Gateway API %s: %s",
+		relPath, release, strings.Join(invalid, ", ")), nil
 }
