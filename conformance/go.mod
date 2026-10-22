@@ -6,7 +6,6 @@ replace sigs.k8s.io/gateway-api => ../
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/miekg/dns v1.1.73
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/mod v0.41.0
 	golang.org/x/net v0.59.0

@@ -777,23 +777,23 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: coredns
+  name: udp-echo
   namespace: gateway-conformance-infra
   labels:
     app: udp
 spec:
   ports:
-    - name: udp-dns
-      port: 53
+    - name: udp-echo
       protocol: UDP
-      targetPort: 53
+      port: 8080
+      targetPort: 8080
   selector:
     app: udp
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: coredns
+  name: udp-echo
   namespace: gateway-conformance-infra
   labels:
     app: udp
@@ -807,43 +807,25 @@ spec:
         app: udp
     spec:
       containers:
-        - args:
-            - -conf
-            - /root/Corefile
-          image: registry.k8s.io/coredns/coredns:v1.14.7
+        - name: udp-echo
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.2.0
           imagePullPolicy: IfNotPresent
-          name: coredns
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              add:
-                - NET_BIND_SERVICE
-              drop:
-                - ALL
-          volumeMounts:
-            - mountPath: /root
-              name: conf
-      volumes:
-        - configMap:
-            defaultMode: 420
-            name: coredns
-          name: conf
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: coredns
-  namespace: gateway-conformance-infra
-data:
-  Corefile: |
-    .:53 {
-        forward . 8.8.8.8 9.9.9.9
-        log
-        errors
-    }
-    foo.bar.com:53 {
-      whoami
-    }
+          env:
+            - name: UDP_ECHO_SERVER
+              value: "1"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: SERVICE_NAME
+              value: udp-echo
+          ports:
+            - containerPort: 8080
+              protocol: UDP
 ---
 apiVersion: v1
 kind: Service
