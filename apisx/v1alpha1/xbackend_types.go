@@ -224,7 +224,8 @@ type EndpointSelectorBackend struct {
 	// available. Implementations SHOULD set ownerReferences so the created
 	// resource's lifecycle is tied to this Backend. Implementations MUST set
 	// the annotation "gateway.networking.x-k8s.io/controller-name" on the
-	// created Service to the controller name, to prevent conflicts with other
+	// created Service to the controller name (i.e., the same value used as
+	// controllerName in GatewayClass objects), to prevent conflicts with other
 	// controllers. Implementations MUST only reconcile generated Services
 	// whose annotation matches their controller name and MUST ignore Services
 	// annotated for another controller.
@@ -236,9 +237,14 @@ type EndpointSelectorBackend struct {
 	// SHOULD be set to Backend.spec.port.number.
 	// Implementations SHOULD create the Service as headless (clusterIP: None),
 	// since no ClusterIP or kube-proxy load balancing is needed.
-	// Implementations MUST name the Service with generateName rather than a
-	// predictable name, so that a name like <backend-name>-backend.svc.cluster.local
-	// does not become a relied-upon DNS entry.
+	// Implementations MUST give the Service an obfuscated name rather than a
+	// human-readable name derived from the Backend, so that a name like
+	// <backend-name>-backend.svc.cluster.local does not become a relied-upon
+	// DNS entry. Implementations MAY use generateName, or MAY derive a
+	// deterministic but obfuscated name (e.g., a hash of the Backend's
+	// namespace, name, and controllerName, or another implementation-specific
+	// seed), provided the resulting name is not reasonably guessable from the
+	// Backend's name alone.
 	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
