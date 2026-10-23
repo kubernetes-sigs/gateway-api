@@ -106,6 +106,15 @@ that create Gateway API routes) should consider the following:
 - Do not add gRPC-specific policy (such as retries on gRPC status codes) to
   `HTTPRoute`. Keep gRPC-aware configuration in `GRPCRoute` only.
 
+{{% alert color="info" title="Union Feature" %}}
+
+GRPCRoute is expected to interoperate with
+[BackendTLSPolicy](/reference/api-types/policy/backendtlspolicy/), a
+[union feature](/guides/implementers-guide/#union-feature-conformance) that
+configures TLS from the Gateway to a backend, in the same way HTTPRoute does.
+
+{{% /alert %}}
+
 ## Spec
 
 The specification of a GRPCRoute consists of:
