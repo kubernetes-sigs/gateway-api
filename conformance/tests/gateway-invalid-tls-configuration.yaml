@@ -1,14 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-certificate-nonexistent-secret
+  name: gateway-invalid-tls-configuration
   namespace: gateway-conformance-infra
   annotations:
     gateway-api/skip-this-for-readiness: "true"
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-    - name: https
+    - name: https-nonexistent-secret
       port: 443
       protocol: HTTPS
       allowedRoutes:
@@ -19,19 +19,8 @@ spec:
           - group: ""
             kind: Secret
             name: nonexistent-certificate
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway-certificate-unsupported-group
-  namespace: gateway-conformance-infra
-  annotations:
-    gateway-api/skip-this-for-readiness: "true"
-spec:
-  gatewayClassName: "{GATEWAY_CLASS_NAME}"
-  listeners:
-    - name: https
-      port: 443
+    - name: https-unsupported-group
+      port: 8443
       protocol: HTTPS
       allowedRoutes:
         namespaces:
@@ -41,19 +30,8 @@ spec:
           - group: wrong.group.company.io
             kind: Secret
             name: tls-validity-checks-certificate
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway-certificate-unsupported-kind
-  namespace: gateway-conformance-infra
-  annotations:
-    gateway-api/skip-this-for-readiness: "true"
-spec:
-  gatewayClassName: "{GATEWAY_CLASS_NAME}"
-  listeners:
-    - name: https
-      port: 443
+    - name: https-unsupported-kind
+      port: 8444
       protocol: HTTPS
       allowedRoutes:
         namespaces:
@@ -63,19 +41,8 @@ spec:
           - group: ""
             kind: WrongKind
             name: tls-validity-checks-certificate
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway-certificate-malformed-secret
-  namespace: gateway-conformance-infra
-  annotations:
-    gateway-api/skip-this-for-readiness: "true"
-spec:
-  gatewayClassName: "{GATEWAY_CLASS_NAME}"
-  listeners:
-    - name: https
-      port: 443
+    - name: https-malformed-secret
+      port: 8445
       protocol: HTTPS
       allowedRoutes:
         namespaces:
