@@ -95,6 +95,7 @@ type LocalPolicyTargetReferenceWithSectionName struct {
 	// resources, SectionName is interpreted as the following:
 	//
 	// * Gateway: Listener name
+	// * ListenerSet: Listener name
 	// * HTTPRoute: HTTPRouteRule name
 	// * Service: Port name
 	//
