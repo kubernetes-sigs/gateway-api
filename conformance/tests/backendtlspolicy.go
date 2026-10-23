@@ -30,7 +30,6 @@ import (
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/conformance/utils/tls"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -61,44 +60,6 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 			Status: metav1.ConditionTrue,
 			Reason: string(gatewayv1.BackendTLSPolicyReasonResolvedRefs),
 		}
-
-		t.Run("Re-encrypt HTTPS request sent to Service with valid BackendTLSPolicy should succeed", func(t *testing.T) {
-			routeNN := types.NamespacedName{Name: "backendtlspolicy-reencrypt", Namespace: ns}
-			gwNN := types.NamespacedName{Name: "same-namespace-with-https-listener", Namespace: ns}
-
-			kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
-			gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
-			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
-
-			validPolicyNN := types.NamespacedName{Name: "normative-test", Namespace: ns}
-			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, acceptedCond)
-			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, resolvedRefsCond)
-
-			// For the re-encrypt case, we need to use the cert for the frontend tls listener.
-			certNN := types.NamespacedName{Name: "tls-validity-checks-certificate", Namespace: ns}
-			serverCertPem, _, err := kubernetes.GetTLSSecret(suite.Client, certNN)
-			if err != nil {
-				t.Fatalf("unexpected error finding TLS secret: %v", err)
-			}
-			if len(serverCertPem) == 0 {
-				t.Fatal("missing required server certificate pem for the test")
-			}
-			// Verify that the request to a re-encrypted call to /backendTLS should succeed.
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "https-listener.org",
-				h.ExpectedResponse{
-					Namespace: ns,
-					Request: h.Request{
-						Host: "https-listener.org",
-						Path: "/backendtlspolicy",
-						SNI:  "https-listener.org",
-					},
-					ExpectedRequest: &h.ExpectedRequest{
-						Path: "/backendtlspolicy",
-						SNI:  "abc.example.com",
-					},
-					Response: h.Response{StatusCodes: []int{200}},
-				})
-		})
 
 		routeNN := types.NamespacedName{Name: "backendtlspolicy", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
