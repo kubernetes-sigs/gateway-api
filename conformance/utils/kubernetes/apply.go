@@ -97,40 +97,41 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 		// relevant addresses (usable, or unusable ones) in the test suite, and those
 		// addresses will be injected into the Gateway and the placeholders removed.
 		//
-		// A special "test/fake-invalid-type" can be provided as well in the test to
-		// explicitly trigger a failure to support a type. If an implementation ever
-		// comes along actually trying to support that type, I'm going to be very
-		// cranky.
+		// A special "test/fake-invalid-type" can be provided to explicitly trigger
+		// a failure to support a type. If an implementation ever comes along actually
+		// trying to support that type, I'm going to be very cranky.
 		//
 		// Note: I would really love to find a better way to do this kind of
 		// thing in the future.
 		var overlayUsable, overlayUnusable bool
-		var specialAddrs []gatewayv1.GatewaySpecAddress
+		var usableRoutability, unusableRoutability gatewayv1.GatewayAddressRoutabilityType
+		var otherAddrs []gatewayv1.GatewaySpecAddress
 		for _, addr := range gwspec.Addresses {
 			switch addr.Value {
 			case "PLACEHOLDER_USABLE_ADDRS":
 				overlayUsable = true
+				usableRoutability = addr.Routability
+				continue
 			case "PLACEHOLDER_UNUSABLE_ADDRS":
 				overlayUnusable = true
+				unusableRoutability = addr.Routability
+				continue
 			}
-
-			if addr.Type != nil && *addr.Type == "test/fake-invalid-type" {
-				specialAddrs = append(specialAddrs, addr)
-			}
+			otherAddrs = append(otherAddrs, addr)
+		}
+		if !overlayUsable && !overlayUnusable {
+			return
 		}
 
 		var primOverlayAddrs []any
-		if len(specialAddrs) > 0 {
-			tlog.Logf(t, "the test provides %d special addresses that will be kept", len(specialAddrs))
-			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(specialAddrs)...)
-		}
+		primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(otherAddrs, "")...)
 		if overlayUnusable {
 			tlog.Logf(t, "address pool of %d unusable addresses will be overlaid", len(a.UnusableNetworkAddresses))
-			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UnusableNetworkAddresses)...)
+			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UnusableNetworkAddresses, unusableRoutability)...)
 		}
 		if overlayUsable {
 			tlog.Logf(t, "address pool of %d usable addresses will be overlaid", len(a.UsableNetworkAddresses))
-			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UsableNetworkAddresses)...)
+			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UsableNetworkAddresses, usableRoutability)...)
 		}
 
 		err = unstructured.SetNestedSlice(uObj.Object, primOverlayAddrs, "spec", "addresses")
@@ -367,16 +368,24 @@ func getContentsFromPathOrURL(manifestFS []fs.FS, location string, timeoutConfig
 // convertGatewayAddrsToPrimitives converts a slice of Gateway addresses
 // to a slice of primitive types and then returns them as a []any so that
 // they can be applied back to an unstructured Gateway.
-func convertGatewayAddrsToPrimitives(gwaddrs []gatewayv1.GatewaySpecAddress) (raw []any) {
+func convertGatewayAddrsToPrimitives(gwaddrs []gatewayv1.GatewaySpecAddress, requestedRoutability gatewayv1.GatewayAddressRoutabilityType) (raw []any) {
 	for _, addr := range gwaddrs {
 		addrType := string(gatewayv1.IPAddressType)
 		if addr.Type != nil {
 			addrType = string(*addr.Type)
 		}
-		raw = append(raw, map[string]any{
-			"type":  addrType,
-			"value": addr.Value,
-		})
+		converted := map[string]any{"type": addrType}
+		if addr.Value != "" {
+			converted["value"] = addr.Value
+		}
+		routability := requestedRoutability
+		if routability == "" {
+			routability = addr.Routability
+		}
+		if routability != "" {
+			converted["routability"] = string(routability)
+		}
+		raw = append(raw, converted)
 	}
 	return
 }
