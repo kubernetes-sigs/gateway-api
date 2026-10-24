@@ -17,14 +17,18 @@ limitations under the License.
 package tests
 
 import (
+	"net"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tls"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -37,29 +41,45 @@ var GatewaySecretInvalidReferenceGrant = suite.ConformanceTest{
 	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant exists but does not grant permission to that specific Secret",
 	Features: []features.FeatureName{
 		features.SupportGateway,
+		features.SupportHTTPRoute,
 		features.SupportReferenceGrant,
 	},
 	Manifests: []string{"tests/gateway-secret-invalid-reference-grant.yaml"},
 	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwNN := types.NamespacedName{Name: "gateway-secret-invalid-reference-grant", Namespace: suite.InfrastructureNamespace}
+		ns := suite.InfrastructureNamespace
+		gwNN := types.NamespacedName{Name: "gateway-secret-invalid-reference-grant", Namespace: ns}
+		controlRouteNN := types.NamespacedName{Name: "gateway-secret-invalid-reference-grant-control", Namespace: ns}
+		certNN := types.NamespacedName{Name: "certificate", Namespace: suite.WebBackendNamespace}
 
 		t.Run("Gateway listener should have a false ResolvedRefs condition with reason RefNotPermitted", func(t *testing.T) {
-			listeners := []v1.ListenerStatus{{
-				Name: v1.SectionName("https"),
-				SupportedKinds: []v1.RouteGroupKind{{
-					Group: (*v1.Group)(&v1.GroupVersion.Group),
-					Kind:  v1.Kind("HTTPRoute"),
-				}},
-				Conditions: []metav1.Condition{{
-					Type:   string(v1.ListenerConditionResolvedRefs),
-					Status: metav1.ConditionFalse,
-					Reason: string(v1.ListenerReasonRefNotPermitted),
-				}},
-				AttachedRoutes: 0,
-			}}
+			kubernetes.GatewayListenerMustHaveConditions(t, s.Client, s.TimeoutConfig, gwNN, "https", []metav1.Condition{{
+				Type:   string(v1.ListenerConditionResolvedRefs),
+				Status: metav1.ConditionFalse,
+				Reason: string(v1.ListenerReasonRefNotPermitted),
+			}})
 
-			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
+			gwAddr, err := kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, kubernetes.NewGatewayRef(gwNN, "http"))
+			require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+
+			t.Run("Control route is fully programmed", func(t *testing.T) {
+				kubernetes.HTTPRouteMustHaveRouteAcceptedConditionsTrue(t, s.Client, s.TimeoutConfig, controlRouteNN, gwNN)
+				kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, s.Client, s.TimeoutConfig, controlRouteNN, gwNN)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
+					Request:   http.Request{Host: "invalid-reference-grant.example.com", Path: "/"},
+					Response:  http.Response{StatusCode: 200},
+					Backend:   suite.InfraBackendServiceNameV1,
+					Namespace: ns,
+				})
+			})
+
+			t.Run("Rejected listener does not accept connections for a hostname matched by its wildcard", func(t *testing.T) {
+				certificate, _, err := kubernetes.GetTLSSecret(s.Client, certNN)
+				require.NoErrorf(t, err, "failed to get referenced TLS certificate")
+				gwIP, _, err := net.SplitHostPort(gwAddr)
+				require.NoErrorf(t, err, "failed to split Gateway address %q", gwAddr)
+				tls.MakeTLSConnectionAndExpectEventuallyConsistentFailure(t, s.TimeoutConfig, net.JoinHostPort(gwIP, "443"), certificate, "test")
+			})
 		})
 	},
 }
