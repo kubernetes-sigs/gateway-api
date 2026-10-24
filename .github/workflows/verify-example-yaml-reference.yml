@@ -1,0 +1,65 @@
+name: Verify example YAMLs reference
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions: {}
+
+jobs:
+  detect-changes:
+    name: Detect changed example files
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      condition_check: ${{ steps.filter.outputs.condition_check }}
+      examples_files: ${{ steps.filter.outputs.examples_files }}
+      references_files: ${{ steps.filter.outputs.references_files }}
+    steps:
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # tag=v4.0.1
+        id: filter
+        with:
+          list-files: shell
+          # Match YAML files recursively under examples/
+          filters: |
+            examples:
+              - added|modified: "examples/**/*.yaml"
+              - added|modified: "examples/**/*.yml"
+            references:
+              - added|modified: "site/content/en/**/*.md"
+              - added|modified: "geps/**/*.md"
+            condition_check:
+              - added|modified: "examples/**/*.yaml"
+              - added|modified: "examples/**/*.yml"
+              - added|modified: "site/content/en/**/*.md"
+              - added|modified: "geps/**/*.md"
+  
+  verify-yamls:
+    name: Example YAML reference review
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.condition_check == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # tag=v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Verify changed example YAML references
+        env:
+          CHANGED_YAMLS: ${{ needs.detect-changes.outputs.examples_files }}
+          CHANGED_REFERENCES: ${{ needs.detect-changes.outputs.references_files }}
+        run: |
+          set +e
+          python3 hack/verify-example-yaml-references.py
+          status=$?
+          set -e
+
+          if [ -f example-yaml-reference-audit-comment.md ]; then
+            cat example-yaml-reference-audit-comment.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          exit "$status"
