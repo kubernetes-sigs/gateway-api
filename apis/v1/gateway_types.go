@@ -232,6 +232,15 @@ type GatewaySpec struct {
 	// on the same address, or cannot mix HTTPS and generic TLS listens on the same port
 	// would not consider those cases compatible, even though they are distinct.
 	//
+	// Serving an HTTPS Listener and a generic TLS Listener on the same port, where
+	// their hostnames overlap without being identical, is an Extended feature of
+	// Gateway API. Implementations that cannot serve that combination MUST NOT claim
+	// support for the `GatewayHTTPSAndTLSPassthroughSamePort` feature.
+	//
+	// Implementations that _do_ serve it SHOULD claim support for the Extended
+	// `GatewayHTTPSAndTLSPassthroughSamePort` feature and pass the associated
+	// conformance tests.
+	//
 	// Implementations MAY merge separate Gateways onto a single set of
 	// Addresses if all Listeners across all Gateways are compatible.
 	//
