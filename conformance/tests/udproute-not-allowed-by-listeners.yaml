@@ -26,5 +26,5 @@ spec:
       sectionName: tls
   rules:
     - backendRefs:
-        - name: coredns
-          port: 53
+        - name: udp-echo
+          port: 8080

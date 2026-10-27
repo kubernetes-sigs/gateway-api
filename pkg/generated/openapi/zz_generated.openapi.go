@@ -5558,7 +5558,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 					},
 					"attempts": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Attempts specifies the maximum number of times an individual request from the Gateway to a backend should be retried in addition to the initial request.\n\nIf the maximum number of retries has been attempted without a successful response from the backend, the Gateway MUST return an error.\n\nSupport: Extended",
+							Description: "Attempts specifies the maximum number of times an individual request from the Gateway to a backend should be retried in addition to the initial request.\n\nIf the maximum number of retries has been attempted without a successful response from the backend, the Gateway MUST return an error.\n\nAn explicit zero value MUST disable retries.\n\nSupport: Extended",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -5652,7 +5652,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"retry": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nSupport: Extended",
+							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nA request is retried when attempts is greater than 0 and the backend did not process it. This is the case when the connection could not be established, or when the backend explicitly rejected the request, either before processing it or with one of the configured status codes.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry"),
 						},
 					},
@@ -10091,7 +10091,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepted by the controller\n\nThe status of each condition is one of True, False, or Unknown.",
+							Description: "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepted by the controller - \"ResolvedRefs\": all references of the resource have been resolved\n\nThe status of each condition is one of True, False, or Unknown.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -10173,7 +10173,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 					},
 					"protocol": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - HTTP, H2C, and HTTP11\n\nSupport: Extended - GRPC, HTTP2, MCP, TCP, WSS\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend. </gateway:util:excludeFromCRD>",
+							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - HTTP, H2C, and HTTP11\n\nSupport: Extended - GRPC, HTTP2, MCP, TCP, WSS\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend.\n\nIn cases the implementation does not support the configured protocol, it MUST set the \"Accepted\" condition to \"False\" with the reason \"UnsupportedProtocol\". </gateway:util:excludeFromCRD>",
 							Type:        []string{"string"},
 							Format:      "",
 						},

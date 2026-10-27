@@ -48,7 +48,7 @@ var (
 	// TLSRouteModeTerminate contains metadata for the TLSRouteModeTerminate feature.
 	TLSRouteModeMixedFeature = Feature{
 		Name:    SupportTLSRouteModeMixed,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 )
 

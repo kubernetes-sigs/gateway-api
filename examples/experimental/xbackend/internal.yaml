@@ -1,0 +1,13 @@
+#$ Used in:
+#$ - reference/api-types/backend.md
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XBackend
+metadata:
+  name: store-api
+spec:
+  type: EndpointSelector
+  port:
+    number: 8080
+  endpointSelector:
+    matchLabels:
+      app: store

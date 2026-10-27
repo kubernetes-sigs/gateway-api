@@ -387,11 +387,123 @@ func Test_listenersMatch(t *testing.T) {
 			},
 			want: true,
 		},
+		{
+			name: "SupportedKinds: expected kind without a Group is not found in an empty actual list",
+			expected: []gatewayv1.ListenerStatus{
+				{
+					SupportedKinds: []gatewayv1.RouteGroupKind{
+						{Kind: gatewayv1.Kind("HTTPRoute")},
+					},
+				},
+			},
+			actual: []gatewayv1.ListenerStatus{{}},
+			want:   false,
+		},
+		{
+			name: "SupportedKinds: expected kind without a Group defaults to the Gateway API group",
+			expected: []gatewayv1.ListenerStatus{
+				{
+					SupportedKinds: []gatewayv1.RouteGroupKind{
+						{Kind: gatewayv1.Kind("HTTPRoute")},
+					},
+				},
+			},
+			actual: []gatewayv1.ListenerStatus{
+				{
+					SupportedKinds: []gatewayv1.RouteGroupKind{
+						{
+							Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
+							Kind:  gatewayv1.Kind("HTTPRoute"),
+						},
+					},
+				},
+			},
+			want: true,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.want, gatewayListenersMatch(t, test.expected, test.actual))
+		})
+	}
+}
+
+func Test_listenerSetListenersMatch(t *testing.T) {
+	tests := []struct {
+		name     string
+		expected []gatewayv1.ListenerEntryStatus
+		actual   []gatewayv1.ListenerEntryStatus
+		want     bool
+	}{
+		{
+			name: "SupportedKinds: expected kind without a Group is not found in an empty actual list",
+			expected: []gatewayv1.ListenerEntryStatus{
+				{
+					SupportedKinds: []gatewayv1.RouteGroupKind{
+						{Kind: gatewayv1.Kind("HTTPRoute")},
+					},
+				},
+			},
+			actual: []gatewayv1.ListenerEntryStatus{{}},
+			want:   false,
+		},
+		{
+			name: "SupportedKinds: expected kind without a Group defaults to the Gateway API group",
+			expected: []gatewayv1.ListenerEntryStatus{
+				{
+					SupportedKinds: []gatewayv1.RouteGroupKind{
+						{Kind: gatewayv1.Kind("HTTPRoute")},
+					},
+				},
+			},
+			actual: []gatewayv1.ListenerEntryStatus{
+				{
+					SupportedKinds: []gatewayv1.RouteGroupKind{
+						{
+							Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
+							Kind:  gatewayv1.Kind("HTTPRoute"),
+						},
+					},
+				},
+			},
+			want: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, listenerSetListenersMatch(t, test.expected, test.actual))
+		})
+	}
+}
+
+func Test_parentRefToString(t *testing.T) {
+	tests := []struct {
+		name string
+		ref  gatewayv1.ParentReference
+		want string
+	}{
+		{
+			name: "no namespace",
+			ref:  gatewayv1.ParentReference{Name: "gw"},
+			want: "gw",
+		},
+		{
+			name: "empty namespace",
+			ref:  gatewayv1.ParentReference{Name: "gw", Namespace: new(gatewayv1.Namespace(""))},
+			want: "gw",
+		},
+		{
+			name: "namespace is printed by value",
+			ref:  gatewayv1.ParentReference{Name: "gw", Namespace: new(gatewayv1.Namespace("ns1"))},
+			want: "ns1/gw",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, parentRefToString(test.ref))
 		})
 	}
 }

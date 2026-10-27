@@ -947,52 +947,6 @@ func UDPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	require.NoErrorf(t, waitErr, "error waiting for UDPRoute status to have a Condition matching expectations")
 }
 
-// TCPRouteMustHaveNoAcceptedParents waits for the specified TCPRoute to have either no parents
-// or a single parent that is not accepted. This is used to validate TCPRoute errors.
-func TCPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
-	t.Helper()
-
-	var actual []gatewayv1.RouteParentStatus
-	emptyChecked := false
-	// We explicitly do not use timeoutConfig.DefaultPollInterval here since we are doing negative testing
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
-		route := &gatewayv1.TCPRoute{}
-		err := client.Get(ctx, routeName, route)
-		if err != nil {
-			return false, fmt.Errorf("error fetching TCPRoute: %w", err)
-		}
-
-		actual = route.Status.Parents
-
-		if len(actual) == 0 {
-			// For empty status, we need to distinguish between "correctly did not set" and "hasn't set yet"
-			// Ensure we iterate at least two times to give it some time.
-			if !emptyChecked {
-				emptyChecked = true
-				return false, nil
-			}
-			return true, nil
-		}
-		if len(actual) > 1 {
-			// Only expect one parent
-			return false, nil
-		}
-
-		for _, parent := range actual {
-			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-				tlog.Logf(t, "TCPRoute %s (controller=%v,ref=%#v) %v", routeName, parent.ControllerName, parent, err)
-				return false, nil
-			}
-		}
-
-		return conditionsMatch(t, []metav1.Condition{{
-			Type:   string(gatewayv1.RouteConditionAccepted),
-			Status: "False",
-		}}, actual[0].Conditions), nil
-	})
-	require.NoErrorf(t, waitErr, "error waiting for TCPRoute to have no accepted parents")
-}
-
 // GatewayAndTCPRoutesMustBeAccepted waits until the specified Gateway has an IP
 // address assigned to it and the TCPRoute has a ParentRef referring to the
 // Gateway. The test will fail if these conditions are not met before the
@@ -1152,52 +1106,6 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute status to have a Condition matching expectations")
 }
 
-// UDPRouteMustHaveNoAcceptedParents waits for the specified UDPRoute to have either no parents
-// or a single parent that is not accepted. This is used to validate UDPRoute errors.
-func UDPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
-	t.Helper()
-
-	var actual []gatewayv1.RouteParentStatus
-	emptyChecked := false
-	// We explicitly do not use timeoutConfig.DefaultPollInterval here since we are doing negative testing
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
-		route := &gatewayv1.UDPRoute{}
-		err := client.Get(ctx, routeName, route)
-		if err != nil {
-			return false, fmt.Errorf("error fetching UDPRoute: %w", err)
-		}
-
-		actual = route.Status.Parents
-
-		if len(actual) == 0 {
-			// For empty status, we need to distinguish between "correctly did not set" and "hasn't set yet"
-			// Ensure we iterate at least two times to give it some time.
-			if !emptyChecked {
-				emptyChecked = true
-				return false, nil
-			}
-			return true, nil
-		}
-		if len(actual) > 1 {
-			// Only expect one parent
-			return false, nil
-		}
-
-		for _, parent := range actual {
-			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-				tlog.Logf(t, "UDPRoute %s (controller=%v,ref=%#v) %v", routeName, parent.ControllerName, parent, err)
-				return false, nil
-			}
-		}
-
-		return conditionsMatch(t, []metav1.Condition{{
-			Type:   string(gatewayv1.RouteConditionAccepted),
-			Status: "False",
-		}}, actual[0].Conditions), nil
-	})
-	require.NoErrorf(t, waitErr, "error waiting for UDPRoute to have no accepted parents")
-}
-
 // HTTPRouteMustHaveResolvedRefsConditionsTrue checks that the supplied HTTPRoute has the resolvedRefsCondition
 // set to true.
 func HTTPRouteMustHaveResolvedRefsConditionsTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
@@ -1230,7 +1138,7 @@ func HTTPRouteMustHaveRouteAcceptedConditionsTrue(t *testing.T, client client.Cl
 
 func parentRefToString(p gatewayv1.ParentReference) string {
 	if p.Namespace != nil && *p.Namespace != "" {
-		return fmt.Sprintf("%v/%v", p.Namespace, p.Name)
+		return fmt.Sprintf("%v/%v", *p.Namespace, p.Name)
 	}
 	return string(p.Name)
 }
@@ -1489,11 +1397,11 @@ func gatewayListenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerSt
 		for _, eKind := range eListener.SupportedKinds {
 			found := false
 
-			for _, aKind := range aListener.SupportedKinds {
-				if eKind.Group == nil {
-					eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
-				}
+			if eKind.Group == nil {
+				eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
+			}
 
+			for _, aKind := range aListener.SupportedKinds {
 				if aKind.Group == nil {
 					aKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
 				}
@@ -1598,11 +1506,11 @@ func listenerSetListenersMatch(t *testing.T, expected, actual []gatewayv1.Listen
 		for _, eKind := range eListener.SupportedKinds {
 			found := false
 
-			for _, aKind := range aListener.SupportedKinds {
-				if eKind.Group == nil {
-					eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
-				}
+			if eKind.Group == nil {
+				eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
+			}
 
+			for _, aKind := range aListener.SupportedKinds {
 				if aKind.Group == nil {
 					aKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
 				}

@@ -3,7 +3,7 @@ title: "GEP-1731: HTTPRoute Retries"
 ---
 
 * Issue: [#1731](https://github.com/kubernetes-sigs/gateway-api/issues/1731)
-* Status: Experimental
+* Status: Standard
 
 (See [status definitions](/geps/overview/#gep-states).)
 
@@ -290,12 +290,14 @@ type HTTPRouteRetry struct {
     // If the maximum number of retries has been attempted without a successful
     // response from the backend, the Gateway MUST return an error.
     //
+    // An explicit zero value MUST disable retries.
+    //
     // Support: Extended
     //
     // +optional
     // +kubebuilder:default=1
-    // +kubebuilder:validation:Minimum:=1
-    Attempts int `json:"attempts,omitempty"`
+    // +kubebuilder:validation:Minimum:=0
+    Attempts *int `json:"attempts,omitempty"`
     
     // Backoff specifies the base interval for a backoff strategy between
     // retry attempts and is represented in Gateway API Duration formatting.
@@ -394,8 +396,6 @@ spec:
 
 ## Conformance Details
 
-Basic support for configuring retries in HTTPRoute up to a specified maximum count and with a minimum duration between attempts will be gated on the `SupportHTTPRouteRetry` feature. Retries will be tested in combination with request and backend timeouts if supported by the implementation.
-
 Retrying requests based on HTTP status codes will be gated under the following features:
 
 * `SupportHTTPRouteRetryCodes`
@@ -406,6 +406,8 @@ Retrying requests based on HTTP status codes will be gated under the following f
 * `SupportHTTPRouteRetryConnectionError`
 
   * Will test that connections interrupted by a TCP failure, disconnect or reset are retried if a `retry` stanza is configured.
+
+The `attempts` field to configure retries up to a specified maximum count is tested only in combination with the above features. Retries will be tested in combination with request and backend timeouts if supported by the implementation.
 
 {{% alert color="warning" %}}
 
