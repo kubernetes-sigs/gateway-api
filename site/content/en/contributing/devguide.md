@@ -119,10 +119,12 @@ kubebuilder annotation on the field stays the source of the predicate, and it mu
 the form `condition ? self.<field>.matches("regex") : true` — anything else fails
 generation rather than silently changing what is validated.
 
-Example, from `HTTPRouteRule`:
+The tag applies to both channels. When only one channel needs it, scope it the same way
+as other validation markers, as `HTTPRouteRule` does for the experimental channel's
+higher rules limit:
 
 ```golang
-// <gateway:validation:levelUpValidation="path.value">
+// <gateway:experimental:validation:levelUpValidation="path.value">
 Matches []HTTPRouteMatch `json:"matches,omitempty"`
 ```
 

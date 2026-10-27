@@ -42,21 +42,32 @@ const matchValidationBatchSize = 16
 // tweaks strip them from descriptions, and applied afterwards.
 const levelUpTagPrefix = `<gateway:validation:levelUpValidation=`
 
+// levelUpTagPrefixes returns the tag forms that apply to a channel: the unscoped
+// one above and <gateway:<channel>:validation:levelUpValidation=...>, which mirrors
+// the other channel-scoped validation markers.
+func levelUpTagPrefixes(channel string) []string {
+	return []string{levelUpTagPrefix, fmt.Sprintf("<gateway:%s:validation:levelUpValidation=", channel)}
+}
+
 // levelUpTarget is one tagged list and the leaf validation to hoist out of it.
 type levelUpTarget struct {
 	path []string // property names from the CRD root to the tagged list
 	leaf []string // object and field names relative to the list item schema
 }
 
-// collectLevelUpTargets reads every levelUpValidation tag in the schema. Properties
-// are visited in name order so generation does not depend on map iteration order;
-// tags on one property keep the order they were written in.
-func collectLevelUpTargets(root *apiext.JSONSchemaProps) ([]levelUpTarget, error) {
+// collectLevelUpTargets reads every levelUpValidation tag in the schema that applies
+// to the channel. Properties are visited in name order so generation does not depend
+// on map iteration order; tags on one property keep the order they were written in,
+// unscoped ones first.
+func collectLevelUpTargets(root *apiext.JSONSchemaProps, channel string) ([]levelUpTarget, error) {
 	var targets []levelUpTarget
 	var walk func(node *apiext.JSONSchemaProps, path []string) error
 	walk = func(node *apiext.JSONSchemaProps, path []string) error {
-		if strings.Contains(node.Description, levelUpTagPrefix) {
-			tags, err := experimentalValidationMarkers(node.Description, levelUpTagPrefix)
+		for _, prefix := range levelUpTagPrefixes(channel) {
+			if !strings.Contains(node.Description, prefix) {
+				continue
+			}
+			tags, err := experimentalValidationMarkers(node.Description, prefix)
 			if err != nil {
 				return err
 			}

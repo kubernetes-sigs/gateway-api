@@ -56,7 +56,7 @@ func matchValidationSchema(kind string, maxItems int64) (*apiext.JSONSchemaProps
 // levelUpSchema runs the two generator steps the way main does, collecting the tags
 // before anything strips them and applying them afterwards.
 func levelUpSchema(root *apiext.JSONSchemaProps) error {
-	targets, err := collectLevelUpTargets(root)
+	targets, err := collectLevelUpTargets(root, "standard")
 	if err != nil {
 		return err
 	}
@@ -193,14 +193,38 @@ func TestCollectLevelUpTargetsIsDeterministic(t *testing.T) {
 		Type:        "array",
 		Description: `<gateway:validation:levelUpValidation="filters.type">`,
 	}
-	first, err := collectLevelUpTargets(root)
+	first, err := collectLevelUpTargets(root, "standard")
 	require.NoError(t, err)
 	require.Len(t, first, 3)
 	for range 20 {
-		next, err := collectLevelUpTargets(root)
+		next, err := collectLevelUpTargets(root, "standard")
 		require.NoError(t, err)
 		require.Equal(t, first, next, "collection must not depend on map iteration order")
 	}
+}
+
+// A channel-scoped tag is collected for that channel only; the unscoped form for both.
+func TestCollectLevelUpTargetsHonorsChannel(t *testing.T) {
+	root, rule, _ := matchValidationSchema("HTTPRoute", 64)
+	setMatchesDescription(rule, `<gateway:validation:levelUpValidation="path.value">`+"\n"+
+		`<gateway:experimental:validation:levelUpValidation="path.type">`+"\n"+
+		`<gateway:standard:validation:levelUpValidation="path.extra">`)
+
+	standard, err := collectLevelUpTargets(root, "standard")
+	require.NoError(t, err)
+	require.Equal(t, [][]string{{"path", "value"}, {"path", "extra"}}, leaves(standard))
+
+	experimental, err := collectLevelUpTargets(root, "experimental")
+	require.NoError(t, err)
+	require.Equal(t, [][]string{{"path", "value"}, {"path", "type"}}, leaves(experimental))
+}
+
+func leaves(targets []levelUpTarget) [][]string {
+	var result [][]string
+	for _, target := range targets {
+		result = append(result, target.leaf)
+	}
+	return result
 }
 
 // Properties holds values rather than pointers, so a missed write-back is invisible to
@@ -216,7 +240,7 @@ func TestLevelUpValidationWritesBackThroughRoot(t *testing.T) {
 // A tagged property removed by the channel tweaks must fail loudly, not silently skip.
 func TestLevelUpValidationRejectsPrunedProperty(t *testing.T) {
 	root, rule, _ := matchValidationSchema("HTTPRoute", 17)
-	targets, err := collectLevelUpTargets(root)
+	targets, err := collectLevelUpTargets(root, "standard")
 	require.NoError(t, err)
 	delete(rule.Properties, "matches")
 	require.ErrorContains(t, applyLevelUpTargets(root, targets), `property "matches" not found`)

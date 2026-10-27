@@ -188,3 +188,48 @@ func TestHTTPRouteParentRefStandard(t *testing.T) {
 		})
 	}
 }
+
+// TestHTTPRouteRuleStandard covers the 16-rule limit of the standard channel.
+// The experimental channel allows 64, see httproute_experimental_test.go.
+func TestHTTPRouteRuleStandard(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1.HTTPRouteRule
+	}{
+		{
+			name:       "16 rules",
+			wantErrors: nil,
+			rules:      make([]gatewayv1.HTTPRouteRule, 16),
+		},
+		{
+			name:       "17 rules",
+			wantErrors: []string{"must have at most 16 items"},
+			rules:      make([]gatewayv1.HTTPRouteRule, 17),
+		},
+		{
+			name:       "invalid path in the last rule",
+			wantErrors: []string{"spec.rules[15].matches[63].path", "must only contain valid characters"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				rules := make([]gatewayv1.HTTPRouteRule, 16)
+				for range 64 {
+					rules[15].Matches = append(rules[15].Matches, gatewayv1.HTTPRouteMatch{
+						Path: &gatewayv1.HTTPPathMatch{Type: new(gatewayv1.PathMatchExact), Value: new("/valid")},
+					})
+				}
+				rules[15].Matches[63].Path.Value = new("/invalid?")
+				return rules
+			}(),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{Name: fmt.Sprintf("foo-%v", time.Now().UnixNano()), Namespace: metav1.NamespaceDefault},
+				Spec:       gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}

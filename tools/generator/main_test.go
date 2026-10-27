@@ -124,6 +124,30 @@ func TestGatewayValidationTypeMarkerGeneratesSchemaForItsChannel(t *testing.T) {
 	}
 }
 
+// The level-up tag shares the channel marker prefix but is not a kubebuilder marker,
+// so the marker pass must leave it to the schema pass instead of rejecting it.
+func TestGatewayValidationIgnoresLevelUpTag(t *testing.T) {
+	parser, pkg := newValidationTestParser(t)
+	info := parser.LookupType(pkg, "HTTPRouteSpec")
+	if info == nil {
+		t.Fatal("HTTPRouteSpec was not loaded")
+	}
+	for i := range info.Fields {
+		if info.Fields[i].Name == "Rules" {
+			info.Fields[i].Doc += "\n<gateway:experimental:validation:levelUpValidation=\"path.value\">" +
+				"\n<gateway:experimental:validation:MaxItems=99>"
+		}
+	}
+
+	if err := applyGatewayTypeValidations(parser, "experimental"); err != nil {
+		t.Fatalf("apply Gateway validations: %v", err)
+	}
+	schema := parser.Schemata[crd.TypeIdent{Package: pkg, Name: "HTTPRouteSpec"}]
+	if got := schema.Properties["rules"].MaxItems; got == nil || *got != 99 {
+		t.Fatalf("expected rules maxItems 99, got %v", got)
+	}
+}
+
 func TestGatewayExactlyOneOfGeneratesTypeValidation(t *testing.T) {
 	parser, pkg := newValidationTestParser(t)
 	info := parser.LookupType(pkg, "GatewaySpecAddress")
@@ -233,7 +257,7 @@ func TestLevelUpTagsSurviveDescriptionStripping(t *testing.T) {
 		}},
 	}}
 
-	targets, err := collectLevelUpTargets(root)
+	targets, err := collectLevelUpTargets(root, "standard")
 	if err != nil {
 		t.Fatalf("collecting tags: %v", err)
 	}

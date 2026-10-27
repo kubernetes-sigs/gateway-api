@@ -158,7 +158,7 @@ func main() {
 				}
 				// Tags must be read before the channel tweaks strip them from the
 				// descriptions, and applied after the tweaks prune properties.
-				targets, err := collectLevelUpTargets(version.Schema.OpenAPIV3Schema)
+				targets, err := collectLevelUpTargets(version.Schema.OpenAPIV3Schema, channel)
 				if err != nil {
 					log.Fatalf("failed to collect levelUpValidation tags for %s %s %s: %v", channel, groupKind.Kind, version.Name, err)
 				}
@@ -403,6 +403,10 @@ func experimentalValidationMarkerValues(description, prefix string, target marke
 		return nil, err
 	}
 	for _, marker := range markersInDescription {
+		// Not a kubebuilder marker: cel.go applies it to the generated schema.
+		if strings.HasPrefix(marker, "levelUpValidation=") {
+			continue
+		}
 		rawMarker := "+kubebuilder:validation:" + marker
 		definition := experimentalValidationRegistry.Lookup(rawMarker, target)
 		if definition == nil {

@@ -85,10 +85,11 @@ type GRPCRouteRuleApplyConfiguration struct {
 	//
 	// <gateway:util:excludeFromCRD>
 	// The CEL cost estimator charges a check on method.service or method.method for
-	// rules x matches executions, which exceeds the per-expression budget at 64 rules.
-	// The generator hoists them onto the rule, in batches of literal match indexes.
-	// <gateway:validation:levelUpValidation="method.service">
-	// <gateway:validation:levelUpValidation="method.method">
+	// rules x matches executions, which exceeds the per-expression budget at the 64
+	// rules the experimental channel allows. The generator hoists them onto the rule
+	// there, in batches of literal match indexes.
+	// <gateway:experimental:validation:levelUpValidation="method.service">
+	// <gateway:experimental:validation:levelUpValidation="method.method">
 	// </gateway:util:excludeFromCRD>
 	Matches []GRPCRouteMatchApplyConfiguration `json:"matches,omitempty"`
 	// Filters define the filters that are applied to requests that match
