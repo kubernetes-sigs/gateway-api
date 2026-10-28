@@ -1332,7 +1332,6 @@ func TestHTTPRouteRule(t *testing.T) {
 			validateHTTPRoute(t, route, tc.wantErrors)
 		})
 	}
-
 }
 
 func TestHTTPBackendRef(t *testing.T) {

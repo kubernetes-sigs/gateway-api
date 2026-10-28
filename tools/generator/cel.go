@@ -170,7 +170,7 @@ func levelUpValidation(parent *apiext.JSONSchemaProps, list string, leaf []strin
 	if validation.MessageExpression != "" || validation.FieldPath != "" || validation.OptionalOldSelf != nil {
 		return fmt.Errorf("%s.%s: batching does not support messageExpression, fieldPath, or optionalOldSelf", object, field)
 	}
-	if err := rebaseValidationSelf(expression, replacement); err != nil {
+	if err = rebaseValidationSelf(expression, replacement); err != nil {
 		return fmt.Errorf("%s.%s: %w", object, field, err)
 	}
 	predicate, err := cel.AstToString(cel.ParsedExprToAst(&exprpb.ParsedExpr{Expr: expression}))
@@ -195,7 +195,7 @@ func levelUpValidation(parent *apiext.JSONSchemaProps, list string, leaf []strin
 		batch.Message = fmt.Sprintf("%s in %s %s: %s", object, list, span, validation.Message)
 		generated = append(generated, batch)
 	}
-	target.XValidations = append(remaining[:index], remaining[index+1:]...)
+	target.XValidations = slices.Delete(remaining, index, index+1)
 	items.Items.Schema.Properties[object] = target
 	parent.XValidations = append(parent.XValidations, generated...)
 	return nil
@@ -271,7 +271,7 @@ func rebaseValidationSelf(e, replacement *exprpb.Expr) error {
 		if node.IdentExpr.GetName() != "self" {
 			return fmt.Errorf("unsupported variable %q in batched validation", node.IdentExpr.GetName())
 		}
-		e.ExprKind = proto.Clone(replacement).(*exprpb.Expr).ExprKind
+		e.ExprKind = proto.Clone(replacement).(*exprpb.Expr).GetExprKind()
 	case *exprpb.Expr_SelectExpr:
 		children = append(children, node.SelectExpr.GetOperand())
 	case *exprpb.Expr_CallExpr:
