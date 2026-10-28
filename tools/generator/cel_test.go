@@ -27,14 +27,14 @@ import (
 
 func matchValidationSchema(kind string, maxItems int64) (*apiext.JSONSchemaProps, *apiext.JSONSchemaProps, *apiext.JSONSchemaProps) {
 	object := "path"
-	description := `<gateway:validation:levelUpValidation="path.value">`
+	description := `<gateway:standard:validation:levelUpValidation="path.value">`
 	validations := apiext.ValidationRules{{
 		Rule: `self.type in ['Exact', 'PathPrefix'] ? self.value.matches('^/[a-z]+$') : true`, Message: "invalid path",
 	}}
 	if kind == "GRPCRoute" {
 		object = "method"
-		description = `<gateway:validation:levelUpValidation="method.service">` + "\n" +
-			`<gateway:validation:levelUpValidation="method.method">`
+		description = `<gateway:standard:validation:levelUpValidation="method.service">` + "\n" +
+			`<gateway:standard:validation:levelUpValidation="method.method">`
 		validations = apiext.ValidationRules{
 			{Rule: `(!has(self.type) || self.type == 'Exact') && has(self.service) ? self.service.matches('^[a-z]+$') : true`, Message: "invalid service"},
 			{Rule: `(!has(self.type) || self.type == 'Exact') && has(self.method) ? self.method.matches('^[a-z]+$') : true`, Message: "invalid method"},
@@ -146,22 +146,22 @@ func TestLevelUpValidationErrors(t *testing.T) {
 			match.Properties["path"] = leaf
 		}},
 		{name: "unterminated tag", modify: func(rule, _ *apiext.JSONSchemaProps) {
-			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="path.value"`)
+			setMatchesDescription(rule, `<gateway:standard:validation:levelUpValidation="path.value"`)
 		}},
 		{name: "unquoted tag value", modify: func(rule, _ *apiext.JSONSchemaProps) {
-			setMatchesDescription(rule, `<gateway:validation:levelUpValidation=path.value>`)
+			setMatchesDescription(rule, `<gateway:standard:validation:levelUpValidation=path.value>`)
 		}},
 		{name: "leaf path too short", modify: func(rule, _ *apiext.JSONSchemaProps) {
-			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="value">`)
+			setMatchesDescription(rule, `<gateway:standard:validation:levelUpValidation="value">`)
 		}},
 		{name: "leaf path too long", modify: func(rule, _ *apiext.JSONSchemaProps) {
-			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="path.value.extra">`)
+			setMatchesDescription(rule, `<gateway:standard:validation:levelUpValidation="path.value.extra">`)
 		}},
 		{name: "unknown object", modify: func(rule, _ *apiext.JSONSchemaProps) {
-			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="missing.value">`)
+			setMatchesDescription(rule, `<gateway:standard:validation:levelUpValidation="missing.value">`)
 		}},
 		{name: "unknown field", modify: func(rule, _ *apiext.JSONSchemaProps) {
-			setMatchesDescription(rule, `<gateway:validation:levelUpValidation="path.missing">`)
+			setMatchesDescription(rule, `<gateway:standard:validation:levelUpValidation="path.missing">`)
 		}},
 		{name: "tagged list without items", modify: func(rule, _ *apiext.JSONSchemaProps) {
 			matches := rule.Properties["matches"]
@@ -191,7 +191,7 @@ func TestCollectLevelUpTargetsIsDeterministic(t *testing.T) {
 	root, rule, _ := matchValidationSchema("GRPCRoute", 64)
 	rule.Properties["backendRefs"] = apiext.JSONSchemaProps{
 		Type:        "array",
-		Description: `<gateway:validation:levelUpValidation="filters.type">`,
+		Description: `<gateway:standard:validation:levelUpValidation="filters.type">`,
 	}
 	first, err := collectLevelUpTargets(root, "standard")
 	require.NoError(t, err)
@@ -203,20 +203,19 @@ func TestCollectLevelUpTargetsIsDeterministic(t *testing.T) {
 	}
 }
 
-// A channel-scoped tag is collected for that channel only; the unscoped form for both.
+// A tag is collected for its own channel only.
 func TestCollectLevelUpTargetsHonorsChannel(t *testing.T) {
 	root, rule, _ := matchValidationSchema("HTTPRoute", 64)
-	setMatchesDescription(rule, `<gateway:validation:levelUpValidation="path.value">`+"\n"+
-		`<gateway:experimental:validation:levelUpValidation="path.type">`+"\n"+
+	setMatchesDescription(rule, `<gateway:experimental:validation:levelUpValidation="path.type">`+"\n"+
 		`<gateway:standard:validation:levelUpValidation="path.extra">`)
 
 	standard, err := collectLevelUpTargets(root, "standard")
 	require.NoError(t, err)
-	require.Equal(t, [][]string{{"path", "value"}, {"path", "extra"}}, leaves(standard))
+	require.Equal(t, [][]string{{"path", "extra"}}, leaves(standard))
 
 	experimental, err := collectLevelUpTargets(root, "experimental")
 	require.NoError(t, err)
-	require.Equal(t, [][]string{{"path", "value"}, {"path", "type"}}, leaves(experimental))
+	require.Equal(t, [][]string{{"path", "type"}}, leaves(experimental))
 }
 
 func leaves(targets []levelUpTarget) [][]string {

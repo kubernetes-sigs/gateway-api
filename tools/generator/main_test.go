@@ -241,7 +241,7 @@ func TestLevelUpTagsSurviveDescriptionStripping(t *testing.T) {
 					"matches": {
 						Type:        "array",
 						MaxItems:    &maxItems,
-						Description: "Matches are evaluated in order.\n\n\n<gateway:validation:levelUpValidation=\"path.value\">",
+						Description: "Matches are evaluated in order.\n\n\n<gateway:standard:validation:levelUpValidation=\"path.value\">",
 						Items: &apiext.JSONSchemaPropsOrArray{Schema: &apiext.JSONSchemaProps{
 							Type: "object",
 							Properties: map[string]apiext.JSONSchemaProps{
