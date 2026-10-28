@@ -25,6 +25,7 @@ import (
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/operators"
+	"github.com/google/cel-go/parser"
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
 	"google.golang.org/protobuf/proto"
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -173,7 +174,10 @@ func levelUpValidation(parent *apiext.JSONSchemaProps, list string, leaf []strin
 	if err = rebaseValidationSelf(expression, replacement); err != nil {
 		return fmt.Errorf("%s.%s: %w", object, field, err)
 	}
-	predicate, err := cel.AstToString(cel.ParsedExprToAst(&exprpb.ParsedExpr{Expr: expression}))
+	// Render without the unparser's default line wrapping at column 80, so the
+	// rule text does not re-wrap when cel-go or the predicate length changes.
+	rebased := cel.ParsedExprToAst(&exprpb.ParsedExpr{Expr: expression}).NativeRep()
+	predicate, err := parser.Unparse(rebased.Expr(), rebased.SourceInfo(), parser.WrapOnOperators())
 	if err != nil {
 		return fmt.Errorf("%s.%s: rendering validation: %w", object, field, err)
 	}
