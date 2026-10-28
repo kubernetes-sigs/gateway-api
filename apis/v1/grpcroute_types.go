@@ -168,7 +168,7 @@ type GRPCRouteSpec struct {
 	// +listType=atomic
 	// <gateway:util:excludeFromCRD>
 	// The experimental channel allows 64 rules; standard keeps 16 until that graduates.
-	// Standard sums the match counts rule by rule because it predates sum() in CEL.
+	// Standard keeps the rule-by-rule sum so its CRD stays unchanged.
 	// The name uniqueness rule is declared per channel too, only to keep it after
 	// the matches rule in the standard CRD as it was before the split.
 	// </gateway:util:excludeFromCRD>
