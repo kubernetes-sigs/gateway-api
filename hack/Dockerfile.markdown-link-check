@@ -1,0 +1,8 @@
+# This file is never built. It pins the markdown-link-check image used by
+# hack/verify-reports.sh in a format Dependabot understands, so Dependabot can
+# open PRs that bump the tag and digest together.
+#
+# Keep both: the digest is what gets pulled, the tag records the version.
+# To bump manually, update the tag and look up its digest with:
+#   docker buildx imagetools inspect ghcr.io/tcort/markdown-link-check:<tag> --format '{{.Manifest.Digest}}'
+FROM ghcr.io/tcort/markdown-link-check:3.15.0@sha256:df0e2fe251d759727c17c831b102e81561954a0b8c7cfbd361007cd7bb4093b6
