@@ -1,0 +1,10 @@
+# This file is never built. It pins the golangci-lint image used by
+# hack/verify-golint.sh in a format Dependabot understands, so Dependabot can
+# open PRs that bump the tag and digest together.
+#
+# Keep both: the digest is what gets pulled, the tag records the version.
+# To bump manually, update the tag and look up its digest with:
+#   docker buildx imagetools inspect golangci/golangci-lint:<tag> --format '{{.Manifest.Digest}}'
+#
+# Keep the version in .github/workflows/kal.yml in sync when bumping.
+FROM golangci/golangci-lint:v2.13.2@sha256:ba07dffad130794ae79ebaa0056809d18c0168f3f846480ffd3eb6c04578b83d

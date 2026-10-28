@@ -50,6 +50,7 @@ updates:
       - "/conformance/mesh"
       - "/conformance/tests"
       - "/conformance/tests/mesh"
+      - "/hack" # golangci-lint image used by hack/verify-golint.sh
     schedule:
       interval: "daily"
     ignore:
