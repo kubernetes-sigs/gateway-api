@@ -18,6 +18,17 @@ limitations under the License.
 // for the site from the reports in conformance/reports.
 package main
 
+import (
+	"flag"
+	"log"
+)
+
 func main() {
-	// TODO: flags, loading, grouping and rendering.
+	reports := flag.String("r", "conformance/reports", "directory containing the conformance reports")
+	out := flag.String("o", "site/content/en/docs/implementations/versions", "directory to write the generated pages to")
+	flag.Parse()
+
+	if err := WritePages(*reports, *out); err != nil {
+		log.Fatalf("generating conformance tables: %v", err)
+	}
 }

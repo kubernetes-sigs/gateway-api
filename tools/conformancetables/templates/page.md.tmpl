@@ -1,0 +1,30 @@
+---
+title: "[[.Title]]"
+weight: [[.Weight]]
+[[if .Hidden]]hide_summary: true
+toc_hide: true
+[[end]]---
+
+The following tables are populated from the conformance reports [uploaded by project implementations](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports). They are separated into the extended features that each project supports listed in their reports.
+Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed should be Extended features. Implementations that submit conformance reports with skipped tests won't appear in the tables.
+
+{{% alert title="Warning" color="warning" %}}
+This page is under active development and is not in its final form, especially for the project name and the names of the features. However, as it is based on submitted conformance reports, the information is correct.
+{{% /alert %}}
+
+## Gateway Profile
+
+### HTTPRoute
+
+[[.GatewayHTTP]]
+[[if .HasGRPCTLS]]### GRPCRoute
+
+[[.GatewayGRPC]]
+### TLSRoute
+
+[[.GatewayTLS]]
+[[end]]## Mesh Profile
+
+### HTTPRoute
+
+[[.MeshHTTP]]
