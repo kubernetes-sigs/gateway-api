@@ -53,15 +53,14 @@ var BackendTLSPolicyObservedGenerationBump = confsuite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.LatestObservedGenerationSet)
-			defer cancel()
-
 			namespaces := []string{confsuite.InfrastructureNamespace}
 			kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 
+			ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.LatestObservedGenerationSet)
+			defer cancel()
 			original := &gatewayv1.BackendTLSPolicy{}
 			err := suite.Client.Get(ctx, policyNN, original)
-			require.NoError(t, err, "error getting HTTPRoute")
+			require.NoError(t, err, "error getting BackendTLSPolicy")
 
 			// Sanity check
 			kubernetes.BackendTLSPolicyMustHaveLatestConditions(t, original)
@@ -70,6 +69,7 @@ var BackendTLSPolicyObservedGenerationBump = confsuite.ConformanceTest{
 			mutate.Spec.Validation.Hostname = "foo.example.com"
 			err = suite.Client.Patch(ctx, mutate, client.MergeFrom(original))
 			require.NoError(t, err, "error patching the BackendTLSPolicy")
+			cancel()
 
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, metav1.Condition{
 				Type:   string(gatewayv1.PolicyConditionAccepted),
@@ -77,6 +77,9 @@ var BackendTLSPolicyObservedGenerationBump = confsuite.ConformanceTest{
 				Reason: "", // any reason
 			})
 
+			// The condition wait has its own timeout and may outlive the previous context.
+			ctx, cancel = context.WithTimeout(context.Background(), suite.TimeoutConfig.LatestObservedGenerationSet)
+			defer cancel()
 			updated := &gatewayv1.BackendTLSPolicy{}
 			err = suite.Client.Get(ctx, policyNN, updated)
 			require.NoError(t, err, "error getting BackendTLSPolicy")

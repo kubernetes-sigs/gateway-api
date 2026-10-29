@@ -75,6 +75,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 
 			err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
 			require.NoErrorf(t, err, "error patching the Gateway: %v", err)
+			cancel()
 
 			// Ensure the generation and observedGeneration sync up
 			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
@@ -82,6 +83,9 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			// Sanity check
 			kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 
+			// The readiness wait has its own timeout and may outlive the previous context.
+			ctx, cancel = context.WithTimeout(context.Background(), s.TimeoutConfig.LatestObservedGenerationSet)
+			defer cancel()
 			updated := &v1.Gateway{}
 			err = s.Client.Get(ctx, gwNN, updated)
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
