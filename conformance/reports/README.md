@@ -73,6 +73,15 @@ different implementation versions have different reproduction steps, this sectio
 can have multiple sub-sections, each related to a specific or a subset of implementation
 versions.
 
+### Implementations list
+
+To appear in the [implementations list][implementations-table], an
+implementation also needs an ImplementationListDetails file, usually
+`conformance/list/implementations/<organization>-<project>/details.yaml`. Its
+`organization` and `project` fields must match the ones in the submitted
+reports. See [conformance/list/implementations](../list/implementations/README.md)
+for the format.
+
 ## Rules exceptions
 
 This structure was introduced after the Gateway API release v1.0.0, while we started
