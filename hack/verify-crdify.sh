@@ -37,7 +37,7 @@ error_files=""
 for file in config/crd/standard/*.yaml; do
   filename="$(basename "${file}")"
 
-  if [[ "${filename}" == "kustomization.yaml" || "${filename}" == *_vap_*.yaml ]]; then
+  if [[ "${filename}" == "kustomization.yaml" || "${filename}" == *_vap_*.yaml || "${filename}" == *_rbac_*.yaml ]]; then
     continue
   fi
 
