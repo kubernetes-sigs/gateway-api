@@ -146,4 +146,4 @@ comply with the following rules:
   - some tests related to the supported extended features have been skipped
   - the conformance test run required some steps unexpected by the suite.
 
-[implementations-table]: https://gateway-api.sigs.k8s.io/implementations/v1.1/
+[implementations-table]: https://gateway-api.sigs.k8s.io/docs/implementations/list/
