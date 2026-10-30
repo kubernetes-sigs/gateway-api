@@ -34,10 +34,14 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	certificatesv1 "k8s.io/api/certificates/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
 const (
@@ -183,6 +187,19 @@ func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string) (*
 		},
 	}
 	return caConfigMap, ca, caPrivKey
+}
+
+// MustCreateClusterTrustBundleFromCAConfigMap builds a ClusterTrustBundle named name
+// holding the "ca.crt" of the given ConfigMap. Callers apply it.
+func MustCreateClusterTrustBundleFromCAConfigMap(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, name string, configMapNN types.NamespacedName) *certificatesv1.ClusterTrustBundle {
+	data, err := GetConfigMapData(c, timeoutConfig, configMapNN)
+	require.NoError(t, err, "error reading CA ConfigMap")
+	require.NotEmpty(t, data["ca.crt"], "missing ca.crt in CA ConfigMap")
+
+	return &certificatesv1.ClusterTrustBundle{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec:       certificatesv1.ClusterTrustBundleSpec{TrustBundle: data["ca.crt"]},
+	}
 }
 
 // generateCACert generates a CA certificate valid for a year.
