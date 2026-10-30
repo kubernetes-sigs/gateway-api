@@ -2,7 +2,7 @@ apiVersion: gateway.networking.kubernetes.io/v1
 kind: ImplementationListDetails
 organization: bohdaq
 project: rust-web-server
-fullName: rust-web-server
+fullName: Bohdaq's rust-web-server
 description: |
   rust-web-server (rws) is a single-binary web server and reverse proxy that also runs as a Gateway API controller, in shared or per-Gateway provisioned mode. See the [documentation][rws-docs] for setup, and [open an issue][rws-issues] for help.
 
