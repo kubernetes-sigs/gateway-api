@@ -1199,7 +1199,7 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name:       "too many matches and rules",
-			wantErrors: []string{"total number of matches across all rules in a route must be less than 128"},
+			wantErrors: []string{"total number of matches across all rules in a route must be"},
 			rules: func() []gatewayv1.HTTPRouteRule {
 				match := gatewayv1.HTTPRouteMatch{
 					Path: &gatewayv1.HTTPPathMatch{
@@ -1214,6 +1214,42 @@ func TestHTTPRouteRule(t *testing.T) {
 						rule.Matches = append(rule.Matches, match)
 					}
 					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "exactly 128 matches across rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.HTTPRouteRule {
+				match := gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new("/"),
+					},
+				}
+				var rules []gatewayv1.HTTPRouteRule
+				for range 2 { // rules
+					rule := gatewayv1.HTTPRouteRule{}
+					for range 64 { // matches
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "exactly 129 matches across rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				rules := make([]gatewayv1.HTTPRouteRule, 3)
+				for i, count := range []int{64, 64, 1} {
+					for range count {
+						rules[i].Matches = append(rules[i].Matches, gatewayv1.HTTPRouteMatch{Path: &gatewayv1.HTTPPathMatch{
+							Type: new(gatewayv1.PathMatchExact), Value: new("/valid"),
+						}})
+					}
 				}
 				return rules
 			}(),

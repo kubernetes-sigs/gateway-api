@@ -615,3 +615,86 @@ func TestHTTPExternalAuthFilterExperimental(t *testing.T) {
 	}
 
 }
+
+// TestHTTPRouteRuleExperimental covers the 64-rule limit of the experimental
+// channel. The standard channel keeps 16 rules, see httproute_standard_test.go.
+func TestHTTPRouteRuleExperimental(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1.HTTPRouteRule
+	}{
+		{
+			name:       "64 rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.HTTPRouteRule {
+				var rules []gatewayv1.HTTPRouteRule
+				for range 64 {
+					rules = append(rules, gatewayv1.HTTPRouteRule{})
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "65 rules",
+			wantErrors: []string{"must have at most 64 items"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				var rules []gatewayv1.HTTPRouteRule
+				for range 65 {
+					rules = append(rules, gatewayv1.HTTPRouteRule{})
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "matches are counted across all rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				match := gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new("/"),
+					},
+				}
+				var rules []gatewayv1.HTTPRouteRule
+				for range 20 { // rules
+					rule := gatewayv1.HTTPRouteRule{}
+					for range 7 { // matches: 140 in total, 112 within the first 16 rules
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{Name: fmt.Sprintf("foo-%v", time.Now().UnixNano()), Namespace: metav1.NamespaceDefault},
+				Spec:       gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+
+	// Check both ends of every batch in the last allowed rule. The generator
+	// unit tests cover every match position; these checks exercise the CRDs.
+	for _, index := range []int{0, 15, 16, 31, 32, 47, 48, 63} {
+		t.Run(fmt.Sprintf("invalid path in last rule at match index %d", index), func(t *testing.T) {
+			rules := make([]gatewayv1.HTTPRouteRule, 64)
+			for range 64 {
+				rules[63].Matches = append(rules[63].Matches, gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{Type: new(gatewayv1.PathMatchExact), Value: new("/valid")},
+				})
+			}
+			rules[63].Matches[index].Path.Value = new("/invalid?")
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{Name: fmt.Sprintf("batch-http-%d", time.Now().UnixNano()), Namespace: metav1.NamespaceDefault},
+				Spec:       gatewayv1.HTTPRouteSpec{Rules: rules},
+			}
+			validateHTTPRoute(t, route, []string{"spec.rules[63]", "must only contain valid characters"})
+		})
+	}
+}
