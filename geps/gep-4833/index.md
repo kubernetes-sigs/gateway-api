@@ -15,8 +15,12 @@ ALPN ([RFC 7301](https://www.rfc-editor.org/rfc/rfc7301)) is negotiated during t
 
 * gRPC servers need `h2`.
 * Some older HTTPS servers only work with `http/1.1`.
+* Some backends, such as those inside a service mesh, need a non-HTTP or private ID.
 
-The right HTTP version depends on the backend, and when several are offered, the backend makes the choice. Operators need to decide which versions to offer, per backend.
+For a `Backend`, the list can usually be inferred from `protocol`, and this GEP makes that mapping precise and required. Inference doesn't cover every case:
+
+* A `Service` targeted by `BackendTLSPolicy` has no protocol field, and `appProtocol` has no value for HTTP/2 over TLS, since that's left to ALPN. There's nothing to infer `h2` from.
+* No `protocol` value can cover every ID beyond `h2` and `http/1.1`.
 
 Gateway API doesn't cover this today:
 
