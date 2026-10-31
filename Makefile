@@ -88,7 +88,7 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./apis/... ./conformance/utils/... ./tools/openapi-generator ./tools/reportfeatures
+	go test -race -cover ./apis/... ./conformance/utils/... ./tools/openapi-generator ./tools/reportfeatures ./tools/conformancetables
 
 golint:
 	hack/verify-golint.sh
@@ -222,6 +222,10 @@ wizard-data:
 .PHONY: conformance-data
 conformance-data:
 	$(PYTHON) hack/docsy-generate-conformance.py
+
+.PHONY: conformance-data-go
+conformance-data-go:
+	go run ./tools/conformancetables -r conformance/reports -o site/content/en/docs/implementations/versions
 
 .PHONY: serve
 serve: wizard-wasm update-geps update-implist api-ref-docs
