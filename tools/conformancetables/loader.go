@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path/filepath"
+	"path"
 	"strings"
 
 	"golang.org/x/mod/semver"
@@ -46,23 +46,19 @@ type Row struct {
 // LoadRows reads every report at or above v1.0.0 and returns one Row per profile.
 func LoadRows(reportsDir string) ([]Row, error) {
 	var rows []Row
-	err := filepath.WalkDir(reportsDir, func(path string, d fs.DirEntry, err error) error {
+	rootFS := os.DirFS(reportsDir)
+	err := fs.WalkDir(rootFS, ".", func(rel string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		if d.IsDir() || filepath.Ext(d.Name()) != ".yaml" {
+		if d.IsDir() || path.Ext(d.Name()) != ".yaml" {
 			return nil
 		}
-		rel, err := filepath.Rel(reportsDir, path)
-		if err != nil {
-			return err
-		}
-		rel = filepath.ToSlash(rel)
 		dir, _, found := strings.Cut(rel, "/")
 		if !found || !semver.IsValid(dir) || semver.Compare(dir, "v1.0.0") < 0 {
 			return nil
 		}
-		content, err := os.ReadFile(path)
+		content, err := fs.ReadFile(rootFS, rel)
 		if err != nil {
 			return err
 		}

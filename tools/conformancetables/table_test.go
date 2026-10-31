@@ -23,8 +23,8 @@ import (
 	v1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 )
 
-func mkRow(org, project, version, mode string, p v1.ProfileReport) Row {
-	return Row{Organization: org, Project: project, Version: version, Mode: mode, Profile: p}
+func mkRow(org, project, version string, p v1.ProfileReport) Row {
+	return Row{Organization: org, Project: project, Version: version, Mode: "default", Profile: p}
 }
 
 func TestFeaturesCell(t *testing.T) {
@@ -45,7 +45,7 @@ func TestFeaturesCell(t *testing.T) {
 		{
 			"partial",
 			v1.ProfileReport{Extended: &v1.ExtendedStatus{
-				Status:            v1.Status{Result: v1.Partial, Statistics: v1.Statistics{Passed: 16, Skipped: 1}},
+				Result: v1.Partial, Statistics: v1.Statistics{Passed: 16, Skipped: 1},
 				SupportedFeatures: []string{"A"},
 			}},
 			"1/1 features<br><b>Partially conformant; 1/17 tests skipped</b>",
@@ -60,7 +60,7 @@ func TestFeaturesCell(t *testing.T) {
 		{
 			"failing extended",
 			v1.ProfileReport{Extended: &v1.ExtendedStatus{
-				Status: v1.Status{Result: v1.Failure, Statistics: v1.Statistics{Passed: 3, Failed: 1}},
+				Result: v1.Failure, Statistics: v1.Statistics{Passed: 3, Failed: 1},
 			}},
 			"0/0 features<br><b>Failing 1/4 tests</b>",
 		},
@@ -77,14 +77,14 @@ func TestFeaturesCell(t *testing.T) {
 func TestBuildTable(t *testing.T) {
 	ok := v1.Status{Result: v1.Success}
 	rows := []Row{
-		mkRow("zeta", "z", "1.0", "default", v1.ProfileReport{
+		mkRow("zeta", "z", "1.0", v1.ProfileReport{
 			Core: ok,
 			Extended: &v1.ExtendedStatus{
 				SupportedFeatures:   []string{"HTTPRouteCORS"},
 				UnsupportedFeatures: []string{"GatewayPort8080"},
 			},
 		}),
-		mkRow("Alpha", "a", "1.0", "default", v1.ProfileReport{Core: v1.Status{Result: v1.Partial}}),
+		mkRow("Alpha", "a", "1.0", v1.ProfileReport{Core: v1.Status{Result: v1.Partial}}),
 	}
 	tbl := BuildTable(rows, false, false)
 
@@ -106,7 +106,7 @@ func TestBuildTable(t *testing.T) {
 }
 
 func TestBuildTableDropColumns(t *testing.T) {
-	rows := []Row{mkRow("a", "p", "1.0", "default", v1.ProfileReport{})}
+	rows := []Row{mkRow("a", "p", "1.0", v1.ProfileReport{})}
 	got := strings.Join(BuildTable(rows, true, true).Header, "|")
 	if got != "Organization|Project|Version|Extended Features" {
 		t.Errorf("header = %q", got)
@@ -115,8 +115,8 @@ func TestBuildTableDropColumns(t *testing.T) {
 
 func TestSortRowsVersion(t *testing.T) {
 	rows := []Row{
-		mkRow("a", "p", "1.10", "default", v1.ProfileReport{}),
-		mkRow("a", "p", "1.9", "default", v1.ProfileReport{}),
+		mkRow("a", "p", "1.10", v1.ProfileReport{}),
+		mkRow("a", "p", "1.9", v1.ProfileReport{}),
 	}
 	SortRows(rows)
 	if rows[0].Version != "1.9" || rows[1].Version != "1.10" {
