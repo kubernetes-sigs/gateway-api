@@ -35,11 +35,9 @@ func TestProcessFeatureName(t *testing.T) {
 		{"GatewayPort8080", "Gateway Port 8080"},
 		{"GatewayStaticAddresses", "Gateway Static Addresses"},
 		{"HTTPResponseHeaderModification", "HTTP Response Header Modification"},
-		// Known quirk, preserved on purpose so the port is behavior-preserving:
-		// the digits rule swallows the "R" and the lowercase "edirect" is dropped.
-		{"HTTPRoute303RedirectStatusCode", "HTTPRoute 303R Status Code"},
-		{"HTTPRoute307RedirectStatusCode", "HTTPRoute 307R Status Code"},
-		{"HTTPRoute308RedirectStatusCode", "HTTPRoute 308R Status Code"},
+		{"HTTPRoute303RedirectStatusCode", "HTTPRoute 303 Redirect Status Code"},
+		{"HTTPRoute307RedirectStatusCode", "HTTPRoute 307 Redirect Status Code"},
+		{"HTTPRoute308RedirectStatusCode", "HTTPRoute 308 Redirect Status Code"},
 		{"HTTPRouteBackendProtocolH2C", "HTTPRoute Backend Protocol H2C"},
 		{"HTTPRouteBackendProtocolWebSocket", "HTTPRoute Backend Protocol Web Socket"},
 		{"HTTPRouteBackendRequestHeaderModification", "HTTPRoute Backend Request Header Modification"},

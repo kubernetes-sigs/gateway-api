@@ -26,13 +26,15 @@ func isDigit(b byte) bool { return b >= '0' && b <= '9' }
 
 // ProcessFeatureName splits a CamelCase feature name into space-separated words.
 //
-// It deliberately mirrors the regex used by the original Python script:
+// It is based on the regex used by the original Python script:
 //
 //	HTTPRoute|[A-Z]+(?=[A-Z][a-z])|[A-Z][a-z]+|[A-Z\d]+
 //
-// The alternatives are tried in order at each position, and characters that
-// match none of them are dropped. Go's regexp has no lookahead, so the
-// matching is done by hand.
+// with one fix: the last alternative no longer swallows an uppercase letter
+// that starts a capitalized word, so "303Redirect" becomes "303 Redirect"
+// rather than "303R". The alternatives are tried in order at each position,
+// and characters that match none of them are dropped. Go's regexp has no
+// lookahead, so the matching is done by hand.
 func ProcessFeatureName(s string) string {
 	var tokens []string
 	i := 0
@@ -87,10 +89,16 @@ func capitalizedWord(s string, i int) (int, bool) {
 	return j, j > i+1
 }
 
-// upperOrDigitRun implements [A-Z\d]+.
+// upperOrDigitRun implements [A-Z\d]+, except that it stops before an
+// uppercase letter that starts a capitalized word (an uppercase letter
+// followed by a lowercase one). "303Redirect" therefore yields "303" and
+// leaves "Redirect" for the next token.
 func upperOrDigitRun(s string, i int) (int, bool) {
 	j := i
 	for j < len(s) && (isUpper(s[j]) || isDigit(s[j])) {
+		if j > i && isUpper(s[j]) && j+1 < len(s) && isLower(s[j+1]) {
+			break
+		}
 		j++
 	}
 	return j, j > i
