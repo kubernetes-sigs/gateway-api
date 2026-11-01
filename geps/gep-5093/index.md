@@ -193,7 +193,7 @@ The condition MUST be omitted until the controller has reconciled address assign
 
 If ***all*** requested entries can be satisfied, or if default address selection has completed when `spec.addresses` is empty:
 
-* MUST set `AddressesAssigned=True` with reason `Assigned`
+* MUST set `AddressesAssigned=True` with reason `AddressesAssigned`
 
 If ***some***, but not all, entries can be satisfied, the implementation SHOULD program the Gateway using the addresses it can satisfy. In either case, it:
 
@@ -204,7 +204,7 @@ Vendors that opt to reject partially satisfied address entries MUST follow the s
 
 If ***no*** entries can be satisfied, the Gateway MUST NOT be programmed unless it is still using a retained active address. The implementation
 
-* MUST set `Programmed=False` with reason `AddressNotAssigned` unless it is still using a retained active address
+* MUST set `Programmed=False` unless it is still using a retained active address. If a requested routability cannot be met, the reason MUST be `AddressNotAssigned`. Other address failures retain their existing reasons, including `AddressNotUsable` for a supplied static address that cannot be used independently of routability.
 * MUST set `AddressesAssigned=False` with reason `NotAssigned`
 
 `Programmed` otherwise retains its existing meaning: it reports whether the proxy is actually deployed and ready. A Gateway with all addresses assigned may still have `Programmed=False` for an unrelated reason.
@@ -306,14 +306,15 @@ Conformance tests for `GatewayAddressRoutability` will cover the following scena
 * API validation accepts an empty string, `Cluster`, and prefixed values with a valid DNS subdomain prefix and non-empty path, including `testing.x-k8s.io/sentinel`. It rejects an unknown bare value, malformed prefixed values, invalid prefixes, and values whose prefix is `k8s.io` or ends in `.k8s.io`. The validation is tested on both spec and status addresses, including reserved-prefix examples such as `k8s.io/value`, `example.k8s.io/value`, and `gateway.networking.k8s.io/value`.
 * A GatewayClass claiming `GatewayAddressRoutabilityCluster` also claims `GatewayAddressRoutability`.
 * A GatewayClass claiming `GatewayAddressRoutability` accepts a `testing.x-k8s.io/sentinel` request and reports that exact routability value in status. This verifies support for routability reporting; it does not validate the assigned address or a routability guarantee.
+* A GatewayClass claiming `GatewayAddressRoutability` leaves a request for another reserved `testing.x-k8s.io` value unsatisfied, with `AddressesAssigned=False` reason `NotAssigned`, `Programmed=False` reason `AddressNotAssigned`, and no assigned status address.
 * A GatewayClass claiming `GatewayAddressRoutabilityCluster` reports a `Cluster` `IPAddress` request with `routability: Cluster`; the address is in the configured or discovered ServiceCIDR. In-cluster reachability is an implementation integration check, not a portable conformance assertion.
-* A GatewayClass claiming `GatewayAddressRoutabilityCluster` with one empty and one `Cluster` request reports exactly one matching status address for each, regardless of list order, and `AddressesAssigned=True` with reason `Assigned`. The empty request is reported as `Cluster` if it satisfies the `Cluster` requirements; otherwise it is explicitly reported as empty.
+* A GatewayClass claiming `GatewayAddressRoutabilityCluster` with one empty and one `Cluster` request reports exactly one matching status address for each, regardless of list order, and `AddressesAssigned=True` with reason `AddressesAssigned`. The empty request is reported as `Cluster` if it satisfies the `Cluster` requirements; otherwise it is explicitly reported as empty.
 * A `Cluster` `IPAddress` request with a static value outside the ServiceCIDR is unsatisfied. Combined with a satisfiable empty request, an implementation that permits partial assignment reports only the successful address and `AddressesAssigned=False` with reason `PartiallyAssigned`, with a message identifying the unsatisfied request. An implementation that rejects partial assignment follows the no-entries-can-be-satisfied behavior. On its own, the unsatisfied request reports `Programmed=False` with reason `AddressNotAssigned` and `AddressesAssigned=False` with reason `NotAssigned`. This scenario requires `SupportGatewayStaticAddresses` and `GatewayAddressRoutabilityCluster`.
 * A `Cluster` `IPAddress` request with a static value in the ServiceCIDR reports that exact value with `routability: Cluster`. This scenario requires `SupportGatewayStaticAddresses` and `GatewayAddressRoutabilityCluster`.
-* A Gateway with `spec.addresses` unset has `AddressesAssigned=True` with reason `Assigned` after default address selection. A claiming implementation reports `Cluster` for each resulting address that satisfies the `Cluster` requirements when it claims `GatewayAddressRoutabilityCluster`; otherwise it explicitly reports an empty value.
+* A Gateway with `spec.addresses` unset has `AddressesAssigned=True` with reason `AddressesAssigned` after default address selection. A claiming implementation reports `Cluster` for each resulting address that satisfies the `Cluster` requirements when it claims `GatewayAddressRoutabilityCluster`; otherwise it explicitly reports an empty value.
 * A claiming implementation with `spec.addresses[].routability` unset or explicitly empty reports `Cluster` when the resulting address satisfies the `Cluster` requirements and it claims `GatewayAddressRoutabilityCluster`; otherwise it explicitly reports an empty value.
 
-The suite may discover ServiceCIDRs from the cluster or receive them through the `serviceCIDRs` conformance option. In-cluster reachability is not asserted by the portable suite because it does not provide a client workload in the target cluster. Tests for valid but unsupported prefixed values require configuration identifying a prefix that the implementation does not support and are not mandatory portable conformance tests. Address retention during rejected updates is excluded from portable conformance. `Hostname`, `NamedAddress`, and implementation-specific address types are excluded from portable conformance for this feature.
+The suite may discover ServiceCIDRs from the cluster or receive them through the `serviceCIDRs` conformance option. In-cluster reachability is not asserted by the portable suite because it does not provide a client workload in the target cluster. Tests for valid but unsupported prefixed values outside the reserved `testing.x-k8s.io` prefix require configuration identifying a prefix that the implementation does not support and are not mandatory portable conformance tests. Address retention during rejected updates is excluded from portable conformance. `Hostname`, `NamedAddress`, and implementation-specific address types are excluded from portable conformance for this feature.
 
 ## Alternatives Considered
 
