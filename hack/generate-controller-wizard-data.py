@@ -47,48 +47,147 @@ PROFILE_TO_CONFORMANCE = {
 # Acronyms that should stay uppercase in display names (e.g. GKE not Gke)
 DISPLAY_ACRONYMS = frozenset({"gke"})
 
-# Feature definitions for the wizard: id, label, and optional description (tooltip).
-# https://gateway-api.sigs.k8s.io/implementations/v1.4/
-FEATURE_DEFINITIONS = {
-    "httpGateway": [
-        {"id": "GatewayPort8080", "label": "Gateway Port 8080", "description": "Gateway listens on port 8080."},
-        {"id": "GatewayAddressEmpty", "label": "Gateway Address Empty", "description": "Gateway status supports empty address list."},
-        {"id": "GatewayHTTPListenerIsolation", "label": "Gateway HTTP Listener Isolation", "description": "HTTPRoutes can target a single listener; others are isolated."},
-        {"id": "GatewayInfrastructurePropagation", "label": "Gateway Infrastructure Propagation", "description": "Gateway status propagates infrastructure details to Routes."},
-        {"id": "GatewayStaticAddresses", "label": "Gateway Static Addresses", "description": "Gateway supports static address assignment."},
-        {"id": "GatewayBackendClientCertificate", "label": "Gateway Backend Client Certificate", "description": "Gateway supports client certificates selection for Gateway TLS origination." },
-        {"id": "GatewayFrontendClientCertificateValidation", "label": "Gateway Frontend Client Certificate Validation", "description": "Gateway supports client certificate validation for Gateway TLS termination." },
-        {"id": "ListenerSet", "label": "ListenerSet", "description": "Gateway supports ListenerSet."},
-    ],
-    "httpRoute": [
-        {"id": "HTTPRouteHostRewrite", "label": "HTTPRoute Host Rewrite", "description": "Modify the host header of requests forwarded to backends."},
-        {"id": "HTTPRoutePathRedirect", "label": "HTTPRoute Path Redirect", "description": "Issue HTTP redirects (e.g. 302) with a modified path."},
-        {"id": "HTTPRouteRequestMirror", "label": "HTTPRoute Request Mirror", "description": "Mirror a proportion of traffic to another backend."},
-        {"id": "HTTPRouteRequestPercentageMirror", "label": "HTTPRoute Request Percentage Mirror", "description": "Mirror a percentage of requests to another backend."},
-        {"id": "HTTPRouteResponseHeaderModification", "label": "HTTPRoute Response Header Modification", "description": "Add, set, or remove response headers."},
-        {"id": "HTTPRouteCORS", "label": "HTTPRoute CORS", "description": "CORS policy configuration for HTTPRoute."},
-    ],
-    "httpBackendTls": [
-        {"id": "BackendTLSPolicy", "label": "Backend TLS Policy", "description": "Configure TLS when connecting to backends."},
-        {"id": "BackendTLSPolicySANValidation", "label": "Backend TLS Policy SAN Validation", "description": "Validate backend certificate SANs."},
-    ],
-    "grpc": [
-        {"id": "GatewayAddressEmpty", "label": "Gateway Address Empty", "description": "Gateway status supports empty address list."},
-        {"id": "GatewayHTTPListenerIsolation", "label": "Gateway HTTP Listener Isolation", "description": "GRPCRoutes can target a single listener; others are isolated."},
-        {"id": "GatewayInfrastructurePropagation", "label": "Gateway Infrastructure Propagation", "description": "Gateway status propagates to GRPCRoutes."},
-        {"id": "GatewayPort8080", "label": "Gateway Port 8080", "description": "Gateway listens on port 8080."},
-        {"id": "GatewayStaticAddresses", "label": "Gateway Static Addresses", "description": "Gateway supports static address assignment."},
-    ],
-    "tls": [
-        {"id": "GatewayAddressEmpty", "label": "Gateway Address Empty", "description": "Gateway status supports empty address list."},
-        {"id": "GatewayHTTPListenerIsolation", "label": "Gateway HTTP Listener Isolation", "description": "TLSRoutes can target a single listener; others are isolated."},
-        {"id": "GatewayInfrastructurePropagation", "label": "Gateway Infrastructure Propagation", "description": "Gateway status propagates to TLSRoutes."},
-        {"id": "GatewayPort8080", "label": "Gateway Port 8080", "description": "Gateway listens on port 8080."},
-        {"id": "GatewayStaticAddresses", "label": "Gateway Static Addresses", "description": "Gateway supports static address assignment."},
-        {"id": "TLSRouteModeMixed", "label": "TLSRoute Mode Mixed", "description": "Gateway supports both Passthrough and Terminate TLS listeners on the same port."},
-        {"id": "TLSRouteModeTerminate", "label": "TLSRoute Mode Terminate", "description": "Gateway supports TLS termination in addition to passthrough routing."},
-    ],
+# Human-readable labels/descriptions for known feature ids. Features not listed
+# here get a label humanized from the id and a short generic description.
+FEATURE_LABEL_OVERRIDES = {
+    "GatewayPort8080": {"label": "Gateway Port 8080", "description": "Gateway listens on port 8080."},
+    "GatewayAddressEmpty": {"label": "Gateway Address Empty", "description": "Gateway status supports empty address list."},
+    "GatewayHTTPListenerIsolation": {"label": "Gateway HTTP Listener Isolation", "description": "HTTPRoutes can target a single listener; others are isolated."},
+    "GatewayInfrastructurePropagation": {"label": "Gateway Infrastructure Propagation", "description": "Gateway status propagates infrastructure details to Routes."},
+    "GatewayStaticAddresses": {"label": "Gateway Static Addresses", "description": "Gateway supports static address assignment."},
+    "GatewayBackendClientCertificate": {"label": "Gateway Backend Client Certificate", "description": "Gateway supports client certificates selection for Gateway TLS origination."},
+    "GatewayFrontendClientCertificateValidation": {"label": "Gateway Frontend Client Certificate Validation", "description": "Gateway supports client certificate validation for Gateway TLS termination."},
+    "ListenerSet": {"label": "ListenerSet", "description": "Gateway supports ListenerSet."},
+    "HTTPRouteHostRewrite": {"label": "HTTPRoute Host Rewrite", "description": "Modify the host header of requests forwarded to backends."},
+    "HTTPRoutePathRedirect": {"label": "HTTPRoute Path Redirect", "description": "Issue HTTP redirects (e.g. 302) with a modified path."},
+    "HTTPRouteRequestMirror": {"label": "HTTPRoute Request Mirror", "description": "Mirror a proportion of traffic to another backend."},
+    "HTTPRouteRequestPercentageMirror": {"label": "HTTPRoute Request Percentage Mirror", "description": "Mirror a percentage of requests to another backend."},
+    "HTTPRouteResponseHeaderModification": {"label": "HTTPRoute Response Header Modification", "description": "Add, set, or remove response headers."},
+    "HTTPRouteCORS": {"label": "HTTPRoute CORS", "description": "CORS policy configuration for HTTPRoute."},
+    "BackendTLSPolicy": {"label": "Backend TLS Policy", "description": "Configure TLS when connecting to backends."},
+    "BackendTLSPolicySANValidation": {"label": "Backend TLS Policy SAN Validation", "description": "Validate backend certificate SANs."},
+    "TLSRouteModeMixed": {"label": "TLSRoute Mode Mixed", "description": "Gateway supports both Passthrough and Terminate TLS listeners on the same port."},
+    "TLSRouteModeTerminate": {"label": "TLSRoute Mode Terminate", "description": "Gateway supports TLS termination in addition to passthrough routing."},
 }
+
+# Categories rendered by the wizard, in display order.
+CATEGORY_ORDER = [
+    "httpGateway", "httpRoute", "httpBackendTls", "backend",
+    "grpc", "tls", "tcp", "udp", "mesh",
+]
+
+# Feature id prefix -> category. More specific prefixes must come first.
+CATEGORY_PREFIXES = [
+    ("httpBackendTls", ("BackendTLS",)),
+    ("backend", ("Backend",)),
+    ("httpRoute", ("HTTPRoute",)),
+    ("grpc", ("GRPCRoute",)),
+    ("tls", ("TLSRoute",)),
+    ("tcp", ("TCPRoute",)),
+    ("udp", ("UDPRoute",)),
+    ("mesh", ("Mesh",)),
+    ("httpGateway", ("Gateway",)),
+]
+
+
+def humanize_feature_id(feature_id):
+    """Split camelCase ids into words, keeping acronyms like GRPC/TLS/SAN intact."""
+    label = re.sub(
+        r"(?<=[a-z])(?=[0-9])|(?<=[0-9])(?=[A-Z][a-z])"
+        r"|(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])",
+        " ",
+        feature_id,
+    )
+    # Keep API resource names as single words, matching the existing labels.
+    for words, fixed in (
+        ("HTTP Route", "HTTPRoute"),
+        ("GRPC Route", "GRPCRoute"),
+        ("TLS Route", "TLSRoute"),
+        ("TCP Route", "TCPRoute"),
+        ("UDP Route", "UDPRoute"),
+        ("Web Socket", "WebSocket"),
+        ("H2 C", "H2C"),
+    ):
+        label = label.replace(words, fixed)
+    return label
+
+
+def categorize_feature(feature_id):
+    for category, prefixes in CATEGORY_PREFIXES:
+        if feature_id.startswith(prefixes):
+            return category
+    # Unknown ids default to the Gateway section so they are still selectable.
+    return "httpGateway"
+
+
+def load_release_features(path):
+    """Return (feature ids, experimental id set) from a release-features yaml, standard first, deduped."""
+    data = load_yaml(path) or {}
+    ids = []
+    for key in ("standard", "experimental"):
+        for feature_id in data.get(key) or []:
+            feature_id = str(feature_id).strip()
+            if feature_id and feature_id not in ids:
+                ids.append(feature_id)
+    experimental = {str(f).strip() for f in data.get("experimental") or []}
+    return ids, experimental
+
+
+def release_feature_files(repo_root):
+    """Map (major, minor) -> release-features yaml path."""
+    features_dir = os.path.join(repo_root, "conformance", "release-features")
+    files = {}
+    if not os.path.isdir(features_dir):
+        return files
+    for name in os.listdir(features_dir):
+        m = re.fullmatch(r"v(\d+)\.(\d+)\.yaml", name)
+        if m:
+            files[(int(m.group(1)), int(m.group(2)))] = os.path.join(features_dir, name)
+    return files
+
+
+def release_features_for_version(version_dir_name, files):
+    """Nearest release-features file for a report version dir, else the oldest one."""
+    major, minor, _ = parse_version(version_dir_name)
+    path = files.get((major, minor))
+    if path is None:
+        path = files[min(files)]
+    return path, *load_release_features(path)
+
+
+def build_feature_definitions(release_features, seen_features, experimental=None):
+    """Definitions for one version: features in the release yaml that reports actually use.
+    Experimental-channel features are tagged in their label."""
+    seen = set(seen_features)
+    experimental = experimental or set()
+    definitions = {category: [] for category in CATEGORY_ORDER}
+    for feature_id in release_features:
+        if feature_id not in seen:
+            continue
+        override = FEATURE_LABEL_OVERRIDES.get(feature_id, {})
+        label = override.get("label") or humanize_feature_id(feature_id)
+        if feature_id in experimental:
+            label += " (Experimental)"
+        description = override.get("description") or f"Support for {label}."
+        definitions[categorize_feature(feature_id)].append(
+            {"id": feature_id, "label": label, "description": description}
+        )
+    for features in definitions.values():
+        features.sort(key=lambda f: f["id"])
+    return definitions
+
+
+def check_feature_definitions(definitions, release_features_by_version):
+    """Fail loudly if a definition was not sourced from that version's release-features yaml."""
+    for version, categories in definitions.items():
+        allowed = set(release_features_by_version[version])
+        for category, features in categories.items():
+            for feature in features:
+                if feature["id"] not in allowed:
+                    raise SystemExit(
+                        f"Feature {feature['id']} in {version}/{category} is not listed in "
+                        f"the release-features file used for {version}."
+                    )
 
 
 def load_yaml(path):
@@ -105,15 +204,25 @@ def parse_version(version_dir_name):
 
 
 def get_version_dirs(reports_root):
-    """Return sorted list of version directory paths (e.g. .../v1.5.0, v1.4.0, ...), newest first.
-    New versions added under conformance/reports/ automatically appear at the top of the list."""
+    """Return sorted list of version directory paths (e.g. .../v1.6, v1.5, ...), newest first.
+    New versions added under conformance/reports/ automatically appear at the top of the list.
+    Symlinked aliases (e.g. v1.6.0 -> v1.6) are deduplicated; the real directory name wins."""
     if not os.path.isdir(reports_root):
         return []
-    dirs = [
-        os.path.join(reports_root, d)
+    candidates = [
+        d
         for d in os.listdir(reports_root)
         if os.path.isdir(os.path.join(reports_root, d)) and parse_version(d) != (0, 0, 0)
     ]
+    by_real = {}
+    for d in candidates:
+        real = os.path.realpath(os.path.join(reports_root, d))
+        by_real.setdefault(real, []).append(d)
+    kept = []
+    for names in by_real.values():
+        real_names = [n for n in names if not os.path.islink(os.path.join(reports_root, n))]
+        kept.append(sorted(real_names or names, key=parse_version)[-1])
+    dirs = [os.path.join(reports_root, d) for d in kept]
     dirs.sort(key=lambda d: parse_version(os.path.basename(d)), reverse=True)
     return dirs
 
@@ -195,7 +304,7 @@ def aggregate_by_impl(version_dir):
     """
     Walk all YAML reports under version_dir and aggregate by (organization, project, version).
     Multiple reports for the same impl (e.g. different modes) are merged into one row.
-    Returns list of implementation dicts (features and conformance merged across reports).
+    Returns (list of implementation dicts, union of all extended features seen).
     """
     seen = {}
     for root, _dirs, files in os.walk(version_dir):
@@ -229,18 +338,21 @@ def aggregate_by_impl(version_dir):
                 seen[key]["features"] |= set(row["features"])
 
     out = []
+    features_seen = set()
     for v in seen.values():
         v["conformance"] = sorted(v["conformance"])
         v["features"] = sorted(v["features"])
+        features_seen |= set(v["features"])
         out.append(v)
     out.sort(key=lambda x: (x["organization"], x["project"], x["version"]))
-    return out
+    return out, features_seen
 
 
 def generate_all(repo_root, output_path):
     """
     Generate controller-wizard-data.json with all versions (--all behavior).
     Versions are emitted newest-first so new releases (e.g. v1.5.0) appear at the top of the wizard dropdown.
+    Feature definitions are built per version from conformance/release-features/.
     repo_root: repository root (parent of conformance/, site-src/).
     output_path: full path to output JSON file.
     Returns True if successful, False if no version dirs (caller may exit or log).
@@ -249,10 +361,26 @@ def generate_all(repo_root, output_path):
     version_dirs = get_version_dirs(reports_root)
     if not version_dirs:
         return False
-    out = {"featureDefinitions": FEATURE_DEFINITIONS}
+    release_files = release_feature_files(repo_root)
+    if not release_files:
+        raise SystemExit("No conformance/release-features/vX.Y.yaml files found.")
+    definitions = {}
+    release_features_by_version = {}
+    implementations = {}
     for version_dir in version_dirs:
         v = os.path.basename(version_dir)
-        out[v] = aggregate_by_impl(version_dir)
+        impls, features_seen = aggregate_by_impl(version_dir)
+        if not impls:
+            continue  # skip empty placeholder dirs (e.g. pre-release v1.7)
+        _path, release_features, experimental = release_features_for_version(v, release_files)
+        definitions[v] = build_feature_definitions(release_features, features_seen, experimental)
+        release_features_by_version[v] = release_features
+        implementations[v] = impls
+    if not implementations:
+        return False
+    check_feature_definitions(definitions, release_features_by_version)
+    out = {"featureDefinitions": definitions}
+    out.update(implementations)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
@@ -300,8 +428,15 @@ def main():
         if not os.path.isdir(version_dir):
             print(f"Version directory not found: {version_dir}", file=sys.stderr)
             sys.exit(1)
-        impls = aggregate_by_impl(version_dir)
-        out = {"featureDefinitions": FEATURE_DEFINITIONS, "implementations": impls}
+        release_files = release_feature_files(repo_root)
+        if not release_files:
+            print("No conformance/release-features/vX.Y.yaml files found.", file=sys.stderr)
+            sys.exit(1)
+        impls, features_seen = aggregate_by_impl(version_dir)
+        _path, release_features, experimental = release_features_for_version(args.version, release_files)
+        definitions = {args.version: build_feature_definitions(release_features, features_seen, experimental)}
+        check_feature_definitions(definitions, {args.version: release_features})
+        out = {"featureDefinitions": definitions, "implementations": impls}
     else:
         parser.error("Specify --all or --version vX.Y")
 
