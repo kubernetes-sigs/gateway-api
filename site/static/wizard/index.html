@@ -47,8 +47,7 @@
     <p class="intro-source">Matches are generated from the
       <a href="https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports" target="_blank" rel="noopener">conformance reports</a> uploaded by project implementations.
       <strong>Must have</strong> determines which controllers match; <strong>Nice to have</strong> optionally ranks your results. Feature names match the
-      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/" target="_blank" rel="noopener">v1.4
-        conformance tables</a>. Implementations only appear in this page if they pass Core conformance for the resource type. Implementations that submit conformance reports with skipped tests won't appear.</p>
+      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/" target="_blank" rel="noopener">conformance tables</a>. Implementations only appear in this page if they pass Core conformance for the resource type. Implementations that submit conformance reports with skipped tests won't appear.</p>
   </div>
 
   <section class="card">
@@ -89,19 +88,54 @@
       <table class="features" id="http-route-features">
         <tbody></tbody>
       </table>
+      <table class="features" id="backend-features">
+        <tbody></tbody>
+      </table>
     </div>
 
     <h3 id="grpcroute">GRPCRoute</h3>
     <table class="features" id="grpc-route-core">
       <tbody></tbody>
     </table>
-    <p class="section-intro">All GRPCRoute features are included as part of the core conformance, there are no optional features.</p>
+    <p class="section-intro">All controllers matched by this wizard include core support of GRPCRoute. Extended features, if any, are listed below; select Core Features to show them.</p>
+    <div id="grpc-route-extended-wrap" style="display: none;">
+      <table class="features" id="grpc-route-features">
+        <tbody></tbody>
+      </table>
+    </div>
 
     <h3 id="tlsroute">TLSRoute</h3>
     <table class="features" id="tls-route-core">
       <tbody></tbody>
     </table>
-    <p class="section-intro">All TLSRoute features are included as part of the core conformance, there are no optional features.</p>
+    <p class="section-intro">All controllers matched by this wizard include core support of TLSRoute. Extended features, if any, are listed below; select Core Features to show them.</p>
+    <div id="tls-route-extended-wrap" style="display: none;">
+      <table class="features" id="tls-route-features">
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h3 id="tcproute">TCPRoute</h3>
+    <table class="features" id="tcp-route-core">
+      <tbody></tbody>
+    </table>
+    <p class="section-intro">All controllers matched by this wizard include core support of TCPRoute. Extended features, if any, are listed below; select Core Features to show them.</p>
+    <div id="tcp-route-extended-wrap" style="display: none;">
+      <table class="features" id="tcp-route-features">
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h3 id="udproute">UDPRoute</h3>
+    <table class="features" id="udp-route-core">
+      <tbody></tbody>
+    </table>
+    <p class="section-intro">All controllers matched by this wizard include core support of UDPRoute. Extended features, if any, are listed below; select Core Features to show them.</p>
+    <div id="udp-route-extended-wrap" style="display: none;">
+      <table class="features" id="udp-route-features">
+        <tbody></tbody>
+      </table>
+    </div>
   </section>
 
   <p id="wizard-data-status" class="data-status"></p>

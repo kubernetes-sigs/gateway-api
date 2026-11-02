@@ -36,6 +36,19 @@ type featureDef struct {
 	Description string `json:"description"`
 }
 
+// featureDefs holds one version's feature categories.
+type featureDefs struct {
+	HTTPGateway    []featureDef `json:"httpGateway"`
+	HTTPRoute      []featureDef `json:"httpRoute"`
+	HTTPBackendTLS []featureDef `json:"httpBackendTls"`
+	Backend        []featureDef `json:"backend"`
+	GRPC           []featureDef `json:"grpc"`
+	TLS            []featureDef `json:"tls"`
+	TCP            []featureDef `json:"tcp"`
+	UDP            []featureDef `json:"udp"`
+	Mesh           []featureDef `json:"mesh"`
+}
+
 type implementation struct {
 	Organization string   `json:"organization"`
 	Project      string   `json:"project"`
@@ -55,18 +68,25 @@ var (
 	allVersionsData map[string][]implementation
 	allVersionKeys  []string // all API version keys, newest first (used for min-version matching)
 	currentVersion  string
+	allFeatureDefs  map[string]featureDefs
 	featHTTPGateway []featureDef
 	featHTTPRoute   []featureDef
 	featHTTPBackend []featureDef
+	featBackend     []featureDef
 	featGRPC        []featureDef
 	featTLS         []featureDef
+	featTCP         []featureDef
+	featUDP         []featureDef
 	featHTTPAll     []featureDef
 )
 
 var radioPrefix = map[string]string{
-	"http": "req-http-",
-	"grpc": "req-grpc-",
-	"tls":  "req-tls-",
+	"http":    "req-http-",
+	"backend": "req-backend-",
+	"grpc":    "req-grpc-",
+	"tls":     "req-tls-",
+	"tcp":     "req-tcp-",
+	"udp":     "req-udp-",
 }
 
 // Feature definitions come only from the loaded JSON (controller-wizard-data.json from hack/generate-controller-wizard-data.py).
@@ -137,11 +157,19 @@ func main() {
 			return nil
 		}
 		name := target.Get("name").String()
-		if name == "req-http-HTTPRouteCore" {
+		switch name {
+		case "req-http-HTTPRouteCore":
 			updateHTTPRouteExtendedVisibility()
-		}
-		if name == "req-http-GatewayCore" {
+		case "req-http-GatewayCore":
 			updateGatewayExtendedVisibility()
+		case "req-grpc-GRPCRouteCore":
+			updateGRPCRouteExtendedVisibility()
+		case "req-tls-TLSRouteCore":
+			updateTLSRouteExtendedVisibility()
+		case "req-tcp-TCPRouteCore":
+			updateTCPRouteExtendedVisibility()
+		case "req-udp-UDPRouteCore":
+			updateUDPRouteExtendedVisibility()
 		}
 		return nil
 	}))
@@ -198,24 +226,14 @@ func onDataLoaded(jsonStr string) {
 		return
 	}
 
-	// Parse feature definitions (single source of truth: JSON from generate-controller-wizard-data.py)
+	// Parse per-version feature definitions (single source of truth: JSON from
+	// generate-controller-wizard-data.py).
 	if fd, ok := raw["featureDefinitions"]; ok {
-		var fdStruct struct {
-			HTTPGateway    []featureDef `json:"httpGateway"`
-			HTTPRoute      []featureDef `json:"httpRoute"`
-			HTTPBackendTLS []featureDef `json:"httpBackendTls"`
-			GRPC           []featureDef `json:"grpc"`
-			TLS            []featureDef `json:"tls"`
-		}
-		if err := json.Unmarshal(fd, &fdStruct); err == nil {
-			featHTTPGateway = fdStruct.HTTPGateway
-			featHTTPRoute = fdStruct.HTTPRoute
-			featHTTPBackend = fdStruct.HTTPBackendTLS
-			featGRPC = fdStruct.GRPC
-			featTLS = fdStruct.TLS
+		var defs map[string]featureDefs
+		if err := json.Unmarshal(fd, &defs); err == nil {
+			allFeatureDefs = defs
 		}
 	}
-	featHTTPAll = append(append(append([]featureDef{}, featHTTPGateway...), featHTTPRoute...), featHTTPBackend...)
 
 	// Single implementations array
 	if implArr, ok := raw["implementations"]; ok {
@@ -223,6 +241,7 @@ func onDataLoaded(jsonStr string) {
 		if err := json.Unmarshal(implArr, &list); err == nil {
 			impls = list
 			allVersionsData = nil
+			applyFeatureDefinitions("")
 			versionRow.Get("style").Set("display", "none")
 			statusEl.Set("textContent", "")
 			renderFeatureTablesFiltered()
@@ -271,6 +290,7 @@ func onDataLoaded(jsonStr string) {
 		dropdownKeys = dropdownKeys[:maxVersionsInDropdown]
 	}
 	currentVersion = dropdownKeys[0]
+	applyFeatureDefinitions(currentVersion)
 	impls = buildImplsForMinVersion(currentVersion)
 
 	versionRow.Get("style").Set("display", "block")
@@ -284,6 +304,7 @@ func onDataLoaded(jsonStr string) {
 	versionSelect.Set("value", currentVersion)
 	versionSelect.Call("addEventListener", "change", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		currentVersion = versionSelect.Get("value").String()
+		applyFeatureDefinitions(currentVersion)
 		impls = buildImplsForMinVersion(currentVersion)
 		updateVersionLinks(currentVersion)
 		renderFeatureTablesFiltered()
@@ -298,6 +319,47 @@ func onDataLoaded(jsonStr string) {
 	statusEl.Set("textContent", "")
 	btn.Set("disabled", false)
 	notifyResize()
+}
+
+// applyFeatureDefinitions loads the definitions for a dropdown version. Keys are
+// report directory names (e.g. v1.6); dropdown keys may be v1.6.0, so fall back
+// to the newest version's definitions when there is no exact match.
+func applyFeatureDefinitions(version string) {
+	defs, ok := allFeatureDefs[version]
+	if !ok {
+		// Dropdown normalizes keys to X.Y.0 while report dirs use X.Y; match by major.minor, newest patch.
+		seg := versionSegment(version)
+		best := ""
+		for k := range allFeatureDefs {
+			if versionSegment(k) != seg {
+				continue
+			}
+			if best == "" || versionCompare(k, best) > 0 {
+				best = k
+			}
+		}
+		if best != "" {
+			defs, ok = allFeatureDefs[best], true
+		}
+	}
+	if !ok {
+		newest := ""
+		for k := range allFeatureDefs {
+			if newest == "" || versionCompare(k, newest) > 0 {
+				newest = k
+			}
+		}
+		defs = allFeatureDefs[newest]
+	}
+	featHTTPGateway = defs.HTTPGateway
+	featHTTPRoute = defs.HTTPRoute
+	featHTTPBackend = defs.HTTPBackendTLS
+	featBackend = defs.Backend
+	featGRPC = defs.GRPC
+	featTLS = defs.TLS
+	featTCP = defs.TCP
+	featUDP = defs.UDP
+	featHTTPAll = append(append(append([]featureDef{}, featHTTPGateway...), featHTTPRoute...), featHTTPBackend...)
 }
 
 // versionSegment returns "v1.4" from "v1.4.0" for implementation table URLs.
@@ -328,7 +390,7 @@ func updateVersionLinks(versionKey string) {
 		introLink.Set("href", base)
 		introLink.Set("textContent", seg+" conformance tables")
 	}
-	for _, id := range []string{"link-httproute", "link-grpcroute", "link-tlsroute"} {
+	for _, id := range []string{"link-httproute", "link-grpcroute", "link-tlsroute", "link-tcproute", "link-udproute"} {
 		el := doc.Call("getElementById", id)
 		if el.Truthy() {
 			el.Set("href", base+"#"+strings.TrimPrefix(id, "link-"))
@@ -444,39 +506,56 @@ func renderFeatureTablesFiltered() {
 		}
 	}
 	renderTable("http-route-features", "http", "", httpRouteAndBackend)
-	// GRPCRoute and TLSRoute: Core Features only; no extended feature table (use Gateway for that)
+	backendOtherFeat := filterFeatures(featBackend, avail)
+	renderTable("backend-features", "backend", "", backendOtherFeat)
+	// GRPCRoute, TLSRoute, TCPRoute and UDPRoute: Core Features row plus any
+	// version-specific extended features.
 	renderTable("grpc-route-core", "grpc", "", []featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}})
+	renderTable("grpc-route-features", "grpc", "", filterFeatures(featGRPC, avail))
 	renderTable("tls-route-core", "tls", "", []featureDef{{ID: "TLSRouteCore", Label: "Core Features"}})
+	renderTable("tls-route-features", "tls", "", filterFeatures(featTLS, avail))
+	renderTable("tcp-route-core", "tcp", "", []featureDef{{ID: "TCPRouteCore", Label: "Core Features"}})
+	renderTable("tcp-route-features", "tcp", "", filterFeatures(featTCP, avail))
+	renderTable("udp-route-core", "udp", "", []featureDef{{ID: "UDPRouteCore", Label: "Core Features"}})
+	renderTable("udp-route-features", "udp", "", filterFeatures(featUDP, avail))
 	updateGatewayExtendedVisibility()
 	updateHTTPRouteExtendedVisibility()
+	updateGRPCRouteExtendedVisibility()
+	updateTLSRouteExtendedVisibility()
+	updateTCPRouteExtendedVisibility()
+	updateUDPRouteExtendedVisibility()
 }
 
 func updateHTTPRouteExtendedVisibility() {
-	wrap := doc.Call("getElementById", "http-route-extended-wrap")
-	if !wrap.Truthy() {
-		return
-	}
-	coreCheckboxes := doc.Call("querySelectorAll", `input[name="req-http-HTTPRouteCore"]`)
-	anyChecked := false
-	for i := 0; i < coreCheckboxes.Length(); i++ {
-		if coreCheckboxes.Index(i).Get("checked").Bool() {
-			anyChecked = true
-			break
-		}
-	}
-	display := "none"
-	if anyChecked {
-		display = "block"
-	}
-	wrap.Get("style").Set("display", display)
+	updateExtendedVisibility("http-route-extended-wrap", "req-http-HTTPRouteCore")
 }
 
 func updateGatewayExtendedVisibility() {
-	wrap := doc.Call("getElementById", "gateway-extended-wrap")
+	updateExtendedVisibility("gateway-extended-wrap", "req-http-GatewayCore")
+}
+
+func updateGRPCRouteExtendedVisibility() {
+	updateExtendedVisibility("grpc-route-extended-wrap", "req-grpc-GRPCRouteCore")
+}
+
+func updateTLSRouteExtendedVisibility() {
+	updateExtendedVisibility("tls-route-extended-wrap", "req-tls-TLSRouteCore")
+}
+
+func updateTCPRouteExtendedVisibility() {
+	updateExtendedVisibility("tcp-route-extended-wrap", "req-tcp-TCPRouteCore")
+}
+
+func updateUDPRouteExtendedVisibility() {
+	updateExtendedVisibility("udp-route-extended-wrap", "req-udp-UDPRouteCore")
+}
+
+func updateExtendedVisibility(wrapID, coreInputName string) {
+	wrap := doc.Call("getElementById", wrapID)
 	if !wrap.Truthy() {
 		return
 	}
-	coreCheckboxes := doc.Call("querySelectorAll", `input[name="req-http-GatewayCore"]`)
+	coreCheckboxes := doc.Call("querySelectorAll", fmt.Sprintf(`input[name="%s"]`, coreInputName))
 	anyChecked := false
 	for i := 0; i < coreCheckboxes.Length(); i++ {
 		if coreCheckboxes.Index(i).Get("checked").Bool() {
@@ -540,15 +619,20 @@ func getSelections() (must, good []selection) {
 	httpFeats = append(httpFeats, featureDef{ID: "GatewayCore", Label: "Core Features"})
 	httpFeats = append(httpFeats, featureDef{ID: "HTTPRouteCore", Label: "Core Features"})
 	httpFeats = append(httpFeats, featHTTPAll...)
-	grpcFeats := []featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}}
-	tlsFeats := []featureDef{{ID: "TLSRouteCore", Label: "Core Features"}}
+	grpcFeats := append([]featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}}, featGRPC...)
+	tlsFeats := append([]featureDef{{ID: "TLSRouteCore", Label: "Core Features"}}, featTLS...)
+	tcpFeats := append([]featureDef{{ID: "TCPRouteCore", Label: "Core Features"}}, featTCP...)
+	udpFeats := append([]featureDef{{ID: "UDPRouteCore", Label: "Core Features"}}, featUDP...)
 	sections := []struct {
 		name  string
 		feats []featureDef
 	}{
 		{"http", httpFeats},
+		{"backend", featBackend},
 		{"grpc", grpcFeats},
 		{"tls", tlsFeats},
+		{"tcp", tcpFeats},
+		{"udp", udpFeats},
 	}
 	for _, s := range sections {
 		for _, f := range s.feats {
@@ -665,6 +749,8 @@ func recommend() {
 		hasConformanceCore := false
 		hasConformanceGRPC := false
 		hasConformanceTLS := false
+		hasConformanceTCP := false
+		hasConformanceUDP := false
 		for _, c := range impl.Conformance {
 			if c == "Core" {
 				hasConformanceCore = true
@@ -674,6 +760,12 @@ func recommend() {
 			}
 			if c == "TLSRoute" {
 				hasConformanceTLS = true
+			}
+			if c == "TCPRoute" {
+				hasConformanceTCP = true
+			}
+			if c == "UDPRoute" {
+				hasConformanceUDP = true
 			}
 		}
 		mustCount := 0
@@ -688,6 +780,12 @@ func recommend() {
 			}
 			if sel.ID == "TLSRouteCore" {
 				ok = hasConformanceTLS
+			}
+			if sel.ID == "TCPRouteCore" {
+				ok = hasConformanceTCP
+			}
+			if sel.ID == "UDPRouteCore" {
+				ok = hasConformanceUDP
 			}
 			if ok {
 				mustCount++
@@ -706,6 +804,12 @@ func recommend() {
 			}
 			if sel.ID == "TLSRouteCore" {
 				ok = hasConformanceTLS
+			}
+			if sel.ID == "TCPRouteCore" {
+				ok = hasConformanceTCP
+			}
+			if sel.ID == "UDPRouteCore" {
+				ok = hasConformanceUDP
 			}
 			if ok {
 				goodCount++
@@ -739,7 +843,7 @@ func recommend() {
 	})
 
 	featureLabel := func(section, id string) string {
-		isCore := id == "HTTPRouteCore" || id == "GatewayCore" || id == "GRPCRouteCore" || id == "TLSRouteCore"
+		isCore := id == "HTTPRouteCore" || id == "GatewayCore" || id == "GRPCRouteCore" || id == "TLSRouteCore" || id == "TCPRouteCore" || id == "UDPRouteCore"
 		if isCore {
 			resourceName := ""
 			switch id {
@@ -751,42 +855,41 @@ func recommend() {
 				resourceName = "GRPCRoute"
 			case "TLSRouteCore":
 				resourceName = "TLSRoute"
+			case "TCPRouteCore":
+				resourceName = "TCPRoute"
+			case "UDPRouteCore":
+				resourceName = "UDPRoute"
 			default:
 				resourceName = section
 			}
 			return "[" + resourceName + "] Core Features"
 		}
 		var label string
-		for _, f := range featHTTPAll {
-			if f.ID == id {
-				label = f.Label
+		for _, list := range [][]featureDef{featHTTPAll, featBackend, featGRPC, featTLS, featTCP, featUDP} {
+			for _, f := range list {
+				if f.ID == id {
+					label = f.Label
+					break
+				}
+			}
+			if label != "" {
 				break
-			}
-		}
-		if label == "" {
-			for _, f := range featGRPC {
-				if f.ID == id {
-					label = f.Label
-					break
-				}
-			}
-		}
-		if label == "" {
-			for _, f := range featTLS {
-				if f.ID == id {
-					label = f.Label
-					break
-				}
 			}
 		}
 		if label == "" {
 			label = id
 		}
-		if section == "grpc" {
+		switch section {
+		case "backend":
+			return "(Backend) " + label
+		case "grpc":
 			return "(GRPC) " + label
-		}
-		if section == "tls" {
+		case "tls":
 			return "(TLS) " + label
+		case "tcp":
+			return "(TCP) " + label
+		case "udp":
+			return "(UDP) " + label
 		}
 		return label
 	}
@@ -833,15 +936,20 @@ func resetAll() {
 	httpFeatsReset = append(httpFeatsReset, featureDef{ID: "GatewayCore", Label: "Core Features"})
 	httpFeatsReset = append(httpFeatsReset, featureDef{ID: "HTTPRouteCore", Label: "Core Features"})
 	httpFeatsReset = append(httpFeatsReset, featHTTPAll...)
-	grpcFeatsReset := []featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}}
-	tlsFeatsReset := []featureDef{{ID: "TLSRouteCore", Label: "Core Features"}}
+	grpcFeatsReset := append([]featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}}, featGRPC...)
+	tlsFeatsReset := append([]featureDef{{ID: "TLSRouteCore", Label: "Core Features"}}, featTLS...)
+	tcpFeatsReset := append([]featureDef{{ID: "TCPRouteCore", Label: "Core Features"}}, featTCP...)
+	udpFeatsReset := append([]featureDef{{ID: "UDPRouteCore", Label: "Core Features"}}, featUDP...)
 	sections := []struct {
 		section string
 		feats   []featureDef
 	}{
 		{"http", httpFeatsReset},
+		{"backend", featBackend},
 		{"grpc", grpcFeatsReset},
 		{"tls", tlsFeatsReset},
+		{"tcp", tcpFeatsReset},
+		{"udp", udpFeatsReset},
 	}
 	for _, s := range sections {
 		prefix := radioPrefix[s.section]
@@ -862,6 +970,10 @@ func resetAll() {
 	notifyResize()
 	updateGatewayExtendedVisibility()
 	updateHTTPRouteExtendedVisibility()
+	updateGRPCRouteExtendedVisibility()
+	updateTLSRouteExtendedVisibility()
+	updateTCPRouteExtendedVisibility()
+	updateUDPRouteExtendedVisibility()
 }
 
 func escapeHTML(s string) string {
