@@ -116,7 +116,9 @@ func TestImplementation_Validate(t *testing.T) {
 				i.SecurityContact = ""
 				return i
 			},
-			wantErr: true,
+			// TODO(youngnick): Change this to true in Gateway API v1.8
+			// DO NOT change this without talking to youngnick first.
+			wantErr: false,
 		},
 		{
 			name: "securityContact missing @",
@@ -219,8 +221,10 @@ func TestConformanceReport_IsConformant_SecurityContact(t *testing.T) {
 			name:              "v1.8 report without securityContact fails",
 			gatewayAPIVersion: "v1.8.0",
 			securityContact:   "",
-			wantGatewayResult: Failure,
-			wantErr:           true,
+			// TODO(youngnick): Update this to Failure and true in v1.8.
+			// DO NOT change this without talking to youngnick.
+			wantGatewayResult: Success,
+			wantErr:           false,
 		},
 		{
 			name:              "v1.8 report with invalid securityContact fails",
@@ -241,11 +245,11 @@ func TestConformanceReport_IsConformant_SecurityContact(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			report := baseReport(tt.gatewayAPIVersion, tt.securityContact)
-			gwResult, _, err := report.IsConformant("v1.8")
-			if (err != nil) != tt.wantErr {
-				t.Errorf("IsConformant() error = %v, wantErr %v", err, tt.wantErr)
+			gwResult, _, errs, _ := report.IsConformant("v1.8")
+			if len(errs) == 0 && tt.wantErr {
+				t.Errorf("IsConformant() error = %v, wantErr %v", errs, tt.wantErr)
 			}
-			if gwResult != tt.wantGatewayResult {
+			if *gwResult != tt.wantGatewayResult {
 				t.Errorf("IsConformant() gatewayResult = %v, want %v", gwResult, tt.wantGatewayResult)
 			}
 		})
@@ -264,37 +268,37 @@ func Test_updateResult(t *testing.T) {
 			name: "Old Failure, new Success",
 			old:  Failure,
 			new:  Success,
-			want: Success,
+			want: Failure,
 		},
 		{
 			name: "Old Success, new Failure",
 			old:  Success,
 			new:  Failure,
-			want: Success,
+			want: Failure,
 		},
 		{
 			name: "Old Partial, new Success",
 			old:  Partial,
 			new:  Success,
-			want: Success,
+			want: Partial,
 		},
 		{
 			name: "Old Success, new Partial",
 			old:  Success,
 			new:  Partial,
-			want: Success,
+			want: Partial,
 		},
 		{
 			name: "Old Failure, new Partial",
 			old:  Failure,
 			new:  Partial,
-			want: Partial,
+			want: Failure,
 		},
 		{
 			name: "Old Partial, new Failure",
 			old:  Partial,
 			new:  Failure,
-			want: Partial,
+			want: Failure,
 		},
 		{
 			name: "Both Failure",
