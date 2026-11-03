@@ -26,8 +26,8 @@ func TestProfileReport_IsConformant(t *testing.T) {
 		// Receiver type
 		coreResult     Result
 		extendedResult *Result
-		coreSkips      int
-		extendedSkips  int
+		coreSkips      uint32
+		extendedSkips  uint32
 		// Named input parameters for target function.
 		version    string
 		wantResult Result
@@ -128,7 +128,7 @@ func TestProfileReport_IsConformant(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Small hack, we use the test name as the profile name to make checking results easier.
 			p := makeProfileReport(tt.name, tt.coreResult, tt.extendedResult, tt.coreSkips, tt.extendedSkips)
-			got, got2, gotErrs := p.IsConformant("")
+			got, got2, gotErrs := p.IsConformant()
 			if len(gotErrs) > 0 {
 				if !tt.wantErrs {
 					t.Errorf("IsConformant() failed, got unexpected errors: %v", gotErrs)
@@ -149,20 +149,20 @@ func TestProfileReport_IsConformant(t *testing.T) {
 	}
 }
 
-func makeProfileReport(name string, coreResult Result, extendedResult *Result, coreSkips, extendedSkips int) *ProfileReport {
+func makeProfileReport(name string, coreResult Result, extendedResult *Result, coreSkips, extendedSkips uint32) *ProfileReport {
 	returnProfile := ProfileReport{
 		Name:    name,
 		Summary: "something",
 		Core: Status{
 			Result:  coreResult,
-			Skipped: uint32(coreSkips),
+			Skipped: coreSkips,
 		},
 	}
 
 	if extendedResult != nil {
 		returnProfile.Extended = &ExtendedStatus{
 			Result:  *extendedResult,
-			Skipped: uint32(extendedSkips),
+			Skipped: extendedSkips,
 		}
 	}
 

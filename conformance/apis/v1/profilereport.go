@@ -79,9 +79,8 @@ type Status struct {
 //
 // Note that this does not use errors.Join because we need the errors to be presented without
 // newlines in eventual reports, and that's surprisingly difficult with Join-ed errors.
-func (p *ProfileReport) IsConformant(version string) (Result, int, []error) {
-
-	var totalSkips int
+func (p *ProfileReport) IsConformant() (Result, uint32, []error) {
+	var totalSkips uint32
 
 	if p.Name == "" {
 		return Failure, 0, []error{errors.New("the ProfileReport must have a non-empty name")}
@@ -92,11 +91,11 @@ func (p *ProfileReport) IsConformant(version string) (Result, int, []error) {
 	}
 
 	var returnErrs []error
-	totalSkips += int(p.Core.Skipped)
+	totalSkips += p.Core.Skipped
 
 	profileResult := Success
 	if p.Core.Result == Failure {
-		returnErrs = append(returnErrs, errors.New("Core tests failed"))
+		returnErrs = append(returnErrs, errors.New("core tests failed"))
 	}
 	profileResult = updateResult(profileResult, p.Core.Result)
 
@@ -108,16 +107,15 @@ func (p *ProfileReport) IsConformant(version string) (Result, int, []error) {
 	}
 
 	if p.Extended != nil {
-		totalSkips += int(p.Extended.Skipped)
+		totalSkips += p.Extended.Skipped
 		if totalSkips > 5 {
 			profileResult = updateResult(profileResult, Partial)
 			returnErrs = append(returnErrs, fmt.Errorf("more than the maxiumum amount of 5 total test skips in a profile : %d", totalSkips))
 		}
 		if p.Extended.Result == Failure {
-			returnErrs = append(returnErrs, errors.New("Extended tests failed"))
+			returnErrs = append(returnErrs, errors.New("extended tests failed"))
 		}
 		profileResult = updateResult(profileResult, p.Extended.Result)
-
 	}
 
 	return profileResult, totalSkips, returnErrs

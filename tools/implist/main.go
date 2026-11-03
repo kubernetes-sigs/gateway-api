@@ -25,6 +25,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"log/slog"
 	"maps"
 	"net/url"
 	"os"
@@ -79,22 +80,34 @@ func main() {
 
 	flag.Parse()
 
-	log.SetOutput(os.Stdout)
+	debug := os.Getenv("DEBUG")
 
-	implDetails, err := readDetails(ImplsDir)
-	if err != nil {
-		log.Fatalf("Couldn't read implementation details: %s", err)
+	logOpts := &slog.HandlerOptions{
+		Level: slog.LevelInfo,
 	}
-	log.Printf("Found %d implementation details entries", len(implDetails))
-
-	confReports, err := readReports(ReportsDir)
-	if err != nil {
-		log.Fatalf("Couldn't read conformance reports: %s", err)
+	if debug != "" {
+		logOpts.Level = slog.LevelDebug
 	}
-	log.Printf("Found %d candidate conformance reports", len(confReports))
 
-	templateOut := NewTemplateOutput()
-	integrations, err := readDetails(IntegrationsDir)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, logOpts))
+	slog.SetDefault(logger)
+
+	implDetails, err := readDetails(logger, ImplsDir)
+	if err != nil {
+		logger.Error("Couldn't read implementation details", "error", err)
+		os.Exit(1)
+	}
+	logger.Debug("Found implementation details entries", "count", len(implDetails))
+
+	confReports, err := readReports(logger, ReportsDir)
+	if err != nil {
+		logger.Error("Couldn't read conformance reports", "error", err)
+		os.Exit(1)
+	}
+	logger.Debug("Found candidate conformance reports", "count", len(confReports))
+
+	templateOut := NewTemplateOutput(logger)
+	integrations, err := readDetails(logger, IntegrationsDir)
 	if err != nil {
 		log.Fatalf("Couldn't read integration details: %s", err)
 	}
@@ -110,39 +123,44 @@ func main() {
 
 	tmpl, err := template.New("impl-list.tmpl").Funcs(funcMap).ParseFS(templateFiles, "templates/impl-list.tmpl")
 	if err != nil {
-		log.Fatalf("error reading mkdocs template: %s", err)
+		logger.Error("error reading mkdocs template", "error", err)
+		os.Exit(1)
 	}
 
 	templateBuffer := &bytes.Buffer{}
 	if errTmpl := tmpl.Execute(templateBuffer, templateOut); errTmpl != nil {
-		log.Fatalf("error rendering template: %s", errTmpl)
+		logger.Error("error endering template", "error", errTmpl)
+		os.Exit(1)
 	}
 
 	headerBytes, err := templateFiles.ReadFile("templates/impl-list-header.md")
 	if err != nil {
-		log.Fatalf("Couldn't read header from templates/impl-list-header.md")
+		logger.Error("Couldn't read header from templates/impl-list-header.md", "error", err)
+		os.Exit(1)
 	}
 
 	footerBytes, err := templateFiles.ReadFile("templates/impl-list-footer.md")
 	if err != nil {
-		log.Fatalf("Couldn't read footer from templates/impl-list-footer.md")
+		logger.Error("Couldn't read footer from templates/impl-list-footer.md", "error", err)
+		os.Exit(1)
 	}
 
 	outputBytes := bytes.Join([][]byte{headerBytes, templateBuffer.Bytes(), footerBytes}, []byte("\n"))
 
 	if errTmpl := os.WriteFile(OutFile, outputBytes, 0o600); errTmpl != nil {
-		log.Fatalf("error writing file: %s", errTmpl)
+		logger.Error("Error writing template file", "error", errTmpl)
+		os.Exit(1)
 	}
 
 	templateOut.PrintSummaryTable(os.Stdout)
 }
 
-func readDetails(dir string) (DetailsMap, error) {
+func readDetails(logger *slog.Logger, dir string) (DetailsMap, error) {
 	out := make(DetailsMap)
 
 	rootFS := os.DirFS(dir)
 
-	log.Printf("Loading implementation details from %s", dir)
+	logger.Debug("Loading details files from", "implsDir", dir)
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return fmt.Errorf("error accessing %s: %w", path, err)
@@ -162,7 +180,7 @@ func readDetails(dir string) (DetailsMap, error) {
 		}
 
 		implListDetail := &v1.ImplementationListDetail{}
-		log.Printf("loading %s", path)
+		logger.Debug("loading details", "path", path)
 		if err := yaml.Unmarshal(content, implListDetail); err != nil {
 			return err
 		}
@@ -177,11 +195,11 @@ func readDetails(dir string) (DetailsMap, error) {
 	return out, nil
 }
 
-func readReports(dir string) (ReportsMap, error) {
+func readReports(logger *slog.Logger, dir string) (ReportsMap, error) {
 	out := make(ReportsMap)
 	rootFS := os.DirFS(dir)
 
-	log.Printf("Loading Conformance reports from %s", dir)
+	logger.Debug("Loading Conformance reports", "confReports", dir)
 
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -208,7 +226,7 @@ func readReports(dir string) (ReportsMap, error) {
 			return nil
 		}
 
-		log.Printf("Found a candidate conformance report: %s", relPath)
+		logger.Debug("Found a candidate conformance report", "path", relPath)
 
 		content, err := fs.ReadFile(rootFS, relPath)
 		if err != nil {
@@ -281,9 +299,10 @@ type TemplateOutput struct {
 	MeshFailedImpls        ConformantImpls
 	AllImplementations     ConformanceMap
 	Integrations           DetailsMap
+	logger                 *slog.Logger
 }
 
-func NewTemplateOutput() TemplateOutput {
+func NewTemplateOutput(logger *slog.Logger) TemplateOutput {
 	var t TemplateOutput
 	t.GatewayConformantImpls = make(ConformantImpls)
 	t.GatewayPartialImpls = make(ConformantImpls)
@@ -293,6 +312,7 @@ func NewTemplateOutput() TemplateOutput {
 	t.MeshFailedImpls = make(ConformantImpls)
 	t.AllImplementations = make(ConformanceMap)
 	t.Integrations = make(DetailsMap)
+	t.logger = logger
 
 	return t
 }
@@ -359,12 +379,12 @@ func (t *TemplateOutput) FilterConformantReports(confReports ReportsMap, implDet
 		if !ok {
 			// This should cause the program to end with an erorr so that CI fails eventually
 			// Maybe this function should return an error?
-			log.Printf("ERROR: Report for %s does not have an implementation details file in conformance/list/implementations", reportFor)
+			t.logger.Error("Report for does not have an implementation details file in conformance/list/implementations", "reportFor", reportFor)
 			continue
 		}
 		fullName := detailsFor.FullName
 
-		resultGatewayPtr, resultMeshPtr, gatewayErrs, meshErrs := report.IsConformant(CurrentVersion)
+		resultGatewayPtr, resultMeshPtr, gatewayErrs, meshErrs := report.IsConformant()
 
 		// Store any errors with the report as the value in the conformance result tables
 		gatewayDescription := ""
@@ -396,10 +416,17 @@ func (t *TemplateOutput) FilterConformantReports(confReports ReportsMap, implDet
 		if resultGatewayPtr != nil {
 			if len(gatewayErrs) > 0 {
 				gatewayDescription = formatErrors(gatewayErrs)
-				log.Printf("Gateway report for %s, version %s, resultGateway %s, from %s, reason:%s", reportFor, report.GatewayAPIVersion, resultGateway, path, gatewayDescription)
+				t.logger.Debug("Gateway report with errors", "reportFor", reportFor,
+					"gatewayAPIVersion", report.GatewayAPIVersion,
+					"result", resultGateway,
+					"path", path,
+					"errors", gatewayDescription)
 				t.GatewayFailedImpls[fullName] = gatewayDescription
 			} else {
-				log.Printf("Gateway report for %s, version %s, result %s, from %s", reportFor, report.GatewayAPIVersion, resultGateway, path)
+				t.logger.Debug("Gateway report", "reportFor", reportFor,
+					"gatewayAPIVersion", report.GatewayAPIVersion,
+					"result", resultGateway,
+					"path", path)
 			}
 			switch resultGateway {
 			case v1.Partial:
@@ -407,17 +434,22 @@ func (t *TemplateOutput) FilterConformantReports(confReports ReportsMap, implDet
 			case v1.Success:
 				t.GatewayConformantImpls[fullName] = gatewayDescription
 			}
-
 		}
 
 		if resultMeshPtr != nil {
-
 			if len(meshErrs) > 0 {
 				meshDescription = formatErrors(meshErrs)
-				log.Printf("Mesh report for %s, version %s, resultGateway %s, from %s, reason:%s", reportFor, report.GatewayAPIVersion, resultMesh, path, meshDescription)
+				t.logger.Debug("Mesh report with errors", "reportFor", reportFor,
+					"gatewayAPIVersion", report.GatewayAPIVersion,
+					"result", resultMesh,
+					"path", path,
+					"errors", meshDescription)
 				t.MeshFailedImpls[fullName] = meshDescription
 			} else {
-				log.Printf("Mesh report for %s, version %s, result %s, from %s", reportFor, report.GatewayAPIVersion, resultMesh, path)
+				t.logger.Debug("Mesh report", "reportFor", reportFor,
+					"gatewayAPIVersion", report.GatewayAPIVersion,
+					"result", resultMesh,
+					"path", path)
 			}
 			switch resultMesh {
 			case v1.Partial:
@@ -425,7 +457,6 @@ func (t *TemplateOutput) FilterConformantReports(confReports ReportsMap, implDet
 			case v1.Success:
 				t.MeshConformantImpls[fullName] = meshDescription
 			}
-
 		}
 
 		if resultGateway != v1.Failure || resultMesh != v1.Failure {
@@ -461,7 +492,6 @@ func removeDuplicateConformanceReports(a ConformantImpls, b ConformantImpls) {
 
 // PrintSummaryTable prints summary tables for each Conformance category to the provided io.Writer.
 func (t *TemplateOutput) PrintSummaryTable(w io.Writer) {
-
 	if len(t.GatewayConformantImpls) > 0 {
 		fmt.Fprint(w, "\n\n\nConformant Gateway Implementations\n\n")
 		for _, impl := range slices.Sorted(maps.Keys(t.GatewayConformantImpls)) {
@@ -495,15 +525,12 @@ func (t *TemplateOutput) PrintSummaryTable(w io.Writer) {
 		fmt.Fprint(w, "\n\n\nNon Conformant Mesh Implementations\n\n")
 		printNonConformantImpls(w, t.MeshFailedImpls)
 	}
-
 }
 
 func printNonConformantImpls(w io.Writer, ci ConformantImpls) {
-
 	for _, key := range slices.Sorted(maps.Keys(ci)) {
 		fmt.Fprintf(w, "%s:   %s\n", key, ci[key])
 	}
-
 }
 
 func formatErrors(errs []error) string {

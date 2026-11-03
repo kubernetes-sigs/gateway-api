@@ -245,7 +245,7 @@ func TestConformanceReport_IsConformant_SecurityContact(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			report := baseReport(tt.gatewayAPIVersion, tt.securityContact)
-			gwResult, _, errs, _ := report.IsConformant("v1.8")
+			gwResult, _, errs, _ := report.IsConformant()
 			if len(errs) == 0 && tt.wantErr {
 				t.Errorf("IsConformant() error = %v, wantErr %v", errs, tt.wantErr)
 			}
