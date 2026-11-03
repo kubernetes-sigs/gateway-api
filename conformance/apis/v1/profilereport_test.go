@@ -128,7 +128,7 @@ func TestProfileReport_IsConformant(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Small hack, we use the test name as the profile name to make checking results easier.
 			p := makeProfileReport(tt.name, tt.coreResult, tt.extendedResult, tt.coreSkips, tt.extendedSkips)
-			got, got2, gotErrs := p.IsConformant("")
+			got, got2, gotErrs := p.IsConformant()
 			if len(gotErrs) > 0 {
 				if !tt.wantErrs {
 					t.Errorf("IsConformant() failed, got unexpected errors: %v", gotErrs)

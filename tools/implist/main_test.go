@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"log/slog"
 	"os"
 	"path/filepath"
 	"slices"
@@ -37,6 +38,9 @@ func TestReadReportsFiltersUnsupportedVersions(t *testing.T) {
 	reportPassVersions = append(reportPassVersions, StaleVersions...)
 
 	slices.Reverse(reportPassVersions)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
 
 	reportsDir := t.TempDir()
 	for _, version := range allVersions {
@@ -49,7 +53,7 @@ func TestReadReportsFiltersUnsupportedVersions(t *testing.T) {
 		}
 	}
 
-	reports, err := readReports(reportsDir)
+	reports, err := readReports(logger, reportsDir)
 	if err != nil {
 		t.Fatalf("readReports returned error: %v", err)
 	}
