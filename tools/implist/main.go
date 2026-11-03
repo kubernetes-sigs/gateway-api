@@ -22,6 +22,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"maps"
@@ -51,9 +52,10 @@ var (
 // TODO(youngnick): Figure out some way to make this more centralized.
 // Don't open a PR about this without talking with youngnick first.
 var (
-	CurrentVersion     = "v1.6"
-	ConformantVersions = []string{CurrentVersion, "v1.5"}
-	StaleVersions      = []string{"v1.4"}
+	CurrentVersion       = "v1.7"
+	ConformantVersions   = []string{CurrentVersion, "v1.6"}
+	StaleVersions        = []string{"v1.5"}
+	NonConformantVersion = "v1.4"
 )
 
 // FullNameToHeadingLink transforms an implementation's full name
@@ -131,6 +133,8 @@ func main() {
 	if errTmpl := os.WriteFile(OutFile, outputBytes, 0o600); errTmpl != nil {
 		log.Fatalf("error writing file: %s", errTmpl)
 	}
+
+	templateOut.PrintSummaryTable(os.Stdout)
 }
 
 func readDetails(dir string) (DetailsMap, error) {
@@ -271,8 +275,10 @@ type ConformantImpls map[string]string
 type TemplateOutput struct {
 	GatewayConformantImpls ConformantImpls
 	GatewayPartialImpls    ConformantImpls
+	GatewayFailedImpls     ConformantImpls
 	MeshConformantImpls    ConformantImpls
 	MeshPartialImpls       ConformantImpls
+	MeshFailedImpls        ConformantImpls
 	AllImplementations     ConformanceMap
 	Integrations           DetailsMap
 }
@@ -281,8 +287,10 @@ func NewTemplateOutput() TemplateOutput {
 	var t TemplateOutput
 	t.GatewayConformantImpls = make(ConformantImpls)
 	t.GatewayPartialImpls = make(ConformantImpls)
+	t.GatewayFailedImpls = make(ConformantImpls)
 	t.MeshConformantImpls = make(ConformantImpls)
 	t.MeshPartialImpls = make(ConformantImpls)
+	t.MeshFailedImpls = make(ConformantImpls)
 	t.AllImplementations = make(ConformanceMap)
 	t.Integrations = make(DetailsMap)
 
@@ -340,58 +348,84 @@ func (t *TemplateOutput) FilterConformantReports(confReports ReportsMap, implDet
 	paths := slices.Sorted(maps.Keys(confReports))
 	for _, path := range paths {
 		report := confReports[path]
-		resultGateway, resultMesh, err := report.IsConformant(CurrentVersion)
 		reportFor := implKey(report.Implementation)
-		// Store any errors with the report as the value in the conformance result tables
-		result := ""
-
-		if !slices.Contains(ConformantVersions, semver.MajorMinor(report.GatewayAPIVersion)) {
-			// If the report is not in the last two versions, it can only be Partial at maximum.
-			if resultGateway == v1.Success {
-				resultGateway = v1.Partial
-				err = errors.New("report is more than two versions old")
-			}
-			if resultMesh == v1.Success {
-				resultMesh = v1.Partial
-				err = errors.New("report is more than two versions old")
-			}
-		}
-
-		if err != nil {
-			result = err.Error()
-			log.Printf("Report for %s, version %s, result %s, from %s, reason:%s", reportFor, report.GatewayAPIVersion, resultGateway, path, err)
-		} else {
-			log.Printf("Report for %s, version %s, result %s, from %s", reportFor, report.GatewayAPIVersion, resultGateway, path)
-		}
-
 		detailsFor, ok := implDetails[reportFor]
-		if !ok {
-			// This should cause the program to end with an erorr so that CI fails eventually
-			// Maybe this function should return an error?
-			log.Printf("ERROR: Report for %s does not have an implementation details file in conformance/list/implementations", reportFor)
-			continue
-		}
-
-		fullName := detailsFor.FullName
-
 		cd := ConformanceDetails{
 			Version:  report.GatewayAPIVersion,
 			Path:     path,
 			ImplList: detailsFor,
 		}
 
-		switch resultGateway {
-		case v1.Partial:
-			t.GatewayPartialImpls[fullName] = result
-		case v1.Success:
-			t.GatewayConformantImpls[fullName] = result
+		if !ok {
+			// This should cause the program to end with an erorr so that CI fails eventually
+			// Maybe this function should return an error?
+			log.Printf("ERROR: Report for %s does not have an implementation details file in conformance/list/implementations", reportFor)
+			continue
+		}
+		fullName := detailsFor.FullName
+
+		resultGatewayPtr, resultMeshPtr, gatewayErrs, meshErrs := report.IsConformant(CurrentVersion)
+
+		// Store any errors with the report as the value in the conformance result tables
+		gatewayDescription := ""
+		meshDescription := ""
+
+		var resultGateway v1.Result
+		var resultMesh v1.Result
+
+		if resultGatewayPtr != nil {
+			resultGateway = *resultGatewayPtr
 		}
 
-		switch resultMesh {
-		case v1.Partial:
-			t.MeshPartialImpls[fullName] = result
-		case v1.Success:
-			t.MeshConformantImpls[fullName] = result
+		if resultMeshPtr != nil {
+			resultMesh = *resultMeshPtr
+		}
+
+		if !slices.Contains(ConformantVersions, semver.MajorMinor(report.GatewayAPIVersion)) {
+			// If the report is not in the last two versions, it can only be Partial at maximum.
+			if resultGatewayPtr != nil && resultGateway == v1.Success {
+				resultGateway = v1.Partial
+				gatewayErrs = append(gatewayErrs, errors.New("report is more than two versions old"))
+			}
+			if resultGatewayPtr != nil && resultMesh == v1.Success {
+				resultMesh = v1.Partial
+				meshErrs = append(meshErrs, errors.New("report is more than two versions old"))
+			}
+		}
+
+		if resultGatewayPtr != nil {
+			if len(gatewayErrs) > 0 {
+				gatewayDescription = formatErrors(gatewayErrs)
+				log.Printf("Gateway report for %s, version %s, resultGateway %s, from %s, reason:%s", reportFor, report.GatewayAPIVersion, resultGateway, path, gatewayDescription)
+				t.GatewayFailedImpls[fullName] = gatewayDescription
+			} else {
+				log.Printf("Gateway report for %s, version %s, result %s, from %s", reportFor, report.GatewayAPIVersion, resultGateway, path)
+			}
+			switch resultGateway {
+			case v1.Partial:
+				t.GatewayPartialImpls[fullName] = gatewayDescription
+			case v1.Success:
+				t.GatewayConformantImpls[fullName] = gatewayDescription
+			}
+
+		}
+
+		if resultMeshPtr != nil {
+
+			if len(meshErrs) > 0 {
+				meshDescription = formatErrors(meshErrs)
+				log.Printf("Mesh report for %s, version %s, resultGateway %s, from %s, reason:%s", reportFor, report.GatewayAPIVersion, resultMesh, path, meshDescription)
+				t.MeshFailedImpls[fullName] = meshDescription
+			} else {
+				log.Printf("Mesh report for %s, version %s, result %s, from %s", reportFor, report.GatewayAPIVersion, resultMesh, path)
+			}
+			switch resultMesh {
+			case v1.Partial:
+				t.MeshPartialImpls[fullName] = meshDescription
+			case v1.Success:
+				t.MeshConformantImpls[fullName] = meshDescription
+			}
+
 		}
 
 		if resultGateway != v1.Failure || resultMesh != v1.Failure {
@@ -400,23 +434,83 @@ func (t *TemplateOutput) FilterConformantReports(confReports ReportsMap, implDet
 	}
 
 	removeDuplicateConformanceReports(t.GatewayPartialImpls, t.GatewayConformantImpls)
+	removeDuplicateConformanceReports(t.GatewayFailedImpls, t.GatewayConformantImpls)
+	removeDuplicateConformanceReports(t.GatewayFailedImpls, t.GatewayPartialImpls)
 	removeDuplicateConformanceReports(t.MeshPartialImpls, t.MeshConformantImpls)
+	removeDuplicateConformanceReports(t.MeshFailedImpls, t.MeshConformantImpls)
+	removeDuplicateConformanceReports(t.MeshFailedImpls, t.MeshPartialImpls)
 }
 
-func removeDuplicateConformanceReports(partialMap ConformantImpls, conformantMap ConformantImpls) {
-	for conformantKey := range conformantMap {
-		for partialKey := range partialMap {
-			if conformantKey != partialKey {
+// removeDuplicateConformanceReports removes any entries in a that intersect with entries in b
+func removeDuplicateConformanceReports(a ConformantImpls, b ConformantImpls) {
+	for aKey := range b {
+		for bKey := range a {
+			if aKey != bKey {
 				continue
 			}
-			// If there's a conformant and a partial report for the same implementation,
-			// only the conformant one counts.
+			// If a and b have the same key, only b counts, so remove the key from a.
 			//
 			// NOTE FOR REVIEW:
 			//
 			// This means that, if you submit a conformance report for an implementation
 			// that's partial, but newer, the older one will count.
-			delete(partialMap, partialKey)
+			delete(a, bKey)
 		}
 	}
+}
+
+// PrintSummaryTable prints summary tables for each Conformance category to the provided io.Writer.
+func (t *TemplateOutput) PrintSummaryTable(w io.Writer) {
+
+	if len(t.GatewayConformantImpls) > 0 {
+		fmt.Fprint(w, "\n\n\nConformant Gateway Implementations\n\n")
+		for _, impl := range slices.Sorted(maps.Keys(t.GatewayConformantImpls)) {
+			fmt.Fprintln(w, impl)
+		}
+	}
+
+	if len(t.GatewayPartialImpls) > 0 {
+		fmt.Fprint(w, "\n\n\nPartially Conformant Gateway Implementations\n\n")
+		printNonConformantImpls(w, t.GatewayPartialImpls)
+	}
+
+	if len(t.GatewayFailedImpls) > 0 {
+		fmt.Fprint(w, "\n\n\nNon Conformant Gateway Implementations\n\n")
+		printNonConformantImpls(w, t.GatewayFailedImpls)
+	}
+
+	if len(t.MeshConformantImpls) > 0 {
+		fmt.Fprint(w, "\n\n\nConformant Mesh Implementations\n\n")
+		for _, impl := range slices.Sorted(maps.Keys(t.MeshConformantImpls)) {
+			fmt.Fprintln(w, impl)
+		}
+	}
+
+	if len(t.MeshPartialImpls) > 0 {
+		fmt.Fprint(w, "\n\n\nPartially Conformant Mesh Implementations\n\n")
+		printNonConformantImpls(w, t.MeshPartialImpls)
+	}
+
+	if len(t.MeshFailedImpls) > 0 {
+		fmt.Fprint(w, "\n\n\nNon Conformant Mesh Implementations\n\n")
+		printNonConformantImpls(w, t.MeshFailedImpls)
+	}
+
+}
+
+func printNonConformantImpls(w io.Writer, ci ConformantImpls) {
+
+	for _, key := range slices.Sorted(maps.Keys(ci)) {
+		fmt.Fprintf(w, "%s:   %s\n", key, ci[key])
+	}
+
+}
+
+func formatErrors(errs []error) string {
+	var msgs []string
+	for _, e := range errs {
+		msgs = append(msgs, e.Error())
+	}
+
+	return strings.Join(msgs, ", ")
 }
