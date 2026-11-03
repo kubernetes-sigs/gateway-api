@@ -138,7 +138,7 @@ func validateURL(rawURL string) error {
 //
 // Note that this does not use errors.Join because we need the errors to be presented without
 // newlines in eventual reports, and that's surprisingly difficult with Join-ed errors.
-func (c *ConformanceReport) IsConformant(version string) (*Result, *Result, []error, []error) {
+func (c *ConformanceReport) IsConformant() (*Result, *Result, []error, []error) {
 	// All profiles must be conformant for the report to be conformant.
 	// For results, Failure > Partial > Success, and the greatest
 	// value will be used.
@@ -161,10 +161,10 @@ func (c *ConformanceReport) IsConformant(version string) (*Result, *Result, []er
 	var gatewayErrs []error
 	var meshErrs []error
 
-	var totalSkips int
+	var totalSkips uint32
 
 	for _, profile := range c.ProfileReports {
-		profileResult, skips, errs := profile.IsConformant(version)
+		profileResult, skips, errs := profile.IsConformant()
 		totalSkips += skips
 
 		if strings.HasPrefix(profile.Name, "MESH") {
@@ -180,20 +180,18 @@ func (c *ConformanceReport) IsConformant(version string) (*Result, *Result, []er
 			}
 			gatewayResult = updateResult(gatewayResult, profileResult)
 		}
-
 	}
 
 	// The Implementation struct must be valid.
 	if err := c.Validate(); err != nil {
 		if hasGateway {
-			gatewayErrs = append(gatewayErrs, fmt.Errorf("Implementation details were not valid: %s", err))
+			gatewayErrs = append(gatewayErrs, fmt.Errorf("implementation details were not valid: %s", err))
 			gatewayResult = updateResult(gatewayResult, Failure)
 		}
 		if hasMesh {
-			meshErrs = append(meshErrs, fmt.Errorf("Implementation details were not valid: %s", err))
+			meshErrs = append(meshErrs, fmt.Errorf("implementation details were not valid: %s", err))
 			meshResult = updateResult(meshResult, Failure)
 		}
-
 	}
 
 	// When we've checked all the profiles in a report, check to see how many test skips in total
@@ -202,11 +200,11 @@ func (c *ConformanceReport) IsConformant(version string) (*Result, *Result, []er
 	// and will fail _both_ Mesh and Gateway conformance directions.
 	if totalSkips > 5 {
 		if hasGateway {
-			gatewayErrs = append(gatewayErrs, fmt.Errorf("Too many tests were skipped across the report: %d ", totalSkips))
+			gatewayErrs = append(gatewayErrs, fmt.Errorf("too many tests were skipped across the report: %d ", totalSkips))
 			gatewayResult = updateResult(gatewayResult, Failure)
 		}
 		if hasMesh {
-			meshErrs = append(meshErrs, fmt.Errorf("Too many tests were skipped across the report: %d ", totalSkips))
+			meshErrs = append(meshErrs, fmt.Errorf("too many tests were skipped across the report: %d ", totalSkips))
 			meshResult = updateResult(meshResult, Failure)
 		}
 	}
