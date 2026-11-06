@@ -25,3 +25,13 @@ responses to clients in any way.
 In this example, all requests are forwarded to service `foo-v1` on port `8080`,
 and they are also forwarded to service `foo-v2` on port `8080`, but responses
 are only generated from service `foo-v1`.
+
+{{% alert color="info" title="Union Feature" %}}
+
+The RequestMirror filter is expected to interoperate with
+[BackendTLSPolicy](/reference/api-types/policy/backendtlspolicy/), a
+[union feature](/guides/implementers-guide/#union-feature-conformance) that
+configures TLS from the Gateway to a mirrored backend, the same way it does
+for any other backend a Route forwards traffic to.
+
+{{% /alert %}}

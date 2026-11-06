@@ -22,6 +22,11 @@ package v1
 // with apply.
 //
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
+//
+// HTTPRequestMirrorFilter is expected to interoperate with BackendTLSPolicy (a
+// Union Feature).
+//
+// <gateway:union:BackendTLSPolicy>
 type HTTPRequestMirrorFilterApplyConfiguration struct {
 	// BackendRef references a resource where mirrored requests are sent.
 	//

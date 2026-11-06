@@ -95,7 +95,10 @@ flowchart LR
 While the diagram above shows an HTTPRoute, BackendTLSPolicy is a
 [union feature](/guides/implementers-guide/#union-feature-conformance) and
 works with any route type that forwards traffic to backends, including
-GRPCRoute and TLSRoute (when in Terminate mode).
+[GRPCRoute](/reference/api-types/grpcroute/) and
+[TLSRoute](/reference/api-types/tlsroute/) (when in Terminate mode). It also
+applies to traffic sent to a backend via an HTTPRoute's
+[RequestMirror filter](/guides/user-guides/http-request-mirroring/).
 
 {{% /alert %}}
 
