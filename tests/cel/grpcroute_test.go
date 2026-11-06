@@ -284,7 +284,7 @@ func TestGRPCRouteRule(t *testing.T) {
 		},
 		{
 			name:       "too many matches and rules",
-			wantErrors: []string{"total number of matches across all rules in a route must be less than 128"},
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
 			rules: func() []gatewayv1.GRPCRouteRule {
 				match := gatewayv1.GRPCRouteMatch{
 					Headers: []gatewayv1.GRPCHeaderMatch{
@@ -308,6 +308,71 @@ func TestGRPCRouteRule(t *testing.T) {
 						rule.Matches = append(rule.Matches, match)
 					}
 					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "64 rules",
+			wantErrors: nil,
+			rules:      grpcRulesWithMethodMatch(64),
+		},
+		{
+			name:       "65 rules",
+			wantErrors: []string{"must have at most 64 items"},
+			rules:      grpcRulesWithMethodMatch(65),
+		},
+		{
+			name:       "matches are counted across all rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
+			rules: func() []gatewayv1.GRPCRouteRule {
+				match := gatewayv1.GRPCRouteMatch{
+					Method: &gatewayv1.GRPCMethodMatch{
+						Type:    new(gatewayv1.GRPCMethodMatchExact),
+						Service: new("foo"),
+						Method:  new("bar"),
+					},
+				}
+				var rules []gatewayv1.GRPCRouteRule
+				for range 20 { // rules
+					rule := gatewayv1.GRPCRouteRule{}
+					for range 7 { // matches: 140 in total, 112 within the first 16 rules
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "rules without matches count as zero, exactly 128 matches across rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.GRPCRouteRule {
+				match := gatewayv1.GRPCRouteMatch{
+					Method: &gatewayv1.GRPCMethodMatch{
+						Type:    new(gatewayv1.GRPCMethodMatchExact),
+						Service: new("foo"),
+						Method:  new("bar"),
+					},
+				}
+				full := gatewayv1.GRPCRouteRule{}
+				for range 64 {
+					full.Matches = append(full.Matches, match)
+				}
+				return []gatewayv1.GRPCRouteRule{full, {}, full}
+			}(),
+		},
+		{
+			name:       "exactly 129 matches across rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be at most 128"},
+			rules: func() []gatewayv1.GRPCRouteRule {
+				rules := make([]gatewayv1.GRPCRouteRule, 3)
+				for i, count := range []int{64, 64, 1} {
+					for range count {
+						rules[i].Matches = append(rules[i].Matches, gatewayv1.GRPCRouteMatch{Method: &gatewayv1.GRPCMethodMatch{
+							Service: new("foo"), Method: new("bar"),
+						}})
+					}
 				}
 				return rules
 			}(),
@@ -341,7 +406,8 @@ func TestGRPCRouteRule(t *testing.T) {
 				}
 				return rules
 			}(),
-		}}
+		},
+	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -354,6 +420,32 @@ func TestGRPCRouteRule(t *testing.T) {
 			}
 			validateGRPCRoute(t, route, tc.wantErrors)
 		})
+	}
+
+	// Check both ends of every batch in the last allowed rule. The generator
+	// unit tests cover every match position; these checks exercise the CRDs.
+	for _, index := range []int{0, 15, 16, 31, 32, 47, 48, 63} {
+		for _, field := range []string{"service", "method"} {
+			t.Run(fmt.Sprintf("invalid %s in last rule at match index %d", field, index), func(t *testing.T) {
+				rules := grpcRulesWithMethodMatch(64)
+				rules[63].Matches = nil
+				for range 64 {
+					rules[63].Matches = append(rules[63].Matches, gatewayv1.GRPCRouteMatch{
+						Method: &gatewayv1.GRPCMethodMatch{Type: new(gatewayv1.GRPCMethodMatchExact), Service: new("foo"), Method: new("bar")},
+					})
+				}
+				if field == "service" {
+					rules[63].Matches[index].Method.Service = new("invalid!")
+				} else {
+					rules[63].Matches[index].Method.Method = new("invalid!")
+				}
+				route := &gatewayv1.GRPCRoute{
+					ObjectMeta: metav1.ObjectMeta{Name: fmt.Sprintf("batch-grpc-%d", time.Now().UnixNano()), Namespace: metav1.NamespaceDefault},
+					Spec:       gatewayv1.GRPCRouteSpec{Rules: rules},
+				}
+				validateGRPCRoute(t, route, []string{"spec.rules[63]", field + " must only contain valid characters"})
+			})
+		}
 	}
 }
 
@@ -469,6 +561,20 @@ func TestGRPCMethodMatch(t *testing.T) {
 			validateGRPCRoute(t, &route, tc.wantErrors)
 		})
 	}
+}
+
+// grpcRulesWithMethodMatch returns nRules rules with one valid method match each.
+func grpcRulesWithMethodMatch(nRules int) []gatewayv1.GRPCRouteRule {
+	valid := gatewayv1.GRPCRouteMatch{Method: &gatewayv1.GRPCMethodMatch{
+		Type:    new(gatewayv1.GRPCMethodMatchExact),
+		Service: new("foo"),
+		Method:  new("bar"),
+	}}
+	var rules []gatewayv1.GRPCRouteRule
+	for range nRules {
+		rules = append(rules, gatewayv1.GRPCRouteRule{Matches: []gatewayv1.GRPCRouteMatch{valid}})
+	}
+	return rules
 }
 
 func validateGRPCRoute(t *testing.T, route *gatewayv1.GRPCRoute, wantErrors []string) {

@@ -124,6 +124,30 @@ func TestGatewayValidationTypeMarkerGeneratesSchemaForItsChannel(t *testing.T) {
 	}
 }
 
+// The level-up tag shares the channel marker prefix but is not a kubebuilder marker,
+// so the marker pass must leave it to the schema pass instead of rejecting it.
+func TestGatewayValidationIgnoresLevelUpTag(t *testing.T) {
+	parser, pkg := newValidationTestParser(t)
+	info := parser.LookupType(pkg, "HTTPRouteSpec")
+	if info == nil {
+		t.Fatal("HTTPRouteSpec was not loaded")
+	}
+	for i := range info.Fields {
+		if info.Fields[i].Name == "Rules" {
+			info.Fields[i].Doc += "\n<gateway:experimental:validation:levelUpValidation=\"path.value\">" +
+				"\n<gateway:experimental:validation:MaxItems=99>"
+		}
+	}
+
+	if err := applyGatewayTypeValidations(parser, "experimental"); err != nil {
+		t.Fatalf("apply Gateway validations: %v", err)
+	}
+	schema := parser.Schemata[crd.TypeIdent{Package: pkg, Name: "HTTPRouteSpec"}]
+	if got := schema.Properties["rules"].MaxItems; got == nil || *got != 99 {
+		t.Fatalf("expected rules maxItems 99, got %v", got)
+	}
+}
+
 func TestGatewayExactlyOneOfGeneratesTypeValidation(t *testing.T) {
 	parser, pkg := newValidationTestParser(t)
 	info := parser.LookupType(pkg, "GatewaySpecAddress")
@@ -201,6 +225,62 @@ metadata:
     gateway.networking.k8s.io/bundle-version: v0.0.0-dev
   name: safe-upgrades.gateway.networking.k8s.io
 `
+
+// The tweaks strip every <gateway:...> tag from the descriptions and replace the
+// schemas they walk, so tags must be collected before gatewayTweaksMap and applied to
+// the schema it returns.
+func TestLevelUpTagsSurviveDescriptionStripping(t *testing.T) {
+	t.Parallel()
+
+	maxItems := int64(2)
+	root := &apiext.JSONSchemaProps{Properties: map[string]apiext.JSONSchemaProps{
+		"spec": {Properties: map[string]apiext.JSONSchemaProps{
+			"rules": {Type: "array", Items: &apiext.JSONSchemaPropsOrArray{Schema: &apiext.JSONSchemaProps{
+				Type: "object",
+				Properties: map[string]apiext.JSONSchemaProps{
+					"matches": {
+						Type:        "array",
+						MaxItems:    &maxItems,
+						Description: "Matches are evaluated in order.\n\n\n<gateway:standard:validation:levelUpValidation=\"path.value\">",
+						Items: &apiext.JSONSchemaPropsOrArray{Schema: &apiext.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiext.JSONSchemaProps{
+								"path": {Type: "object", XValidations: apiext.ValidationRules{{
+									Rule:    "self.type == 'Exact' ? self.value.matches('^/[a-z]+$') : true",
+									Message: "invalid path",
+								}}},
+							},
+						}},
+					},
+				},
+			}}},
+		}},
+	}}
+
+	targets, err := collectLevelUpTargets(root, "standard")
+	if err != nil {
+		t.Fatalf("collecting tags: %v", err)
+	}
+	if len(targets) != 1 {
+		t.Fatalf("expected 1 target, got %d", len(targets))
+	}
+
+	root.Properties = gatewayTweaksMap("standard", root.Properties)
+	if err := applyLevelUpTargets(root, targets); err != nil {
+		t.Fatalf("applying tags: %v", err)
+	}
+
+	rule := root.Properties["spec"].Properties["rules"].Items.Schema
+	if description := rule.Properties["matches"].Description; strings.Contains(description, "<gateway:") {
+		t.Fatalf("tweaks left a tag in the description: %q", description)
+	}
+	if len(rule.XValidations) != 1 {
+		t.Fatalf("expected 1 generated validation, got %d", len(rule.XValidations))
+	}
+	if path := rule.Properties["matches"].Items.Schema.Properties["path"]; len(path.XValidations) != 0 {
+		t.Fatalf("expected the leaf validation to move, got %d", len(path.XValidations))
+	}
+}
 
 func TestUpdateVAPManifestStandardChannel(t *testing.T) {
 	t.Parallel()
