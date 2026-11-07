@@ -41,47 +41,33 @@ var GatewayInvalidTLSConfiguration = suite.ConformanceTest{
 	Manifests: []string{"tests/gateway-invalid-tls-configuration.yaml"},
 	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		listeners := []v1.ListenerStatus{{
-			Name: v1.SectionName("https"),
-			SupportedKinds: []v1.RouteGroupKind{{
-				Group: (*v1.Group)(&v1.GroupVersion.Group),
-				Kind:  v1.Kind("HTTPRoute"),
-			}},
-			Conditions: []metav1.Condition{{
-				Type:   string(v1.ListenerConditionResolvedRefs),
-				Status: metav1.ConditionFalse,
-				Reason: string(v1.ListenerReasonInvalidCertificateRef),
-			}},
-			AttachedRoutes: 0,
-		}}
-
-		testCases := []struct {
-			name                  string
-			gatewayNamespacedName types.NamespacedName
-		}{
-			{
-				name:                  "Nonexistent secret referenced as CertificateRef in a Gateway listener",
-				gatewayNamespacedName: types.NamespacedName{Name: "gateway-certificate-nonexistent-secret", Namespace: suite.InfrastructureNamespace},
-			},
-			{
-				name:                  "Unsupported group resource referenced as CertificateRef in a Gateway listener",
-				gatewayNamespacedName: types.NamespacedName{Name: "gateway-certificate-unsupported-group", Namespace: suite.InfrastructureNamespace},
-			},
-			{
-				name:                  "Unsupported kind resource referenced as CertificateRef in a Gateway listener",
-				gatewayNamespacedName: types.NamespacedName{Name: "gateway-certificate-unsupported-kind", Namespace: suite.InfrastructureNamespace},
-			},
-			{
-				name:                  "Malformed secret referenced as CertificateRef in a Gateway listener",
-				gatewayNamespacedName: types.NamespacedName{Name: "gateway-certificate-malformed-secret", Namespace: suite.InfrastructureNamespace},
-			},
+		listenerNames := []v1.SectionName{
+			"https-nonexistent-secret",
+			"https-unsupported-group",
+			"https-unsupported-kind",
+			"https-malformed-secret",
 		}
-
-		for _, tc := range testCases {
-			t.Run(tc.name, func(t *testing.T) {
-				t.Parallel()
-				kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, tc.gatewayNamespacedName, listeners)
+		listeners := make([]v1.ListenerStatus, 0, len(listenerNames))
+		for _, listenerName := range listenerNames {
+			listeners = append(listeners, v1.ListenerStatus{
+				Name: listenerName,
+				SupportedKinds: []v1.RouteGroupKind{{
+					Group: (*v1.Group)(&v1.GroupVersion.Group),
+					Kind:  v1.Kind("HTTPRoute"),
+				}},
+				Conditions: []metav1.Condition{{
+					Type:   string(v1.ListenerConditionResolvedRefs),
+					Status: metav1.ConditionFalse,
+					Reason: string(v1.ListenerReasonInvalidCertificateRef),
+				}},
+				AttachedRoutes: 0,
 			})
 		}
+
+		gatewayNamespacedName := types.NamespacedName{
+			Name:      "gateway-invalid-tls-configuration",
+			Namespace: suite.InfrastructureNamespace,
+		}
+		kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gatewayNamespacedName, listeners)
 	},
 }
