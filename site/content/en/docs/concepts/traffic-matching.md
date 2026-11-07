@@ -67,6 +67,7 @@ metadata:
 spec:
   parentRefs:
     - name: example-com
+      sectionName: specific
   rules:
     - matches:
       - path:
@@ -84,6 +85,7 @@ metadata:
 spec:
   parentRefs:
     - name: example-com
+      sectionName: wildcard
   rules:
     - matches:
       - path:
