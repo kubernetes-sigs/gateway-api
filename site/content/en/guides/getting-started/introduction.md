@@ -93,6 +93,24 @@ kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/re
 Refer to the [server-side apply documentation](https://kubernetes.io/docs/reference/using-api/server-side-apply/)
 to learn more about this kubectl command option.
 
+### Aggregated RBAC roles
+
+Both install files include `ClusterRole`s that are aggregated into the
+Kubernetes builtin `view`, `edit` and `admin` roles
+(see [user-facing roles](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)):
+
+| Role | Access to Gateway API resources |
+|------|---------------------------------|
+| `view` | Read all resources, including their `status`. |
+| `edit` and `admin` | The same read access, plus create, update, patch and delete on all resources. |
+
+The `status` subresources are owned by the implementation and are never
+writable through these roles. Credentials, such as TLS certificates, are only
+referenced by name from Gateway API resources, never stored in them. GatewayClass
+(and XMesh in the experimental channel) is cluster-scoped, so these roles only
+apply to it when they are bound with a `ClusterRoleBinding`. The experimental
+channel adds the same for the `gateway.networking.x-k8s.io` resources.
+
 ### v1.2 Upgrade Notes
 Before upgrading to Gateway API v1.2, you'll want to confirm that any
 implementations of Gateway API have been upgraded to support the `v1` API
