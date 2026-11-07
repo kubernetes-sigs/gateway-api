@@ -26,8 +26,6 @@ import (
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
 	gatewayv1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1"
-	gatewayv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2"
-	gatewayv1alpha3 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha3"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1"
 	experimentalv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1"
 )
@@ -35,8 +33,6 @@ import (
 type Interface interface {
 	Discovery() discovery.DiscoveryInterfaces
 	GatewayV1() gatewayv1.GatewayV1Interface
-	GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface
-	GatewayV1alpha3() gatewayv1alpha3.GatewayV1alpha3Interface
 	GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface
 	ExperimentalV1alpha1() experimentalv1alpha1.ExperimentalV1alpha1Interface
 }
@@ -45,8 +41,6 @@ type Interface interface {
 type Clientset struct {
 	*discovery.DiscoveryClient
 	gatewayV1            *gatewayv1.GatewayV1Client
-	gatewayV1alpha2      *gatewayv1alpha2.GatewayV1alpha2Client
-	gatewayV1alpha3      *gatewayv1alpha3.GatewayV1alpha3Client
 	gatewayV1beta1       *gatewayv1beta1.GatewayV1beta1Client
 	experimentalV1alpha1 *experimentalv1alpha1.ExperimentalV1alpha1Client
 }
@@ -54,16 +48,6 @@ type Clientset struct {
 // GatewayV1 retrieves the GatewayV1Client
 func (c *Clientset) GatewayV1() gatewayv1.GatewayV1Interface {
 	return c.gatewayV1
-}
-
-// GatewayV1alpha2 retrieves the GatewayV1alpha2Client
-func (c *Clientset) GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface {
-	return c.gatewayV1alpha2
-}
-
-// GatewayV1alpha3 retrieves the GatewayV1alpha3Client
-func (c *Clientset) GatewayV1alpha3() gatewayv1alpha3.GatewayV1alpha3Interface {
-	return c.gatewayV1alpha3
 }
 
 // GatewayV1beta1 retrieves the GatewayV1beta1Client
@@ -124,14 +108,6 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
-	cs.gatewayV1alpha2, err = gatewayv1alpha2.NewForConfigAndClient(&configShallowCopy, httpClient)
-	if err != nil {
-		return nil, err
-	}
-	cs.gatewayV1alpha3, err = gatewayv1alpha3.NewForConfigAndClient(&configShallowCopy, httpClient)
-	if err != nil {
-		return nil, err
-	}
 	cs.gatewayV1beta1, err = gatewayv1beta1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
@@ -162,8 +138,6 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.gatewayV1 = gatewayv1.New(c)
-	cs.gatewayV1alpha2 = gatewayv1alpha2.New(c)
-	cs.gatewayV1alpha3 = gatewayv1alpha3.New(c)
 	cs.gatewayV1beta1 = gatewayv1beta1.New(c)
 	cs.experimentalV1alpha1 = experimentalv1alpha1.New(c)
 

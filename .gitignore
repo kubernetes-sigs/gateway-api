@@ -77,3 +77,6 @@ site/static/wizard/data/*
 # AI tools
 .claude
 .codex
+
+# API-ref docgen scratch dirs (hack/docsy/generate.sh)
+tmp/
