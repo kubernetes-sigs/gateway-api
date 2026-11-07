@@ -88,7 +88,7 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./apis/... ./conformance/utils/... ./tools/openapi-generator ./tools/reportfeatures
+	CGO_ENABLED=1 go test -race -cover ./apis/... ./conformance/utils/... ./tools/openapi-generator ./tools/reportfeatures ./tools/implist
 
 golint:
 	hack/verify-golint.sh

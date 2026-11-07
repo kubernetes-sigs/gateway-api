@@ -19,8 +19,6 @@ package v1
 import (
 	"errors"
 	"fmt"
-
-	"golang.org/x/mod/semver"
 )
 
 // ProfileReport is the generated report for the test results of a specific
@@ -76,43 +74,49 @@ type Status struct {
 	FailedTests []string `json:"failedTests,omitempty"`
 }
 
-func (p *ProfileReport) IsConformant(version string) error {
+// IsConformant returns the Result, the number of skipped extended tests for the profile,
+// plus a slice of errors if any are present.
+//
+// Note that this does not use errors.Join because we need the errors to be presented without
+// newlines in eventual reports, and that's surprisingly difficult with Join-ed errors.
+func (p *ProfileReport) IsConformant() (Result, uint32, []error) {
+	var totalSkips uint32
+
 	if p.Name == "" {
-		return errors.New("the ProfileReport must have a non-empty name")
+		return Failure, 0, []error{errors.New("the ProfileReport must have a non-empty name")}
 	}
 
 	if p.Summary == "" {
-		return errors.New("the ProfileReport must have a non-empty summary")
+		return Failure, 0, []error{errors.New("the ProfileReport must have a non-empty summary")}
 	}
 
-	if err := p.Core.IsConformant(version); err != nil {
-		return fmt.Errorf("core feature error: %s", err)
+	var returnErrs []error
+	totalSkips += p.Core.Skipped
+
+	profileResult := Success
+	if p.Core.Result == Failure {
+		returnErrs = append(returnErrs, errors.New("core tests failed"))
+	}
+	profileResult = updateResult(profileResult, p.Core.Result)
+
+	// If there are Core skipped tests, then the profile is Partially Conformant.
+	// This will be changed to Not Conformant in v1.8.
+	if totalSkips > 0 {
+		profileResult = updateResult(profileResult, Partial)
+		returnErrs = append(returnErrs, fmt.Errorf("skipped %d core tests", totalSkips))
 	}
 
 	if p.Extended != nil {
-		if err := p.Extended.IsConformant(version); err != nil {
-			return fmt.Errorf("extended features error: %s", err)
+		totalSkips += p.Extended.Skipped
+		if totalSkips > 5 {
+			profileResult = updateResult(profileResult, Partial)
+			returnErrs = append(returnErrs, fmt.Errorf("more than the maxiumum amount of 5 total test skips in a profile : %d", totalSkips))
 		}
-	}
-
-	return nil
-}
-
-func (s *Status) IsConformant(version string) error {
-	if s.Result == Failure {
-		return errors.New("Status showed a failure")
-	}
-
-	if s.Result == Partial {
-		// TODO(youngnick): Update this to be zero skipped tests later.
-		// Check how many skipped tests there were
-		if semver.MajorMinor(version) == "v1.7" {
-			if s.Skipped > 5 {
-				return errors.New("Status showed too many skipped tests")
-			}
+		if p.Extended.Result == Failure {
+			returnErrs = append(returnErrs, errors.New("extended tests failed"))
 		}
+		profileResult = updateResult(profileResult, p.Extended.Result)
 	}
 
-	// This is a success, so we are good.
-	return nil
+	return profileResult, totalSkips, returnErrs
 }
