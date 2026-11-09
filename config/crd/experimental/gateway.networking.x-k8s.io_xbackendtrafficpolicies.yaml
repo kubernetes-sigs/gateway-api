@@ -273,8 +273,6 @@ spec:
                     != ''Permanent'' || has(self.absoluteTimeout)'
                 - message: cookie must be nil if type is not Cookie
                   rule: '!has(self.cookie) || self.type == ''Cookie'''
-                - message: cookie must be specified for Cookie type
-                  rule: self.type != 'Cookie' || has(self.cookie)
                 - message: header must be nil if type is not Header
                   rule: '!has(self.header) || self.type == ''Header'''
                 - message: header must be specified for Header type
