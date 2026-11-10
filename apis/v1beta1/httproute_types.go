@@ -27,6 +27,9 @@ import (
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
+// +kubebuilder:printcolumn:name="Gateway",type=string,JSONPath=`.status.parents[0].parentRef.name`
+// +kubebuilder:printcolumn:name="Accepted",type=string,JSONPath=`.status.parents[0].conditions[?(@.type=="Accepted")].status`
+// +kubebuilder:printcolumn:name="Programmed",type=string,JSONPath=`.status.parents[0].conditions[?(@.type=="Programmed")].status`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // HTTPRoute provides a way to route HTTP requests. This includes the capability
