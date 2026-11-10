@@ -96,14 +96,7 @@ var GRPCRouteWeight = confsuite.ConformanceTest{
 				return resp.Response.GetAssertions().GetContext().GetPod(), nil
 			})
 
-			for i := range weight.MaxTestRetries {
-				if err := weight.TestWeightedDistribution(sender, expectedWeights); err != nil {
-					t.Logf("Traffic distribution test failed (%d/%d): %s", i+1, weight.MaxTestRetries, err)
-				} else {
-					return
-				}
-			}
-			t.Fatal("Weighted distribution tests failed")
+			weight.ExpectWeightedDistribution(t, suite.TimeoutConfig, sender, expectedWeights)
 		})
 	},
 }
