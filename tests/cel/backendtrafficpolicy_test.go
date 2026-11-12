@@ -270,7 +270,7 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 					Name: gatewayv1.HeaderName("x-session-id"),
 				},
 			},
-			wantErrors: []string{"header must be nil if type is not Header", "cookie must be specified for Cookie type"},
+			wantErrors: []string{"header must be nil if type is not Header"},
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig header type with cookie field",
@@ -283,11 +283,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			wantErrors: []string{"cookie must be nil if type is not Cookie", "header must be specified for Header type"},
 		},
 		{
-			name: "invalid BackendTrafficPolicyConfig cookie type without cookie field",
+			name: "valid BackendTrafficPolicyConfig cookie type without cookie field",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				Type: new(gatewayv1.CookieBasedSessionPersistence),
 			},
-			wantErrors: []string{"cookie must be specified for Cookie type"},
+			wantErrors: []string{},
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig header type without header field",
