@@ -367,7 +367,7 @@ relationships between the different resources:
 A typical [north/south] API request flow for a gateway implemented using a
 reverse proxy is:
 
-1. A client makes a request to <http://foo.example.com>.
+1. A client makes a request to **`http://foo.example.com`**.
 2. DNS resolves the name to a `Gateway` address.
 3. The reverse proxy receives the request on a `Listener` and uses the [Host
    header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an
