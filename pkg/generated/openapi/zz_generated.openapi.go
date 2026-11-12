@@ -31,239 +31,210 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		v1.APIGroup{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_APIGroup(ref),
-		v1.APIGroupList{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_APIGroupList(ref),
-		v1.APIResource{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_APIResource(ref),
-		v1.APIResourceList{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_APIResourceList(ref),
-		v1.APIVersions{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_APIVersions(ref),
-		v1.ApplyOptions{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_ApplyOptions(ref),
-		v1.Condition{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_Condition(ref),
-		v1.CreateOptions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_CreateOptions(ref),
-		v1.DeleteOptions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_DeleteOptions(ref),
-		v1.Duration{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_Duration(ref),
-		v1.FieldSelectorRequirement{}.OpenAPIModelName():                                  schema_pkg_apis_meta_v1_FieldSelectorRequirement(ref),
-		v1.FieldsV1{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_FieldsV1(ref),
-		v1.GetOptions{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_GetOptions(ref),
-		v1.GroupKind{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_GroupKind(ref),
-		v1.GroupResource{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_GroupResource(ref),
-		v1.GroupVersion{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_GroupVersion(ref),
-		v1.GroupVersionForDiscovery{}.OpenAPIModelName():                                  schema_pkg_apis_meta_v1_GroupVersionForDiscovery(ref),
-		v1.GroupVersionKind{}.OpenAPIModelName():                                          schema_pkg_apis_meta_v1_GroupVersionKind(ref),
-		v1.GroupVersionResource{}.OpenAPIModelName():                                      schema_pkg_apis_meta_v1_GroupVersionResource(ref),
-		v1.InternalEvent{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_InternalEvent(ref),
-		v1.LabelSelector{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_LabelSelector(ref),
-		v1.LabelSelectorRequirement{}.OpenAPIModelName():                                  schema_pkg_apis_meta_v1_LabelSelectorRequirement(ref),
-		v1.List{}.OpenAPIModelName():                                                      schema_pkg_apis_meta_v1_List(ref),
-		v1.ListMeta{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_ListMeta(ref),
-		v1.ListOptions{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_ListOptions(ref),
-		v1.ManagedFieldsEntry{}.OpenAPIModelName():                                        schema_pkg_apis_meta_v1_ManagedFieldsEntry(ref),
-		v1.MicroTime{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_MicroTime(ref),
-		v1.ObjectMeta{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_ObjectMeta(ref),
-		v1.OwnerReference{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_OwnerReference(ref),
-		v1.PartialObjectMetadata{}.OpenAPIModelName():                                     schema_pkg_apis_meta_v1_PartialObjectMetadata(ref),
-		v1.PartialObjectMetadataList{}.OpenAPIModelName():                                 schema_pkg_apis_meta_v1_PartialObjectMetadataList(ref),
-		v1.Patch{}.OpenAPIModelName():                                                     schema_pkg_apis_meta_v1_Patch(ref),
-		v1.PatchOptions{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_PatchOptions(ref),
-		v1.Preconditions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_Preconditions(ref),
-		v1.RootPaths{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_RootPaths(ref),
-		v1.ServerAddressByClientCIDR{}.OpenAPIModelName():                                 schema_pkg_apis_meta_v1_ServerAddressByClientCIDR(ref),
-		v1.ShardInfo{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_ShardInfo(ref),
-		v1.Status{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_Status(ref),
-		v1.StatusCause{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_StatusCause(ref),
-		v1.StatusDetails{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_StatusDetails(ref),
-		v1.Table{}.OpenAPIModelName():                                                     schema_pkg_apis_meta_v1_Table(ref),
-		v1.TableColumnDefinition{}.OpenAPIModelName():                                     schema_pkg_apis_meta_v1_TableColumnDefinition(ref),
-		v1.TableOptions{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_TableOptions(ref),
-		v1.TableRow{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_TableRow(ref),
-		v1.TableRowCondition{}.OpenAPIModelName():                                         schema_pkg_apis_meta_v1_TableRowCondition(ref),
-		v1.Time{}.OpenAPIModelName():                                                      schema_pkg_apis_meta_v1_Time(ref),
-		v1.Timestamp{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_Timestamp(ref),
-		v1.TypeMeta{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_TypeMeta(ref),
-		v1.UpdateOptions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_UpdateOptions(ref),
-		v1.WatchEvent{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_WatchEvent(ref),
-		runtime.RawExtension{}.OpenAPIModelName():                                         schema_k8sio_apimachinery_pkg_runtime_RawExtension(ref),
-		runtime.TypeMeta{}.OpenAPIModelName():                                             schema_k8sio_apimachinery_pkg_runtime_TypeMeta(ref),
-		runtime.Unknown{}.OpenAPIModelName():                                              schema_k8sio_apimachinery_pkg_runtime_Unknown(ref),
-		version.Info{}.OpenAPIModelName():                                                 schema_k8sio_apimachinery_pkg_version_Info(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners":                                schema_sigsk8sio_gateway_api_apis_v1_AllowedListeners(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes":                                   schema_sigsk8sio_gateway_api_apis_v1_AllowedRoutes(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference":                          schema_sigsk8sio_gateway_api_apis_v1_BackendObjectReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.BackendRef":                                      schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicy":                                schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicy(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyList":                            schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicySpec":                            schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation":                      schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                                 schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.CookieConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ForwardBodyConfig":                               schema_sigsk8sio_gateway_api_apis_v1_ForwardBodyConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.Fraction":                                        schema_sigsk8sio_gateway_api_apis_v1_Fraction(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSConfig":                               schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation":                           schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCAuthConfig":                                  schema_sigsk8sio_gateway_api_apis_v1_GRPCAuthConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef":                                  schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCHeaderMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCMethodMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCMethodMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCRoute":                                       schema_sigsk8sio_gateway_api_apis_v1_GRPCRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteList":                                   schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch":                                  schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteRule":                                   schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec":                                   schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.Gateway":                                         schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS":                               schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayClass":                                    schema_sigsk8sio_gateway_api_apis_v1_GatewayClass(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassList":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayClassList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassSpec":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayClassSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassStatus":                              schema_sigsk8sio_gateway_api_apis_v1_GatewayClassStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure":                           schema_sigsk8sio_gateway_api_apis_v1_GatewayInfrastructure(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayList":                                     schema_sigsk8sio_gateway_api_apis_v1_GatewayList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewaySpec":                                     schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress":                              schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatus":                                   schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatusAddress":                            schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPAuthConfig":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPAuthConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter":                          schema_sigsk8sio_gateway_api_apis_v1_HTTPExternalAuthFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeader":                                      schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter":                                schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPPathMatch":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPPathMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPPathModifier":                                schema_sigsk8sio_gateway_api_apis_v1_HTTPPathModifier(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPQueryParamMatch":                             schema_sigsk8sio_gateway_api_apis_v1_HTTPQueryParamMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter":                         schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestMirrorFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRequestRedirectFilter":                       schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestRedirectFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRoute":                                       schema_sigsk8sio_gateway_api_apis_v1_HTTPRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteList":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRule":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteSpec":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts":                               schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteTimeouts(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPURLRewriteFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.HeaderConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_HeaderConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.Listener":                                        schema_sigsk8sio_gateway_api_apis_v1_Listener(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntry":                                   schema_sigsk8sio_gateway_api_apis_v1_ListenerEntry(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntryStatus":                             schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerFilter":                                  schema_sigsk8sio_gateway_api_apis_v1_ListenerFilter(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerFilters":                                 schema_sigsk8sio_gateway_api_apis_v1_ListenerFilters(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerNamespaces":                              schema_sigsk8sio_gateway_api_apis_v1_ListenerNamespaces(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerSet":                                     schema_sigsk8sio_gateway_api_apis_v1_ListenerSet(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerSetList":                                 schema_sigsk8sio_gateway_api_apis_v1_ListenerSetList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerSetSpec":                                 schema_sigsk8sio_gateway_api_apis_v1_ListenerSetSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerSetStatus":                               schema_sigsk8sio_gateway_api_apis_v1_ListenerSetStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerStatus":                                  schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig":                               schema_sigsk8sio_gateway_api_apis_v1_ListenerTLSConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference":                            schema_sigsk8sio_gateway_api_apis_v1_LocalObjectReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.LocalParametersReference":                        schema_sigsk8sio_gateway_api_apis_v1_LocalParametersReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.LocalPolicyTargetReference":                      schema_sigsk8sio_gateway_api_apis_v1_LocalPolicyTargetReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.LocalPolicyTargetReferenceWithSectionName":       schema_sigsk8sio_gateway_api_apis_v1_LocalPolicyTargetReferenceWithSectionName(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.NamespacedPolicyTargetReference":                 schema_sigsk8sio_gateway_api_apis_v1_NamespacedPolicyTargetReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ObjectReference":                                 schema_sigsk8sio_gateway_api_apis_v1_ObjectReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ParametersReference":                             schema_sigsk8sio_gateway_api_apis_v1_ParametersReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ParentGatewayReference":                          schema_sigsk8sio_gateway_api_apis_v1_ParentGatewayReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ParentReference":                                 schema_sigsk8sio_gateway_api_apis_v1_ParentReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus":                            schema_sigsk8sio_gateway_api_apis_v1_PolicyAncestorStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.PolicyStatus":                                    schema_sigsk8sio_gateway_api_apis_v1_PolicyStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant":                                  schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrant(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantFrom(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantList":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo":                                schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantTo(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind":                                  schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.RouteNamespaces":                                 schema_sigsk8sio_gateway_api_apis_v1_RouteNamespaces(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus":                               schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.RouteStatus":                                     schema_sigsk8sio_gateway_api_apis_v1_RouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference":                           schema_sigsk8sio_gateway_api_apis_v1_SecretObjectReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence":                              schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.SubjectAltName":                                  schema_sigsk8sio_gateway_api_apis_v1_SubjectAltName(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.SupportedFeature":                                schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TCPRoute":                                        schema_sigsk8sio_gateway_api_apis_v1_TCPRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TCPRouteList":                                    schema_sigsk8sio_gateway_api_apis_v1_TCPRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TCPRouteRule":                                    schema_sigsk8sio_gateway_api_apis_v1_TCPRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TCPRouteSpec":                                    schema_sigsk8sio_gateway_api_apis_v1_TCPRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TCPRouteStatus":                                  schema_sigsk8sio_gateway_api_apis_v1_TCPRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TLSConfig":                                       schema_sigsk8sio_gateway_api_apis_v1_TLSConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TLSPortConfig":                                   schema_sigsk8sio_gateway_api_apis_v1_TLSPortConfig(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TLSRoute":                                        schema_sigsk8sio_gateway_api_apis_v1_TLSRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TLSRouteList":                                    schema_sigsk8sio_gateway_api_apis_v1_TLSRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TLSRouteRule":                                    schema_sigsk8sio_gateway_api_apis_v1_TLSRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TLSRouteSpec":                                    schema_sigsk8sio_gateway_api_apis_v1_TLSRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.TLSRouteStatus":                                  schema_sigsk8sio_gateway_api_apis_v1_TLSRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.UDPRoute":                                        schema_sigsk8sio_gateway_api_apis_v1_UDPRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.UDPRouteList":                                    schema_sigsk8sio_gateway_api_apis_v1_UDPRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.UDPRouteRule":                                    schema_sigsk8sio_gateway_api_apis_v1_UDPRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.UDPRouteSpec":                                    schema_sigsk8sio_gateway_api_apis_v1_UDPRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.UDPRouteStatus":                                  schema_sigsk8sio_gateway_api_apis_v1_UDPRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute":                                 schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteList":                             schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference":                schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReferenceWithSectionName": schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReferenceWithSectionName(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.NamespacedPolicyTargetReference":           schema_sigsk8sio_gateway_api_apis_v1alpha2_NamespacedPolicyTargetReference(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyAncestorStatus":                      schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyAncestorStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.ReferenceGrant":                            schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrant(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.ReferenceGrantList":                        schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrantList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRoute":                                  schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteRule":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteSpec":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteStatus":                            schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRoute":                                  schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteList":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteRule":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteSpec":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteStatus":                            schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRoute":                                  schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteRule":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteSpec":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteStatus":                            schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicy":                          schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicy(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicyList":                      schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha3.TLSRoute":                                  schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha3.TLSRouteList":                              schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha3.TLSRouteSpec":                              schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.Gateway":                                    schema_sigsk8sio_gateway_api_apis_v1beta1_Gateway(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClass":                               schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClass(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClassList":                           schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClassList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayList":                                schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRoute":                                  schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                             schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute":                                schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendStatus":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend":                  schema_sigsk8sio_gateway_api_apisx_v1alpha1_EndpointSelectorBackend(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend":                  schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.LabelSelector":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_LabelSelector(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshSpec":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshStatus":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicyStatus(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackend(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendList":                             schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendList(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicyList":                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh":                                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMesh(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMeshList":                                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy":                         schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicyList":                     schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicyList(ref),
+		v1.APIGroup{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_APIGroup(ref),
+		v1.APIGroupList{}.OpenAPIModelName():                                        schema_pkg_apis_meta_v1_APIGroupList(ref),
+		v1.APIResource{}.OpenAPIModelName():                                         schema_pkg_apis_meta_v1_APIResource(ref),
+		v1.APIResourceList{}.OpenAPIModelName():                                     schema_pkg_apis_meta_v1_APIResourceList(ref),
+		v1.APIVersions{}.OpenAPIModelName():                                         schema_pkg_apis_meta_v1_APIVersions(ref),
+		v1.ApplyOptions{}.OpenAPIModelName():                                        schema_pkg_apis_meta_v1_ApplyOptions(ref),
+		v1.Condition{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_Condition(ref),
+		v1.CreateOptions{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_CreateOptions(ref),
+		v1.DeleteOptions{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_DeleteOptions(ref),
+		v1.Duration{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_Duration(ref),
+		v1.FieldSelectorRequirement{}.OpenAPIModelName():                            schema_pkg_apis_meta_v1_FieldSelectorRequirement(ref),
+		v1.FieldsV1{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_FieldsV1(ref),
+		v1.GetOptions{}.OpenAPIModelName():                                          schema_pkg_apis_meta_v1_GetOptions(ref),
+		v1.GroupKind{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_GroupKind(ref),
+		v1.GroupResource{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_GroupResource(ref),
+		v1.GroupVersion{}.OpenAPIModelName():                                        schema_pkg_apis_meta_v1_GroupVersion(ref),
+		v1.GroupVersionForDiscovery{}.OpenAPIModelName():                            schema_pkg_apis_meta_v1_GroupVersionForDiscovery(ref),
+		v1.GroupVersionKind{}.OpenAPIModelName():                                    schema_pkg_apis_meta_v1_GroupVersionKind(ref),
+		v1.GroupVersionResource{}.OpenAPIModelName():                                schema_pkg_apis_meta_v1_GroupVersionResource(ref),
+		v1.InternalEvent{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_InternalEvent(ref),
+		v1.LabelSelector{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_LabelSelector(ref),
+		v1.LabelSelectorRequirement{}.OpenAPIModelName():                            schema_pkg_apis_meta_v1_LabelSelectorRequirement(ref),
+		v1.List{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_List(ref),
+		v1.ListMeta{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_ListMeta(ref),
+		v1.ListOptions{}.OpenAPIModelName():                                         schema_pkg_apis_meta_v1_ListOptions(ref),
+		v1.ManagedFieldsEntry{}.OpenAPIModelName():                                  schema_pkg_apis_meta_v1_ManagedFieldsEntry(ref),
+		v1.MicroTime{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_MicroTime(ref),
+		v1.ObjectMeta{}.OpenAPIModelName():                                          schema_pkg_apis_meta_v1_ObjectMeta(ref),
+		v1.OwnerReference{}.OpenAPIModelName():                                      schema_pkg_apis_meta_v1_OwnerReference(ref),
+		v1.PartialObjectMetadata{}.OpenAPIModelName():                               schema_pkg_apis_meta_v1_PartialObjectMetadata(ref),
+		v1.PartialObjectMetadataList{}.OpenAPIModelName():                           schema_pkg_apis_meta_v1_PartialObjectMetadataList(ref),
+		v1.Patch{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_Patch(ref),
+		v1.PatchOptions{}.OpenAPIModelName():                                        schema_pkg_apis_meta_v1_PatchOptions(ref),
+		v1.Preconditions{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_Preconditions(ref),
+		v1.RootPaths{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_RootPaths(ref),
+		v1.ServerAddressByClientCIDR{}.OpenAPIModelName():                           schema_pkg_apis_meta_v1_ServerAddressByClientCIDR(ref),
+		v1.ShardInfo{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_ShardInfo(ref),
+		v1.Status{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_Status(ref),
+		v1.StatusCause{}.OpenAPIModelName():                                         schema_pkg_apis_meta_v1_StatusCause(ref),
+		v1.StatusDetails{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_StatusDetails(ref),
+		v1.Table{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_Table(ref),
+		v1.TableColumnDefinition{}.OpenAPIModelName():                               schema_pkg_apis_meta_v1_TableColumnDefinition(ref),
+		v1.TableOptions{}.OpenAPIModelName():                                        schema_pkg_apis_meta_v1_TableOptions(ref),
+		v1.TableRow{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_TableRow(ref),
+		v1.TableRowCondition{}.OpenAPIModelName():                                   schema_pkg_apis_meta_v1_TableRowCondition(ref),
+		v1.Time{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_Time(ref),
+		v1.Timestamp{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_Timestamp(ref),
+		v1.TypeMeta{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_TypeMeta(ref),
+		v1.UpdateOptions{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_UpdateOptions(ref),
+		v1.WatchEvent{}.OpenAPIModelName():                                          schema_pkg_apis_meta_v1_WatchEvent(ref),
+		runtime.RawExtension{}.OpenAPIModelName():                                   schema_k8sio_apimachinery_pkg_runtime_RawExtension(ref),
+		runtime.TypeMeta{}.OpenAPIModelName():                                       schema_k8sio_apimachinery_pkg_runtime_TypeMeta(ref),
+		runtime.Unknown{}.OpenAPIModelName():                                        schema_k8sio_apimachinery_pkg_runtime_Unknown(ref),
+		version.Info{}.OpenAPIModelName():                                           schema_k8sio_apimachinery_pkg_version_Info(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners":                          schema_sigsk8sio_gateway_api_apis_v1_AllowedListeners(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes":                             schema_sigsk8sio_gateway_api_apis_v1_AllowedRoutes(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference":                    schema_sigsk8sio_gateway_api_apis_v1_BackendObjectReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.BackendRef":                                schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicy":                          schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicy(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyList":                      schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicySpec":                      schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation":                schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                           schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.CookieConfig":                              schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ForwardBodyConfig":                         schema_sigsk8sio_gateway_api_apis_v1_ForwardBodyConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.Fraction":                                  schema_sigsk8sio_gateway_api_apis_v1_Fraction(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSConfig":                         schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation":                     schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCAuthConfig":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCAuthConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch":                           schema_sigsk8sio_gateway_api_apis_v1_GRPCHeaderMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCMethodMatch":                           schema_sigsk8sio_gateway_api_apis_v1_GRPCMethodMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRoute":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCRoute(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter":                           schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteList":                             schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteRule":                             schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec":                             schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus":                           schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.Gateway":                                   schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS":                         schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayClass":                              schema_sigsk8sio_gateway_api_apis_v1_GatewayClass(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassList":                          schema_sigsk8sio_gateway_api_apis_v1_GatewayClassList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassSpec":                          schema_sigsk8sio_gateway_api_apis_v1_GatewayClassSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassStatus":                        schema_sigsk8sio_gateway_api_apis_v1_GatewayClassStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure":                     schema_sigsk8sio_gateway_api_apis_v1_GatewayInfrastructure(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayList":                               schema_sigsk8sio_gateway_api_apis_v1_GatewayList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewaySpec":                               schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress":                        schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatus":                             schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatusAddress":                      schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig":                          schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPAuthConfig":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPAuthConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter":                    schema_sigsk8sio_gateway_api_apis_v1_HTTPExternalAuthFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeader":                                schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter":                          schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderMatch":                           schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPPathMatch":                             schema_sigsk8sio_gateway_api_apis_v1_HTTPPathMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPPathModifier":                          schema_sigsk8sio_gateway_api_apis_v1_HTTPPathModifier(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPQueryParamMatch":                       schema_sigsk8sio_gateway_api_apis_v1_HTTPQueryParamMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter":                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestMirrorFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRequestRedirectFilter":                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestRedirectFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRoute":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRoute(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter":                           schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteList":                             schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRule":                             schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteSpec":                             schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteStatus":                           schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts":                         schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteTimeouts(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter":                      schema_sigsk8sio_gateway_api_apis_v1_HTTPURLRewriteFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HeaderConfig":                              schema_sigsk8sio_gateway_api_apis_v1_HeaderConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.Listener":                                  schema_sigsk8sio_gateway_api_apis_v1_Listener(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntry":                             schema_sigsk8sio_gateway_api_apis_v1_ListenerEntry(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntryStatus":                       schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerFilter":                            schema_sigsk8sio_gateway_api_apis_v1_ListenerFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerFilters":                           schema_sigsk8sio_gateway_api_apis_v1_ListenerFilters(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerNamespaces":                        schema_sigsk8sio_gateway_api_apis_v1_ListenerNamespaces(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerSet":                               schema_sigsk8sio_gateway_api_apis_v1_ListenerSet(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerSetList":                           schema_sigsk8sio_gateway_api_apis_v1_ListenerSetList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerSetSpec":                           schema_sigsk8sio_gateway_api_apis_v1_ListenerSetSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerSetStatus":                         schema_sigsk8sio_gateway_api_apis_v1_ListenerSetStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerStatus":                            schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerTLSConfig":                         schema_sigsk8sio_gateway_api_apis_v1_ListenerTLSConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference":                      schema_sigsk8sio_gateway_api_apis_v1_LocalObjectReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.LocalParametersReference":                  schema_sigsk8sio_gateway_api_apis_v1_LocalParametersReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.LocalPolicyTargetReference":                schema_sigsk8sio_gateway_api_apis_v1_LocalPolicyTargetReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.LocalPolicyTargetReferenceWithSectionName": schema_sigsk8sio_gateway_api_apis_v1_LocalPolicyTargetReferenceWithSectionName(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.NamespacedPolicyTargetReference":           schema_sigsk8sio_gateway_api_apis_v1_NamespacedPolicyTargetReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ObjectReference":                           schema_sigsk8sio_gateway_api_apis_v1_ObjectReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ParametersReference":                       schema_sigsk8sio_gateway_api_apis_v1_ParametersReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ParentGatewayReference":                    schema_sigsk8sio_gateway_api_apis_v1_ParentGatewayReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ParentReference":                           schema_sigsk8sio_gateway_api_apis_v1_ParentReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus":                      schema_sigsk8sio_gateway_api_apis_v1_PolicyAncestorStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.PolicyStatus":                              schema_sigsk8sio_gateway_api_apis_v1_PolicyStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant":                            schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrant(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom":                        schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantFrom(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantList":                        schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec":                        schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo":                          schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantTo(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind":                            schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.RouteNamespaces":                           schema_sigsk8sio_gateway_api_apis_v1_RouteNamespaces(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus":                         schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.RouteStatus":                               schema_sigsk8sio_gateway_api_apis_v1_RouteStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference":                     schema_sigsk8sio_gateway_api_apis_v1_SecretObjectReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence":                        schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.SubjectAltName":                            schema_sigsk8sio_gateway_api_apis_v1_SubjectAltName(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.SupportedFeature":                          schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TCPRoute":                                  schema_sigsk8sio_gateway_api_apis_v1_TCPRoute(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TCPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1_TCPRouteList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TCPRouteRule":                              schema_sigsk8sio_gateway_api_apis_v1_TCPRouteRule(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TCPRouteSpec":                              schema_sigsk8sio_gateway_api_apis_v1_TCPRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TCPRouteStatus":                            schema_sigsk8sio_gateway_api_apis_v1_TCPRouteStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TLSConfig":                                 schema_sigsk8sio_gateway_api_apis_v1_TLSConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TLSPortConfig":                             schema_sigsk8sio_gateway_api_apis_v1_TLSPortConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TLSRoute":                                  schema_sigsk8sio_gateway_api_apis_v1_TLSRoute(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TLSRouteList":                              schema_sigsk8sio_gateway_api_apis_v1_TLSRouteList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TLSRouteRule":                              schema_sigsk8sio_gateway_api_apis_v1_TLSRouteRule(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TLSRouteSpec":                              schema_sigsk8sio_gateway_api_apis_v1_TLSRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TLSRouteStatus":                            schema_sigsk8sio_gateway_api_apis_v1_TLSRouteStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.UDPRoute":                                  schema_sigsk8sio_gateway_api_apis_v1_UDPRoute(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.UDPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1_UDPRouteList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.UDPRouteRule":                              schema_sigsk8sio_gateway_api_apis_v1_UDPRouteRule(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.UDPRouteSpec":                              schema_sigsk8sio_gateway_api_apis_v1_UDPRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.UDPRouteStatus":                            schema_sigsk8sio_gateway_api_apis_v1_UDPRouteStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1beta1.Gateway":                              schema_sigsk8sio_gateway_api_apis_v1beta1_Gateway(ref),
+		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClass":                         schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClass(ref),
+		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClassList":                     schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClassList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayList":                          schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRoute":                            schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRoute(ref),
+		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                        schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                       schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
+		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                   schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.Attribute":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_Attribute(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus":              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort":                        schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec":                        schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendStatus":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS":                         schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":           schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend":            schema_sigsk8sio_gateway_api_apisx_v1alpha1_EndpointSelectorBackend(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend":            schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.LabelSelector":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_LabelSelector(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshSpec":                           schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshStatus":                         schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentBasedSampling":                schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentBasedSampling(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                        schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicySpec":                schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicySpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TelemetryPolicyStatus":              schema_sigsk8sio_gateway_api_apisx_v1alpha1_TelemetryPolicyStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingConfig":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingProvider(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend":                           schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackend(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendList":                       schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy":              schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicyList":          schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMesh(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMeshList":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicy":                   schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicy(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XTelemetryPolicyList":               schema_sigsk8sio_gateway_api_apisx_v1alpha1_XTelemetryPolicyList(ref),
 	}
 }
 
@@ -8237,1389 +8208,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_supportedFeatureInternal(ref common.Re
 				Required: []string{"name"},
 			},
 		},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of GRPCRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of GRPCRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is kind of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"group", "kind", "name"},
-			},
-		},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReferenceWithSectionName(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is kind of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"sectionName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "SectionName is the name of a section within the target resource. When unspecified, this targetRef targets the entire resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener name * ListenerSet: Listener name * HTTPRoute: HTTPRouteRule name * Service: Port name\n\nIf a SectionName is specified, but does not exist on the targeted object, the Policy must fail to attach, and the policy implementation should record a `ResolvedRefs` or similar Condition in the Policy's status.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"group", "kind", "name"},
-			},
-		},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_NamespacedPolicyTargetReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is kind of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the target resource.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"namespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Namespace is the namespace of the referent. When unspecified, the local namespace is inferred. Even when policy targets a resource in a different namespace, it MUST only apply to traffic originating from the same namespace as the policy.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"group", "kind", "name"},
-			},
-		},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyAncestorStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"ancestorRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
-						},
-					},
-					"controllerName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ControllerName is a domain/path string that indicates the name of the controller that wrote this status. This corresponds with the controllerName field on GatewayClass.\n\nExample: \"example.net/gateway-controller\".\n\nThe format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).\n\nControllers MUST populate this field when writing status. Controllers should ensure that entries to status populated with their ControllerName are cleaned up when they are no longer necessary.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"conditions": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-map-keys": []interface{}{
-									"type",
-								},
-								"x-kubernetes-list-type": "map",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Conditions describes the status of the Policy with respect to the given Ancestor.\n\n<gateway:util:excludeFromCRD>\n\nNotes for implementors:\n\nConditions are a listType `map`, which means that they function like a map with a key of the `type` field _in the k8s apiserver_.\n\nThis means that implementations must obey some rules when updating this section.\n\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n* Implementations MUST NOT remove or reorder Conditions that they are not\n  directly responsible for. For example, if an implementation sees a Condition\n  with type `special.io/SomeField`, it MUST NOT remove, change or update that\n  Condition.\n* Implementations MUST always _merge_ changes into Conditions of the same Type,\n  rather than creating more than one Condition of the same Type.\n* Implementations MUST always update the `observedGeneration` field of the\n  Condition to the `metadata.generation` of the Gateway at the time of update creation.\n* If the `observedGeneration` of a Condition is _greater than_ the value the\n  implementation knows about, then it MUST NOT perform the update on that Condition,\n  but must wait for a future reconciliation and status update. (The assumption is that\n  the implementation's copy of the object is stale and an update will be re-triggered\n  if relevant.)\n\n</gateway:util:excludeFromCRD>",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1.Condition{}.OpenAPIModelName()),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"ancestorRef", "controllerName", "conditions"},
-			},
-		},
-		Dependencies: []string{
-			v1.Condition{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ParentReference"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"ancestors": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Ancestors is a list of ancestor resources (usually Gateways) that are associated with the policy, and the status of the policy with respect to each ancestor. When this policy attaches to a parent, the controller that manages the parent and the ancestors MUST add an entry to this list when the controller first sees the policy and SHOULD update the entry as appropriate when the relevant ancestor is modified.\n\nNote that choosing the relevant ancestor is left to the Policy designers; an important part of Policy design is designing the right object level at which to namespace this status.\n\nNote also that implementations MUST ONLY populate ancestor status for the Ancestor resources they are responsible for. Implementations MUST use the ControllerName field to uniquely identify the entries in this list that they are responsible for.\n\nNote that to achieve this, the list of PolicyAncestorStatus structs MUST be treated as a map with a composite key, made up of the AncestorRef and ControllerName fields combined.\n\nA maximum of 16 ancestors will be represented in this list. An empty list means the Policy is not relevant for any ancestors.\n\nIf this slice is full, implementations MUST NOT add further entries. Instead they MUST consider the policy unimplementable and signal that on any related resources such as the ancestor that would be referenced here. For example, if this list was full on BackendTLSPolicy, no additional Gateways would be able to reference the Service targeted by the BackendTLSPolicy.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"ancestors"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrant(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ReferenceGrant identifies kinds of resources in other namespaces that are trusted to reference the specified kinds of resources in the same namespace as the policy.\n\nEach ReferenceGrant can be used to represent a unique trust relationship. Additional Reference Grants can be used to add to the set of trusted sources of inbound references for the namespace they are defined within.\n\nA ReferenceGrant is required for all cross-namespace references in Gateway API (with the exception of cross-namespace Route-Gateway attachment, which is governed by the AllowedRoutes configuration on the Gateway, and cross-namespace Service ParentRefs on a \"consumer\" mesh Route, which defines routing rules applicable only to workloads in the Route namespace). ReferenceGrants allowing a reference from a Route to a Service are only applicable to BackendRefs.\n\nReferenceGrant is a form of runtime verification allowing users to assert which cross-namespace object references are permitted. Implementations that support ReferenceGrant MUST NOT permit cross-namespace references which have no grant, and MUST respond to the removal of a grant by revoking the access that the grant allowed.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of ReferenceGrant.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrantList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ReferenceGrantList contains a list of ReferenceGrant.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.ReferenceGrant"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha2.ReferenceGrant"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRoute(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TCPRoute provides a way to route TCP requests. When combined with a Gateway listener, it can be used to forward connections on the port specified by the listener to a set of backends specified by the TCPRoute.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of TCPRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of TCPRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteSpec", "sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TCPRouteList contains a list of TCPRoute",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRoute"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRoute"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TCPRouteRule is the configuration for a given rule.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"backendRefs": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the underlying implementation MUST actively reject connection attempts to this backend. Connection rejections must respect weight; if an invalid backend is requested to have 80% of connections, then 80% of connections must be rejected instead.\n\nSupport: Core for Kubernetes Service",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"backendRefs"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.BackendRef"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TCPRouteSpec defines the desired state of TCPRoute",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parentRefs": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "ParentRefs references the resources (usually Gateways) that a Route wants to be attached to. Note that the referenced parent resource needs to allow this for the attachment to be complete. For Gateways, that means the Gateway needs to allow attachment from Routes of this kind and namespace. For Services, that means the Service must either be in the same namespace for a \"producer\" route, or the mesh implementation must support and allow \"consumer\" routes for the referenced Service. ReferenceGrant is not applicable for governing ParentRefs to Services - it is not possible to create a \"producer\" route for a Service in a different namespace from the Route.\n\nThere are two kinds of parent resources with \"Core\" support:\n\n* Gateway (Gateway conformance profile) * Service (Mesh conformance profile, ClusterIP Services only)\n\nThis API may be extended in the future to support additional kinds of parent resources.\n\nParentRefs must be _distinct_. This means either that:\n\n* They select different objects.  If this is the case, then parentRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, `namespace`, and `name` must\n  be unique across all parentRef entries in the Route.\n* They do not select different objects, but for each optional field used,\n  each ParentRef that selects the same object must set the same set of\n  optional fields to different values. If one ParentRef sets a\n  combination of optional fields, all must set the same combination.\n\nSome examples:\n\n* If one ParentRef sets `sectionName`, all ParentRefs referencing the\n  same object must also set `sectionName`.\n* If one ParentRef sets `port`, all ParentRefs referencing the same\n  object must also set `port`.\n* If one ParentRef sets `sectionName` and `port`, all ParentRefs\n  referencing the same object must also set `sectionName` and `port`.\n\nIt is possible to separately reference multiple distinct objects that may be collapsed by an implementation. For example, some implementations may choose to merge compatible Gateway Listeners together. If that is the case, the list of routes attached to those resources should also be merged.\n\nNote that for ParentRefs that cross namespace boundaries, there are specific rules. Cross-namespace references are only valid if they are explicitly allowed by something in the namespace they are referring to. For example, Gateway has the AllowedRoutes field, and ReferenceGrant provides a generic way to enable other kinds of cross-namespace reference.\n\n<gateway:experimental:description> ParentRefs from a Route to a Service in the same namespace are \"producer\" routes, which apply default routing rules to inbound connections from any namespace to the Service.\n\nParentRefs from a Route to a Service in a different namespace are \"consumer\" routes, and these routing rules are only applied to outbound connections originating from the same namespace as the Route, for which the intended destination of the connections are a Service targeted as a ParentRef of the Route. </gateway:experimental:description>\n\n<gateway:util:excludeFromCRD> Ensures that when the same parent is referenced more than once, each reference carries a distinct, non-empty sectionName. The first rule enforces consistency (all refs specify sectionName or none do), the second enforces uniqueness. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"sectionName must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))\"> <gateway:standard:validation:XValidation:message=\"sectionName must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))\"> <gateway:util:excludeFromCRD> Experimental variants of the above rules that additionally require the combination of sectionName and port to be consistently specified and unique across refs. </gateway:util:excludeFromCRD> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) == (!has(p2.port) || p2.port == 0)): true))\"> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))\">",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
-									},
-								},
-							},
-						},
-					},
-					"useDefaultGateways": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default) or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.\n\n<gateway:experimental>",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"rules": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of TCP matchers and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteRule"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"rules"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ParentReference", "sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteRule"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TCPRouteStatus defines the observed state of TCPRoute",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parents": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Parents is a list of parent resources (usually Gateways) that are associated with the route, and the status of the route with respect to each parent. When this route attaches to a parent, the controller that manages the parent must add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route or gateway is modified.\n\nNote that parent references that cannot be resolved by an implementation of this API will not be added to this list. Implementations of this API can only populate Route status for the Gateways/parent resources they are responsible for.\n\nA maximum of 32 Gateways will be represented in this list. An empty list means the route has not been attached to any Gateway.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nWhile parents is not a listType `map`, this is due to the fact that the list key is not scalar, and Kubernetes is unable to represent this.\n\nParent status MUST be considered to be namespaced by the combination of the parentRef and controllerName fields, and implementations should keep the following rules in mind when updating this status:\n\n* Implementations MUST update only entries that have a matching value of\n  `controllerName` for that implementation.\n* Implementations MUST NOT update entries with non-matching `controllerName`\n  fields.\n* Implementations MUST treat each `parentRef`` in the Route separately and\n  update its status based on the relationship with that parent.\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n\n</gateway:util:excludeFromCRD>",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"parents"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRoute(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "The TLSRoute resource is similar to TCPRoute, but can be configured to match against TLS-specific metadata. This allows more flexibility in matching streams for a given TLS listener.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of TLSRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of TLSRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteSpec", "sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TLSRouteList contains a list of TLSRoute",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRoute"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRoute"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TLSRouteRule is the configuration for a given rule.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"backendRefs": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the rule performs no forwarding; if no filters are specified that would result in a response being sent, the underlying implementation must actively reject request attempts to this backend, by rejecting the connection. Request rejections must respect weight; if an invalid backend is requested to have 80% of requests, then 80% of requests must be rejected instead.\n\nWhen a TLSRoute is attached to a listener in Terminate mode, a BackendTLSPolicy can be used to enable re-encryption of the traffic to the backends.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended\n\nSupport for BackendTLSPolicy: Extended",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"backendRefs"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.BackendRef"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TLSRouteSpec defines the desired state of a TLSRoute resource.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parentRefs": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "ParentRefs references the resources (usually Gateways) that a Route wants to be attached to. Note that the referenced parent resource needs to allow this for the attachment to be complete. For Gateways, that means the Gateway needs to allow attachment from Routes of this kind and namespace. For Services, that means the Service must either be in the same namespace for a \"producer\" route, or the mesh implementation must support and allow \"consumer\" routes for the referenced Service. ReferenceGrant is not applicable for governing ParentRefs to Services - it is not possible to create a \"producer\" route for a Service in a different namespace from the Route.\n\nThere are two kinds of parent resources with \"Core\" support:\n\n* Gateway (Gateway conformance profile) * Service (Mesh conformance profile, ClusterIP Services only)\n\nThis API may be extended in the future to support additional kinds of parent resources.\n\nParentRefs must be _distinct_. This means either that:\n\n* They select different objects.  If this is the case, then parentRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, `namespace`, and `name` must\n  be unique across all parentRef entries in the Route.\n* They do not select different objects, but for each optional field used,\n  each ParentRef that selects the same object must set the same set of\n  optional fields to different values. If one ParentRef sets a\n  combination of optional fields, all must set the same combination.\n\nSome examples:\n\n* If one ParentRef sets `sectionName`, all ParentRefs referencing the\n  same object must also set `sectionName`.\n* If one ParentRef sets `port`, all ParentRefs referencing the same\n  object must also set `port`.\n* If one ParentRef sets `sectionName` and `port`, all ParentRefs\n  referencing the same object must also set `sectionName` and `port`.\n\nIt is possible to separately reference multiple distinct objects that may be collapsed by an implementation. For example, some implementations may choose to merge compatible Gateway Listeners together. If that is the case, the list of routes attached to those resources should also be merged.\n\nNote that for ParentRefs that cross namespace boundaries, there are specific rules. Cross-namespace references are only valid if they are explicitly allowed by something in the namespace they are referring to. For example, Gateway has the AllowedRoutes field, and ReferenceGrant provides a generic way to enable other kinds of cross-namespace reference.\n\n<gateway:experimental:description> ParentRefs from a Route to a Service in the same namespace are \"producer\" routes, which apply default routing rules to inbound connections from any namespace to the Service.\n\nParentRefs from a Route to a Service in a different namespace are \"consumer\" routes, and these routing rules are only applied to outbound connections originating from the same namespace as the Route, for which the intended destination of the connections are a Service targeted as a ParentRef of the Route. </gateway:experimental:description>\n\n<gateway:util:excludeFromCRD> Ensures that when the same parent is referenced more than once, each reference carries a distinct, non-empty sectionName. The first rule enforces consistency (all refs specify sectionName or none do), the second enforces uniqueness. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"sectionName must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))\"> <gateway:standard:validation:XValidation:message=\"sectionName must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))\"> <gateway:util:excludeFromCRD> Experimental variants of the above rules that additionally require the combination of sectionName and port to be consistently specified and unique across refs. </gateway:util:excludeFromCRD> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) == (!has(p2.port) || p2.port == 0)): true))\"> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))\">",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
-									},
-								},
-							},
-						},
-					},
-					"useDefaultGateways": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default) or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.\n\n<gateway:experimental>",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"hostnames": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Hostnames defines a set of SNI names that should match against the SNI attribute of TLS ClientHello message in TLS handshake. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed in SNI names per RFC 6066. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label must appear by itself as the first label.\n\nIf a hostname is specified by both the Listener and TLSRoute, there must be at least one intersecting hostname for the TLSRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches TLSRoutes\n  that have either not specified any hostnames, or have specified at\n  least one of `test.example.com` or `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches TLSRoutes\n  that have either not specified any hostnames or have specified at least\n  one hostname that matches the Listener hostname. For example,\n  `test.example.com` and `*.example.com` would both match. On the other\n  hand, `example.com` and `test.example.net` would not match.\n\nIf both the Listener and TLSRoute have specified hostnames, any TLSRoute hostnames that do not match the Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the TLSRoute specified `test.example.com` and `test.example.net`, `test.example.net` must not be considered for a match.\n\nIf both the Listener and TLSRoute have specified hostnames, and none match with the criteria above, then the TLSRoute is not accepted. The implementation must raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nSupport: Core",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"rules": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of TLS matchers and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteRule"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"rules"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ParentReference", "sigs.k8s.io/gateway-api/apis/v1alpha2.TLSRouteRule"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TLSRouteStatus defines the observed state of TLSRoute",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parents": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Parents is a list of parent resources (usually Gateways) that are associated with the route, and the status of the route with respect to each parent. When this route attaches to a parent, the controller that manages the parent must add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route or gateway is modified.\n\nNote that parent references that cannot be resolved by an implementation of this API will not be added to this list. Implementations of this API can only populate Route status for the Gateways/parent resources they are responsible for.\n\nA maximum of 32 Gateways will be represented in this list. An empty list means the route has not been attached to any Gateway.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nWhile parents is not a listType `map`, this is due to the fact that the list key is not scalar, and Kubernetes is unable to represent this.\n\nParent status MUST be considered to be namespaced by the combination of the parentRef and controllerName fields, and implementations should keep the following rules in mind when updating this status:\n\n* Implementations MUST update only entries that have a matching value of\n  `controllerName` for that implementation.\n* Implementations MUST NOT update entries with non-matching `controllerName`\n  fields.\n* Implementations MUST treat each `parentRef`` in the Route separately and\n  update its status based on the relationship with that parent.\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n\n</gateway:util:excludeFromCRD>",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"parents"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRoute(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "UDPRoute provides a way to route UDP traffic. When combined with a Gateway listener, it can be used to forward traffic on the port specified by the listener to a set of backends specified by the UDPRoute.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of UDPRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of UDPRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteSpec", "sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "UDPRouteList contains a list of UDPRoute",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRoute"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRoute"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "UDPRouteRule is the configuration for a given rule.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"backendRefs": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the underlying implementation MUST actively reject connection attempts to this backend. Packet drops must respect weight; if an invalid backend is requested to have 80% of the packets, then 80% of packets must be dropped instead.\n\nSupport: Extended for Kubernetes Service",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.BackendRef"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"backendRefs"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.BackendRef"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "UDPRouteSpec defines the desired state of UDPRoute.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parentRefs": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "ParentRefs references the resources (usually Gateways) that a Route wants to be attached to. Note that the referenced parent resource needs to allow this for the attachment to be complete. For Gateways, that means the Gateway needs to allow attachment from Routes of this kind and namespace. For Services, that means the Service must either be in the same namespace for a \"producer\" route, or the mesh implementation must support and allow \"consumer\" routes for the referenced Service. ReferenceGrant is not applicable for governing ParentRefs to Services - it is not possible to create a \"producer\" route for a Service in a different namespace from the Route.\n\nThere are two kinds of parent resources with \"Core\" support:\n\n* Gateway (Gateway conformance profile) * Service (Mesh conformance profile, ClusterIP Services only)\n\nThis API may be extended in the future to support additional kinds of parent resources.\n\nParentRefs must be _distinct_. This means either that:\n\n* They select different objects.  If this is the case, then parentRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, `namespace`, and `name` must\n  be unique across all parentRef entries in the Route.\n* They do not select different objects, but for each optional field used,\n  each ParentRef that selects the same object must set the same set of\n  optional fields to different values. If one ParentRef sets a\n  combination of optional fields, all must set the same combination.\n\nSome examples:\n\n* If one ParentRef sets `sectionName`, all ParentRefs referencing the\n  same object must also set `sectionName`.\n* If one ParentRef sets `port`, all ParentRefs referencing the same\n  object must also set `port`.\n* If one ParentRef sets `sectionName` and `port`, all ParentRefs\n  referencing the same object must also set `sectionName` and `port`.\n\nIt is possible to separately reference multiple distinct objects that may be collapsed by an implementation. For example, some implementations may choose to merge compatible Gateway Listeners together. If that is the case, the list of routes attached to those resources should also be merged.\n\nNote that for ParentRefs that cross namespace boundaries, there are specific rules. Cross-namespace references are only valid if they are explicitly allowed by something in the namespace they are referring to. For example, Gateway has the AllowedRoutes field, and ReferenceGrant provides a generic way to enable other kinds of cross-namespace reference.\n\n<gateway:experimental:description> ParentRefs from a Route to a Service in the same namespace are \"producer\" routes, which apply default routing rules to inbound connections from any namespace to the Service.\n\nParentRefs from a Route to a Service in a different namespace are \"consumer\" routes, and these routing rules are only applied to outbound connections originating from the same namespace as the Route, for which the intended destination of the connections are a Service targeted as a ParentRef of the Route. </gateway:experimental:description>\n\n<gateway:util:excludeFromCRD> Ensures that when the same parent is referenced more than once, each reference carries a distinct, non-empty sectionName. The first rule enforces consistency (all refs specify sectionName or none do), the second enforces uniqueness. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"sectionName must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))\"> <gateway:standard:validation:XValidation:message=\"sectionName must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))\"> <gateway:util:excludeFromCRD> Experimental variants of the above rules that additionally require the combination of sectionName and port to be consistently specified and unique across refs. </gateway:util:excludeFromCRD> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) == (!has(p2.port) || p2.port == 0)): true))\"> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))\">",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
-									},
-								},
-							},
-						},
-					},
-					"useDefaultGateways": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default) or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.\n\n<gateway:experimental>",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"rules": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of UDP matchers and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteRule"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"rules"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ParentReference", "sigs.k8s.io/gateway-api/apis/v1alpha2.UDPRouteRule"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "UDPRouteStatus defines the observed state of UDPRoute.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parents": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Parents is a list of parent resources (usually Gateways) that are associated with the route, and the status of the route with respect to each parent. When this route attaches to a parent, the controller that manages the parent must add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route or gateway is modified.\n\nNote that parent references that cannot be resolved by an implementation of this API will not be added to this list. Implementations of this API can only populate Route status for the Gateways/parent resources they are responsible for.\n\nA maximum of 32 Gateways will be represented in this list. An empty list means the route has not been attached to any Gateway.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nWhile parents is not a listType `map`, this is due to the fact that the list key is not scalar, and Kubernetes is unable to represent this.\n\nParent status MUST be considered to be namespaced by the combination of the parentRef and controllerName fields, and implementations should keep the following rules in mind when updating this status:\n\n* Implementations MUST update only entries that have a matching value of\n  `controllerName` for that implementation.\n* Implementations MUST NOT update entries with non-matching `controllerName`\n  fields.\n* Implementations MUST treat each `parentRef`` in the Route separately and\n  update its status based on the relationship with that parent.\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n\n</gateway:util:excludeFromCRD>",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"parents"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of BackendTLSPolicy.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicySpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of BackendTLSPolicy.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.PolicyStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicySpec", "sigs.k8s.io/gateway-api/apis/v1.PolicyStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicy"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicy"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRoute(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "The TLSRoute resource is similar to TCPRoute, but can be configured to match against TLS-specific metadata. This allows more flexibility in matching streams for a given TLS listener.\n\nIf you need to forward traffic to a single target for a TLS listener, you could choose to use a TCPRoute with a TLS listener.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of TLSRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSRouteSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of TLSRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSRouteStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.TLSRouteSpec", "sigs.k8s.io/gateway-api/apis/v1.TLSRouteStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TLSRouteList contains a list of TLSRoute",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1alpha3.TLSRoute"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1alpha3.TLSRoute"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TLSRouteSpec defines the desired state of a TLSRoute resource.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parentRefs": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "ParentRefs references the resources (usually Gateways) that a Route wants to be attached to. Note that the referenced parent resource needs to allow this for the attachment to be complete. For Gateways, that means the Gateway needs to allow attachment from Routes of this kind and namespace. For Services, that means the Service must either be in the same namespace for a \"producer\" route, or the mesh implementation must support and allow \"consumer\" routes for the referenced Service. ReferenceGrant is not applicable for governing ParentRefs to Services - it is not possible to create a \"producer\" route for a Service in a different namespace from the Route.\n\nThere are two kinds of parent resources with \"Core\" support:\n\n* Gateway (Gateway conformance profile) * Service (Mesh conformance profile, ClusterIP Services only)\n\nThis API may be extended in the future to support additional kinds of parent resources.\n\nParentRefs must be _distinct_. This means either that:\n\n* They select different objects.  If this is the case, then parentRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, `namespace`, and `name` must\n  be unique across all parentRef entries in the Route.\n* They do not select different objects, but for each optional field used,\n  each ParentRef that selects the same object must set the same set of\n  optional fields to different values. If one ParentRef sets a\n  combination of optional fields, all must set the same combination.\n\nSome examples:\n\n* If one ParentRef sets `sectionName`, all ParentRefs referencing the\n  same object must also set `sectionName`.\n* If one ParentRef sets `port`, all ParentRefs referencing the same\n  object must also set `port`.\n* If one ParentRef sets `sectionName` and `port`, all ParentRefs\n  referencing the same object must also set `sectionName` and `port`.\n\nIt is possible to separately reference multiple distinct objects that may be collapsed by an implementation. For example, some implementations may choose to merge compatible Gateway Listeners together. If that is the case, the list of routes attached to those resources should also be merged.\n\nNote that for ParentRefs that cross namespace boundaries, there are specific rules. Cross-namespace references are only valid if they are explicitly allowed by something in the namespace they are referring to. For example, Gateway has the AllowedRoutes field, and ReferenceGrant provides a generic way to enable other kinds of cross-namespace reference.\n\n<gateway:experimental:description> ParentRefs from a Route to a Service in the same namespace are \"producer\" routes, which apply default routing rules to inbound connections from any namespace to the Service.\n\nParentRefs from a Route to a Service in a different namespace are \"consumer\" routes, and these routing rules are only applied to outbound connections originating from the same namespace as the Route, for which the intended destination of the connections are a Service targeted as a ParentRef of the Route. </gateway:experimental:description>\n\n<gateway:util:excludeFromCRD> Ensures that when the same parent is referenced more than once, each reference carries a distinct, non-empty sectionName. The first rule enforces consistency (all refs specify sectionName or none do), the second enforces uniqueness. </gateway:util:excludeFromCRD> <gateway:standard:validation:XValidation:message=\"sectionName must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))\"> <gateway:standard:validation:XValidation:message=\"sectionName must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))\"> <gateway:util:excludeFromCRD> Experimental variants of the above rules that additionally require the combination of sectionName and port to be consistently specified and unique across refs. </gateway:util:excludeFromCRD> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) == (!has(p2.port) || p2.port == 0)): true))\"> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))\">",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
-									},
-								},
-							},
-						},
-					},
-					"useDefaultGateways": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default) or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.\n\n<gateway:experimental>",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"hostnames": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Hostnames defines a set of SNI hostnames that should match against the SNI attribute of TLS ClientHello message in TLS handshake. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed in SNI hostnames per RFC 6066. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label must appear by itself as the first label.\n\n<gateway:util:excludeFromCRD> If a hostname is specified by both the Listener and TLSRoute, there must be at least one intersecting hostname for the TLSRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches TLSRoutes\n  that have specified at least one of `test.example.com` or\n  `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches TLSRoutes\n  that have specified at least one hostname that matches the Listener\n  hostname. For example, `test.example.com` and `*.example.com` would both\n  match. On the other hand, `example.com` and `test.example.net` would not\n  match.\n* A listener with `something.example.com` as the hostname matches a\n  TLSRoute with hostname `*.example.com`.\n\nIf both the Listener and TLSRoute have specified hostnames, any TLSRoute hostnames that do not match any Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the TLSRoute specified `test.example.com` and `test.example.net`, `test.example.net` must not be considered for a match.\n\nIf both the Listener and TLSRoute have specified hostnames, and none match with the criteria above, then the TLSRoute is not accepted for that Listener. If the TLSRoute does not match any Listener on its parent, the implementation must raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nA Listener MUST be have protocol set to TLS when a TLSRoute attaches to it. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus with the reason of \"UnsupportedValue\" in case a Listener of the wrong type is used. Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`. Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`. </gateway:util:excludeFromCRD>\n\nIn the event that multiple TLSRoutes specify intersecting hostnames (e.g. overlapping wildcard matching and exact matching hostnames), precedence must be given to rules from the TLSRoute with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname.\n\nWhen multiple TLSRoutes attach to the same Listener and yield identical Listener/Route intersected hostnames, implementations SHOULD evaluate precedence using the original hostnames configured on the Route, not the calculated Listener/Route hostname intersection.\n\nResolving Route precedence using original Route hostname specificity is an Extended feature. Implementations that support this behavior SHOULD claim support for the `GatewayRouteHostnameIntersectionPrecedence` feature. Implementations that do not support this feature MAY evaluate precedence using the calculated Listener/Route hostname intersection.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"rules": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of actions.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.TLSRouteRule"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"hostnames", "rules"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ParentReference", "sigs.k8s.io/gateway-api/apis/v1.TLSRouteRule"},
 	}
 }
 
