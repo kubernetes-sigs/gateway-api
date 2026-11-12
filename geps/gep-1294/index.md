@@ -185,6 +185,38 @@ By default, a `Service` attachment applies to all ports in the service. Users ma
 If `port` is set, the implementation MUST associate the route only with that port.
 If `port` is not set, the implementation MUST associate the route with all ports defined in the Service.
 
+The parent Service port and the backend Service port are independent and may
+differ. The `parentRef.port` field selects the port of the parent Service to
+which the route applies. Each `backendRef.port` selects the destination port
+of its backend Service. Both fields refer to Service port numbers
+(`spec.ports[].port`), not target ports (`spec.ports[].targetPort`).
+
+For example, this HTTPRoute applies to requests to port 80 of the `echo`
+Service and forwards them to port 8080 of the `echo-v1` Service in the same
+namespace:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo
+spec:
+  parentRefs:
+  - group: ""
+    kind: Service
+    name: echo
+    port: 80
+  rules:
+  - backendRefs:
+    - name: echo-v1
+      port: 8080
+```
+
+The `echo` Service must define port 80, and the `echo-v1` Service must define
+port 8080. The existing
+[MeshHTTPRouteSimpleSameNamespace conformance test](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/tests/mesh/httproute-simple-same-namespace.yaml)
+uses this combination of parent and backend ports.
+
 ### `hostnames` field
 
 GAMMA implementations SHOULD NOT infer any functionality from the `hostnames` field on `xRoute`s (currently, `TLSRoute`, `HTTPRoute`, and `GRPCRoute` have this field) due to current under-specification and reserved potential for future usage or API changes.
