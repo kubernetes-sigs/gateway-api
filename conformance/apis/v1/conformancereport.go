@@ -122,7 +122,7 @@ func validateURL(rawURL string) error {
 		return fmt.Errorf("could not parse url: %w", err)
 	}
 	if !parsed.IsAbs() {
-		return errors.New("url must be absolute (missing scheme)")
+		return fmt.Errorf("url must be absolute (missing scheme) %s", rawURL)
 	}
 	if parsed.Scheme != "http" && parsed.Scheme != "https" {
 		return fmt.Errorf("url scheme must be http or https, got %q", parsed.Scheme)
@@ -133,73 +133,114 @@ func validateURL(rawURL string) error {
 	return nil
 }
 
-// IsConformant returns Result values for Gateway, Mesh, and an error that describes
+// IsConformant returns Result values for Gateway, Mesh, and a slice of errors that describe
 // if something went wrong.
-func (c *ConformanceReport) IsConformant(version string) (Result, Result, error) {
-	// Firstly, the Implementation struct must be valid.
-	if err := c.Validate(); err != nil {
-		return Failure, Failure, err
-	}
+//
+// Note that this does not use errors.Join because we need the errors to be presented without
+// newlines in eventual reports, and that's surprisingly difficult with Join-ed errors.
+func (c *ConformanceReport) IsConformant() (*Result, *Result, []error, []error) {
+	// All profiles must be conformant for the report to be conformant.
+	// For results, Failure > Partial > Success, and the greatest
+	// value will be used.
+	//
+	// So, if one profile is Partial, then Partial is the best you get,
+	// per traffic direction. So for Gateway and Mesh, Success or Partial are
+	// orthogonal. You can be Conformant for Gateway, and Partial for Mesh,
+	// or any other combination.
 
-	var returnErr error
+	// Because of the above, we need to track the result per direction, as well
+	// as if the report contains a result at all for each direction.
+	// (otherwise we can't distinguish between "has Gateway, failed" and "does not
+	// have Gateway")
+	gatewayResult := Success
+	meshResult := Success
 
-	gatewayResult := Failure
-	meshResult := Failure
+	hasGateway := false
+	hasMesh := false
 
-	// At least one profile must be valid for the report to be conformant.
+	var gatewayErrs []error
+	var meshErrs []error
+
+	var totalSkips uint32
+
 	for _, profile := range c.ProfileReports {
-		err := profile.IsConformant(version)
-		if err == nil {
-			// Assume this profile is good for now
-			profileResult := Success
+		profileResult, skips, errs := profile.IsConformant()
+		totalSkips += skips
 
-			// Do some additional checks here that require access to multiple parts
-			// of the report
-			// If the result was marked as partial, then it can only be partial.
-			if profile.Core.Result == Partial {
-				profileResult = Partial
+		if strings.HasPrefix(profile.Name, "MESH") {
+			hasMesh = true
+			if len(errs) > 0 {
+				meshErrs = append(meshErrs, errs...)
 			}
-			// If there are Core skipped tests, then the profile can only ever be partial.
-			if len(profile.Core.SkippedTests) > 0 {
-				returnErr = errors.Join(returnErr, fmt.Errorf("core tests were skipped for %s", profile.Name))
-				profileResult = Partial
-			}
-
-			// Update the overall result with the temp result
-			if strings.HasPrefix(profile.Name, "MESH") {
-				meshResult = updateResult(meshResult, profileResult)
-			} else {
-				gatewayResult = updateResult(gatewayResult, profileResult)
-			}
+			meshResult = updateResult(meshResult, profileResult)
 		} else {
-			// If there's errors, then this profile is counted as a Failure
-			// Update the overall results accordingly.
-			if strings.HasPrefix(profile.Name, "MESH") {
-				meshResult = updateResult(meshResult, Failure)
-			} else {
-				gatewayResult = updateResult(gatewayResult, Failure)
+			hasGateway = true
+			if len(errs) > 0 {
+				gatewayErrs = append(gatewayErrs, errs...)
 			}
-			returnErr = errors.Join(returnErr, err)
+			gatewayResult = updateResult(gatewayResult, profileResult)
 		}
 	}
-	return gatewayResult, meshResult, returnErr
+
+	// The Implementation struct must be valid.
+	if err := c.Validate(); err != nil {
+		if hasGateway {
+			gatewayErrs = append(gatewayErrs, fmt.Errorf("implementation details were not valid: %s", err))
+			gatewayResult = updateResult(gatewayResult, Failure)
+		}
+		if hasMesh {
+			meshErrs = append(meshErrs, fmt.Errorf("implementation details were not valid: %s", err))
+			meshResult = updateResult(meshResult, Failure)
+		}
+	}
+
+	// When we've checked all the profiles in a report, check to see how many test skips in total
+	// there were.
+	// As of v1.7, if there are more than 5 test skips in total, then the report is _not_ conformant,
+	// and will fail _both_ Mesh and Gateway conformance directions.
+	if totalSkips > 5 {
+		if hasGateway {
+			gatewayErrs = append(gatewayErrs, fmt.Errorf("too many tests were skipped across the report: %d ", totalSkips))
+			gatewayResult = updateResult(gatewayResult, Failure)
+		}
+		if hasMesh {
+			meshErrs = append(meshErrs, fmt.Errorf("too many tests were skipped across the report: %d ", totalSkips))
+			meshResult = updateResult(meshResult, Failure)
+		}
+	}
+
+	retGatewayResult := &gatewayResult
+
+	if !hasGateway {
+		retGatewayResult = nil
+	}
+
+	retMeshResult := &meshResult
+
+	if !hasMesh {
+		retMeshResult = nil
+	}
+
+	return retGatewayResult, retMeshResult, gatewayErrs, meshErrs
 }
 
+// updateResult updates the Result values after comparing them
+// For results, Failure > Partial > Success
 func updateResult(oldResult, newResult Result) Result {
 	if oldResult == newResult {
 		return oldResult
 	}
 
-	if oldResult == Success {
+	if oldResult == Failure {
 		return oldResult
 	}
 
 	if oldResult == Partial {
 		if newResult == Success {
-			return newResult
+			return oldResult
 		}
 		if newResult == Failure {
-			return oldResult
+			return newResult
 		}
 	}
 
