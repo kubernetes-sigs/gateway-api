@@ -1,0 +1,46 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-11-12T23:58:23Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.7.0
+implementation:
+  contact:
+  - '@bohdaq'
+  organization: bohdaq
+  project: rust-web-server
+  url: https://rws8.tech
+  version: 18.36.0
+kind: ConformanceReport
+mode: mesh
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+    supportedFeatures:
+    - MeshClusterIPMatching
+    - MeshConsumerRoute
+    - MeshHTTPRouteBackendRequestHeaderModification
+    - MeshHTTPRouteNamedRouteRule
+    - MeshHTTPRouteQueryParamMatching
+    - MeshHTTPRouteRedirectPath
+    - MeshHTTPRouteRedirectPort
+    - MeshHTTPRouteRewritePath
+    - MeshHTTPRouteSchemeRedirect
+  name: MESH-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 3
+      Skipped: 0
+  name: MESH-GRPC
+  summary: Core tests succeeded.
