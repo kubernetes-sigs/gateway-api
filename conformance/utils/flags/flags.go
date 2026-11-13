@@ -138,6 +138,9 @@ func init() {
 			o.Implementation.Contact = strings.Split(v, ",")
 		},
 	)
+	registerStringFlag("security-contact", "", "Security contact email address for the implementation",
+		func(o *suite.ConfigurableOptions, v string) { o.Implementation.SecurityContact = v },
+	)
 	registerBoolFlag("skip-provisional-tests", false, "Whether to skip provisional tests",
 		func(o *suite.ConfigurableOptions, v bool) { o.SkipProvisionalTests = v },
 	)

@@ -11,6 +11,7 @@ Only versions that included changes to conformance are listed.
 * Partial Conformance is removed. Only fully conformant implementations are counted as conformant.
 * Conformance reports with skipped tests will not be accepted. For extended features, you will
 not be able to claim support for a feature unless you pass all tests for that feature.
+* Conformance reports must include a valid `implementation.securityContact` email address (an actively monitored project security alias or mailing list rather than a personal email). By providing a security contact, implementations agree to abide by the NDA/embargo policy and avoid early disclosure of any security advisories shared by Gateway API (which are provided on a best-effort basis without guarantee of advance notice).
 
 ## Gateway API v1.7
 

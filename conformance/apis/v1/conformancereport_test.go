@@ -20,11 +20,12 @@ import "testing"
 
 func TestImplementation_Validate(t *testing.T) {
 	validImpl := Implementation{
-		Organization: "sigs-k8s",
-		Project:      "gateway-api",
-		URL:          "https://github.com/kubernetes-sigs/gateway-api",
-		Version:      "v1.0.0",
-		Contact:      []string{"@kubernetes-sigs/gateway-api-maintainers"},
+		Organization:    "sigs-k8s",
+		Project:         "gateway-api",
+		URL:             "https://github.com/kubernetes-sigs/gateway-api",
+		Version:         "v1.0.0",
+		Contact:         []string{"@kubernetes-sigs/gateway-api-maintainers"},
+		SecurityContact: "security@example.com",
 	}
 
 	tests := []struct {
@@ -109,6 +110,54 @@ func TestImplementation_Validate(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "empty securityContact",
+			mutate: func(i Implementation) Implementation {
+				i.SecurityContact = ""
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "securityContact missing @",
+			mutate: func(i Implementation) Implementation {
+				i.SecurityContact = "not-an-email"
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "securityContact missing local part",
+			mutate: func(i Implementation) Implementation {
+				i.SecurityContact = "@example.com"
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "securityContact missing domain",
+			mutate: func(i Implementation) Implementation {
+				i.SecurityContact = "security@"
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "securityContact domain without dot",
+			mutate: func(i Implementation) Implementation {
+				i.SecurityContact = "security@localhost"
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "securityContact with display name",
+			mutate: func(i Implementation) Implementation {
+				i.SecurityContact = "Security Team <security@example.com>"
+				return i
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -117,6 +166,89 @@ func TestImplementation_Validate(t *testing.T) {
 			err := impl.Validate()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestConformanceReport_IsConformant_SecurityContact(t *testing.T) {
+	baseReport := func(gatewayAPIVersion, securityContact string) ConformanceReport {
+		return ConformanceReport{
+			GatewayAPIVersion: gatewayAPIVersion,
+			Implementation: Implementation{
+				Organization:    "sigs-k8s",
+				Project:         "gateway-api",
+				URL:             "https://github.com/kubernetes-sigs/gateway-api",
+				Version:         "v1.0.0",
+				Contact:         []string{"@kubernetes-sigs/gateway-api-maintainers"},
+				SecurityContact: securityContact,
+			},
+			ProfileReports: []ProfileReport{
+				{
+					Name:    "GATEWAY-HTTP",
+					Summary: "Core tests succeeded.",
+					Core: Status{
+						Result:     Success,
+						Statistics: Statistics{Passed: 1},
+					},
+				},
+			},
+		}
+	}
+
+	tests := []struct {
+		name              string
+		gatewayAPIVersion string
+		securityContact   string
+		wantGatewayResult Result
+		wantErr           bool
+	}{
+		{
+			name:              "v1.7 report without securityContact is valid",
+			gatewayAPIVersion: "v1.7.0",
+			securityContact:   "",
+			wantGatewayResult: Success,
+			wantErr:           false,
+		},
+		{
+			name:              "v1.7 report with invalid securityContact fails",
+			gatewayAPIVersion: "v1.7.0",
+			securityContact:   "not-an-email",
+			wantGatewayResult: Failure,
+			wantErr:           true,
+		},
+		{
+			name:              "v1.8 report without securityContact fails",
+			gatewayAPIVersion: "v1.8.0",
+			securityContact:   "",
+			wantGatewayResult: Failure,
+			wantErr:           true,
+		},
+		{
+			name:              "v1.8 report with invalid securityContact fails",
+			gatewayAPIVersion: "v1.8.0",
+			securityContact:   "invalid-email",
+			wantGatewayResult: Failure,
+			wantErr:           true,
+		},
+		{
+			name:              "v1.8 report with valid securityContact succeeds",
+			gatewayAPIVersion: "v1.8.0",
+			securityContact:   "security@example.com",
+			wantGatewayResult: Success,
+			wantErr:           false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			report := baseReport(tt.gatewayAPIVersion, tt.securityContact)
+			gwResult, _, err := report.IsConformant("v1.8")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IsConformant() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if gwResult != tt.wantGatewayResult {
+				t.Errorf("IsConformant() gatewayResult = %v, want %v", gwResult, tt.wantGatewayResult)
 			}
 		})
 	}
