@@ -64,8 +64,26 @@ and submit reports for a specific implementation.
 
 For help running the test suite, see the [Running the suite](/docs/conformance/running-tests/) guide.
 
+### Security Contact and Embargo Policy
+
+Conformance reports include an `implementation.securityContact` email address (required starting in Gateway API v1.8) used to coordinate security advisories with Gateway API implementations, similar to the [Kubernetes Security Response Committee (formerly Product Security Committee) private distributors list][k8s-src-distributors].
+
+Because conformance reports are stored in a public repository, implementations should provide an **actively monitored project security email alias or mailing list** (e.g., `security@example.com` or `psirt@example.com`) rather than an individual's personal email address. This list is intended to provide actionable information to implementation teams rather than individuals, and using a dedicated alias allows implementations to manage spam filtering and moderation.
+
+By submitting a conformance report with a `securityContact` email address, you are agreeing to abide by a non-disclosure agreement (NDA) and embargo policy, and to avoid any form of early disclosure of any security advisories released by Gateway API:
+
+* **Dedicated Security Alias**: Provide an actively monitored security email alias for your project or organization rather than a personal email address.
+* **Confidentiality & Need-to-Know**: Information received via the security contact may only be shared internally within your team on a strict need-to-know basis to fix the issue in your implementation, and anyone with whom it is shared must agree to these same terms.
+* **No Early Disclosure**: Vulnerability details, patches, and derived binaries or releases must not be made public, distributed to external parties, or hinted at prior to the agreed-upon public disclosure date and time.
+* **Leak Notification**: If embargoed information leaks prematurely, you must urgently inform the Gateway API maintainers and `security@kubernetes.io` with details of what leaked and to whom.
+
+{{% alert color="warning" title="Disclaimer" %}}
+Security advisories are released on a **best-effort basis**. There is no guarantee that all potential security issues will be released in this way or with advance notice.
+{{% /alert %}}
+
 [reports-folder]: https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/
 [conformance-guide]: https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/README.md
+[k8s-src-distributors]: https://github.com/kubernetes/committee-security-response/blob/main/private-distributors-list.md
 
 ## Prerelease reports
 

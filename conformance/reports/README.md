@@ -120,6 +120,13 @@ comply with the following rules:
     maintaining this file, so they can be easily contacted when needed (e.g. for
     relevant release announcements regarding conformance, etc.). Optionally, it
     can be an email address or a support URL (e.g. GitHub new issue page).
+  - `securityContact`: a dedicated, actively monitored security email alias or
+    mailing list for the project (e.g. `security@example.com` or
+    `psirt@example.com`) for receiving security advisories and vulnerability
+    notifications affecting Gateway API implementations (required starting with
+    Gateway API v1.8). Do not use personal email addresses. See
+    [Security Contact and Embargo Policy](#security-contact-and-embargo-policy)
+    below for the terms associated with providing this contact.
   - `url`: it must be a valid url for a GitHub repository, or any other website with
     information related to the project.
   - `version`: it must be a snapshot of the project, which means it can be a commit,
@@ -146,4 +153,4 @@ comply with the following rules:
   - some tests related to the supported extended features have been skipped
   - the conformance test run required some steps unexpected by the suite.
 
-[implementations-table]: https://gateway-api.sigs.k8s.io/docs/implementations/list/
+[implementations-table]: https://gateway-api.sigs.k8s.io/implementations/v1.1/
