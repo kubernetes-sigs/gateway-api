@@ -11,6 +11,7 @@ implementation:
   version: "1.30.0"
   contact:
     - "@test"
+  securityContact: "security@placeholder.com"
 supportedFeatures:
   - HTTPRouteHostRewrite
   - HTTPRouteMethodMatching

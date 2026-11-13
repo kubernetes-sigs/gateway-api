@@ -111,6 +111,13 @@ comply with the following rules:
     maintaining this file, so they can be easily contacted when needed (e.g. for
     relevant release announcements regarding conformance, etc.). Optionally, it
     can be an email address or a support URL (e.g. GitHub new issue page).
+  - `securityContact`: a dedicated, actively monitored security email alias or
+    mailing list for the project (e.g. `security@example.com` or
+    `psirt@example.com`) for receiving security advisories and vulnerability
+    notifications affecting Gateway API implementations (required starting with
+    Gateway API v1.8). Do not use personal email addresses. See
+    [Security Contact and Embargo Policy](#security-contact-and-embargo-policy)
+    below for the terms associated with providing this contact.
   - `url`: it must be a valid url for a GitHub repository, or any other website with
     information related to the project.
   - `version`: it must be a snapshot of the project, which means it can be a commit,
@@ -137,4 +144,20 @@ comply with the following rules:
   - some tests related to the supported extended features have been skipped
   - the conformance test run required some steps unexpected by the suite.
 
+### Security Contact and Embargo Policy
+
+Similar to the [Kubernetes Security Response Committee (formerly Product Security Committee) private distributors list][k8s-src-distributors], Gateway API uses the `implementation.securityContact` email address in conformance reports to provide actionable security information to implementation maintainers.
+
+Because conformance reports are stored in a public repository, implementations **should provide an actively monitored project security email alias or mailing list** (such as `security@example.com` or `psirt@example.com`) rather than an individual's personal email address. This ensures continuity as team membership changes and allows implementations to apply mailing list moderation or spam filtering.
+
+By submitting a conformance report with a `securityContact` email address, you agree to abide by a non-disclosure agreement (NDA) and embargo policy, and to avoid any form of early disclosure of security advisories released by Gateway API:
+
+- **Dedicated Security Alias**: The contact should be an actively monitored security email alias for your project or organization, not intended for individuals to find out about security issues.
+- **Confidentiality & Need-to-Know**: Any non-public vulnerability details, advisories, or patches received via the security contact must be kept strictly confidential and shared only within your implementation team on a need-to-know basis to remediate the issue. Anyone with whom the information is shared must agree to these same terms.
+- **No Early Disclosure**: Vulnerability information, patches, and derived binaries or releases must not be made public, distributed to external parties, or hinted at in any way prior to the coordinated public disclosure date and time.
+- **Leak Notification**: In the event that embargoed information is inadvertently shared beyond what is permitted by this policy, you must immediately notify the Gateway API maintainers and `security@kubernetes.io` with details of what information leaked and to whom. Violation of this policy may result in removal from future pre-release security notifications.
+
+> **Disclaimer**: Security advisories and advance notifications are provided on a **best-effort basis**. There is no guarantee that all potential security issues will be released in this way or with advance notice.
+
 [implementations-table]: https://gateway-api.sigs.k8s.io/implementations/v1.1/
+[k8s-src-distributors]: https://github.com/kubernetes/committee-security-response/blob/main/private-distributors-list.md
