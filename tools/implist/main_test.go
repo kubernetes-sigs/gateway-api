@@ -53,3 +53,17 @@ func TestReadReportsFiltersUnsupportedVersions(t *testing.T) {
 		}
 	}
 }
+
+func TestFullNameToHeadingLink(t *testing.T) {
+	for fullName, want := range map[string]string{
+		"Envoy Gateway":                                  "#envoy-gateway",
+		"Google Kubernetes Engine":                       "#google-kubernetes-engine",
+		"Bohdaq's rust-web-server":                       "#bohdaqs-rust-web-server",
+		"Lexfrei's Cloudflare Tunnel Gateway Controller": "#lexfreis-cloudflare-tunnel-gateway-controller",
+		"Example #1 (beta)":                              "#example-1-beta",
+	} {
+		if got := FullNameToHeadingLink(fullName); got != want {
+			t.Errorf("FullNameToHeadingLink(%q) = %q, want %q", fullName, got, want)
+		}
+	}
+}
