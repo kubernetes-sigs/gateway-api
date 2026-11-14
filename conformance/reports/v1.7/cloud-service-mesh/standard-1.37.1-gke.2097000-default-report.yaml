@@ -1,0 +1,41 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-11-07T14:58:39Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.7.0
+implementation:
+  contact:
+  - csm-gateway-api@google.com
+  organization: Google Cloud
+  project: Cloud Service Mesh
+  url: https://cloud.google.com/service-mesh/docs/gateway/overview
+  version: 1.37.1-gke.2097000
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - MeshHTTPRouteMatching
+    statistics:
+      Failed: 0
+      Passed: 6
+      Skipped: 1
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 6
+      Skipped: 0
+    supportedFeatures:
+    - MeshHTTPRouteBackendRequestHeaderModification
+    - MeshHTTPRouteNamedRouteRule
+    - MeshHTTPRouteQueryParamMatching
+    - MeshHTTPRouteRedirectPath
+    - MeshHTTPRouteRedirectPort
+    - MeshHTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - MeshClusterIPMatching
+    - MeshConsumerRoute
+    - MeshHTTPRouteRewritePath
+  name: MESH-HTTP
+  summary: Core tests partially succeeded with 1 test skips. Extended tests succeeded.
