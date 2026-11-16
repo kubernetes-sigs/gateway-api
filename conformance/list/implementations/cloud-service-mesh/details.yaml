@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: Google Cloud
+project: Cloud Service Mesh
+fullName: Google Cloud Service Mesh
+description: |
+  [Cloud Service Mesh][csm] is Google Cloud's managed service mesh for
+  Kubernetes and compute workloads. For east-west mesh traffic in [Google
+  Kubernetes Engine (GKE)][gke] clusters, Cloud Service Mesh supports the
+  [GAMMA][gamma] Gateway API configuration model through a managed control plane
+  and Envoy sidecar proxies.
+
+  Cloud Service Mesh supports weighted traffic splitting, header modification,
+  query parameter matching, redirects, and route rule naming with `HTTPRoute`.
+  See the documentation for an [overview of Gateway API support][csm-gateway]
+  and instructions to [set up a mesh with the Gateway API][csm-gateway-setup].
+
+  [csm]: https://cloud.google.com/service-mesh
+  [gke]: https://cloud.google.com/kubernetes-engine
+  [csm-gateway]: https://cloud.google.com/service-mesh/docs/gateway/overview
+  [csm-gateway-setup]: https://cloud.google.com/service-mesh/docs/gateway/set-up-envoy-mesh
