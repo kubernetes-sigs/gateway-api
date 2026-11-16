@@ -30,6 +30,13 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // BackendTLSPolicy provides a way to configure how a Gateway
 // connects to a Backend via TLS.
+//
+// BackendTLSPolicy is a Union Feature: It is expected to be combined with
+// another feature that forwards traffic to a backend.
+//
+// <gateway:union:GRPCRoute>
+// <gateway:union:TLSRoute>
+// <gateway:union:HTTPRequestMirrorFilter>
 type BackendTLSPolicy struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional

@@ -1,3 +1,13 @@
+{{- define "unionFeatureLinks" -}}
+{{- $doc := . -}}
+{{- $tags := regexFindAll "<gateway:union:[A-Za-z]+>" $doc -1 -}}
+{{- range $i, $tag := $tags -}}
+{{- if $i }}, {{ end -}}
+{{- $name := trimSuffix ">" (trimPrefix "<gateway:union:" $tag) -}}
+[{{ $name }}](#{{ lower $name }})
+{{- end -}}
+{{- end -}}
+
 {{- define "type" -}}
 {{- $type := . -}}
 {{- if markdownShouldRenderType $type -}}
@@ -8,6 +18,10 @@
 
 {{ $type.Doc }}
 
+{{ if contains "<gateway:union:" $type.Doc -}}
+:link: **Union Feature**: works with {{ template "unionFeatureLinks" $type.Doc }}
+
+{{ end -}}
 {{ if $type.Validation -}}
 _Validation:_
 {{- range $type.Validation }}
@@ -36,7 +50,7 @@ _Appears in:_
 {{ end -}}
 
 {{ range $type.Members -}}
-| `{{ .Name  }}`<br />_{{ markdownRenderType .Type }}_{{- if contains "<gateway:experimental>" .Doc -}}<br /> :warning: **Experimental**{{ end -}}{{- if .Default }}<p>Default: {{ markdownRenderDefault .Default }}</p>{{ end -}}<p>**Validations:**<br />{{ range .Validation -}}{{ markdownRenderValidation . }}<br />{{ end }}</p>| {{ template "type_members" . }} |
+| `{{ .Name  }}`<br />_{{ markdownRenderType .Type }}_{{- if contains "<gateway:experimental>" .Doc -}}<br /> :warning: **Experimental**{{ end -}}{{- if contains "<gateway:union:" .Doc -}}<br /> :link: **Union Feature**: works with {{ template "unionFeatureLinks" .Doc }}{{ end -}}{{- if .Default }}<p>Default: {{ markdownRenderDefault .Default }}</p>{{ end -}}<p>**Validations:**<br />{{ range .Validation -}}{{ markdownRenderValidation . }}<br />{{ end }}</p>| {{ template "type_members" . }} |
 {{ end -}}
 
 {{ end -}}
