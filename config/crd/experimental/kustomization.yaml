@@ -14,3 +14,5 @@ resources:
 - gateway.networking.x-k8s.io_xbackendtrafficpolicies.yaml
 - gateway.networking.x-k8s.io_xmeshes.yaml
 - gateway.networking.x-k8s.io_xtelemetrypolicies.yaml
+- gateway.networking.k8s.io_rbac_aggregation.yaml
+- gateway.networking.x-k8s.io_rbac_aggregation.yaml
