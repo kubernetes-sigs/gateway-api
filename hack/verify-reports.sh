@@ -48,6 +48,19 @@ check_ge_v1.1.0() {
     fi
 }
 
+# Check if the provided Gateway API version is greater than or equal to v1.8.0
+check_ge_v1.8.0() {
+    local version=$(normalize_version "$1")
+    local minimum_version="1.8.0"
+
+    # Compare using sort -V
+    if [[ $(echo -e "${version}\n${minimum_version}" | sort -V | head -n1) == "${minimum_version}" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Check if the report fields are valid according to the rules defined in https://github.com/kubernetes-sigs/gateway-api/blob/release-1.1/conformance/reports/README.md
 check_report_fields() {
     local report=$1
@@ -72,6 +85,16 @@ check_report_fields() {
     if [[ $mode == "" ]]; then
         error "$report mode must be set"
         EXIT_VALUE=1
+    fi
+    if check_ge_v1.8.0 "${expected_gateway_api_version}"; then
+        local security_contact=$(yq eval '.implementation.securityContact // ""' "$report")
+        if [[ $security_contact == "" ]]; then
+            error "$report implementation.securityContact must be set"
+            EXIT_VALUE=1
+        elif [[ ! $security_contact =~ ^[^[:space:]@]+@[^[:space:]@.]+\.[^[:space:]@]+$ ]]; then
+            error "$report implementation.securityContact must be a valid email address"
+            EXIT_VALUE=1
+        fi
     fi
 }
 
