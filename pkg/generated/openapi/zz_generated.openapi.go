@@ -4520,7 +4520,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.Referenc
 					},
 					"routability": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Routability specifies the requested reachability scope of this address. Valid values are empty, `Cluster`, or a prefixed implementation-specific value. The `k8s.io` domain and all its subdomains are reserved. When unset or empty, this field uses the implementation's default routability behavior.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Routability specifies the requested reachability scope of this address. Valid values are empty, `Cluster`, or a prefixed implementation-specific value. The `k8s.io` domain and all its subdomains are reserved and cannot be used until Gateway API defines a value for them. When unset or empty, this field uses the implementation's default routability behavior.\n\nSupport: Extended\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nImplementations claiming GatewayAddressRoutability MUST report routability for every resulting status address. </gateway:util:excludeFromCRD>\n\n<gateway:experimental>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4637,7 +4637,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref common.Refere
 					},
 					"routability": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Routability reports the reachability scope of this address. When empty or unset, this field uses the implementation's default routability behavior. The `k8s.io` domain and all its subdomains are reserved for well-known values.\n\n<gateway:experimental>",
+							Description: "Routability reports the reachability scope of this address. An empty or unset value means the address has no portable reachability guarantee. The `k8s.io` domain and all its subdomains are reserved for well-known values.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nImplementations claiming GatewayAddressRoutability MUST set this field for every status address. </gateway:util:excludeFromCRD>\n\n<gateway:experimental>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
