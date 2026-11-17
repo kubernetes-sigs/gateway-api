@@ -17,16 +17,33 @@ limitations under the License.
 package main
 
 import (
+	"log/slog"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 )
 
 func TestReadReportsFiltersUnsupportedVersions(t *testing.T) {
 	t.Parallel()
 
+	// Derive the versions to check from the provided versions.
+	allVersions := ConformantVersions
+	allVersions = append(allVersions, StaleVersions...)
+	allVersions = append(allVersions, NonConformantVersion)
+
+	slices.Reverse(allVersions)
+
+	reportPassVersions := ConformantVersions
+	reportPassVersions = append(reportPassVersions, StaleVersions...)
+
+	slices.Reverse(reportPassVersions)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+
 	reportsDir := t.TempDir()
-	for _, version := range []string{"v1.3.0", "v1.4.0", "v1.5.0", "v1.6.0"} {
+	for _, version := range allVersions {
 		versionDir := filepath.Join(reportsDir, version)
 		if err := os.Mkdir(versionDir, 0o755); err != nil {
 			t.Fatalf("failed to create report directory: %v", err)
@@ -36,7 +53,7 @@ func TestReadReportsFiltersUnsupportedVersions(t *testing.T) {
 		}
 	}
 
-	reports, err := readReports(reportsDir)
+	reports, err := readReports(logger, reportsDir)
 	if err != nil {
 		t.Fatalf("readReports returned error: %v", err)
 	}
@@ -44,10 +61,10 @@ func TestReadReportsFiltersUnsupportedVersions(t *testing.T) {
 	if got, want := len(reports), 3; got != want {
 		t.Fatalf("readReports returned %d reports, want %d", got, want)
 	}
-	if _, ok := reports[filepath.Join("v1.3.0", "report.yaml")]; ok {
+	if _, ok := reports[filepath.Join(NonConformantVersion, "report.yaml")]; ok {
 		t.Error("readReports included a report from an unsupported version")
 	}
-	for _, version := range []string{"v1.4.0", "v1.5.0", "v1.6.0"} {
+	for _, version := range reportPassVersions {
 		if _, ok := reports[filepath.Join(version, "report.yaml")]; !ok {
 			t.Errorf("readReports omitted report from %s", version)
 		}
