@@ -151,6 +151,7 @@ The Backend resource is designed with a clear separation between Core and Extend
 | `ExternalHostname` type | Extended | First-class external FQDN support, replacing `ExternalName` Services |
 | Inline TLS | Extended | TLS configuration inlined on the Backend resource |
 | `TCP`, `GRPC`, `HTTP2`, `MCP`, and `WSS` protocols | Extended | Extended backend communication protocols |
+| [ALPN protocols](../gep-4833/index.md) | Extended | ALPN protocols offered to the backend on TLS connections |
 | [Session persistence](../gep-1619/index.md) | Extended | Session persistence across endpoints selected by an `EndpointSelector` Backend |
 
 This layering allows the Backend resource itself to move to Standard quickly (Core tests just validate "does Backend do what Service does"), while Extended features mature independently.
@@ -242,9 +243,8 @@ type BackendSpec struct {
   // configurations (e.g. version upgrades or h2c). In cases where the
   // protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN),
   // implementations MUST include the protocol set here in the negotiation
-  // options presented to the backend. It is currently undefined whether this
-  // means required, optional, or most preferred (e.g. first in the set).
-  // TODO: Define full semantics in protocol negotation.
+  // options presented to the backend. How this maps to the ALPN list offered
+  // on TLS connections is defined in GEP-4833.
   //
   // These protocols are also used for validation of future protocol-specific
   // fields that may be added to the Backend resource (e.g. retries).

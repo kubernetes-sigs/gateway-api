@@ -1,0 +1,13 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4833
+name: ALPN Protocols for Backend Connections
+status: Provisional
+authors:
+  - zhaohuabing
+relationships:
+  extends:
+    - number: 1897
+      name: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
+    - number: 4894
+      name: Backend Resource
