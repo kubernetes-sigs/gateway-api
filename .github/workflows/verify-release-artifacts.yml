@@ -1,18 +1,24 @@
-# Verify that release artifacts (standard-install.yaml) match the source at the release tag.
-# Runs when a new release is published (any tag). For release events, GitHub uses the workflow
-# from the default branch—ensure this file is on main (or your default branch).
-# For past releases that didn't trigger, run manually: Actions -> Verify Release Artifacts -> Run workflow.
+# Verify that release artifacts (standard-install.yaml, experimental-install.yaml,
+# standard-swagger.json, experimental-swagger.json) are attached to the release,
+# have a bundle-version matching the release title/tag, and match the source at the tag.
+# Runs automatically when a v* tag is pushed or when a release is published/prereleased/edited,
+# and can also be run manually against Draft or Published releases via workflow_dispatch.
 
 name: Verify Release Artifacts
 
 on:
+  push:
+    tags:
+      - 'v*'
   release:
     types:
       - published
+      - prereleased
+      - edited
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag to verify (e.g. v1.4.1). Required when run manually.'
+        description: 'Release tag to verify (e.g. v1.7.0-rc.2). Required when run manually.'
         required: true
         type: string
 
@@ -20,20 +26,24 @@ permissions:
   contents: read
 
 jobs:
-  verify-standard-install:
-    name: standard-install.yaml and standard-swagger.json matches source at tag
+  verify-release-artifacts:
+    name: Verify release title, attached YAML/JSON assets, bundle-version, and source match
     runs-on: ubuntu-latest
+    if: github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v')
     steps:
       - name: Set tag for verification
         id: set-tag
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${INPUTS_TAG}" >> $GITHUB_OUTPUT
+            echo "tag=${INPUTS_TAG}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=${GITHUB_EVENT_RELEASE_TAG_NAME}" >> $GITHUB_OUTPUT
+            echo "tag=${GITHUB_EVENT_RELEASE_TAG_NAME}" >> "$GITHUB_OUTPUT"
           fi
         env:
           INPUTS_TAG: ${{ inputs.tag }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_EVENT_RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
 
       - name: Set up Go
@@ -45,44 +55,103 @@ jobs:
           TAG: ${{ steps.set-tag.outputs.tag }}
           REPO: ${{ github.repository }}
         run: |
-          set -e
+          set -euo pipefail
           echo "Verifying tag: $TAG"
-          echo "Comparing: (A) standard-install.yaml from release $TAG  vs  (B) standard-install.yaml built from source at $TAG"
           echo ""
+
+          # 1) Fetch release metadata (works for both Draft and Published releases)
+          if ! RELEASE_JSON=$(gh release view "$TAG" --repo "$REPO" --json name,tagName,isDraft,assets 2>/dev/null); then
+            echo "::error::No GitHub release (Draft or Published) found for tag '$TAG'. Please create the Draft release with attached YAML/JSON assets."
+            exit 1
+          fi
+
+          RELEASE_TITLE=$(echo "$RELEASE_JSON" | jq -r '.name')
+          RELEASE_TAG=$(echo "$RELEASE_JSON" | jq -r '.tagName')
+          IS_DRAFT=$(echo "$RELEASE_JSON" | jq -r '.isDraft')
+
+          echo "Release Title: '$RELEASE_TITLE' | Tag: '$RELEASE_TAG' | Draft: $IS_DRAFT"
+
+          if [ -z "$RELEASE_TITLE" ] || [ "$RELEASE_TITLE" != "$RELEASE_TAG" ]; then
+            echo "::error::Release title ('$RELEASE_TITLE') does not match release tag ('$RELEASE_TAG')."
+            exit 1
+          fi
+
+          # 2) Verify standard and experimental YAML and OpenAPI JSON assets are attached
+          REQUIRED_ASSETS=(
+            "standard-install.yaml"
+            "experimental-install.yaml"
+            "standard-swagger.json"
+            "experimental-swagger.json"
+          )
+          ATTACHED_ASSETS=$(echo "$RELEASE_JSON" | jq -r '.assets[].name')
+
+          for asset in "${REQUIRED_ASSETS[@]}"; do
+            if ! echo "$ATTACHED_ASSETS" | grep -qx "$asset"; then
+              echo "::error::Missing required release asset '$asset' on release '$RELEASE_TITLE'."
+              exit 1
+            fi
+            echo "Found attached asset: $asset"
+          done
 
           workdir=$(mktemp -d)
           cd "$workdir"
 
-          # A) Get standard-install.yaml and standard-swagger.json from this release
+          # 3) Download attached release assets
           echo "Downloading release assets."
-          gh release download "$TAG" --repo "$REPO" --pattern "standard-install.yaml" --pattern "standard-swagger.json" --dir .
+          gh release download "$TAG" --repo "$REPO" \
+            --pattern "standard-install.yaml" \
+            --pattern "experimental-install.yaml" \
+            --pattern "standard-swagger.json" \
+            --pattern "experimental-swagger.json" \
+            --dir .
 
-          # B) Get source tarball from release, or fall back to GitHub archive for this tag
+          # 4) Verify bundle-version in standard-install.yaml and experimental-install.yaml matches release title
+          for yaml_file in standard-install.yaml experimental-install.yaml; do
+            VERSIONS=$(awk '/gateway\.networking\.k8s\.io\/bundle-version:/ {print $2}' "$yaml_file" | sort -u)
+            if [ -z "$VERSIONS" ]; then
+              echo "::error::No 'gateway.networking.k8s.io/bundle-version' annotation found in $yaml_file."
+              exit 1
+            fi
+            for v in $VERSIONS; do
+              if [ "$v" != "$RELEASE_TITLE" ]; then
+                echo "::error::Version mismatch in $yaml_file: found bundle-version '$v', expected release title '$RELEASE_TITLE'."
+                exit 1
+              fi
+            done
+            echo "Verified all bundle-version annotations in $yaml_file match '$RELEASE_TITLE'."
+          done
+
+          # 5) Download source tarball for this tag, build artifacts, and compare
           echo "Downloading source tarball"
           curl -sSfL -o source.tar.gz "https://github.com/${REPO}/archive/refs/tags/${TAG}.tar.gz"
-          tar --extract --gunzip --file $(ls *.tar.gz | head -1)
+          tar --extract --gunzip --file "$(ls ./*.tar.gz | head -1)"
           cd gateway-api-*
-          echo "Building standard-install.yaml from source at tag $TAG (same version)..."
+          echo "Building standard-install.yaml and experimental-install.yaml from source at tag $TAG..."
           VERSION=$TAG make build-install-yaml 2>/dev/null || make build-install-yaml
-          echo "Building standard-swagger.json from source at tag $TAG (same version)..."
+          echo "Building standard-swagger.json and experimental-swagger.json from source at tag $TAG..."
           VERSION=$TAG make build-openapi-json
 
-          # C) Normalize build files
-          sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' ../standard-install.yaml > /tmp/release.yaml
-          sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' release/standard-install.yaml > /tmp/built.yaml
+          # 6) Normalize and compare build files against attached release assets
+          for yaml_file in standard-install.yaml experimental-install.yaml; do
+            sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' "../${yaml_file}" > "/tmp/release-${yaml_file}"
+            sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' "release/${yaml_file}" > "/tmp/built-${yaml_file}"
+
+            echo ""
+            echo "Diff for ${yaml_file}: (A) release asset vs (B) built from source."
+            if ! diff -u "/tmp/release-${yaml_file}" "/tmp/built-${yaml_file}"; then
+              echo ""
+              echo "::error::Validation FAILED. ${yaml_file} in the release does not match the source code at $TAG."
+              exit 1
+            fi
+          done
+
+          for json_file in standard-swagger.json experimental-swagger.json; do
+            if ! diff -u "../${json_file}" "release/${json_file}"; then
+              echo ""
+              echo "::error::Validation FAILED. ${json_file} in the release does not match the source code at $TAG."
+              exit 1
+            fi
+          done
 
           echo ""
-          echo "Diff: (A) release asset  vs  (B) built from source. Lines with - are in release, + are in built."
-          if ! diff -u /tmp/release.yaml /tmp/built.yaml; then
-              echo ""
-              echo "::error::Validation FAILED. The CRD logic in the release does not match the source code."
-              exit 1
-          fi
-          # These files are not pretty printed, so the diff will be unreadable.
-          if ! diff -u ../standard-swagger.json release/standard-swagger.json; then
-              echo ""
-              echo "::error::Validation FAILED. The OpenAPI Swagger definitions in the release does not match the source code."
-              exit 1
-          fi
-          echo ""
-          echo "Success! The manifest logic in the $TAG release matches the source code."
+          echo "Success! All release artifacts in $RELEASE_TITLE are attached, match the release title/version, and match the source code."
