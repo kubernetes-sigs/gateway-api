@@ -1,0 +1,209 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-11-16T21:53:06Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.7.0
+implementation:
+  contact:
+  - https://github.com/nginx/nginx-gateway-fabric/discussions/new/choose
+  organization: nginx
+  project: nginx-gateway-fabric
+  url: https://github.com/nginx/nginx-gateway-fabric
+  version: v2.9.0
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 40
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 52
+      Skipped: 0
+    supportedFeatures:
+    - BackendTLSPolicy
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructure
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    - ListenerSet
+    unsupportedFeatures:
+    - BackendTLSPolicySANValidation
+    - ClusterTrustBundle
+    - GatewayAddressRoutability
+    - GatewayAddressRoutabilityCluster
+    - GatewayListenerFilters
+    - GatewayRouteHostnameIntersectionPrecedence
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteBackendURLRewrite
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteRequestTimeout
+    - HTTPRouteRetryCodes
+    - HTTPRouteRetryConnectionError
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 17
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 0
+    supportedFeatures:
+    - BackendTLSPolicy
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructure
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    unsupportedFeatures:
+    - BackendTLSPolicySANValidation
+    - ClusterTrustBundle
+    - GatewayAddressRoutability
+    - GatewayAddressRoutabilityCluster
+    - GatewayListenerFilters
+    - GatewayRouteHostnameIntersectionPrecedence
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 21
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 17
+      Skipped: 0
+    supportedFeatures:
+    - BackendTLSPolicy
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructure
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - TLSRouteModeMixed
+    - TLSRouteModeTerminate
+    unsupportedFeatures:
+    - BackendTLSPolicySANValidation
+    - ClusterTrustBundle
+    - GatewayAddressRoutability
+    - GatewayAddressRoutabilityCluster
+    - GatewayListenerFilters
+    - GatewayRouteHostnameIntersectionPrecedence
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 20
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructure
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - TCPRoute
+    unsupportedFeatures:
+    - ClusterTrustBundle
+    - GatewayAddressRoutability
+    - GatewayAddressRoutabilityCluster
+    - GatewayListenerFilters
+    - GatewayRouteHostnameIntersectionPrecedence
+  name: GATEWAY-TCP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 21
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructure
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - UDPRoute
+    unsupportedFeatures:
+    - ClusterTrustBundle
+    - GatewayAddressRoutability
+    - GatewayAddressRoutabilityCluster
+    - GatewayListenerFilters
+    - GatewayRouteHostnameIntersectionPrecedence
+  name: GATEWAY-UDP
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- BackendTLSPolicyPreserveForeignStatus
+- GatewayPreserveForeignConditions
+- HTTPRoutePreserveForeignStatus
