@@ -1034,11 +1034,13 @@ type RouteGroupKind struct {
 // be reachable from.
 //
 // Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
+// Prefixed values must be qualified names with a DNS subdomain prefix, such as
+// `example.com/CorpWan`.
 // The `k8s.io` domain and all its subdomains are reserved and cannot be used
 // until Gateway API defines a value for them.
 //
 // <gateway:experimental:validation:MaxLength=253>
-// <gateway:experimental:validation:XValidation:message="Routability must be empty, Cluster, or an implementation-specific prefixed path; k8s.io and its subdomains are reserved",rule="size(self) == 0 || self == 'Cluster' || (self.matches('^.*/.+$') && !format.dns1123Subdomain().validate(self.split('/')[0]).hasValue() && self.split('/')[0] != 'k8s.io' && !self.split('/')[0].endsWith('.k8s.io'))">
+// <gateway:experimental:validation:XValidation:message="Routability must be empty, Cluster, or an implementation-specific prefixed name; k8s.io and its subdomains are reserved",rule="size(self) == 0 || self == 'Cluster' || (self.contains('/') && !format.qualifiedName().validate(self).hasValue() && self.split('/')[0] != 'k8s.io' && !self.split('/')[0].endsWith('.k8s.io'))">
 type GatewayAddressRoutabilityType string
 
 const (
@@ -1075,11 +1077,18 @@ type GatewaySpecAddress struct {
 
 	// Routability specifies the requested reachability scope of this address.
 	// Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
-	// The `k8s.io` domain and all its subdomains are reserved.
-	// When unset or empty, this field uses the implementation's default
-	// routability behavior.
+	// The `k8s.io` domain and all its subdomains are reserved and cannot be used
+	// until Gateway API defines a value for them. When unset or empty, this field uses the
+	// implementation's default routability behavior.
 	//
 	// Support: Extended
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementors:
+	//
+	// Implementations claiming GatewayAddressRoutability MUST report routability
+	// for every resulting status address.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// <gateway:experimental>
@@ -1106,9 +1115,16 @@ type GatewayStatusAddress struct {
 	// +required
 	Value string `json:"value"`
 
-	// Routability reports the reachability scope of this address. When empty or
-	// unset, this field uses the implementation's default routability behavior.
+	// Routability reports the reachability scope of this address. An empty or
+	// unset value means the address has no portable reachability guarantee.
 	// The `k8s.io` domain and all its subdomains are reserved for well-known values.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementors:
+	//
+	// Implementations claiming GatewayAddressRoutability MUST set this field
+	// for every status address.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// <gateway:experimental>
@@ -1358,6 +1374,7 @@ const (
 	//
 	//   * IPAM address exhaustion
 	//   * Address not yet allocated
+	//   * A requested address routability cannot be satisfied
 	//
 	// When this reason is used the implementation SHOULD provide a clear
 	// message explaining the underlying problem, ideally with some hints as to
