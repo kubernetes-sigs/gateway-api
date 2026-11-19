@@ -31,8 +31,8 @@ import (
 	xgatewayv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
 
-func validTracingProvider() xgatewayv1alpha1.TracingProvider {
-	return xgatewayv1alpha1.TracingProvider{
+func validTracingProvider() *xgatewayv1alpha1.TracingProvider {
+	return &xgatewayv1alpha1.TracingProvider{
 		BackendRef: gatewayv1.BackendObjectReference{
 			Name: "otel-collector",
 			Port: new(gatewayv1.PortNumber(4317)),

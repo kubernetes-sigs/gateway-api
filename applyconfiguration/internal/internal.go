@@ -2467,7 +2467,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: provider
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.TracingProvider
-      default: {}
     - name: samplingRate
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction

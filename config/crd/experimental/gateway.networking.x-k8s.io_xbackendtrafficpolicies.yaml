@@ -111,6 +111,7 @@ spec:
                           be made up of retries.
 
                           Support: Extended
+                        format: int32
                         maximum: 100
                         minimum: 0
                         type: integer
@@ -138,6 +139,7 @@ spec:
                           Count specifies the number of requests per time interval.
 
                           Support: Extended
+                        format: int32
                         maximum: 1000000
                         minimum: 1
                         type: integer

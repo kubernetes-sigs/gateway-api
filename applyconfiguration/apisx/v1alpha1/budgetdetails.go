@@ -34,7 +34,7 @@ type BudgetDetailsApplyConfiguration struct {
 	//
 	// Support: Extended
 	//
-	Percent *int `json:"percent,omitempty"`
+	Percent *int32 `json:"percent,omitempty"`
 	// Interval defines the duration in which requests will be considered
 	// for calculating the budget for retries.
 	//
@@ -52,7 +52,7 @@ func BudgetDetails() *BudgetDetailsApplyConfiguration {
 // WithPercent sets the Percent field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Percent field is set to the value of the last call.
-func (b *BudgetDetailsApplyConfiguration) WithPercent(value int) *BudgetDetailsApplyConfiguration {
+func (b *BudgetDetailsApplyConfiguration) WithPercent(value int32) *BudgetDetailsApplyConfiguration {
 	b.Percent = &value
 	return b
 }

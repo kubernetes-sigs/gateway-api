@@ -162,7 +162,7 @@ type BudgetDetails struct {
 	// +kubebuilder:default=20
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=100
-	Percent *int `json:"percent,omitempty"`
+	Percent *int32 `json:"percent,omitempty"`
 
 	// Interval defines the duration in which requests will be considered
 	// for calculating the budget for retries.
