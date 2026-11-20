@@ -26,7 +26,7 @@ func TestReadReportsFiltersUnsupportedVersions(t *testing.T) {
 	t.Parallel()
 
 	reportsDir := t.TempDir()
-	for _, version := range []string{"v1.3.0", "v1.4.0", "v1.5.0", "v1.6.0"} {
+	for _, version := range []string{"v1.4.0", "v1.5.0", "v1.6.0", "v1.7.0"} {
 		versionDir := filepath.Join(reportsDir, version)
 		if err := os.Mkdir(versionDir, 0o755); err != nil {
 			t.Fatalf("failed to create report directory: %v", err)
@@ -44,10 +44,10 @@ func TestReadReportsFiltersUnsupportedVersions(t *testing.T) {
 	if got, want := len(reports), 3; got != want {
 		t.Fatalf("readReports returned %d reports, want %d", got, want)
 	}
-	if _, ok := reports[filepath.Join("v1.3.0", "report.yaml")]; ok {
+	if _, ok := reports[filepath.Join("v1.4.0", "report.yaml")]; ok {
 		t.Error("readReports included a report from an unsupported version")
 	}
-	for _, version := range []string{"v1.4.0", "v1.5.0", "v1.6.0"} {
+	for _, version := range []string{"v1.5.0", "v1.6.0", "v1.7.0"} {
 		if _, ok := reports[filepath.Join(version, "report.yaml")]; !ok {
 			t.Errorf("readReports omitted report from %s", version)
 		}
