@@ -65,3 +65,19 @@ spec:
   - backendRefs:
     - name: grpc-infra-backend-v1
       port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpcroute-empty-hostname-x-older
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-grpcroute-exact-hostname-x
+    namespace: gateway-conformance-infra
+  - name: gw-grpcroute-wc-hostname-x
+    namespace: gateway-conformance-infra
+  rules:
+  - backendRefs:
+    - name: grpc-infra-backend-v1
+      port: 8080

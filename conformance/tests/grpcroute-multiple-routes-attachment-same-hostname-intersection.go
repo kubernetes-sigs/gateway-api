@@ -52,18 +52,19 @@ var GRPCRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 
 		t.Run("GRPCRoute exact hostname match takes precedence over GRPCRoute wildcard hostname match despite having newer creation timestamp", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gw-grpcroute-exact-hostname-x", Namespace: ns}
-			olderRouteNN := types.NamespacedName{Name: "grpcroute-wc-hostname-x-older", Namespace: ns}
-			newerRouteNN := types.NamespacedName{Name: "grpcroute-exact-hostname-x-newer", Namespace: ns}
+			olderNoHostnameRouteNN := types.NamespacedName{Name: "grpcroute-empty-hostname-x-older", Namespace: ns}
+			olderWildcardRouteNN := types.NamespacedName{Name: "grpcroute-wc-hostname-x-older", Namespace: ns}
+			newerExactRouteNN := types.NamespacedName{Name: "grpcroute-exact-hostname-x-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.GRPCRoute{}, true, olderRouteNN)
+			gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.GRPCRoute{}, true, olderWildcardRouteNN, olderNoHostnameRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
 
 			newerRoute := &gatewayv1.GRPCRoute{
-				Name:      newerRouteNN.Name,
-				Namespace: newerRouteNN.Namespace,
+				Name:      newerExactRouteNN.Name,
+				Namespace: newerExactRouteNN.Namespace,
 				Spec: gatewayv1.GRPCRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
@@ -81,7 +82,7 @@ var GRPCRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			}
 			suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{newerRoute}, suite.CleanupTestResources)
 
-			kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.GRPCRoute{}, true, olderRouteNN, newerRouteNN)
+			kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.GRPCRoute{}, true, olderNoHostnameRouteNN, olderWildcardRouteNN, newerExactRouteNN)
 
 			grpc.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.GRPCClient, suite.TimeoutConfig, gwAddr,
 				grpc.ExpectedResponse{
@@ -96,18 +97,19 @@ var GRPCRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 
 		t.Run("GRPCRoute more specific wildcard hostname match takes precedence over less specific wildcard hostname match despite having newer creation timestamp", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gw-grpcroute-wc-hostname-x", Namespace: ns}
-			olderRouteNN := types.NamespacedName{Name: "grpcroute-less-specific-wc-hostname-x-older", Namespace: ns}
-			newerRouteNN := types.NamespacedName{Name: "grpcroute-more-specific-wc-hostname-x-newer", Namespace: ns}
+			olderNoHostnameRouteNN := types.NamespacedName{Name: "grpcroute-empty-hostname-x-older", Namespace: ns}
+			olderLessSpecificRouteNN := types.NamespacedName{Name: "grpcroute-less-specific-wc-hostname-x-older", Namespace: ns}
+			newerMoreSpecificRouteNN := types.NamespacedName{Name: "grpcroute-more-specific-wc-hostname-x-newer", Namespace: ns}
 
 			// This test creates an additional Gateway in the gateway-conformance-infra namespace so we have to wait for it to be ready.
-			gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.GRPCRoute{}, true, olderRouteNN)
+			gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.GRPCRoute{}, true, olderLessSpecificRouteNN, olderNoHostnameRouteNN)
 
 			// CreationTimestamp has second-level precision; sleep ensures the second route is strictly newer than the first.
 			time.Sleep(time.Second)
 
 			newerRoute := &gatewayv1.GRPCRoute{
-				Name:      newerRouteNN.Name,
-				Namespace: newerRouteNN.Namespace,
+				Name:      newerMoreSpecificRouteNN.Name,
+				Namespace: newerMoreSpecificRouteNN.Namespace,
 				Spec: gatewayv1.GRPCRouteSpec{
 					CommonRouteSpec: gatewayv1.CommonRouteSpec{
 						ParentRefs: []gatewayv1.ParentReference{{
@@ -125,7 +127,7 @@ var GRPCRouteMultipleRoutesAttachmentSameHostnameIntersection = confsuite.Confor
 			}
 			suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{newerRoute}, suite.CleanupTestResources)
 
-			kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.GRPCRoute{}, true, olderRouteNN, newerRouteNN)
+			kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.GRPCRoute{}, true, olderNoHostnameRouteNN, olderLessSpecificRouteNN, newerMoreSpecificRouteNN)
 
 			grpc.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.GRPCClient, suite.TimeoutConfig, gwAddr,
 				grpc.ExpectedResponse{
