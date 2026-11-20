@@ -124,18 +124,22 @@ func TestConformanceOptions_EmptyYAML(t *testing.T) {
 	assert.Empty(t, opts.ExemptFeatures)
 	assert.Empty(t, opts.UsableNetworkAddresses)
 	assert.Empty(t, opts.UnusableNetworkAddresses)
+	assert.Empty(t, opts.UsableClusterNetworkAddresses)
+	assert.Empty(t, opts.UnusableClusterNetworkAddresses)
 }
 
 func TestConformanceOptions_PartialYAML(t *testing.T) {
-	// A YAML file that sets only a subset of fields (here meshName and selected
-	// timeoutConfig entries) must override exactly those fields and
-	// preserve defaults for everything else, including sibling fields
-	// inside timeoutConfig.
+	// A YAML file that sets only a subset of fields must override exactly
+	// those fields and preserve defaults for everything else, including
+	// sibling fields inside timeoutConfig.
 	opts := loadConfigurableOptionsFromYAML(t, "data/test-conformance-options-partial.yaml")
 
 	defaults := conformanceconfig.DefaultTimeoutConfig()
 
 	assert.Equal(t, "partial-only", opts.MeshName)
+	assert.Equal(t, []string{"10.96.0.0/12", "fd00:1234::/108"}, opts.ServiceCIDRs)
+	assert.Equal(t, []v1.GatewaySpecAddress{{Type: ptr.To(v1.IPAddressType), Value: "10.96.0.100"}}, opts.UsableClusterNetworkAddresses)
+	assert.Equal(t, []v1.GatewaySpecAddress{{Type: ptr.To(v1.IPAddressType), Value: "192.0.2.20"}}, opts.UnusableClusterNetworkAddresses)
 	assert.Equal(t, 5*time.Second, opts.TimeoutConfig.DeleteTimeout)
 	assert.Equal(t, 5, opts.TimeoutConfig.RequiredConsecutiveSuccesses)
 	assert.Equal(t, 75*time.Second, opts.TimeoutConfig.TCPRouteMustHaveCondition)
