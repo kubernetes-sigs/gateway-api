@@ -218,6 +218,7 @@ spec:
                           and must be empty otherwise
                         rule: 'self.sourceType == ''Attribute'' ? has(self.attributeKey)
                           : !has(self.attributeKey)'
+                    maxItems: 16
                     type: array
                     x-kubernetes-list-map-keys:
                     - name

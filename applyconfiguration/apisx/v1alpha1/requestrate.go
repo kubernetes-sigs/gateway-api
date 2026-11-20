@@ -30,7 +30,7 @@ type RequestRateApplyConfiguration struct {
 	// Count specifies the number of requests per time interval.
 	//
 	// Support: Extended
-	Count *int `json:"count,omitempty"`
+	Count *int32 `json:"count,omitempty"`
 	// Interval specifies the divisor of the rate of requests, the amount of
 	// time during which the given count of requests occur.
 	//
@@ -47,7 +47,7 @@ func RequestRate() *RequestRateApplyConfiguration {
 // WithCount sets the Count field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Count field is set to the value of the last call.
-func (b *RequestRateApplyConfiguration) WithCount(value int) *RequestRateApplyConfiguration {
+func (b *RequestRateApplyConfiguration) WithCount(value int32) *RequestRateApplyConfiguration {
 	b.Count = &value
 	return b
 }
