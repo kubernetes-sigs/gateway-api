@@ -21,6 +21,8 @@ package main
 import (
 	"flag"
 	"log"
+
+	"sigs.k8s.io/gateway-api/tools/conformancetables/page"
 )
 
 func main() {
@@ -28,7 +30,7 @@ func main() {
 	out := flag.String("o", "site/content/en/docs/implementations/versions", "directory to write the generated pages to")
 	flag.Parse()
 
-	if err := WritePages(*reports, *out); err != nil {
+	if err := page.WritePages(*reports, *out); err != nil {
 		log.Fatalf("generating conformance tables: %v", err)
 	}
 }

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package page
 
 import (
 	"bytes"
@@ -29,6 +29,8 @@ import (
 	"text/template"
 
 	"golang.org/x/mod/semver"
+	"sigs.k8s.io/gateway-api/tools/conformancetables/loader"
+	"sigs.k8s.io/gateway-api/tools/conformancetables/table"
 )
 
 //go:embed templates/page.md.tmpl
@@ -38,7 +40,7 @@ var templateFS embed.FS
 type group struct {
 	Minor  string // e.g. "v1.6"
 	Latest string // newest release dir in the group, e.g. "v1.6.0"
-	Rows   []Row
+	Rows   []loader.Row
 }
 
 type pageData struct {
@@ -54,16 +56,16 @@ type pageData struct {
 
 // BuildGroups groups rows by minor release, keeps the newest report per
 // project and removes duplicates. Groups are ordered oldest to newest.
-func BuildGroups(rows []Row) []group {
+func BuildGroups(rows []loader.Row) []group {
 	var out []group
-	for minor, rs := range GroupByMinor(rows) {
+	for minor, rs := range loader.GroupByMinor(rows) {
 		latest := rs[0].ReleaseDir
 		for _, r := range rs {
 			if semver.Compare(r.ReleaseDir, latest) > 0 {
 				latest = r.ReleaseDir
 			}
 		}
-		out = append(out, group{Minor: minor, Latest: latest, Rows: Dedupe(LatestPerProject(rs))})
+		out = append(out, group{Minor: minor, Latest: latest, Rows: loader.Dedupe(loader.LatestPerProject(rs))})
 	}
 	sort.Slice(out, func(i, j int) bool {
 		return semver.Compare(out[i].Latest, out[j].Latest) < 0
@@ -89,7 +91,7 @@ func RenderPage(g group, maxMinor int, hidden bool) (string, bool, error) {
 		httpName, meshName = "HTTP", "MESH"
 	}
 	projects := map[string]bool{}
-	for _, r := range SelectProfile(g.Rows, httpName) {
+	for _, r := range table.SelectProfile(g.Rows, httpName) {
 		projects[r.Project] = true
 	}
 	if len(projects) < 3 {
@@ -99,7 +101,7 @@ func RenderPage(g group, maxMinor int, hidden bool) (string, bool, error) {
 	dropCore := semver.Compare(g.Latest, "v1.4.0") < 0
 	dropMode := g.Latest == "v1.0.0"
 	build := func(name string) string {
-		return BuildTable(SelectProfile(g.Rows, name), dropCore, dropMode).Markdown()
+		return table.BuildTable(table.SelectProfile(g.Rows, name), dropCore, dropMode).Markdown()
 	}
 	data := pageData{
 		Title:       semver.MajorMinor(g.Latest),
@@ -127,7 +129,7 @@ func RenderPage(g group, maxMinor int, hidden bool) (string, bool, error) {
 
 // WritePages reads reportsDir and writes one page per release into outDir.
 func WritePages(reportsDir, outDir string) error {
-	rows, err := LoadRows(reportsDir)
+	rows, err := loader.LoadRows(reportsDir)
 	if err != nil {
 		return err
 	}
