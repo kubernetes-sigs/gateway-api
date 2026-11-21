@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"golang.org/x/mod/semver"
+
 	"sigs.k8s.io/gateway-api/tools/conformancetables/loader"
 	"sigs.k8s.io/gateway-api/tools/conformancetables/logic"
 
