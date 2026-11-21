@@ -14,19 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package page
 
 import (
 	"strings"
 	"testing"
 
 	v1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
+	"sigs.k8s.io/gateway-api/tools/conformancetables/loader"
 )
 
-func httpRows(profile string, projects ...string) []Row {
-	var rows []Row
+func httpRows(profile string, projects ...string) []loader.Row {
+	var rows []loader.Row
 	for _, p := range projects {
-		rows = append(rows, Row{
+		rows = append(rows, loader.Row{
 			Organization: "o", Project: p, Version: "1", Mode: "default",
 			Profile: v1.ProfileReport{Name: profile},
 		})

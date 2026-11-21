@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package table
 
 import (
 	"fmt"
@@ -22,6 +22,8 @@ import (
 	"strings"
 
 	"golang.org/x/mod/semver"
+	"sigs.k8s.io/gateway-api/tools/conformancetables/loader"
+	"sigs.k8s.io/gateway-api/tools/conformancetables/logic"
 
 	v1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 )
@@ -38,8 +40,8 @@ type Table struct {
 }
 
 // SelectProfile returns the rows whose profile has the given name.
-func SelectProfile(rows []Row, name string) []Row {
-	var out []Row
+func SelectProfile(rows []loader.Row, name string) []loader.Row {
+	var out []loader.Row
 	for _, r := range rows {
 		if r.Profile.Name == name {
 			out = append(out, r)
@@ -59,7 +61,7 @@ func versionLess(a, b string) bool {
 }
 
 // SortRows orders rows by organization (case-insensitive), version, mode, file.
-func SortRows(rows []Row) {
+func SortRows(rows []loader.Row) {
 	sort.SliceStable(rows, func(i, j int) bool {
 		a, b := rows[i], rows[j]
 		if x, y := strings.ToLower(a.Organization), strings.ToLower(b.Organization); x != y {
@@ -126,8 +128,8 @@ func featuresCell(p v1.ProfileReport) string {
 }
 
 // BuildTable renders already-selected rows (one profile) as a Table.
-func BuildTable(rows []Row, dropCore, dropMode bool) Table {
-	rows = append([]Row(nil), rows...)
+func BuildTable(rows []loader.Row, dropCore, dropMode bool) Table {
+	rows = append([]loader.Row(nil), rows...)
 	SortRows(rows)
 
 	names := map[string]bool{}
@@ -136,10 +138,10 @@ func BuildTable(rows []Row, dropCore, dropMode bool) Table {
 			continue
 		}
 		for _, f := range r.Profile.Extended.SupportedFeatures {
-			names[ProcessFeatureName(f)] = true
+			names[logic.ProcessFeatureName(f)] = true
 		}
 		for _, f := range r.Profile.Extended.UnsupportedFeatures {
-			names[ProcessFeatureName(f)] = true
+			names[logic.ProcessFeatureName(f)] = true
 		}
 	}
 	var features []string
@@ -163,7 +165,7 @@ func BuildTable(rows []Row, dropCore, dropMode bool) Table {
 		supported := map[string]bool{}
 		if r.Profile.Extended != nil {
 			for _, f := range r.Profile.Extended.SupportedFeatures {
-				supported[ProcessFeatureName(f)] = true
+				supported[logic.ProcessFeatureName(f)] = true
 			}
 		}
 		row := []string{r.Organization, r.Project, r.Version}
