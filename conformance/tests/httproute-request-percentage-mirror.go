@@ -185,7 +185,7 @@ func testMirroredRequestsDistribution(t *testing.T, suite *confsuite.Conformance
 
 	for _, mirrorPod := range mirrorPods {
 		require.Eventually(t, func() bool {
-			mirrorLogRegexp := http.GetMirrorLogRegexp(expected.Request.Path)
+			mirrorLogRegexp := http.GetMirrorLogRegexp(expected.Request.Path, len(expected.Request.Body))
 
 			tlog.Log(t, "Searching for the mirrored request log")
 			tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
