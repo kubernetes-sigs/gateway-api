@@ -56,7 +56,7 @@ guide](docs/concepts/versioning/).
 
 The `Terminate` mode for `TLSRoute` is available at the `Extended` [Support Level].
 
-[Support Level]: docs/concepts/conformance/#2-support-levels
+[Support Level]: docs/conformance/#support-levels
 
 ## Downstream TLS
 
