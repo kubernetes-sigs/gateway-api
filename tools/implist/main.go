@@ -51,9 +51,9 @@ var (
 // TODO(youngnick): Figure out some way to make this more centralized.
 // Don't open a PR about this without talking with youngnick first.
 var (
-	CurrentVersion     = "v1.6"
-	ConformantVersions = []string{CurrentVersion, "v1.5"}
-	StaleVersions      = []string{"v1.4"}
+	CurrentVersion     = "v1.7"
+	ConformantVersions = []string{CurrentVersion, "v1.6"}
+	StaleVersions      = []string{"v1.5"}
 )
 
 // FullNameToHeadingLink transforms an implementation's full name
