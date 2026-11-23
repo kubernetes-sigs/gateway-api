@@ -41,11 +41,18 @@ type GatewaySpecAddressApplyConfiguration struct {
 	Value *string `json:"value,omitempty"`
 	// Routability specifies the requested reachability scope of this address.
 	// Valid values are empty, `Cluster`, or a prefixed implementation-specific value.
-	// The `k8s.io` domain and all its subdomains are reserved.
-	// When unset or empty, this field uses the implementation's default
-	// routability behavior.
+	// The `k8s.io` domain and all its subdomains are reserved and cannot be used
+	// until Gateway API defines a value for them. When unset or empty, this field uses the
+	// implementation's default routability behavior.
 	//
 	// Support: Extended
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementors:
+	//
+	// Implementations claiming GatewayAddressRoutability MUST report routability
+	// for every resulting status address.
+	// </gateway:util:excludeFromCRD>
 	//
 	// <gateway:experimental>
 	Routability *apisv1.GatewayAddressRoutabilityType `json:"routability,omitempty"`

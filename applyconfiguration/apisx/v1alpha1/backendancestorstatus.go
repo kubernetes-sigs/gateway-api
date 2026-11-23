@@ -19,9 +19,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
+	applyconfigurationapisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
 // BackendAncestorStatusApplyConfiguration represents a declarative configuration of the BackendAncestorStatus type for use
@@ -30,6 +30,18 @@ import (
 // BackendAncestorStatus describes the status of a Backend with respect to a
 // specific ancestor resource (typically a Gateway).
 type BackendAncestorStatusApplyConfiguration struct {
+	// For Kubernetes API conventions, see:
+	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
+	// conditions represent the current state of the Backend resource.
+	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
+	//
+	// Defined condition types include:
+	// - "Accepted": the resource has been acknowledged and accepted by the controller
+	// - "ResolvedRefs": all references of the resource have been resolved
+	//
+	// The status of each condition is one of True, False, or Unknown.
+	//
+	Conditions []v1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 	// ControllerName is a domain/path string that indicates the name of the
 	// controller that manages the Backend.
 	//
@@ -47,23 +59,11 @@ type BackendAncestorStatusApplyConfiguration struct {
 	// they are no longer necessary.
 	// </gateway:util:excludeFromCRD>
 	//
-	ControllerName *v1.GatewayController `json:"controllerName,omitempty"`
+	ControllerName *apisv1.GatewayController `json:"controllerName,omitempty"`
 	// AncestorRef identifies the ancestor resource that this status is
 	// associated with.
 	//
-	AncestorRef *apisv1.ParentReferenceApplyConfiguration `json:"ancestorRef,omitempty"`
-	// For Kubernetes API conventions, see:
-	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
-	// conditions represent the current state of the Backend resource.
-	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
-	//
-	// Defined condition types include:
-	// - "Accepted": the resource has been acknowledged and accepted by the controller
-	// - "ResolvedRefs": all references of the resource have been resolved
-	//
-	// The status of each condition is one of True, False, or Unknown.
-	//
-	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
+	AncestorRef *applyconfigurationapisv1.ParentReferenceApplyConfiguration `json:"ancestorRef,omitempty"`
 }
 
 // BackendAncestorStatusApplyConfiguration constructs a declarative configuration of the BackendAncestorStatus type for use with
@@ -72,10 +72,23 @@ func BackendAncestorStatus() *BackendAncestorStatusApplyConfiguration {
 	return &BackendAncestorStatusApplyConfiguration{}
 }
 
+// WithConditions adds the given value to the Conditions field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Conditions field.
+func (b *BackendAncestorStatusApplyConfiguration) WithConditions(values ...*v1.ConditionApplyConfiguration) *BackendAncestorStatusApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithConditions")
+		}
+		b.Conditions = append(b.Conditions, *values[i])
+	}
+	return b
+}
+
 // WithControllerName sets the ControllerName field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ControllerName field is set to the value of the last call.
-func (b *BackendAncestorStatusApplyConfiguration) WithControllerName(value v1.GatewayController) *BackendAncestorStatusApplyConfiguration {
+func (b *BackendAncestorStatusApplyConfiguration) WithControllerName(value apisv1.GatewayController) *BackendAncestorStatusApplyConfiguration {
 	b.ControllerName = &value
 	return b
 }
@@ -83,20 +96,7 @@ func (b *BackendAncestorStatusApplyConfiguration) WithControllerName(value v1.Ga
 // WithAncestorRef sets the AncestorRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the AncestorRef field is set to the value of the last call.
-func (b *BackendAncestorStatusApplyConfiguration) WithAncestorRef(value *apisv1.ParentReferenceApplyConfiguration) *BackendAncestorStatusApplyConfiguration {
+func (b *BackendAncestorStatusApplyConfiguration) WithAncestorRef(value *applyconfigurationapisv1.ParentReferenceApplyConfiguration) *BackendAncestorStatusApplyConfiguration {
 	b.AncestorRef = value
-	return b
-}
-
-// WithConditions adds the given value to the Conditions field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the Conditions field.
-func (b *BackendAncestorStatusApplyConfiguration) WithConditions(values ...*metav1.ConditionApplyConfiguration) *BackendAncestorStatusApplyConfiguration {
-	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithConditions")
-		}
-		b.Conditions = append(b.Conditions, *values[i])
-	}
 	return b
 }

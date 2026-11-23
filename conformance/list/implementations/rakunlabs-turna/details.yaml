@@ -1,0 +1,13 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: rakunlabs
+project: turna
+fullName: Turna
+description: |
+  [Turna][turna] is an open source operations sidecar and Gateway API implementation written in Go. Its controller watches Gateway API resources and programs proxies that route HTTP, gRPC, TLS, TCP and UDP traffic straight to pod endpoints from EndpointSlices, using Turna's own load balancing, retries and passive health checks.
+
+  See the [Kubernetes Gateway documentation][turna-gateway-doc] to install it with Helm or Kustomize. For questions and issues, [open an issue on GitHub][turna-issue-new].
+
+  [turna]:https://github.com/rakunlabs/turna
+  [turna-gateway-doc]:https://rakunlabs.github.io/turna/reference/kubernetes
+  [turna-issue-new]:https://github.com/rakunlabs/turna/issues/new

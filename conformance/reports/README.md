@@ -73,6 +73,15 @@ different implementation versions have different reproduction steps, this sectio
 can have multiple sub-sections, each related to a specific or a subset of implementation
 versions.
 
+### Implementations list
+
+To appear in the [implementations list][implementations-table], an
+implementation also needs an ImplementationListDetails file, usually
+`conformance/list/implementations/<organization>-<project>/details.yaml`. Its
+`organization` and `project` fields must match the ones in the submitted
+reports. See [conformance/list/implementations](../list/implementations/README.md)
+for the format.
+
 ## Rules exceptions
 
 This structure was introduced after the Gateway API release v1.0.0, while we started
@@ -111,6 +120,13 @@ comply with the following rules:
     maintaining this file, so they can be easily contacted when needed (e.g. for
     relevant release announcements regarding conformance, etc.). Optionally, it
     can be an email address or a support URL (e.g. GitHub new issue page).
+  - `securityContact`: a dedicated, actively monitored security email alias or
+    mailing list for the project (e.g. `security@example.com` or
+    `psirt@example.com`) for receiving security advisories and vulnerability
+    notifications affecting Gateway API implementations (required starting with
+    Gateway API v1.8). Do not use personal email addresses. See
+    [Security Contact and Embargo Policy](#security-contact-and-embargo-policy)
+    below for the terms associated with providing this contact.
   - `url`: it must be a valid url for a GitHub repository, or any other website with
     information related to the project.
   - `version`: it must be a snapshot of the project, which means it can be a commit,

@@ -36,9 +36,16 @@ type GatewayStatusAddressApplyConfiguration struct {
 	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
 	//
 	Value *string `json:"value,omitempty"`
-	// Routability reports the reachability scope of this address. When empty or
-	// unset, this field uses the implementation's default routability behavior.
+	// Routability reports the reachability scope of this address. An empty or
+	// unset value means the address has no portable reachability guarantee.
 	// The `k8s.io` domain and all its subdomains are reserved for well-known values.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementors:
+	//
+	// Implementations claiming GatewayAddressRoutability MUST set this field
+	// for every status address.
+	// </gateway:util:excludeFromCRD>
 	//
 	// <gateway:experimental>
 	Routability *apisv1.GatewayAddressRoutabilityType `json:"routability,omitempty"`

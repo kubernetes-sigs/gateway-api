@@ -152,7 +152,7 @@ type TracingConfig struct {
 	// Support: Core (within Tracing feature)
 	//
 	// +optional
-	Provider TracingProvider `json:"provider,omitzero"`
+	Provider *TracingProvider `json:"provider,omitempty"`
 
 	// SamplingRate specifies the base probability of sampling new traces.
 	//
@@ -225,6 +225,7 @@ type TracingConfig struct {
 	// +listType=map
 	// +listMapKey=name
 	// +optional
+	// +kubebuilder:validation:MaxItems=16
 	Attributes []Attribute `json:"attributes,omitempty"`
 }
 

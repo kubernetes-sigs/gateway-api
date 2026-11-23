@@ -135,7 +135,7 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 				h.ExpectedResponse{
 					Namespace: ns,
 					Request: h.Request{
-						Host: "abc.example.org",
+						Host: "abc.example.com",
 						Path: "/backendtlspolicy-host-mismatch",
 						SNI:  "abc.example.com",
 					},

@@ -376,7 +376,6 @@ type BackendSpec struct {
 // SessionPersistence defines the desired state of SessionPersistence.
 // +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookie) || !has(self.cookie.lifetimeType) || self.cookie.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
 // +kubebuilder:validation:XValidation:message="cookie must be nil if type is not Cookie",rule="!has(self.cookie) || self.type == 'Cookie'"
-// +kubebuilder:validation:XValidation:message="cookie must be specified for Cookie type",rule="self.type != 'Cookie' || has(self.cookie)"
 // +kubebuilder:validation:XValidation:message="header must be nil if type is not Header",rule="!has(self.header) || self.type == 'Header'"
 // +kubebuilder:validation:XValidation:message="header must be specified for Header type",rule="self.type != 'Header' || has(self.header)"
 type SessionPersistence struct {

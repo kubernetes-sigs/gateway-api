@@ -51,7 +51,7 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 					Interval: toDuration("10s"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -68,10 +68,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent: new(20),
+					Percent: new(int32(20)),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -88,7 +88,7 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("10s"),
 				}),
 			},
@@ -105,11 +105,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("2h"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("10s"),
 				}),
 			},
@@ -126,11 +126,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("1ms"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("10s"),
 				}),
 			},
@@ -147,11 +147,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("10s"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("2h"),
 				}),
 			},
@@ -168,11 +168,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("10s"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -189,11 +189,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("10s"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -210,11 +210,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("10s"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -232,11 +232,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("10s"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -252,11 +252,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
-					Percent:  new(20),
+					Percent:  new(int32(20)),
 					Interval: toDuration("10s"),
 				}),
 				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
-					Count:    new(10),
+					Count:    new(int32(10)),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -270,7 +270,7 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 					Name: gatewayv1.HeaderName("x-session-id"),
 				},
 			},
-			wantErrors: []string{"header must be nil if type is not Header", "cookie must be specified for Cookie type"},
+			wantErrors: []string{"header must be nil if type is not Header"},
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig header type with cookie field",
@@ -283,11 +283,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			wantErrors: []string{"cookie must be nil if type is not Cookie", "header must be specified for Header type"},
 		},
 		{
-			name: "invalid BackendTrafficPolicyConfig cookie type without cookie field",
+			name: "valid BackendTrafficPolicyConfig cookie type without cookie field",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				Type: new(gatewayv1.CookieBasedSessionPersistence),
 			},
-			wantErrors: []string{"cookie must be specified for Cookie type"},
+			wantErrors: []string{},
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig header type without header field",

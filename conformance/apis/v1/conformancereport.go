@@ -19,9 +19,11 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"net/mail"
 	"net/url"
 	"strings"
 
+	"golang.org/x/mod/semver"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -87,11 +89,29 @@ type Implementation struct {
 	// on a repository, but for projects without a publicly exposed repository a general support
 	// page URL can be provided.
 	Contact []string `json:"contact"`
+
+	// SecurityContact is a dedicated, actively monitored security email alias or
+	// mailing list for the project (e.g. `security@example.com` or
+	// `psirt@example.com`), used for reporting security vulnerabilities and
+	// sharing security advisories with the maintainers of the implementation.
+	// Personal email addresses should not be used.
+	//
+	// By submitting a conformance report with a SecurityContact email, the
+	// implementation agrees to abide by an NDA/embargo policy and avoid any form
+	// of early disclosure of security advisories released by Gateway API.
+	// Security advisories are shared on a best-effort basis; there is no
+	// guarantee that all potential security issues will be released in this way
+	// or with advance notice.
+	SecurityContact string `json:"securityContact"`
 }
 
 // Validate ensures that the Implementation struct has valid fields set.
 // See https://github.com/kubernetes-sigs/gateway-api/issues/2178.
 func (i *Implementation) Validate() error {
+	return i.validate(true)
+}
+
+func (i *Implementation) validate(requireSecurityContact bool) error {
 	if i.Organization == "" {
 		return errors.New("implementation's organization cannot be empty")
 	}
@@ -109,6 +129,14 @@ func (i *Implementation) Validate() error {
 	}
 	if len(i.Contact) == 0 {
 		return errors.New("implementation's contact cannot be empty")
+	}
+	if requireSecurityContact && i.SecurityContact == "" {
+		return errors.New("implementation's securityContact cannot be empty")
+	}
+	if i.SecurityContact != "" {
+		if err := validateEmail(i.SecurityContact); err != nil {
+			return fmt.Errorf("implementation's securityContact is invalid: %w", err)
+		}
 	}
 	return nil
 }
@@ -133,11 +161,31 @@ func validateURL(rawURL string) error {
 	return nil
 }
 
+// validateEmail ensures that rawEmail is a well-formed email address.
+func validateEmail(rawEmail string) error {
+	parsed, err := mail.ParseAddress(rawEmail)
+	if err != nil {
+		return fmt.Errorf("could not parse email: %w", err)
+	}
+	if parsed.Address != rawEmail {
+		return errors.New("email must be a plain address without display name or angle brackets")
+	}
+	_, domain, ok := strings.Cut(parsed.Address, "@")
+	if !ok || !strings.Contains(domain, ".") || strings.HasPrefix(domain, ".") || strings.HasSuffix(domain, ".") {
+		return errors.New("email must include a valid domain")
+	}
+	return nil
+}
+
 // IsConformant returns Result values for Gateway, Mesh, and an error that describes
 // if something went wrong.
 func (c *ConformanceReport) IsConformant(version string) (Result, Result, error) {
+	// SecurityContact is required for reports starting in Gateway API v1.8.
+	reportMajorMinor := semver.MajorMinor(c.GatewayAPIVersion)
+	requireSecurityContact := reportMajorMinor == "" || semver.Compare(reportMajorMinor, "v1.8") >= 0
+
 	// Firstly, the Implementation struct must be valid.
-	if err := c.Validate(); err != nil {
+	if err := c.validate(requireSecurityContact); err != nil {
 		return Failure, Failure, err
 	}
 

@@ -11,9 +11,12 @@ linters:
         settings:
           linters:
             enable:
+              - "conflictingmarkers" # Ensures that fields do not have mutually exclusive markers.
               - "defaultorrequired" # defaultorrequired analyzer checks that fields marked as required do not have default values applied.
               - "defaults" # defaults is a linter to check that fields with default markers are configured correctly.
+              - "dependenttags" # Ensures that markers are accompanied by the markers they depend on.
               - "duplicatemarkers" # Ensures there are no exact duplicate markers. for types and fields.
+              - "forbiddenmarkers" # Ensure that types and fields do not contain any markers that are forbidden.
               - "jsontags" # Ensures every field has a json tag.
               - "nodurations" # Ensures that fields in the API types do not contain `Duration` type ether from the `time` package or the `k8s.io/apimachinery/pkg/apis/meta/v1` package
               - "nofloats" # Ensures floats are not used.
@@ -23,25 +26,24 @@ linters:
               - "noreferences" # Ensures that field names use 'Ref'/'Refs' instead of 'Reference'/'References'.
               - "notimestamp" # Ensures that structs do not contain a TimeStamp field.
               - "optionalorrequired" # Every field should be marked as `+optional` or `+required`.
+              - "preferredmarkers" # Ensures that preferred markers are used over their equivalents.
               - "ssatags" # Ensure proper Server-Side Apply (SSA) tags on array fields.
               - "statussubresource" # All root objects that have a `status` field should have a status subresource.
               - "uniquemarkers" # Ensure that types and fields do not contain more than a single definition of a marker that should only be present once.
+              # The following linters are only enforced for experimental (gateway.networking.x-k8s.io) APIs in apisx/.
+              - "arrayofstruct" # Enforces that an array of struct has at least one required field.
+              - "conditions" # Ensure conditions have the correct json tags and markers.
+              - "integers" # Ensure only int32 and int64 are used for integers.
+              - "maxlength" # Ensure all strings and arrays have maximum lengths/maximum items.
+              - "nobools" # Bools do not evolve over time, should use enums instead.
             disable:
-              # Enforces that an array of struct has at least one required fields. Disabled because BackendRef and others are already using it
-              # - "arrayofstructs"
               # Disabled because it is very verbose...
               # - "commentstart"
-              # Disabled because it changes how conditions are merged and we may need to check impact on existing installations
-              # - "conditions"
-              # Enforces usage of int32 or int64. Disabled because GA APIs are already using it
-              # - "integers"
-              # Disabled because some GA fields do not have a maxlength and this may break
-              # - "maxlength"
               # Disabled because some GA fields do not have a minlength and this may break.
               # Must be revisited with VAP
               # - "minlength"
-              # Ensure no booleans are used - controversial
-              # - "nobools"
+              # Disabled because there are no naming conventions to enforce beyond noreferences
+              # - "namingconventions"
               # Ensure that non pointer structs with no required fields are marked as optional. Breaking change
               # - "nonpointerstructs"
               # Ensure that optional fields are pointers - controversial
@@ -53,10 +55,51 @@ linters:
               # - "statusoptional"
               - "*"
           lintersConfig:
+            conditions:
+              isFirstField: Warn # Require conditions to be the first field in the status struct.
+              usePatchStrategy: Forbid # Forbid patchStrategy markers on the Conditions field.
+              useProtobuf: Forbid # We don't use protobuf, so protobuf tags are not required.
+            conflictingmarkers:
+              conflicts:
+                - name: "optional_vs_required"
+                  sets:
+                    - ["optional", "kubebuilder:validation:optional", "k8s:optional"]
+                    - ["required", "kubebuilder:validation:required", "k8s:required"]
+                  description: "A field cannot be both optional and required."
+                - name: "default_vs_required"
+                  sets:
+                    - ["default", "kubebuilder:default"]
+                    - ["required", "kubebuilder:validation:Required", "k8s:required"]
+                  description: "A field with a default value cannot be required"
+            dependenttags:
+              rules:
+                - identifier: "listMapKey"
+                  type: "All"
+                  dependsOn:
+                    - "listType"
+            forbiddenmarkers:
+              markers:
+                - identifier: "kubebuilder:validation:schemaless"
+                - identifier: "kubebuilder:pruning:preserveUnknownFields"
+                - identifier: "kubebuilder:validation:embeddedResource"
+            preferredmarkers:
+              markers:
+                - preferredIdentifier: "optional"
+                  equivalentIdentifiers:
+                    - identifier: "kubebuilder:validation:optional"
+                - preferredIdentifier: "required"
+                  equivalentIdentifiers:
+                    - identifier: "kubebuilder:validation:required"
             defaults:
               preferredDefaultMarker: "kubebuilder:default"
   exclusions:
     generated: strict
+    rules:
+      # Linters that are only enforced experimental (gateway.networking.x-k8s.io) APIs in apisx/.
+      - linters:
+          - kubeapilinter
+        path-except: ^apisx/
+        text: "^(arrayofstruct|conditions|integers|maxlength|nobools):"
     paths:
       - conformance/
       - wasm/

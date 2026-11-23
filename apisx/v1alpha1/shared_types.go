@@ -40,7 +40,7 @@ type RequestRate struct {
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=1000000
 	// +optional
-	Count *int `json:"count,omitempty"`
+	Count *int32 `json:"count,omitempty"`
 
 	// Interval specifies the divisor of the rate of requests, the amount of
 	// time during which the given count of requests occur.

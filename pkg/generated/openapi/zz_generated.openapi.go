@@ -4520,7 +4520,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.Referenc
 					},
 					"routability": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Routability specifies the requested reachability scope of this address. Valid values are empty, `Cluster`, or a prefixed implementation-specific value. The `k8s.io` domain and all its subdomains are reserved. When unset or empty, this field uses the implementation's default routability behavior.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Routability specifies the requested reachability scope of this address. Valid values are empty, `Cluster`, or a prefixed implementation-specific value. The `k8s.io` domain and all its subdomains are reserved and cannot be used until Gateway API defines a value for them. When unset or empty, this field uses the implementation's default routability behavior.\n\nSupport: Extended\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nImplementations claiming GatewayAddressRoutability MUST report routability for every resulting status address. </gateway:util:excludeFromCRD>\n\n<gateway:experimental>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4637,7 +4637,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref common.Refere
 					},
 					"routability": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Routability reports the reachability scope of this address. When empty or unset, this field uses the implementation's default routability behavior. The `k8s.io` domain and all its subdomains are reserved for well-known values.\n\n<gateway:experimental>",
+							Description: "Routability reports the reachability scope of this address. An empty or unset value means the address has no portable reachability guarantee. The `k8s.io` domain and all its subdomains are reserved for well-known values.\n\n<gateway:util:excludeFromCRD> Notes for implementors:\n\nImplementations claiming GatewayAddressRoutability MUST set this field for every status address. </gateway:util:excludeFromCRD>\n\n<gateway:experimental>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -10066,21 +10066,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 				Description: "BackendAncestorStatus describes the status of a Backend with respect to a specific ancestor resource (typically a Gateway).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"controllerName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ControllerName is a domain/path string that indicates the name of the controller that manages the Backend.\n\nExample: \"example.net/gateway-controller\".\n\nThe format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller MUST populate this field when writing status and ensure that entries to status populated with their controller name are removed when they are no longer necessary. </gateway:util:excludeFromCRD>",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"ancestorRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "AncestorRef identifies the ancestor resource that this status is associated with.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
-						},
-					},
 					"conditions": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
@@ -10100,6 +10085,21 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 									},
 								},
 							},
+						},
+					},
+					"controllerName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ControllerName is a domain/path string that indicates the name of the controller that manages the Backend.\n\nExample: \"example.net/gateway-controller\".\n\nThe format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller MUST populate this field when writing status and ensure that entries to status populated with their controller name are removed when they are no longer necessary. </gateway:util:excludeFromCRD>",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"ancestorRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AncestorRef identifies the ancestor resource that this status is associated with.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 						},
 					},
 				},
@@ -10686,7 +10686,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_TracingConfig(ref common.Refere
 					"provider": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Provider specifies the tracing collector or backend endpoint receiving OTLP spans.\n\nWhen configured, spans generated by the Gateway proxy are exported to this destination. This field is required when Mode is \"Enabled\", and must not be set otherwise.\n\nSupport: Core (within Tracing feature)",
-							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.TracingProvider"),
 						},
 					},

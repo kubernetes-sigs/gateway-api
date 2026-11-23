@@ -72,6 +72,24 @@ run them. Currently conformance tests cover the majority of capabilities in
 the Standard channel, for both Core and Extended behaviors for each supported
 resource and traffic direction.
 
+## What conformance actually means
+
+Conformance is intended to provide publicly available, reproducible reports that
+users and the public can use to verify that implementations support the features
+that they claim to.
+
+To this end, implementations are expected to run the conformance test suite, take
+the output, and submit the conformance report to the Gateway API repo. Tooling will
+then apply conformance rules and update lists of conformant implementations, feature
+matrices and other information automatically.
+
+In this way, users can be confident that, when an implementation says it supports
+a particular version of Gateway API (and optionally a set of Extended features
+associated with that version), it actually does.
+
+The last benefit that conformance gives is that it ensures that behavior for
+standardized behaviors is portable across conformant implementations.
+
 
 ## Contributing to Conformance
 
