@@ -1,6 +1,3 @@
-//go:build experimental
-// +build experimental
-
 /*
 Copyright 2023 The Kubernetes Authors.
 
@@ -467,6 +464,142 @@ func TestGRPCMethodMatch(t *testing.T) {
 				},
 			}
 			validateGRPCRoute(t, &route, tc.wantErrors)
+		})
+	}
+}
+
+func TestGRPCRequestMirrorFilter(t *testing.T) {
+	var percent int32 = 42
+	var denominator int32 = 1000
+	var bad_denominator int32 = 0
+	testService := gatewayv1.ObjectName("test-service")
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1.GRPCRouteRule
+	}{
+		{
+			name:       "GRPCRoute - Invalid because both percent and fraction are specified",
+			wantErrors: []string{"Invalid value: at most one of the fields in [percent fraction] may be set"},
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(8081)),
+						},
+						Percent: &percent,
+						Fraction: &gatewayv1.Fraction{
+							Numerator:   83,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name:       "GRPCRoute - Invalid fraction - numerator greater than denominator",
+			wantErrors: []string{"numerator must be less than or equal to denominator"},
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: &gatewayv1.Fraction{
+							Numerator:   1001,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name:       "GRPCRoute - Invalid fraction - denominator is 0",
+			wantErrors: []string{"spec.rules[0].filters[0].requestMirror.fraction.denominator in body should be greater than or equal to 1"},
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: &gatewayv1.Fraction{
+							Numerator:   0,
+							Denominator: &bad_denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name:       "GRPCRoute - Invalid fraction - numerator is negative",
+			wantErrors: []string{"spec.rules[0].filters[0].requestMirror.fraction.numerator in body should be greater than or equal to 0"},
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: &gatewayv1.Fraction{
+							Numerator:   -1,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "GRPCRoute - Valid with percent",
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(8081)),
+						},
+						Percent: &percent,
+					},
+				}},
+			}},
+		},
+		{
+			name: "GRPCRoute - Valid with fraction",
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: &gatewayv1.Fraction{
+							Numerator:   83,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.GRPCRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.GRPCRouteSpec{Rules: tc.rules},
+			}
+			validateGRPCRoute(t, route, tc.wantErrors)
 		})
 	}
 }
