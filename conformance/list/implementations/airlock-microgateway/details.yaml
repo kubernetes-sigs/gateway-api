@@ -4,6 +4,7 @@ organization: airlock
 project: microgateway
 url: https://github.com/airlock/microgateway
 fullName: "Airlock Microgateway"
+securityContact: security@airlock.com
 description: |
   [Airlock Microgateway][airlock-microgateway] is a Kubernetes-native security solution that extends the routing capabilities of the Gateway API with WAAP (Web Application and API Protection) features and identity-aware proxying.
   It filters requests using deny rules against known attacks (OWASP Top 10), along with header filtering, JSON parsing, OpenAPI specification enforcement, GraphQL schema validation, GeoIP support, and antivirus scanning via ICAP.
