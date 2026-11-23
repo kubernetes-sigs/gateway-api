@@ -130,6 +130,8 @@ func run(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	writer.Close()
+	if err := writer.Close(); err != nil {
+		return fmt.Errorf("error closing output file: %w", err)
+	}
 	return nil
 }
