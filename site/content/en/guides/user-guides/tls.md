@@ -41,7 +41,7 @@ from the client is not terminated at the Gateway, but rather passes through the 
 encrypted.
 
 For upstream connections, `BackendTLSPolicy` is used, and neither listener protocol nor TLS mode apply to the
-upstream TLS configuration. `BackendTLSPolicy` is a [union feature](guides/implementers-guide/#union-feature-conformance),
+upstream TLS configuration. `BackendTLSPolicy` is a [union feature](/guides/implementers-guide/#union-feature-conformance),
 which means it applies to any route or filter that forwards traffic to a backend. For `HTTPRoute`, `GRPCRoute`,
 and `TLSRoute` (with `Terminate` mode), the use of `BackendTLSPolicy` enables what is commonly known as a
 connection that is terminated and then re-encrypted at the Gateway.
@@ -50,13 +50,13 @@ connection that is terminated and then re-encrypted at the Gateway.
 
 The `TLSRoute` resource is GA and has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
-guide](docs/concepts/versioning/).
+guide](/docs/concepts/versioning/).
 
 {{< /details >}}
 
 The `Terminate` mode for `TLSRoute` is available at the `Extended` [Support Level].
 
-[Support Level]: docs/conformance/#support-levels
+[Support Level]: /docs/conformance/#support-levels
 
 ## Downstream TLS
 
@@ -117,14 +117,14 @@ would be invalid.
 ### Client Certificate Validation (Frontend mTLS)
 
 {{< details title="Extended Support Feature: GatewayFrontendClientCertificateValidation" open="true" >}}
-This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/conformance/).
 
 {{< /details >}}
 
 {{< details title="Standard Channel since v1.5.0" color="success" >}}
 GatewayFrontendClientCertificateValidation feature has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
-guide](docs/concepts/versioning/).
+guide](/docs/concepts/versioning/).
 
 {{< /details >}}
 
@@ -135,7 +135,7 @@ Unlike server certificate configuration, which is defined per-listener, client c
 #### Configuration Overview
 
 {{< details title="Extended Support Feature: GatewayFrontendClientCertificateValidationInsecureFallback" open="true" >}}
-This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/conformance/).
 
 {{< /details >}}
 
@@ -166,7 +166,7 @@ This example shows how to configure client certificate validation with default c
 
 The `BackendTLSPolicy` resource is GA and has been part of the Standard Channel
 since `v1.4.0`. For more information on release channels, refer to our
-[versioning guide](docs/concepts/versioning/).
+[versioning guide](/docs/concepts/versioning/).
 
 {{< /details >}}
 
@@ -220,7 +220,7 @@ are expected to serve a valid certificate for `auth.example.com`.
 {{< details title="Standard Channel since v1.5.0" color="success" >}}
 GatewayBackendClientCertificate feature has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
-guide](docs/concepts/versioning/).
+guide](/docs/concepts/versioning/).
 
 {{< /details >}}
 
