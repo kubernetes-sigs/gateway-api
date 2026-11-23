@@ -23,13 +23,9 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
-	apisv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
-	apisv1alpha3 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha3"
 	apisv1beta1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1beta1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
@@ -246,42 +242,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.UDPRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("UDPRouteStatus"):
 		return &apisv1.UDPRouteStatusApplyConfiguration{}
-
-		// Group=gateway.networking.k8s.io, Version=v1alpha2
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
-		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("ReferenceGrant"):
-		return &apisv1alpha2.ReferenceGrantApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TCPRoute"):
-		return &apisv1alpha2.TCPRouteApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteRule"):
-		return &apisv1alpha2.TCPRouteRuleApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteSpec"):
-		return &apisv1alpha2.TCPRouteSpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteStatus"):
-		return &apisv1alpha2.TCPRouteStatusApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TLSRoute"):
-		return &apisv1alpha2.TLSRouteApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteRule"):
-		return &apisv1alpha2.TLSRouteRuleApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteSpec"):
-		return &apisv1alpha2.TLSRouteSpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteStatus"):
-		return &apisv1alpha2.TLSRouteStatusApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("UDPRoute"):
-		return &apisv1alpha2.UDPRouteApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("UDPRouteRule"):
-		return &apisv1alpha2.UDPRouteRuleApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("UDPRouteSpec"):
-		return &apisv1alpha2.UDPRouteSpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("UDPRouteStatus"):
-		return &apisv1alpha2.UDPRouteStatusApplyConfiguration{}
-
-		// Group=gateway.networking.k8s.io, Version=v1alpha3
-	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicy"):
-		return &apisv1alpha3.BackendTLSPolicyApplyConfiguration{}
-	case v1alpha3.SchemeGroupVersion.WithKind("TLSRoute"):
-		return &apisv1alpha3.TLSRouteApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("Gateway"):
