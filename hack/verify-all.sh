@@ -61,6 +61,28 @@ if [[ -n "$PULL_BASE_REF" && "$PULL_BASE_REF" == release-* ]]; then
   EXCLUDE="${EXCLUDE} verify-reports.sh"
 fi
 
+# Check that the tools required by the verify scripts are installed, so that
+# all missing tools are reported up front instead of failing mid-run.
+REQUIRED_TOOLS="go git make python3 docker yq"
+
+MISSING_TOOLS=()
+for tool in $REQUIRED_TOOLS; do
+  if ! command -v "$tool" &> /dev/null; then
+    MISSING_TOOLS+=("$tool")
+  elif [[ "$tool" == "yq" ]] && ! yq --version 2>&1 | grep -q "mikefarah.* v4\."; then
+    MISSING_TOOLS+=("yq (found $(yq --version 2>&1 | head -1), need github.com/mikefarah/yq v4)")
+  fi
+done
+
+if [ ${#MISSING_TOOLS[@]} -ne 0 ]; then
+  echo -e "${color_red}Missing required tools:${color_norm}"
+  for tool in "${MISSING_TOOLS[@]}"; do
+    echo -e "${color_red}- $tool${color_norm}"
+  done
+  echo "See more details in https://gateway-api.sigs.k8s.io/contributing/devguide/#prerequisites"
+  exit 1
+fi
+
 SCRIPTS=$(find "${SCRIPT_ROOT}"/hack -name "verify-*.sh")
 
 ret=0
