@@ -737,7 +737,7 @@ The generated Service exists only to produce EndpointSlices, which is reflected 
 - The `gateway.networking.x-k8s.io/controller-name` annotation MUST be set to the implementation's
   `controllerName` and implementations MUST only reconcile Services carrying their own controller name, allowing
   multiple controllers to coexist.
-- An `ownerReference` SHOULD be set to tie the Service's lifecycle to the Backend.
+- An `ownerReference` MUST be set to tie the Service's lifecycle to the Backend.
 - The Service SHOULD be headless `clusterIP: None` with `targetPort` set to the Backend's port.
 - Service-level behaviors such as `internalTrafficPolicy`, `externalTrafficPolicy`, `sessionAffinity`, and
   `trafficDistribution` play no role as no ClusterIP or kube-proxy load balancing is involved.
