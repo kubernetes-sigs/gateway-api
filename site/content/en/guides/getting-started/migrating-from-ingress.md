@@ -161,7 +161,7 @@ Gateway API has the following primary extension points:
 *   *Custom implementations*. For some features, it is left up to an
     implementation to define how to support them. Those features correspond to the
     implementation-specific
-    (custom)  [conformance level](/docs/concepts/conformance/#2-support-levels). For
+    (custom)  [conformance level](/docs/conformance/#support-levels). For
     example:
     *   The `RegularExpression` type of
         the [HTTPPathMatch](/reference/api-spec/main/spec/#httppathmatch).

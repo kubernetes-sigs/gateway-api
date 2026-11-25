@@ -25,7 +25,7 @@ should be retried and how many times.
 ## Retrying on HTTP status
 
 {{< details title="Extended Support Feature: HTTPRouteRetryCodes" open="true" >}}
-This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/conformance/).
 {{< /details >}}
 
 The following `HTTPRoute` retries any request to `backend-svc` that
@@ -45,7 +45,7 @@ returns a `500`, `503`, or `504`, up to two additional attempts:
 ## Retrying on connection errors
 
 {{< details title="Extended Support Feature: HTTPRouteRetryConnectionError" open="true" >}}
-This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/conformance/).
 {{< /details >}}
 
 When the `retry` field is configured, connection errors (disconnect, reset,
@@ -63,7 +63,7 @@ failures should be masked:
 ## Combining with timeouts
 
 {{< details title="Extended Support Feature: HTTPRouteRetryCodes, HTTPRouteRequestTimeout, HTTPRouteBackendTimeout" open="true" >}}
-This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/conformance/).
 {{< /details >}}
 
 Retries interact with the [`timeouts`](/guides/http-timeouts/) on the same rule:
@@ -82,7 +82,7 @@ to 2s, and retries up to three times:
 ## Configuring backoff between retries
 
 {{< details title="Implementation-specific Feature" open="true" >}}
-This feature is part of implementation-specific support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+This feature is part of implementation-specific support. For more information on support levels, refer to our [conformance guide](/docs/conformance/).
 {{< /details >}}
 
 The `backoff` field sets the base interval the gateway waits before each
