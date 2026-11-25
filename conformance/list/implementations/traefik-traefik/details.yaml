@@ -9,6 +9,6 @@ description: |
   For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-new] or ask for help in the [Traefik Labs Community Forum][traefiklabs-community-forum].
 
   [traefik-proxy]:https://traefik.io
-  [traefik-proxy-gateway-api-doc]:https://doc.traefik.io/traefik/v3.7/reference/install-configuration/providers/kubernetes/kubernetes-gateway
+  [traefik-proxy-gateway-api-doc]:https://doc.traefik.io/traefik/v3.8/reference/install-configuration/providers/kubernetes/kubernetes-gateway
   [traefik-proxy-issue-new]:https://github.com/traefik/traefik/issues/new/choose
   [traefiklabs-community-forum]:https://community.traefik.io/c/traefik/traefik-v3/21

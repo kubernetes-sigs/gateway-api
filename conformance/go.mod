@@ -7,7 +7,6 @@ replace sigs.k8s.io/gateway-api => ../
 require (
 	github.com/google/uuid v1.6.0
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/mod v0.42.0
 	golang.org/x/net v0.62.0
 	golang.org/x/sync v0.24.0
 	google.golang.org/grpc v1.85.0
@@ -16,7 +15,7 @@ require (
 	k8s.io/apimachinery v0.37.2
 	k8s.io/client-go v0.37.2
 	k8s.io/utils v0.0.0-20260626114624-be93311217bd
-	sigs.k8s.io/controller-runtime v0.25.2
+	sigs.k8s.io/controller-runtime v0.25.3
 	sigs.k8s.io/gateway-api v0.0.0-00010101000000-000000000000
 	sigs.k8s.io/gateway-api-conformance-images v0.2.0
 	sigs.k8s.io/yaml v1.6.0

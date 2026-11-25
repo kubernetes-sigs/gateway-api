@@ -7,6 +7,7 @@ implementation:
   - https://www.airlock.com/en/contact
   organization: airlock
   project: microgateway
+  securityContact: security@airlock.com
   url: https://github.com/airlock/microgateway
   version: 4.6.0
 kind: ConformanceReport
