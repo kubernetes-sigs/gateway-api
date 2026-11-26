@@ -1016,6 +1016,90 @@ func TestHTTPRouteRule(t *testing.T) {
 			}},
 		},
 		{
+			name:       "invalid URLRewrite filter (within backendRefs) because path match has type RegularExpression, with two backendRefs",
+			wantErrors: []string{"Within backendRefs, When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
+					{
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  new(gatewayv1.PathMatchRegularExpression),
+							Value: new("/foo"),
+						},
+					},
+				},
+				BackendRefs: []gatewayv1.HTTPBackendRef{
+					{
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterURLRewrite,
+							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
+									ReplacePrefixMatch: new("foo"),
+								},
+							},
+						}},
+					},
+					{
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterURLRewrite,
+							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
+									ReplacePrefixMatch: new("foo"),
+								},
+							},
+						}},
+					},
+				},
+			}},
+		},
+		{
+			name:       "invalid RequestRedirect filter (within backendRefs) because path match has type RegularExpression, with two backendRefs",
+			wantErrors: []string{"Within backendRefs, when using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
+					{
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  new(gatewayv1.PathMatchRegularExpression),
+							Value: new("/foo"),
+						},
+					},
+				},
+				BackendRefs: []gatewayv1.HTTPBackendRef{
+					{
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
+									ReplacePrefixMatch: new("foo"),
+								},
+							},
+						}},
+					},
+					{
+						Name: testService,
+						Port: new(gatewayv1.PortNumber(80)),
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
+									ReplacePrefixMatch: new("foo"),
+								},
+							},
+						}},
+					},
+				},
+			}},
+		},
+		{
 			name:       "rewrite and redirect filters combined (invalid)",
 			wantErrors: []string{"May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both"}, // errCount: 3,
 			rules: []gatewayv1.HTTPRouteRule{{
