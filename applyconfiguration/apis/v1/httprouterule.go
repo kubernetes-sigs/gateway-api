@@ -90,6 +90,13 @@ type HTTPRouteRuleApplyConfiguration struct {
 	// When no rules matching a request have been successfully attached to the
 	// parent a request is coming from, a HTTP 404 status code MUST be returned.
 	//
+	// <gateway:util:excludeFromCRD>
+	// The CEL cost estimator charges a check on path.value for rules x matches
+	// executions, which exceeds the per-expression budget at the 64 rules the
+	// experimental channel allows. The generator hoists it onto the rule there, in
+	// batches of literal match indexes.
+	// <gateway:experimental:validation:levelUpValidation="path.value">
+	// </gateway:util:excludeFromCRD>
 	Matches []HTTPRouteMatchApplyConfiguration `json:"matches,omitempty"`
 	// Filters define the filters that are applied to requests that match
 	// this rule.
