@@ -36,6 +36,8 @@ func init() {
 
 // mustApplyClusterTrustBundleFromCAConfigMap creates a ClusterTrustBundle named ctbName holding
 // the ca.crt of the CA ConfigMap caConfigMapName and registers it for cleanup.
+// ClusterTrustBundles are cluster-scoped, so conformance runners need cluster-wide
+// create/delete RBAC on clustertrustbundles; without it this fails with an opaque 403.
 func mustApplyClusterTrustBundleFromCAConfigMap(t *testing.T, suite *confsuite.ConformanceTestSuite, ctbName, caConfigMapName string) {
 	bundle := kubernetes.MustCreateClusterTrustBundleFromCAConfigMap(t, suite.Client, suite.TimeoutConfig, ctbName,
 		types.NamespacedName{Name: caConfigMapName, Namespace: confsuite.InfrastructureNamespace})
