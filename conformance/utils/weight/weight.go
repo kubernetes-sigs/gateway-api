@@ -243,6 +243,30 @@ func AddRandomEntropy(addRandomValue func(string) error) error {
 	}
 }
 
+// ExpectWeightedDistribution polls TestWeightedDistribution until the
+// observed distribution matches expectedWeights, or fails the test once
+// timeoutConfig.MaxTimeToConsistency elapses.
+//
+// Routes are programmed asynchronously, so samples taken immediately after the
+// manifest is applied can still observe the pre-route distribution. Callers that
+// have no other way to tell that a route has been programmed should use this
+// instead of retrying a fixed number of times, which bounds the wait by how long
+// the samples happen to take rather than by the configured timeout.
+func ExpectWeightedDistribution(t *testing.T, timeoutConfig config.TimeoutConfig, sender RequestSender, expectedWeights map[string]float64) {
+	t.Helper()
+
+	var lastErr error
+	err := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval, timeoutConfig.MaxTimeToConsistency, true,
+		func(_ context.Context) (bool, error) {
+			if lastErr = TestWeightedDistribution(sender, expectedWeights); lastErr == nil {
+				return true, nil
+			}
+			tlog.Logf(t, "traffic distribution does not match the expected weights yet: %s", lastErr)
+			return false, nil
+		})
+	require.NoErrorf(t, err, "traffic distribution did not match the expected weights after %v: %s", timeoutConfig.MaxTimeToConsistency, lastErr)
+}
+
 // ExpectWeightedDistributionBatch polls TestWeightedDistributionBatch until the
 // observed distribution matches expectedWeights, or fails the test once
 // timeoutConfig.MaxTimeToConsistency elapses.
