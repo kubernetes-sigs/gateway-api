@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
 date: "2025-05-19T14:32:51Z"
 gatewayAPIChannel: standard
-gatewayAPIVersion: v1.1.0
+gatewayAPIVersion: v1.123
 implementation:
   contact:
   - https://www.airlock.com/en/contact
