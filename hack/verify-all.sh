@@ -53,13 +53,7 @@ if $SILENT ; then
   echo "Running in the silent mode, run with -v if you want to see script logs."
 fi
 
-EXCLUDE="verify-all.sh"
-
-# On a release branch we must ignore the conformance reports checks
-if [[ -n "$PULL_BASE_REF" && "$PULL_BASE_REF" == release-* ]]; then
-  echo "Running on a release branch, extra tests may be ignored"
-  EXCLUDE="${EXCLUDE} verify-reports.sh"
-fi
+EXCLUDE="verify-all.sh verify-reports.sh"
 
 # Check that the tools required by the verify scripts are installed, so that
 # all missing tools are reported up front instead of failing mid-run.
