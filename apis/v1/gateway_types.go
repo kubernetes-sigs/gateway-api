@@ -1709,6 +1709,8 @@ const (
 	// * "UnsupportedProtocol"
 	// * "NoValidCACertificate"
 	// * "UnsupportedValue"
+	// * "InvalidListenerFilter"
+	// * "InvalidListenerFilterOrder"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -1754,6 +1756,17 @@ const (
 	// Listener uses a value for a field that is not supported by the
 	// implementation
 	ListenerReasonUnsupportedValue ListenerConditionReason = "UnsupportedValue"
+
+	// This reason is used with the "Accepted" condition when a filter in
+	// the Listener's filters.requests is invalid, for example when
+	// implementation-side validation rejects a combination that CEL
+	// validation did not catch.
+	ListenerReasonInvalidListenerFilter ListenerConditionReason = "InvalidListenerFilter"
+
+	// This reason is used with the "Accepted" condition when the
+	// implementation can not execute the filters in the Listener's
+	// filters.requests in the order they are specified.
+	ListenerReasonInvalidListenerFilterOrder ListenerConditionReason = "InvalidListenerFilterOrder"
 )
 
 const (
@@ -1771,6 +1784,7 @@ const (
 	// * "RefNotPermitted"
 	// * "InvalidCACertificateRef"
 	// * "InvalidCACertificateKind"
+	// * "InvalidListenerFilterRef"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -1813,6 +1827,17 @@ const (
 	// CACertificate References used to configure Client Certificate
 	// validation for Gateway has unknown or unsupported kind.
 	ListenerReasonInvalidCACertificateKind ListenerConditionReason = "InvalidCACertificateKind"
+
+	// This reason is used with the "ResolvedRefs" condition when an
+	// ExternalAuth backendRef or an ExtensionRef in the Listener's
+	// filters.requests refers to a resource that does not exist, has an
+	// unsupported group or kind, or is otherwise unresolvable.
+	// This reason must be used only when the reference is allowed, either by
+	// referencing an object in the same namespace as the Gateway, or when
+	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.
+	// If the reference is not allowed, the reason RefNotPermitted must be used
+	// instead.
+	ListenerReasonInvalidListenerFilterRef ListenerConditionReason = "InvalidListenerFilterRef"
 )
 
 const (

@@ -957,11 +957,11 @@ reasons.
 
 ### Conformance
 
-* **Feature name:** `ListenerFilters` (Extended). Implementations
+* **Feature name:** `GatewayListenerFilters` (Extended). Implementations
   advertise support via the standard Gateway API feature list.
 * **Sub-features:** one per permitted filter variant, so an implementation
   can advertise partial support:
-  `ListenerFilterExternalAuth`, `ListenerFilterExtensionRef`.
+  `GatewayListenerFilterExternalAuth`, `GatewayListenerFilterExtensionRef`.
 * **Conformance test-only extension.** Several of the ordering and matching
   tests below require driving a *dynamic* header mutation from within a
   pre-routing filter. Because `RequestHeaderModifier` is excluded from the
@@ -969,7 +969,7 @@ reasons.
   exercise the phase's dynamic-signal property), these tests rely on a
   conformance-scoped `ExtensionRef` (`SetRequestHeader`) provided
   by the Gateway API conformance suite. Implementations claiming
-  `ListenerFilterExtensionRef` conformance MUST recognize this test extension
+  `GatewayListenerFilterExtensionRef` conformance MUST recognize this test extension
   in the conformance test namespace. This mirrors how Gateway API already
   uses test-only extensions to exercise implementation-specific surfaces.
 * **Required conformance tests:**
@@ -994,7 +994,8 @@ reasons.
   5. **Wrong-protocol rejection.** A listener with `Protocol` set to a value
      other than `HTTP` or `HTTPS` (for example, `TCP`) whose `filters`
      field is set MUST be rejected at admission by the CEL validation on
-     the Listener struct.
+     the Listener struct. This is covered by the CEL validation tests
+     rather than by the conformance suite.
   6. **Unresolvable filter reference.** A listener whose `filters.requests`
      contains an `ExternalAuth.backendRef` (or `ExtensionRef`) that does
      not exist MUST have `ResolvedRefs=False`,

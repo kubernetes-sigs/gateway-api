@@ -1,0 +1,48 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-listener-filter-externalauth-unsupported
+  namespace: gateway-conformance-infra
+  annotations:
+    gateway-api/skip-this-for-readiness: "true"
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+      filters:
+        requests:
+          - type: ExternalAuth
+            externalAuth:
+              protocol: HTTP
+              backendRef:
+                name: infra-backend-v1
+                port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-listener-filter-extensionref-unsupported
+  namespace: gateway-conformance-infra
+  annotations:
+    gateway-api/skip-this-for-readiness: "true"
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+      filters:
+        requests:
+          - type: ExtensionRef
+            extensionRef:
+              group: example.com
+              kind: ListenerFilter
+              name: unsupported

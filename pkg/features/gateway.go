@@ -106,6 +106,14 @@ const (
 	// specifying filters on Gateway listeners.
 	SupportGatewayListenerFilters FeatureName = "GatewayListenerFilters"
 
+	// SupportGatewayListenerFilterExternalAuth option indicates support for
+	// the ExternalAuth filter type in Gateway listener filters.
+	SupportGatewayListenerFilterExternalAuth FeatureName = "GatewayListenerFilterExternalAuth"
+
+	// SupportGatewayListenerFilterExtensionRef option indicates support for
+	// the ExtensionRef filter type in Gateway listener filters.
+	SupportGatewayListenerFilterExtensionRef FeatureName = "GatewayListenerFilterExtensionRef"
+
 	// SupportClusterTrustBundle option indicates support for ClusterTrustBundle
 	// references in BackendTLSPolicyValidation and Gateway frontend TLS validation.
 	SupportClusterTrustBundle FeatureName = "ClusterTrustBundle"
@@ -188,6 +196,18 @@ var (
 		Channel: FeatureChannelExperimental,
 	}
 
+	// GatewayListenerFilterExternalAuthFeature contains metadata for the SupportGatewayListenerFilterExternalAuth feature.
+	GatewayListenerFilterExternalAuthFeature = Feature{
+		Name:    SupportGatewayListenerFilterExternalAuth,
+		Channel: FeatureChannelExperimental,
+	}
+
+	// GatewayListenerFilterExtensionRefFeature contains metadata for the SupportGatewayListenerFilterExtensionRef feature.
+	GatewayListenerFilterExtensionRefFeature = Feature{
+		Name:    SupportGatewayListenerFilterExtensionRef,
+		Channel: FeatureChannelExperimental,
+	}
+
 	// ClusterTrustBundleFeature contains metadata for the ClusterTrustBundle
 	// reference feature. It is a union feature: it belongs to both
 	// GatewayExtendedFeatures and BackendTLSPolicyExtendedFeatures, so an
@@ -219,4 +239,6 @@ var GatewayExtendedFeatures = sets.New(
 	ClusterTrustBundleFeature,
 	ListenerSetFeature,
 	GatewayListenerFiltersFeature,
+	GatewayListenerFilterExternalAuthFeature,
+	GatewayListenerFilterExtensionRefFeature,
 )
