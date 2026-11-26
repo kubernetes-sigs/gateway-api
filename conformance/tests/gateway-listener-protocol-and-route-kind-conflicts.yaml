@@ -1,0 +1,71 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tlsroutes-only
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: tls
+    port: 443
+    protocol: TLS
+    hostname: abc.example.com
+    tls:
+      mode: Passthrough
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: TLSRoute
+  - name: conflicted-https
+    port: 8443
+    protocol: HTTPS
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: HTTPRoute
+    tls:
+      certificateRefs:
+      - name: tls-validity-checks-certificate
+  - name: conflicted-tls
+    port: 8443
+    protocol: TLS
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: TLSRoute
+    tls:
+      mode: Passthrough
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: disallowed-kind
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: tlsroutes-only
+    namespace: gateway-conformance-infra
+    sectionName: tls
+  rules:
+  - backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: TLSRoute
+metadata:
+  name: mixed-protocol-conflict-control
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: tlsroutes-only
+    sectionName: tls
+  hostnames:
+  - abc.example.com
+  rules:
+  - backendRefs:
+    - name: tcp-backend
+      port: 8443
