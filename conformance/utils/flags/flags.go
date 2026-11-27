@@ -27,6 +27,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	conformanceconfig "sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/consts"
 )
 
 const (
@@ -108,6 +109,9 @@ func init() {
 	)
 	registerBoolFlag("allow-crds-mismatch", false, "Flag to allow the suite not to fail in case there is a mismatch between CRDs versions and channels.",
 		func(o *suite.ConfigurableOptions, v bool) { o.AllowCRDsMismatch = v },
+	)
+	registerStringFlag("expected-apiversion", consts.BundleVersion, "Expected API version of the CRDs",
+		func(o *suite.ConfigurableOptions, v string) { o.ExpectedAPIVersion = v },
 	)
 	registerStringFlag("conformance-profiles", "", "Comma-separated list of the conformance profiles to run",
 		func(o *suite.ConfigurableOptions, v string) {
