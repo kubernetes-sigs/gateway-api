@@ -1,0 +1,22 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 5293
+name: Dynamic RequestHeaderModifier
+status: Provisional
+authors:
+  - jaellio
+relationships:
+  seeAlso:
+    - number: 5224
+      name: Pre-Routing Filters
+      description: Pre-routing is the phase where a dynamic RequestHeaderModifier
+        is most useful, since the derived header value can then influence route
+        selection.
+    - number: 5091
+      name: Payload Processing Resource
+      description: The parent proposal that first raised body-based header
+        projection; a subset of this GEP's motivation.
+    - number: 5194
+      name: Filter ordering
+      description: Ordering guarantees are load-bearing when a later filter
+        consumes a value produced by an earlier dynamic RequestHeaderModifier.
