@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "autoprefixer": "^10.6.2",
+    "autoprefixer": "^10.7.0",
     "postcss-cli": "^12.0.0"
   }
 }
