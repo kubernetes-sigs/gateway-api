@@ -333,9 +333,9 @@ const (
 	//
 	// Possible reasons for this condition to be False are:
 	//
+	// * "Pending"
 	// * "Invalid"
 	// * "ParentNotProgrammed"
-	// * "ListenersNotValid"
 	//
 	// Additional reasons for this condition to be False are influenced by
 	// child ListenerEntry conditions:
@@ -365,6 +365,7 @@ const (
 	// Possible reasons for this condition to be True are:
 	//
 	// * "Accepted"
+	// * "ListenersNotValid"
 	//
 	// Possible reasons for this condition to be False are:
 	//
@@ -490,6 +491,7 @@ const (
 	// * "PortUnavailable"
 	// * "UnsupportedProtocol"
 	// * "TooManyListeners"
+	// * "Conflicted"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -503,6 +505,11 @@ const (
 	// This reason is used with the "Accepted" condition when the condition is
 	// True.
 	ListenerEntryReasonAccepted ListenerEntryConditionReason = "Accepted"
+
+	// This reason is used with the "Accepted" condition when the
+	// Listener could not be attached to the Gateway because it conflicts
+	// with another listener.
+	ListenerEntryReasonConflicted ListenerEntryConditionReason = "Conflicted"
 
 	// This reason is used with the "Accepted" condition when the
 	// Listener could not be attached to the Gateway because its

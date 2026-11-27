@@ -49,19 +49,19 @@ var ListenerSetHostnameConflict = confsuite.ConformanceTest{
 
 		hostnameConflictedListenerConditions := []metav1.Condition{
 			{
-				Type:   string(gatewayv1.ListenerConditionAccepted),
+				Type:   string(gatewayv1.ListenerEntryConditionAccepted),
 				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonHostnameConflict),
+				Reason: string(gatewayv1.ListenerEntryReasonConflicted),
 			},
 			{
-				Type:   string(gatewayv1.ListenerConditionProgrammed),
+				Type:   string(gatewayv1.ListenerEntryConditionProgrammed),
 				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonHostnameConflict),
+				Reason: "", // any reason
 			},
 			{
-				Type:   string(gatewayv1.ListenerConditionConflicted),
+				Type:   string(gatewayv1.ListenerEntryConditionConflicted),
 				Status: metav1.ConditionTrue,
-				Reason: string(gatewayv1.ListenerReasonHostnameConflict),
+				Reason: string(gatewayv1.ListenerEntryReasonHostnameConflict),
 			},
 		}
 
@@ -110,7 +110,7 @@ var ListenerSetHostnameConflict = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerSetReasonListenersNotValid),
+			Reason: "", // any reason
 		})
 		// The conflicted listener should not be accepted
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, hostnameConflictedListenerConditions, "hostname-conflict-with-gateway-listener")
@@ -120,7 +120,7 @@ var ListenerSetHostnameConflict = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
+			Reason: string(gatewayv1.ListenerSetReasonListenersNotValid),
 		})
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
@@ -141,7 +141,7 @@ var ListenerSetHostnameConflict = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerSetReasonListenersNotValid),
+			Reason: "", // any reason
 		})
 		// The conflicted listener should not be accepted
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, hostnameConflictedListenerConditions, "hostname-conflict-with-listener-set-listener")
