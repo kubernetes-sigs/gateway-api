@@ -110,7 +110,7 @@ var HTTPRouteRequestMultipleMirrors = confsuite.ConformanceTest{
 					t.Fatalf("Invalid query in path: %v", err)
 				}
 				// Start inspecting logs before sending the request
-				waitForMirroredRequests := http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, tc.Request.Path, suite.TimeoutConfig)
+				waitForMirroredRequests := http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, tc.Request.Path, tc.Request.Body, suite.TimeoutConfig)
 				defer waitForMirroredRequests() // clean-up in case we exit below
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 			})

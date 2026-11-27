@@ -33,18 +33,18 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
-func GetMirrorLogRegexp(path string) *regexp.Regexp {
-	return regexp.MustCompile(fmt.Sprintf("Echoing back request made to %s to client", regexp.QuoteMeta(path)))
+func GetMirrorLogRegexp(path string, bodyLength int) *regexp.Regexp {
+	return regexp.MustCompile(fmt.Sprintf("Echoing back request made to %s to client .*content-length: %d$", regexp.QuoteMeta(path), bodyLength))
 }
 
-func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, path string, timeoutConfig config.TimeoutConfig) func() {
+func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, path string, body string, timeoutConfig config.TimeoutConfig) func() {
 	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
 			tlog.Fatalf(t, "Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only check http request mirror.", i)
 		}
 	}
 
-	mirrorLogRegexp := GetMirrorLogRegexp(path)
+	mirrorLogRegexp := GetMirrorLogRegexp(path, len(body))
 
 	var done sync.WaitGroup
 	var started sync.WaitGroup

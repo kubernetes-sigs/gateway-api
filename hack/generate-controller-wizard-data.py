@@ -61,6 +61,7 @@ FEATURE_LABEL_OVERRIDES = {
     "HTTPRouteHostRewrite": {"label": "HTTPRoute Host Rewrite", "description": "Modify the host header of requests forwarded to backends."},
     "HTTPRoutePathRedirect": {"label": "HTTPRoute Path Redirect", "description": "Issue HTTP redirects (e.g. 302) with a modified path."},
     "HTTPRouteRequestMirror": {"label": "HTTPRoute Request Mirror", "description": "Mirror a proportion of traffic to another backend."},
+    "HTTPRouteRequestMirrorBody": {"label": "HTTPRoute Request Mirror Body", "description": "Mirror a proportion of traffic to another backend with body transmission."},
     "HTTPRouteRequestPercentageMirror": {"label": "HTTPRoute Request Percentage Mirror", "description": "Mirror a percentage of requests to another backend."},
     "HTTPRouteResponseHeaderModification": {"label": "HTTPRoute Response Header Modification", "description": "Add, set, or remove response headers."},
     "HTTPRouteCORS": {"label": "HTTPRoute CORS", "description": "CORS policy configuration for HTTPRoute."},
