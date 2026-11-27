@@ -1,4 +1,13 @@
 meshName: "partial-only"
+serviceCIDRs:
+  - "10.96.0.0/12"
+  - "fd00:1234::/108"
+usableClusterNetworkAddresses:
+  - type: IPAddress
+    value: "10.96.0.100"
+unusableClusterNetworkAddresses:
+  - type: IPAddress
+    value: "192.0.2.20"
 timeoutConfig:
   deleteTimeout: "5s"
   requiredConsecutiveSuccesses: 5
