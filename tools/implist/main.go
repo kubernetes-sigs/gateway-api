@@ -33,6 +33,7 @@ import (
 	"slices"
 	"strings"
 	"text/template"
+	"unicode"
 
 	"golang.org/x/mod/semver"
 	"sigs.k8s.io/yaml"
@@ -62,14 +63,17 @@ var (
 // FullNameToHeadingLink transforms an implementation's full name
 // into the canonical Markdown heading link format.
 func FullNameToHeadingLink(fullName string) string {
-	// Spaces to dash
-	out := strings.ReplaceAll(fullName, " ", "-")
-	// Remove all hashes
-	out = strings.ReplaceAll(out, "#", "")
-	// Add the hash prefix
-	out = "#" + out
-	// Make sure it's lower case
-	return strings.ToLower(out)
+	var out strings.Builder
+	out.WriteString("#")
+	for _, r := range strings.ToLower(fullName) {
+		switch {
+		case r == ' ':
+			out.WriteRune('-')
+		case r == '-' || r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r):
+			out.WriteRune(r)
+		}
+	}
+	return out.String()
 }
 
 func main() {
