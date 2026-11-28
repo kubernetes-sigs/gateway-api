@@ -58,10 +58,7 @@ var (
 )
 
 // FullNameToHeadingLink transforms an implementation's full name
-// into the canonical Markdown heading link format: the anchor the site
-// gives the heading, which is lower case, has spaces as dashes, and drops
-// punctuation other than dashes and underscores (an apostrophe in
-// "Example's Gateway" gives "#examples-gateway").
+// into the canonical Markdown heading link format.
 func FullNameToHeadingLink(fullName string) string {
 	var out strings.Builder
 	out.WriteString("#")
